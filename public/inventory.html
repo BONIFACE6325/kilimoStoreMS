@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Inventory — AgroVault ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="assets/style.css"/>
+<style>
+.bin { border-radius:10px;padding:12px 10px;text-align:center;cursor:pointer;border:1.5px solid transparent;transition:all .2s; }
+.bin:hover { transform:scale(1.05);box-shadow:var(--shadow-md); }
+.bin.occupied { background:linear-gradient(135deg,rgba(16,185,129,.15),rgba(16,185,129,.05));border-color:rgba(16,185,129,.3); }
+.bin.full { background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(99,102,241,.05));border-color:rgba(99,102,241,.3); }
+.bin.low { background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(245,158,11,.04));border-color:rgba(245,158,11,.3); }
+.bin.empty { background:var(--surface2);border-color:var(--border); }
+</style>
+</head>
+<body>
+<div class="layout">
+  <div id="nav-mount"></div>
+  <div class="main-area">
+    <div id="top-mount"></div>
+    <div class="page-content">
+
+      <div class="page-header anim-fade-up">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <a href="index.html" style="font-size:13px;color:var(--text3)">Dashboard</a>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg>
+              <span style="font-size:13px;font-weight:600;color:var(--text)">Inventory</span>
+            </div>
+            <div class="page-title">Inventory Management</div>
+            <div class="page-desc">Real-time stock tracking across all warehouse bays</div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-secondary btn-sm" id="btnExportInv">Export CSV</button>
+            <button class="btn btn-primary btn-sm" id="btnNewBatch">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              New Batch
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div id="invKpis" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:24px" class="anim-fade-up anim-delay-1"></div>
+
+      <!-- Map header -->
+      <div class="chart-box anim-fade-up anim-delay-2" style="margin-bottom:20px">
+        <div class="section-header">
+          <div><div class="section-title">Warehouse Bay Map</div><div class="section-sub">Click any bin for details</div></div>
+          <div style="display:flex;gap:14px;font-size:12px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,rgba(16,185,129,.3),rgba(16,185,129,.1));border:1.5px solid rgba(16,185,129,.3)"></div><span style="color:var(--text2)">Occupied</span></div>
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,rgba(99,102,241,.3),rgba(99,102,241,.1));border:1.5px solid rgba(99,102,241,.3)"></div><span style="color:var(--text2)">90%+ Full</span></div>
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(245,158,11,.1));border:1.5px solid rgba(245,158,11,.3)"></div><span style="color:var(--text2)">Low Stock</span></div>
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:3px;background:var(--surface2);border:1.5px solid var(--border)"></div><span style="color:var(--text2)">Empty</span></div>
+          </div>
+        </div>
+        <div id="warehouseMap" style="display:grid;grid-template-columns:1fr 1fr;gap:20px"></div>
+      </div>
+
+      <!-- Batches -->
+      <div class="card anim-fade-up anim-delay-3" style="overflow:hidden">
+        <div style="padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div><div class="section-title">Active Batches</div><div class="section-sub">48 batches currently in storage</div></div>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="batchSearch" placeholder="Search batch…" class="form-input" style="width:180px"/>
+            <select id="gradeFilter" class="form-input form-select" style="width:120px"><option>All Grades</option><option>Grade A</option><option>Grade B</option><option>Grade C</option></select>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead><tr><th>Batch ID</th><th>Farmer</th><th>Crop</th><th>Bay / Bin</th><th>Qty (MT)</th><th>Moisture %</th><th>Grade</th><th>Date In</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="batchBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="addBatchModal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Create New Batch</div>
+      <button id="closeBatchModal" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div><label class="form-label">Farmer *</label><select class="form-input form-select"><option>Select farmer…</option><option>Amina Mwangi</option><option>John Ochieng</option></select></div>
+        <div><label class="form-label">Crop Type *</label><select class="form-input form-select"><option>Select crop…</option><option>Maize</option><option>Rice</option><option>Beans</option></select></div>
+        <div><label class="form-label">Quantity (MT) *</label><input type="number" class="form-input" placeholder="0.00"/></div>
+        <div><label class="form-label">Moisture % *</label><input type="number" class="form-input" placeholder="e.g. 12.5" step="0.1"/></div>
+        <div><label class="form-label">Bay</label><select class="form-input form-select"><option>Auto-assign</option><option>Bay A</option><option>Bay B</option><option>Bay C</option><option>Bay D</option></select></div>
+        <div><label class="form-label">Date Received</label><input type="date" class="form-input"/></div>
+        <div style="grid-column:1/-1"><label class="form-label">Notes</label><textarea class="form-input" rows="2" style="resize:vertical"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cancelBatchModal">Cancel</button>
+      <button class="btn btn-primary" id="submitBatch">Create Batch</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script src="assets/components.js"></script>
+<script>
+renderNav('inventory.html');
+
+let allBatches = [];
+let allBins = [];
+let allFarmers = [];
+
+// Fetch initially
+async function loadInventory() {
+  try {
+    // 1. Fetch Batches
+    const batchesRes = await fetch('/api/v1/batches');
+    allBatches = await batchesRes.json();
+    
+    // 2. Fetch Bins
+    const binsRes = await fetch('/api/v1/bins/map');
+    allBins = await binsRes.json();
+
+    // 3. Fetch Farmers
+    const farmersRes = await fetch('/api/v1/farmers');
+    allFarmers = await farmersRes.json();
+
+    populateFarmersDropdown();
+    renderKPIs();
+    renderWarehouseMap();
+    renderBatchesTable(allBatches);
+
+  } catch (err) {
+    console.error(err);
+    showToast('Failed to load inventory data', 'error');
+  }
+}
+
+function populateFarmersDropdown() {
+  const select = document.querySelector('#addBatchModal select');
+  select.innerHTML = '<option value="">Select farmer…</option>';
+  allFarmers.forEach(f => {
+    select.innerHTML += `<option value="${f.id}">${f.name} (${f.farmer_code})</option>`;
+  });
+}
+
+function renderKPIs() {
+  const totalStock = allBatches.filter(b => b.status === 'stored' || b.status === 'drying').reduce((sum, b) => sum + parseFloat(b.current_weight), 0);
+  const avgMoisture = allBatches.length > 0 ? (allBatches.reduce((sum, b) => sum + parseFloat(b.moisture), 0) / allBatches.length).toFixed(1) : '0';
+  const totalBins = allBins.length;
+  const occupiedBins = allBins.filter(b => b.current_occupancy_mt > 0).length;
+  const occupancyRate = totalBins > 0 ? Math.round((occupiedBins / totalBins) * 100) : 0;
+
+  const invKpis = [
+    [totalStock.toLocaleString() + ' MT', 'Total Stock Stored', '#10b981', 'Active stored grain'],
+    [occupancyRate + '%', 'Occupancy Rate', '#6366f1', `${occupiedBins} of ${totalBins} bins in use`],
+    [allBatches.length.toString(), 'Active Batches', '#d97706', 'Stored + processing'],
+    [avgMoisture + '%', 'Avg. Moisture', '#f97316', 'Target safety: <13.5%'],
+  ];
+
+  const kpiContainer = document.getElementById('invKpis');
+  kpiContainer.innerHTML = '';
+  invKpis.forEach(function(k) {
+    var d = document.createElement('div');
+    d.className = 'kpi-card';
+    d.innerHTML = '<div class="kpi-value" style="color:' + k[2] + ';font-size:22px">' + k[0] + '</div><div class="kpi-label">' + k[1] + '</div><div style="font-size:11.5px;color:var(--text3);margin-top:4px">' + k[3] + '</div>';
+    kpiContainer.appendChild(d);
+  });
+}
+
+function renderWarehouseMap() {
+  const mapContainer = document.getElementById('warehouseMap');
+  mapContainer.innerHTML = '';
+
+  // Group bins into simulated Bays (A, B, C, D)
+  const baysGroup = {
+    'Bay A — Maize': allBins.filter(b => b.name.startsWith('A')),
+    'Bay B — Rice': allBins.filter(b => b.name.startsWith('B')),
+    'Bay C — Beans': allBins.filter(b => b.name.startsWith('C')),
+    'Bay D — Mixed': allBins.filter(b => !b.name.startsWith('A') && !b.name.startsWith('B') && !b.name.startsWith('C'))
+  };
+
+  Object.entries(baysGroup).forEach(([bayName, bins]) => {
+    var bayDiv = document.createElement('div');
+    var label = document.createElement('div');
+    label.style.cssText = 'font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:10px';
+    label.textContent = bayName;
+    bayDiv.appendChild(label);
+    
+    var grid = document.createElement('div');
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:8px';
+    
+    bins.forEach(function(b) {
+      const pct = Math.round((b.current_occupancy_mt / b.capacity_mt) * 100);
+      const pctColor = pct > 90 ? '#4338ca' : pct > 0 ? '#059669' : 'var(--text3)';
+      const statusClass = pct > 90 ? 'full' : pct > 0 ? 'occupied' : 'empty';
+      
+      var binDiv = document.createElement('div');
+      binDiv.className = 'bin ' + statusClass;
+      binDiv.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px">Bin ' + b.name + '</div><div style="font-size:16px;font-weight:800;color:' + pctColor + '">' + (pct===0?'—':pct+'%') + '</div><div style="font-size:9.5px;color:var(--text3);margin-top:2px">' + (b.crop_type || '—') + '</div>';
+      binDiv.onclick = function() { showToast('Bin ' + b.name + ': ' + b.current_occupancy_mt + ' MT occupied out of ' + b.capacity_mt + ' MT capacity.', 'info'); };
+      grid.appendChild(binDiv);
+    });
+    
+    bayDiv.appendChild(grid);
+    mapContainer.appendChild(bayDiv);
+  });
+}
+
+function renderBatchesTable(data) {
+  var batchBody = document.getElementById('batchBody');
+  batchBody.innerHTML = '';
+  if (data.length === 0) {
+    batchBody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--text3);padding:20px 0;">No active batches.</td></tr>';
+    return;
+  }
+  data.forEach(function(b) {
+    var mVal = parseFloat(b.current_weight);
+    var mColor = parseFloat(b.moisture) > 14.5 ? '#dc2626' : parseFloat(b.moisture) > 13.5 ? '#d97706' : '#059669';
+    var sClass = b.status==='stored'?'badge-green':b.status==='drying'?'badge-amber':'badge-indigo';
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td><code style="font-size:12px;color:var(--text3)">' + b.batch_code + '</code></td>'
+      + '<td><div style="display:flex;align-items:center;gap:8px"><div class="avatar avatar-sm">' + b.farmer_name[0] + '</div><strong>' + b.farmer_name + '</strong></div></td>'
+      + '<td><span class="badge badge-green" style="font-size:11px">' + b.crop_type + '</span></td>'
+      + '<td style="color:var(--text3)">Bin ' + b.bin_name + '</td>'
+      + '<td><strong>' + b.current_weight + ' MT</strong></td>'
+      + '<td><span style="color:' + mColor + ';font-weight:600">' + b.moisture + '%</span></td>'
+      + '<td><span class="badge badge-green">Grade A</span></td>'
+      + '<td style="color:var(--text3)">' + b.created_at + '</td>'
+      + '<td><span class="badge ' + sClass + '"><span class="dot"></span>' + b.status + '</span></td>'
+      + '<td><div style="display:flex;gap:6px"><button class="btn btn-secondary btn-sm" style="padding:5px 10px;font-size:12px" onclick="showToast(\'Viewing ' + b.batch_code + ' timeline…\',\'info\')">View</button><button class="btn btn-outline btn-sm" style="padding:5px 10px;font-size:12px" onclick="showToast(\'Requesting transfer…\',\'info\')">Move</button></div></td>';
+    batchBody.appendChild(tr);
+  });
+}
+
+// Create Batch Submit
+document.getElementById('submitBatch').onclick = async function() {
+  const farmerId = document.querySelector('#addBatchModal select:nth-of-type(1)').value;
+  const cropType = document.querySelector('#addBatchModal select:nth-of-type(2)').value;
+  const qty = document.querySelector('#addBatchModal input[type="number"]:nth-of-type(1)').value;
+  const moisture = document.querySelector('#addBatchModal input[type="number"]:nth-of-type(2)').value;
+
+  if (!farmerId || !cropType || !qty || !moisture) {
+    showToast('Please fill in all required fields.', 'error');
+    return;
+  }
+
+  // Pick first available bin of that crop type, or default
+  const suitableBin = allBins.find(b => !b.crop_type || b.crop_type === cropType);
+  const binId = suitableBin ? suitableBin.id : null;
+
+  try {
+    const res = await fetch('/api/v1/batches', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        farmer_id: farmerId,
+        crop_type: cropType,
+        initial_weight_mt: parseFloat(qty),
+        initial_moisture: parseFloat(moisture),
+        bin_id: binId
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Grain batch received successfully!', 'success');
+      document.getElementById('addBatchModal').classList.remove('open');
+      loadInventory();
+    } else {
+      showToast(data.message || 'Intake failed', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Network error during grain intake', 'error');
+  }
+};
+
+// Bind Events
+document.getElementById('btnExportInv').onclick = function() { showToast('Exporting inventory…','info'); };
+document.getElementById('btnNewBatch').onclick = function() { document.getElementById('addBatchModal').classList.add('open'); };
+document.getElementById('closeBatchModal').onclick = function() { document.getElementById('addBatchModal').classList.remove('open'); };
+document.getElementById('cancelBatchModal').onclick = function() { document.getElementById('addBatchModal').classList.remove('open'); };
+document.getElementById('addBatchModal').addEventListener('click', function(e) { if(e.target===this) this.classList.remove('open'); });
+
+document.getElementById('batchSearch').oninput = function() {
+  const q = this.value.toLowerCase();
+  const filtered = allBatches.filter(b => b.batch_code.toLowerCase().includes(q) || b.farmer_name.toLowerCase().includes(q));
+  renderBatchesTable(filtered);
+};
+
+document.addEventListener('DOMContentLoaded', loadInventory);
+</script>
+</body>
+</html>

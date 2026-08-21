@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Inventory — AgroVault ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="assets/style.css"/>
+<style>
+.bin { border-radius:10px;padding:12px 10px;text-align:center;cursor:pointer;border:1.5px solid transparent;transition:all .2s; }
+.bin:hover { transform:scale(1.05);box-shadow:var(--shadow-md); }
+.bin.occupied { background:linear-gradient(135deg,rgba(16,185,129,.15),rgba(16,185,129,.05));border-color:rgba(16,185,129,.3); }
+.bin.full { background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(99,102,241,.05));border-color:rgba(99,102,241,.3); }
+.bin.low { background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(245,158,11,.04));border-color:rgba(245,158,11,.3); }
+.bin.empty { background:var(--surface2);border-color:var(--border); }
+</style>
+</head>
+<body>
+<div class="layout">
+  <div id="nav-mount"></div>
+  <div class="main-area">
+    <div id="top-mount"></div>
+    <div class="page-content">
+
+      <div class="page-header anim-fade-up">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <a href="index.html" style="font-size:13px;color:var(--text3)">Dashboard</a>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg>
+              <span style="font-size:13px;font-weight:600;color:var(--text)">Inventory</span>
+            </div>
+            <div class="page-title">Inventory Management</div>
+            <div class="page-desc">Real-time stock tracking across all warehouse bays</div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-secondary btn-sm" id="btnExportInv">Export CSV</button>
+            <button class="btn btn-primary btn-sm" id="btnNewBatch">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              New Batch
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div id="invKpis" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:24px" class="anim-fade-up anim-delay-1"></div>
+
+      <!-- Map header -->
+      <div class="chart-box anim-fade-up anim-delay-2" style="margin-bottom:20px">
+        <div class="section-header">
+          <div><div class="section-title">Warehouse Bay Map</div><div class="section-sub">Click any bin for details</div></div>
+          <div style="display:flex;gap:14px;font-size:12px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,rgba(16,185,129,.3),rgba(16,185,129,.1));border:1.5px solid rgba(16,185,129,.3)"></div><span style="color:var(--text2)">Occupied</span></div>
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,rgba(99,102,241,.3),rgba(99,102,241,.1));border:1.5px solid rgba(99,102,241,.3)"></div><span style="color:var(--text2)">90%+ Full</span></div>
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(245,158,11,.1));border:1.5px solid rgba(245,158,11,.3)"></div><span style="color:var(--text2)">Low Stock</span></div>
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:3px;background:var(--surface2);border:1.5px solid var(--border)"></div><span style="color:var(--text2)">Empty</span></div>
+          </div>
+        </div>
+        <div id="warehouseMap" style="display:grid;grid-template-columns:1fr 1fr;gap:20px"></div>
+      </div>
+
+      <!-- Batches -->
+      <div class="card anim-fade-up anim-delay-3" style="overflow:hidden">
+        <div style="padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div><div class="section-title">Active Batches</div><div class="section-sub">48 batches currently in storage</div></div>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="batchSearch" placeholder="Search batch…" class="form-input" style="width:180px"/>
+            <select id="gradeFilter" class="form-input form-select" style="width:120px"><option>All Grades</option><option>Grade A</option><option>Grade B</option><option>Grade C</option></select>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead><tr><th>Batch ID</th><th>Farmer</th><th>Crop</th><th>Bay / Bin</th><th>Qty (MT)</th><th>Moisture %</th><th>Grade</th><th>Date In</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="batchBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="addBatchModal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Create New Batch</div>
+      <button id="closeBatchModal" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div><label class="form-label">Farmer *</label><select class="form-input form-select"><option>Select farmer…</option><option>Amina Mwangi</option><option>John Ochieng</option></select></div>
+        <div><label class="form-label">Crop Type *</label><select class="form-input form-select"><option>Select crop…</option><option>Maize</option><option>Rice</option><option>Beans</option></select></div>
+        <div><label class="form-label">Quantity (MT) *</label><input type="number" class="form-input" placeholder="0.00"/></div>
+        <div><label class="form-label">Moisture % *</label><input type="number" class="form-input" placeholder="e.g. 12.5" step="0.1"/></div>
+        <div><label class="form-label">Bay</label><select class="form-input form-select"><option>Auto-assign</option><option>Bay A</option><option>Bay B</option><option>Bay C</option><option>Bay D</option></select></div>
+        <div><label class="form-label">Date Received</label><input type="date" class="form-input"/></div>
+        <div style="grid-column:1/-1"><label class="form-label">Notes</label><textarea class="form-input" rows="2" style="resize:vertical"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cancelBatchModal">Cancel</button>
+      <button class="btn btn-primary" id="submitBatch">Create Batch</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script src="assets/components.js"></script>
+<script>
+renderNav('inventory.html');
+
+// KPIs
+var invKpis = [['84,320 MT','Total Stock','#10b981','↑ 2,100 MT this week'],['73%','Occupancy Rate','#6366f1','27% capacity available'],['48','Active Batches','#d97706','6 pending grading'],['12.4%','Avg. Moisture','#f97316','Target: <13%'],['98.2%','Grade A Quality','#10b981','1.8% rejected']];
+var kpiContainer = document.getElementById('invKpis');
+invKpis.forEach(function(k) {
+  var d = document.createElement('div');
+  d.className = 'kpi-card';
+  d.innerHTML = '<div class="kpi-value" style="color:' + k[2] + ';font-size:22px">' + k[0] + '</div><div class="kpi-label">' + k[1] + '</div><div style="font-size:11.5px;color:var(--text3);margin-top:4px">' + k[3] + '</div>';
+  kpiContainer.appendChild(d);
+});
+
+// Warehouse map
+var bays = [
+  ['Bay A — Maize', [['A1',78,'occupied','Maize'],['A2',91,'full','Maize'],['A3',45,'low','Maize'],['A4',82,'occupied','Maize'],['A5',0,'empty','—'],['A6',67,'occupied','Maize'],['A7',55,'occupied','Maize'],['A8',90,'full','Maize']]],
+  ['Bay B — Rice', [['B1',91,'full','Rice'],['B2',87,'occupied','Rice'],['B3',72,'occupied','Rice'],['B4',0,'empty','—'],['B5',65,'occupied','Rice'],['B6',45,'low','Rice'],['B7',78,'occupied','Rice'],['B8',83,'occupied','Rice']]],
+  ['Bay C — Beans', [['C1',45,'low','Beans'],['C2',32,'low','Beans'],['C3',61,'occupied','Beans'],['C4',48,'low','Beans'],['C5',0,'empty','—'],['C6',0,'empty','—'],['C7',29,'low','Beans'],['C8',55,'occupied','Beans']]],
+  ['Bay D — Mixed', [['D1',62,'occupied','Wheat'],['D2',78,'occupied','Wheat'],['D3',0,'empty','—'],['D4',33,'low','Mixed'],['D5',71,'occupied','Mixed'],['D6',0,'empty','—'],['D7',44,'low','Mixed'],['D8',60,'occupied','Mixed']]],
+];
+var mapContainer = document.getElementById('warehouseMap');
+bays.forEach(function(bay) {
+  var bayDiv = document.createElement('div');
+  var label = document.createElement('div');
+  label.style.cssText = 'font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:10px';
+  label.textContent = bay[0];
+  bayDiv.appendChild(label);
+  var grid = document.createElement('div');
+  grid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:8px';
+  bay[1].forEach(function(b) {
+    var pctColor = b[2]==='full'?'#4338ca':b[2]==='occupied'?'#059669':b[2]==='low'?'#d97706':'var(--text3)';
+    var binDiv = document.createElement('div');
+    binDiv.className = 'bin ' + b[2];
+    binDiv.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px">' + b[0] + '</div><div style="font-size:16px;font-weight:800;color:' + pctColor + '">' + (b[1]===0?'—':b[1]+'%') + '</div><div style="font-size:9.5px;color:var(--text3);margin-top:2px">' + b[3] + '</div>';
+    binDiv.onclick = function() { showToast(b[0] + ': ' + (b[1]===0?'Empty':b[1]+'% full') + ' — ' + b[3], 'info'); };
+    grid.appendChild(binDiv);
+  });
+  bayDiv.appendChild(grid);
+  mapContainer.appendChild(bayDiv);
+});
+
+// Batch table
+var batches = [
+  ['BCH-1142','Amina Mwangi','Maize','Bay A / A2','240','12.1','A','12 Jun 2026','stored'],
+  ['BCH-1141','John Ochieng','Rice','Bay B / B1','180','13.4','A','11 Jun 2026','stored'],
+  ['BCH-1140','Grace Kilimo','Maize','Bay A / A1','320','11.8','A','11 Jun 2026','stored'],
+  ['BCH-1139','Ali Hassan','Beans','Bay C / C3','90','14.2','B','10 Jun 2026','drying'],
+  ['BCH-1138','Mary Njau','Rice','Bay B / B3','210','12.9','A','10 Jun 2026','stored'],
+  ['BCH-1137','Samuel Ngowi','Wheat','Bay D / D1','150','15.1','B','09 Jun 2026','grading'],
+];
+var batchBody = document.getElementById('batchBody');
+batches.forEach(function(b) {
+  var mVal = parseFloat(b[5]);
+  var mColor = mVal > 14 ? '#dc2626' : mVal > 13 ? '#d97706' : '#059669';
+  var gClass = b[6]==='A'?'badge-green':b[6]==='B'?'badge-amber':'badge-red';
+  var sClass = b[8]==='stored'?'badge-green':b[8]==='drying'?'badge-amber':'badge-indigo';
+  var tr = document.createElement('tr');
+  tr.innerHTML = '<td><code style="font-size:12px;color:var(--text3)">' + b[0] + '</code></td>'
+    + '<td><div style="display:flex;align-items:center;gap:8px"><div class="avatar avatar-sm">' + b[1][0] + '</div><strong>' + b[1] + '</strong></div></td>'
+    + '<td><span class="badge badge-green" style="font-size:11px">' + b[2] + '</span></td>'
+    + '<td style="color:var(--text3)">' + b[3] + '</td>'
+    + '<td><strong>' + b[4] + '</strong></td>'
+    + '<td><span style="color:' + mColor + ';font-weight:600">' + b[5] + '%</span></td>'
+    + '<td><span class="badge ' + gClass + '">Grade ' + b[6] + '</span></td>'
+    + '<td style="color:var(--text3)">' + b[7] + '</td>'
+    + '<td><span class="badge ' + sClass + '"><span class="dot"></span>' + b[8] + '</span></td>'
+    + '<td><div style="display:flex;gap:6px"><button class="btn btn-secondary btn-sm" style="padding:5px 10px;font-size:12px" onclick="showToast(\'Viewing ' + b[0] + '…\',\'info\')">View</button><button class="btn btn-outline btn-sm" style="padding:5px 10px;font-size:12px" onclick="showToast(\'Moving batch…\',\'info\')">Move</button></div></td>';
+  batchBody.appendChild(tr);
+});
+
+// Modal
+document.getElementById('btnExportInv').onclick = function() { showToast('Exporting inventory…','info'); };
+document.getElementById('btnNewBatch').onclick = function() { document.getElementById('addBatchModal').classList.add('open'); };
+document.getElementById('closeBatchModal').onclick = function() { document.getElementById('addBatchModal').classList.remove('open'); };
+document.getElementById('cancelBatchModal').onclick = function() { document.getElementById('addBatchModal').classList.remove('open'); };
+document.getElementById('submitBatch').onclick = function() { showToast('Batch created successfully!','success'); document.getElementById('addBatchModal').classList.remove('open'); };
+document.getElementById('addBatchModal').addEventListener('click', function(e) { if(e.target===this) this.classList.remove('open'); });
+document.getElementById('batchSearch').oninput = function() { if(this.value.length > 1) showToast('Searching batches…','info'); };
+</script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Grading — AgroVault ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="assets/style.css"/>
+</head>
+<body>
+<div class="layout">
+  <div id="nav-mount"></div>
+  <div class="main-area">
+    <div id="top-mount"></div>
+    <div class="page-content">
+
+      <div class="page-header anim-fade-up">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <a href="index.html" style="font-size:13px;color:var(--text3)">Dashboard</a>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg>
+              <span style="font-size:13px;font-weight:600;color:var(--text)">Grading</span>
+            </div>
+            <div class="page-title">⭐ Quality Grading &amp; Inspection</div>
+            <div class="page-desc">Inspect batches, record foreign matter, and assign standard grain grades</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:24px" class="anim-fade-up anim-delay-1">
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpiTotalGraded">0</div>
+          <div class="kpi-label">Total Graded Batches</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpiGradeAYield" style="color:var(--emerald-500)">85%</div>
+          <div class="kpi-label">Grade A Share</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpiInspectionRate" style="color:var(--indigo-500)">100%</div>
+          <div class="kpi-label">Inspection Compliance</div>
+        </div>
+      </div>
+
+      <!-- Main Log -->
+      <div class="card anim-fade-up anim-delay-2" style="overflow:hidden">
+        <div style="padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div class="section-title">Grain Batches Pending Inspection</div>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="gradingSearch" placeholder="Search batch…" class="form-input" style="width:200px" oninput="filterTable()"/>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Batch Code</th>
+                <th>Farmer Name</th>
+                <th>Crop</th>
+                <th>Weight (MT)</th>
+                <th>Moisture (%)</th>
+                <th>Current Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="gradingTableBody">
+              <tr>
+                <td colspan="7" style="text-align:center;color:var(--text3);padding:30px 0;">Loading batches...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal to complete grading job -->
+<div id="gradingModal" class="modal-overlay">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title">Record Quality Inspection</div>
+      <button id="closeGradingModal" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="gradingForm" style="display:grid;grid-template-columns:1fr;gap:14px">
+        <input type="hidden" id="gradingBatchId"/>
+        <div>
+          <label class="form-label">Batch Code</label>
+          <input type="text" id="gradingBatchCode" class="form-input" readonly style="background:var(--surface2)"/>
+        </div>
+        <div>
+          <label class="form-label">Quality Grade Assigned *</label>
+          <select id="gradingGrade" class="form-input form-select" required>
+            <option value="A">Grade A (Premium Quality)</option>
+            <option value="B">Grade B (Standard Quality)</option>
+            <option value="C">Grade C (Substandard/Industrial)</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Grading &amp; Lab Fee (TZS) *</label>
+          <input type="number" id="gradingFee" class="form-input" placeholder="e.g. 50000" required/>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cancelGradingModal">Cancel</button>
+      <button class="btn btn-primary" id="saveGradingBtn">Confirm Inspection</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script src="assets/components.js"></script>
+<script>
+renderNav('grading.html');
+
+let allBatches = [];
+
+async function loadData() {
+  try {
+    const res = await fetch('/api/v1/batches');
+    const batches = await res.json();
+    
+    // Stored batches ready to be graded
+    allBatches = batches.filter(b => b.status === 'stored' || b.status === 'received');
+    
+    renderStats();
+    renderTable(allBatches);
+  } catch (err) {
+    console.error(err);
+    showToast('Failed to load grading data', 'error');
+  }
+}
+
+function renderStats() {
+  document.getElementById('kpiTotalGraded').textContent = allBatches.length;
+}
+
+function renderTable(data) {
+  const tbody = document.getElementById('gradingTableBody');
+  tbody.innerHTML = '';
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:20px 0;">No active batches ready for grading.</td></tr>';
+    return;
+  }
+  data.forEach(b => {
+    tbody.innerHTML += `
+      <tr>
+        <td><code style="font-weight:600;color:var(--indigo-600)">${b.batch_code}</code></td>
+        <td><strong>${b.farmer_name}</strong></td>
+        <td><span class="badge badge-green">${b.crop_type}</span></td>
+        <td><strong>${parseFloat(b.current_weight).toLocaleString()} MT</strong></td>
+        <td>${parseFloat(b.moisture).toFixed(1)}%</td>
+        <td><span class="badge badge-indigo"><span class="dot"></span>${b.status}</span></td>
+        <td>
+          <button class="btn btn-primary btn-sm" onclick="openGradingModal('${b.id}', '${b.batch_code}')">Inspect &amp; Grade</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function filterTable() {
+  const query = document.getElementById('gradingSearch').value.toLowerCase();
+  const filtered = allBatches.filter(b => b.batch_code.toLowerCase().includes(query) || b.farmer_name.toLowerCase().includes(query));
+  renderTable(filtered);
+}
+
+const modal = document.getElementById('gradingModal');
+function openGradingModal(id, code) {
+  document.getElementById('gradingBatchId').value = id;
+  document.getElementById('gradingBatchCode').value = code;
+  document.getElementById('gradingGrade').value = 'A';
+  document.getElementById('gradingFee').value = '50000';
+  modal.classList.add('open');
+}
+
+document.getElementById('closeGradingModal').onclick = () => modal.classList.remove('open');
+document.getElementById('cancelGradingModal').onclick = () => modal.classList.remove('open');
+
+document.getElementById('saveGradingBtn').onclick = async (e) => {
+  e.preventDefault();
+  const id = document.getElementById('gradingBatchId').value;
+  const grade = document.getElementById('gradingGrade').value;
+  const fee = parseFloat(document.getElementById('gradingFee').value);
+
+  if (!grade || isNaN(fee)) {
+    showToast('Please fill out all required fields', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/v1/batches/${id}/processing`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'grading',
+        status: 'completed',
+        grade: grade,
+        fee: fee
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(`Batch ${data.batch.batch_code} graded as Grade ${grade}. TZS ${fee.toLocaleString()} fee applied.`, 'success');
+      modal.classList.remove('open');
+      loadData();
+    } else {
+      showToast(data.error || 'Failed to complete grading', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Network error while completing job', 'error');
+  }
+};
+
+document.addEventListener('DOMContentLoaded', loadData);
+</script>
+</body>
+</html>

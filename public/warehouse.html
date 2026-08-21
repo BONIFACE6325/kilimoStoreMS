@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Warehouse — AgroVault ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="assets/style.css"/>
+</head>
+<body>
+<div class="layout">
+  <div id="nav-mount"></div>
+  <div class="main-area">
+    <div id="top-mount"></div>
+    <div class="page-content">
+
+      <div class="page-header anim-fade-up">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <a href="index.html" style="font-size:13px;color:var(--text3)">Dashboard</a>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg>
+              <span style="font-size:13px;font-weight:600;color:var(--text)">Warehouse</span>
+            </div>
+            <div class="page-title">🏭 Warehouse Capacity Planning</div>
+            <div class="page-desc">Manage warehouse bays, storage bins, and track volumetric utilization</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:24px" class="anim-fade-up anim-delay-1">
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpiTotalBins">0</div>
+          <div class="kpi-label">Total Storage Bins</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpiOccupiedBins" style="color:var(--indigo-500)">0</div>
+          <div class="kpi-label">Occupied Bins</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpiGlobalUtilization" style="color:var(--emerald-500)">0.0%</div>
+          <div class="kpi-label">Global Space Utilization</div>
+        </div>
+      </div>
+
+      <!-- Bins Grid -->
+      <div class="section-header anim-fade-up anim-delay-2">
+        <div class="section-title">Warehouse Storage Bays &amp; Silos</div>
+      </div>
+      <div id="binsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-bottom:28px" class="anim-fade-up anim-delay-2">
+        <!-- Dynamic Bin Cards -->
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script src="assets/components.js"></script>
+<script>
+renderNav('warehouse.html');
+
+let allBins = [];
+
+async function loadData() {
+  try {
+    const res = await fetch('/api/v1/bins/map');
+    allBins = await res.json();
+    
+    renderStats();
+    renderBins();
+  } catch (err) {
+    console.error(err);
+    showToast('Failed to load warehouse data', 'error');
+  }
+}
+
+function renderStats() {
+  document.getElementById('kpiTotalBins').textContent = allBins.length;
+  
+  const occupied = allBins.filter(b => b.status !== 'empty').length;
+  document.getElementById('kpiOccupiedBins').textContent = occupied;
+
+  const totalCap = allBins.reduce((sum, b) => sum + parseFloat(b.capacity_mt), 0);
+  const totalOccupancy = allBins.reduce((sum, b) => sum + parseFloat(b.current_occupancy_mt), 0);
+  
+  const globalUtil = totalCap > 0 ? ((totalOccupancy / totalCap) * 100).toFixed(1) : '0.0';
+  document.getElementById('kpiGlobalUtilization').textContent = `${globalUtil}%`;
+}
+
+function renderBins() {
+  const container = document.getElementById('binsGrid');
+  container.innerHTML = '';
+  if (allBins.length === 0) {
+    container.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text3)">No silos or bins mapped.</div>';
+    return;
+  }
+
+  allBins.forEach(b => {
+    const cap = parseFloat(b.capacity_mt);
+    const occ = parseFloat(b.current_occupancy_mt);
+    const utilPct = Math.min(((occ / cap) * 100), 100).toFixed(1);
+    
+    let badgeClass = 'badge-green';
+    let progressColor = '#10b981';
+    
+    if (b.status === 'full') {
+      badgeClass = 'badge-red';
+      progressColor = '#ef4444';
+    } else if (b.status === 'low') {
+      badgeClass = 'badge-amber';
+      progressColor = '#fbbf24';
+    } else if (b.status === 'empty') {
+      badgeClass = 'badge-gray';
+      progressColor = 'var(--border2)';
+    }
+
+    container.innerHTML += `
+      <div class="kpi-card" style="display:flex;flex-direction:column;gap:14px;padding:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:18px;font-weight:800;color:var(--text)">Silo Bin ${b.name}</div>
+          <span class="badge ${badgeClass}">${b.status.toUpperCase()}</span>
+        </div>
+        
+        <div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:4px">Stored Grain Type</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text)">${b.crop_type || 'None (Clean)'}</div>
+        </div>
+
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:6px">
+            <span>Capacity</span>
+            <strong>${occ.toLocaleString()} / ${cap.toLocaleString()} MT</strong>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${utilPct}%;background:${progressColor}"></div>
+          </div>
+          <div style="text-align:right;font-size:11px;color:var(--text3);margin-top:4px">${utilPct}% full</div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+document.addEventListener('DOMContentLoaded', loadData);
+</script>
+</body>
+</html>

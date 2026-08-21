@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Farmers — AgroVault ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="assets/style.css"/>
+</head>
+<body>
+<div class="layout">
+  <div id="nav-mount"></div>
+  <div class="main-area">
+    <div id="top-mount"></div>
+    <div class="page-content">
+
+      <div class="page-header anim-fade-up">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <a href="index.html" style="font-size:13px;color:var(--text3);font-weight:500">Dashboard</a>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg>
+              <span style="font-size:13px;font-weight:600;color:var(--text)">Farmers</span>
+            </div>
+            <div class="page-title">Farmer Management</div>
+            <div class="page-desc">2,418 registered farmers across all regions</div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-secondary btn-sm" id="btnExport">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export
+            </button>
+            <button class="btn btn-primary btn-sm" id="btnAdd">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Farmer
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats chips -->
+      <div id="statsRow" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:24px" class="anim-fade-up anim-delay-1"></div>
+
+      <!-- Filters -->
+      <div class="card anim-fade-up anim-delay-2" style="padding:16px;margin-bottom:20px">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+          <div style="flex:1;min-width:200px;position:relative">
+            <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text3)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="searchInput" placeholder="Search by name, ID, phone…" class="form-input" style="padding-left:38px"/>
+          </div>
+          <select id="regionFilter" class="form-input form-select" style="width:140px">
+            <option value="">All Regions</option>
+            <option>Arusha</option><option>Mwanza</option><option>Dodoma</option>
+            <option>Iringa</option><option>Morogoro</option>
+          </select>
+          <select id="statusFilter" class="form-input form-select" style="width:130px">
+            <option value="">All Status</option><option>Active</option><option>Inactive</option>
+          </select>
+          <select class="form-input form-select" style="width:130px">
+            <option value="">All Crops</option><option>Maize</option><option>Rice</option><option>Beans</option><option>Wheat</option>
+          </select>
+          <button class="btn btn-secondary btn-sm" id="btnClear">Clear</button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="card anim-fade-up anim-delay-3" style="overflow:hidden">
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead><tr>
+              <th><input type="checkbox" id="chkAll" style="accent-color:var(--emerald-500)"/></th>
+              <th>Farmer ID</th><th>Name</th><th>Region</th><th>Phone</th>
+              <th>Crop(s)</th><th>Stock (MT)</th><th>Loan Balance</th><th>Status</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="farmerBody"></tbody>
+          </table>
+        </div>
+        <!-- Pagination -->
+        <div style="padding:14px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div style="font-size:13px;color:var(--text3)">Showing <strong style="color:var(--text)">1–8</strong> of <strong style="color:var(--text)">2,418</strong> farmers</div>
+          <div id="pagination" style="display:flex;gap:6px"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="addFarmerModal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Register New Farmer</div>
+      <button id="btnCloseModal" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:4px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div><label class="form-label">First Name *</label><input type="text" class="form-input" placeholder="e.g. Amina"/></div>
+        <div><label class="form-label">Last Name *</label><input type="text" class="form-input" placeholder="e.g. Mwangi"/></div>
+        <div><label class="form-label">Phone Number *</label><input type="tel" class="form-input" placeholder="+255 7XX XXX XXX"/></div>
+        <div><label class="form-label">National ID</label><input type="text" class="form-input" placeholder="NIDA Number"/></div>
+        <div>
+          <label class="form-label">Region *</label>
+          <select class="form-input form-select">
+            <option>Select region…</option>
+            <option>Arusha</option><option>Mwanza</option><option>Dodoma</option><option>Iringa</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Primary Crop *</label>
+          <select class="form-input form-select">
+            <option>Select crop…</option>
+            <option>Maize</option><option>Rice</option><option>Beans</option><option>Wheat</option>
+          </select>
+        </div>
+        <div style="grid-column:1/-1"><label class="form-label">Physical Address</label><input type="text" class="form-input" placeholder="Village, Ward, District"/></div>
+        <div style="grid-column:1/-1"><label class="form-label">Notes</label><textarea class="form-input" rows="3" placeholder="Additional information…" style="resize:vertical"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="btnCancelModal">Cancel</button>
+      <button class="btn btn-primary" id="btnSubmitFarmer">Register Farmer</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script src="assets/components.js"></script>
+<script>
+renderNav('farmers.html');
+
+// Stats
+var statsData = [['2,418','Total Farmers','#10b981'],['1,986','Active','#10b981'],['432','Inactive','var(--text3)'],['347','With Active Loans','#d97706'],['6','Regions','#6366f1']];
+var statsRow = document.getElementById('statsRow');
+statsData.forEach(function(s) {
+  var d = document.createElement('div');
+  d.className = 'card';
+  d.style.cssText = 'padding:16px;text-align:center';
+  d.innerHTML = '<div style="font-size:22px;font-weight:800;color:' + s[2] + '">' + s[0] + '</div><div style="font-size:12px;color:var(--text3);margin-top:2px;font-weight:500">' + s[1] + '</div>';
+  statsRow.appendChild(d);
+});
+
+// Farmer data
+var farmersData = [
+  ['FRM-001','Amina Mwangi','Arusha','+255 712 345 678','Maize, Beans','2,400','TZS 480,000','active'],
+  ['FRM-002','John Ochieng','Mwanza','+255 713 456 789','Rice','1,890','TZS 0','active'],
+  ['FRM-003','Grace Kilimo','Dodoma','+255 714 567 890','Maize','1,640','TZS 1,200,000','active'],
+  ['FRM-004','Peter Mushi','Iringa','+255 715 678 901','Wheat, Beans','1,210','TZS 350,000','inactive'],
+  ['FRM-005','Mary Njau','Morogoro','+255 716 789 012','Rice','980','TZS 0','active'],
+  ['FRM-006','Ali Hassan','Arusha','+255 717 890 123','Maize','870','TZS 620,000','active'],
+  ['FRM-007','Fatuma Idris','Mwanza','+255 718 901 234','Beans','760','TZS 0','active'],
+  ['FRM-008','Samuel Ngowi','Dodoma','+255 719 012 345','Maize, Rice','640','TZS 900,000','inactive'],
+];
+
+function renderFarmers(data) {
+  var tbody = document.getElementById('farmerBody');
+  tbody.innerHTML = '';
+  data.forEach(function(row) {
+    var id = row[0], n = row[1], r = row[2], ph = row[3], c = row[4], s = row[5], l = row[6], st = row[7];
+    var crops = c.split(', ').map(function(x) { return '<span class="badge badge-green" style="margin-right:3px;font-size:10.5px">' + x + '</span>'; }).join('');
+    var lColor = l === 'TZS 0' ? 'var(--text3)' : '#d97706';
+    var lWeight = l === 'TZS 0' ? '400' : '600';
+    var stClass = st === 'active' ? 'badge-green' : 'badge-gray';
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td><input type="checkbox" style="accent-color:var(--emerald-500)"/></td>'
+      + '<td><code style="font-size:12px;color:var(--text3)">' + id + '</code></td>'
+      + '<td><div style="display:flex;align-items:center;gap:10px"><div class="avatar avatar-sm">' + n[0] + '</div><div><div style="font-weight:600;font-size:13.5px;color:var(--text)">' + n + '</div><div style="font-size:11.5px;color:var(--text3)">' + ph + '</div></div></div></td>'
+      + '<td>' + r + '</td>'
+      + '<td style="color:var(--text3)">' + ph + '</td>'
+      + '<td>' + crops + '</td>'
+      + '<td><strong>' + s + '</strong></td>'
+      + '<td style="color:' + lColor + ';font-weight:' + lWeight + '">' + l + '</td>'
+      + '<td><span class="badge ' + stClass + '"><span class="dot"></span>' + st + '</span></td>'
+      + '<td><div style="display:flex;gap:6px"><button class="btn btn-secondary btn-sm" style="padding:5px 10px;font-size:12px" onclick="showToast(\'Viewing ' + id + '…\',\'info\')">View</button><button class="btn btn-outline btn-sm" style="padding:5px 10px;font-size:12px" onclick="showToast(\'Opening loan form…\',\'info\')">Loan</button></div></td>';
+    tbody.appendChild(tr);
+  });
+}
+renderFarmers(farmersData);
+
+// Pagination
+var pages = ['«','‹','1','2','3','…','24','›','»'];
+var pgDiv = document.getElementById('pagination');
+pages.forEach(function(p, i) {
+  var btn = document.createElement('button');
+  btn.className = 'btn btn-secondary btn-sm';
+  btn.style.cssText = 'padding:5px 10px;font-size:12.5px;' + (p === '1' ? 'background:var(--emerald-500);color:white;border-color:var(--emerald-500)' : '');
+  btn.textContent = p;
+  btn.onclick = function() { showToast('Page ' + p, 'info'); };
+  pgDiv.appendChild(btn);
+});
+
+// Events
+document.getElementById('btnExport').onclick = function() { showToast('Exporting farmer data…','info'); };
+document.getElementById('btnAdd').onclick = function() { document.getElementById('addFarmerModal').classList.add('open'); };
+document.getElementById('btnCloseModal').onclick = function() { document.getElementById('addFarmerModal').classList.remove('open'); };
+document.getElementById('btnCancelModal').onclick = function() { document.getElementById('addFarmerModal').classList.remove('open'); };
+document.getElementById('btnSubmitFarmer').onclick = function() { showToast('Farmer registered successfully!','success'); document.getElementById('addFarmerModal').classList.remove('open'); };
+document.getElementById('btnClear').onclick = function() { showToast('Filters cleared','info'); };
+document.getElementById('chkAll').onchange = function() {
+  document.querySelectorAll('#farmerBody input[type=checkbox]').forEach(function(c) { c.checked = document.getElementById('chkAll').checked; });
+};
+document.getElementById('searchInput').oninput = function() {
+  var q = this.value.toLowerCase();
+  var filtered = q.length > 1 ? farmersData.filter(function(r) { return r[1].toLowerCase().includes(q) || r[2].toLowerCase().includes(q); }) : farmersData;
+  renderFarmers(filtered);
+};
+document.getElementById('addFarmerModal').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+</script>
+</body>
+</html>

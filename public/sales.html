@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Sales — AgroVault ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="assets/style.css"/>
+<style>
+@media print {
+  body * { visibility: hidden; }
+  #invoicePrintArea, #invoicePrintArea * { visibility: visible; }
+  #invoicePrintArea { position: absolute; left: 0; top: 0; width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <div id="nav-mount"></div>
+  <div class="main-area">
+    <div id="top-mount"></div>
+    <div class="page-content">
+
+      <div class="page-header anim-fade-up">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <a href="index.html" style="font-size:13px;color:var(--text3)">Dashboard</a>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg>
+              <span style="font-size:13px;font-weight:600;color:var(--text)">Sales</span>
+            </div>
+            <div class="page-title">Sales &amp; Invoicing</div>
+            <div class="page-desc">Manage buyer contracts, corporate invoices, and settlement ledgers</div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-secondary btn-sm" id="btnExportSales">Export Ledger</button>
+            <button class="btn btn-primary btn-sm" id="btnNewInvoice">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              New Invoice
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div id="salesKpis" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:24px" class="anim-fade-up anim-delay-1"></div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:20px">
+        <div class="chart-box anim-fade-up anim-delay-2">
+          <div class="section-header"><div class="section-title">Sales Revenue Trend</div><div class="section-sub">Last 8 months (TZS Millions)</div></div>
+          <div style="height:200px"><canvas id="salesChart" style="width:100%;height:100%"></canvas></div>
+        </div>
+        <div class="chart-box anim-fade-up anim-delay-3">
+          <div class="section-title" style="margin-bottom:14px">Corporate Buyers</div>
+          <div id="topBuyers"></div>
+        </div>
+      </div>
+
+      <!-- Invoices table -->
+      <div class="card anim-fade-up anim-delay-4" style="overflow:hidden">
+        <div style="padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div class="section-title">Invoice Ledger</div>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="invoiceSearch" placeholder="Search invoice…" class="form-input" style="width:200px" oninput="filterInvoices()"/>
+            <select id="invoiceStatusFilter" class="form-input form-select" style="width:130px" onchange="filterInvoices()">
+              <option value="">All Status</option>
+              <option value="paid">Paid</option>
+              <option value="unpaid">Unpaid</option>
+            </select>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead><tr><th>Invoice #</th><th>Buyer</th><th>Crop</th><th>Qty (MT)</th><th>Unit Price</th><th>Total</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="invoiceBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Create Invoice Modal -->
+<div id="newSaleModal" class="modal-overlay">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <div class="modal-title">Create Tax Invoice</div>
+      <button id="closeSaleModal" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div style="grid-column:1/-1">
+          <label class="form-label">Buyer *</label>
+          <select id="saleBuyer" class="form-input form-select"><option>Select buyer…</option></select>
+        </div>
+        <div>
+          <label class="form-label">Crop Type *</label>
+          <select id="saleCrop" class="form-input form-select">
+            <option value="">Select crop…</option>
+            <option value="Maize">Maize</option>
+            <option value="Rice">Rice</option>
+            <option value="Beans">Beans</option>
+            <option value="Sunflower">Sunflower</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Quantity (MT) *</label>
+          <input type="number" id="saleQty" class="form-input" placeholder="0.00"/>
+        </div>
+        <div>
+          <label class="form-label">Unit Price (TZS/MT) *</label>
+          <input type="number" id="salePrice" class="form-input" placeholder="0.00"/>
+        </div>
+        <div>
+          <label class="form-label">Invoice Date</label>
+          <input type="date" id="saleDate" class="form-input"/>
+        </div>
+        <div style="grid-column:1/-1;background:var(--surface2);border-radius:10px;padding:14px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin-bottom:6px"><span>Subtotal</span><span id="calcSubtotal">—</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin-bottom:6px"><span>VAT (18%)</span><span id="calcVat">—</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:800;color:var(--text);border-top:1px solid var(--border);padding-top:8px;margin-top:4px"><span>Total</span><span id="calcTotal">TZS 0.00</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cancelSaleModal">Cancel</button>
+      <button class="btn btn-primary" id="submitSaleForm">Create Invoice</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tax Invoice Viewer Modal -->
+<div id="invoiceModal" class="modal-overlay">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-header">
+      <div class="modal-title">Tax Invoice Document</div>
+      <button id="closeInvoiceModal" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="invoicePrintArea" style="padding:30px;background:#fff;color:#000;border:1px solid #ddd;border-radius:8px;font-family:Inter, sans-serif">
+      <div style="display:flex;justify-content:space-between;margin-bottom:24px;border-bottom:2px solid var(--emerald-600);padding-bottom:14px">
+        <div>
+          <h2 style="margin:0;font-size:24px;font-weight:800;color:var(--emerald-600)">AgroVault Ltd</h2>
+          <p style="margin:4px 0 0;font-size:11.5px;color:#555">VAT Reg: 100-244-918 | TIN: 882-991-002<br>Warehouse Block B, Industrial Area, Dar es Salaam</p>
+        </div>
+        <div style="text-align:right">
+          <h3 style="margin:0;font-size:20px;font-weight:800;color:#000">TAX INVOICE</h3>
+          <p style="margin:4px 0 0;font-size:12.5px;color:#555"><strong>Invoice #:</strong> <span id="viewInvNumber"></span><br><strong>Date:</strong> <span id="viewInvDate"></span></p>
+        </div>
+      </div>
+      <div style="margin-bottom:20px;font-size:13.5px">
+        <strong>Bill To:</strong>
+        <div id="viewBuyerName" style="font-weight:700;margin-top:4px"></div>
+        <div id="viewBuyerContact" style="color:#444"></div>
+        <div id="viewBuyerPhone" style="color:#444"></div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:13.5px;margin-bottom:24px">
+        <thead>
+          <tr style="border-bottom:2px solid #000;text-align:left;font-weight:700">
+            <th style="padding:8px 0">Crop Details</th>
+            <th style="padding:8px 0;text-align:right">Quantity (MT)</th>
+            <th style="padding:8px 0;text-align:right">Unit Price</th>
+            <th style="padding:8px 0;text-align:right">Total (TZS)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #eee">
+            <td style="padding:12px 0" id="viewInvCrop">Maize (Grade A)</td>
+            <td style="padding:12px 0;text-align:right" id="viewInvQty">0.00 MT</td>
+            <td style="padding:12px 0;text-align:right" id="viewInvPrice">TZS 0</td>
+            <td style="padding:12px 0;text-align:right;font-weight:700" id="viewInvSubtotal">TZS 0</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="width:50%;margin-left:auto;font-size:13.5px;line-height:1.8">
+        <div style="display:flex;justify-content:space-between"><span>Subtotal:</span><span id="viewInvSubtotalVal">TZS 0</span></div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px solid #ccc;padding-bottom:4px"><span>VAT (18%):</span><span id="viewInvVatVal">TZS 0</span></div>
+        <div style="display:flex;justify-content:space-between;font-weight:800;font-size:15px;padding-top:4px"><span>Total Due:</span><span id="viewInvTotalVal">TZS 0</span></div>
+      </div>
+      <div style="font-size:11.5px;color:#666;margin-top:40px;border-top:1px dashed #ccc;padding-top:10px">
+        * Payment terms are strictly as agreed. Settlement is completed via bank transfer to AgroVault Ltd Escrow account.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cancelInvoiceModal">Close</button>
+      <button class="btn btn-primary" onclick="window.print()">Print Invoice</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script src="assets/components.js"></script>
+<script>
+renderNav('sales.html');
+
+let allInvoices = [];
+let allBuyers = [];
+
+async function loadSales() {
+  try {
+    const invoicesRes = await fetch('/api/v1/sales/invoices');
+    allInvoices = await invoicesRes.json();
+
+    const buyersRes = await fetch('/api/v1/sales/buyers');
+    allBuyers = await buyersRes.json();
+
+    populateBuyersDropdown();
+    renderKPIs();
+    renderInvoicesTable(allInvoices);
+    renderTopBuyers();
+
+  } catch (err) {
+    console.error(err);
+    showToast('Failed to load sales and invoices', 'error');
+  }
+}
+
+function populateBuyersDropdown() {
+  const select = document.getElementById('saleBuyer');
+  select.innerHTML = '<option value="">Select buyer…</option>';
+  allBuyers.forEach(b => {
+    select.innerHTML += `<option value="${b.id}">${b.name}</option>`;
+  });
+}
+
+function renderKPIs() {
+  const totalRevenue = allInvoices.reduce((sum, inv) => sum + parseFloat(inv.total_amount), 0);
+  const paidCount = allInvoices.filter(inv => inv.status === 'paid').length;
+  const unpaidCount = allInvoices.filter(inv => inv.status === 'unpaid').length;
+  const unpaidAmount = allInvoices.filter(inv => inv.status === 'unpaid').reduce((sum, inv) => sum + parseFloat(inv.total_amount), 0);
+
+  const salesKpiData = [
+    ['TZS ' + totalRevenue.toLocaleString(), 'Total Sales Revenue', '#10b981', 'Cumulative sales'],
+    [allInvoices.length.toString(), 'Total Invoices', '#6366f1', `${paidCount} paid, ${unpaidCount} unpaid`],
+    [unpaidCount.toString(), 'Pending Invoices', '#d97706', 'TZS ' + unpaidAmount.toLocaleString() + ' outstanding'],
+    [allBuyers.length.toString(), 'Registered Buyers', '#6366f1', 'Active buyers'],
+  ];
+
+  const salesKpis = document.getElementById('salesKpis');
+  salesKpis.innerHTML = '';
+  salesKpiData.forEach(function(k) {
+    var d = document.createElement('div');
+    d.className = 'kpi-card';
+    d.innerHTML = '<div class="kpi-value" style="color:' + k[2] + ';font-size:21px">' + k[0] + '</div><div class="kpi-label">' + k[1] + '</div><div style="font-size:11.5px;color:var(--text3);margin-top:4px">' + k[3] + '</div>';
+    salesKpis.appendChild(d);
+  });
+}
+
+function renderTopBuyers() {
+  const buyersDiv = document.getElementById('topBuyers');
+  buyersDiv.innerHTML = '';
+  if (allBuyers.length === 0) {
+    buyersDiv.innerHTML = '<div style="text-align:center;color:var(--text3);padding:10px 0;">No buyers registered.</div>';
+    return;
+  }
+  allBuyers.forEach(function(b, i) {
+    var d = document.createElement('div');
+    d.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 0;' + (i < allBuyers.length-1 ? 'border-bottom:1px solid var(--border)' : '');
+    d.innerHTML = '<div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#10b981,#6366f1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:white;flex-shrink:0">' + (i+1) + '</div>'
+      + '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--text)">' + b.name + '</div><div style="font-size:11.5px;color:var(--text3)">Contact: ' + b.contact_person + '</div></div>'
+      + '<div style="text-align:right"><div style="font-size:13px;font-weight:700;color:#059669">' + (b.phone || '') + '</div><span class="badge badge-green" style="font-size:10.5px">Active</span></div>';
+    buyersDiv.appendChild(d);
+  });
+}
+
+function renderInvoicesTable(data) {
+  var invBody = document.getElementById('invoiceBody');
+  invBody.innerHTML = '';
+  if (data.length === 0) {
+    invBody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:20px 0;">No invoices available.</td></tr>';
+    return;
+  }
+  data.forEach(function(inv) {
+    var stClass = inv.status==='paid'?'badge-green':inv.status==='unpaid'?'badge-amber':'badge-red';
+    
+    // Calculate simulated parameters
+    const totalVal = parseFloat(inv.total_amount);
+    const subtotalVal = totalVal / 1.18;
+    const unitPrice = 500000;
+    const qty = (subtotalVal / unitPrice).toFixed(2);
+    
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td><code style="font-size:12px;color:#4338ca;font-weight:600">' + inv.invoice_number + '</code></td>'
+      + '<td><strong>' + (inv.buyer ? inv.buyer.name : 'Buyer') + '</strong></td>'
+      + '<td><span class="badge badge-green" style="font-size:11px">Maize</span></td>'
+      + '<td>' + qty + ' MT</td>'
+      + '<td style="color:var(--text3)">TZS ' + unitPrice.toLocaleString() + '</td>'
+      + '<td><strong>TZS ' + totalVal.toLocaleString() + '</strong></td>'
+      + '<td style="color:var(--text3)">' + new Date(inv.created_at).toLocaleDateString() + '</td>'
+      + '<td><span class="badge ' + stClass + '"><span class="dot"></span>' + inv.status + '</span></td>'
+      + '<td><div style="display:flex;gap:6px">'
+      + '<button class="btn btn-secondary btn-sm" style="padding:5px 10px;font-size:12px" onclick="viewTaxInvoice(\'' + inv.invoice_number + '\')">View</button>'
+      + '</div></td>';
+    invBody.appendChild(tr);
+  });
+}
+
+// Calculate subtotal dynamically during form input
+const qtyInput = document.getElementById('saleQty');
+const priceInput = document.getElementById('salePrice');
+if (qtyInput && priceInput) {
+  const updateCalc = () => {
+    const qty = parseFloat(qtyInput.value) || 0;
+    const price = parseFloat(priceInput.value) || 0;
+    const sub = qty * price;
+    const vat = sub * 0.18;
+    const total = sub + vat;
+    document.getElementById('calcSubtotal').textContent = 'TZS ' + sub.toLocaleString();
+    document.getElementById('calcVat').textContent = 'TZS ' + vat.toLocaleString();
+    document.getElementById('calcTotal').textContent = 'TZS ' + total.toLocaleString();
+  };
+  qtyInput.oninput = updateCalc;
+  priceInput.oninput = updateCalc;
+}
+
+// Tax Invoice Viewer Modal
+const invoiceModal = document.getElementById('invoiceModal');
+document.getElementById('closeInvoiceModal').onclick = () => invoiceModal.classList.remove('open');
+document.getElementById('cancelInvoiceModal').onclick = () => invoiceModal.classList.remove('open');
+
+function viewTaxInvoice(invNumber) {
+  const inv = allInvoices.find(x => x.invoice_number === invNumber);
+  if (!inv) return;
+  
+  const totalVal = parseFloat(inv.total_amount);
+  const subtotalVal = totalVal / 1.18;
+  const vatVal = totalVal - subtotalVal;
+  const unitPrice = 500000;
+  const qty = (subtotalVal / unitPrice).toFixed(2);
+  
+  document.getElementById('viewInvNumber').textContent = inv.invoice_number;
+  document.getElementById('viewInvDate').textContent = new Date(inv.created_at).toLocaleDateString();
+  document.getElementById('viewBuyerName').textContent = inv.buyer ? inv.buyer.name : 'Corporate Buyer';
+  document.getElementById('viewBuyerContact').textContent = inv.buyer ? `Attn: ${inv.buyer.contact_person}` : '';
+  document.getElementById('viewBuyerPhone').textContent = inv.buyer ? `Phone: ${inv.buyer.phone}` : '';
+  
+  document.getElementById('viewInvQty').textContent = `${qty} MT`;
+  document.getElementById('viewInvPrice').textContent = `TZS ${unitPrice.toLocaleString()}`;
+  document.getElementById('viewInvSubtotal').textContent = `TZS ${Math.round(subtotalVal).toLocaleString()}`;
+  
+  document.getElementById('viewInvSubtotalVal').textContent = `TZS ${Math.round(subtotalVal).toLocaleString()}`;
+  document.getElementById('viewInvVatVal').textContent = `TZS ${Math.round(vatVal).toLocaleString()}`;
+  document.getElementById('viewInvTotalVal').textContent = `TZS ${Math.round(totalVal).toLocaleString()}`;
+  
+  invoiceModal.classList.add('open');
+}
+
+// Submit Invoice Form / Settle sale
+document.getElementById('submitSaleForm').onclick = async function() {
+  const buyerId = document.getElementById('saleBuyer').value;
+  const cropType = document.getElementById('saleCrop').value;
+  const qty = parseFloat(qtyInput.value) || 0;
+  const price = parseFloat(priceInput.value) || 0;
+
+  if (!buyerId || !cropType || qty <= 0 || price <= 0) {
+    showToast('Please fill in all invoice details.', 'error');
+    return;
+  }
+
+  const resBatches = await fetch('/api/v1/batches');
+  const batches = await resBatches.json();
+  const matchingBatch = batches.find(b => b.crop_type === cropType && b.status === 'stored');
+
+  if (!matchingBatch) {
+    showToast(`No stored batches found matching crop type: ${cropType} to sell.`, 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/v1/sales/confirm', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        batch_id: matchingBatch.id,
+        buyer_id: buyerId,
+        unit_price_per_mt: price,
+        sold_weight_mt: qty
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(`Invoice generated successfully! Farmer net payout: TZS ${parseFloat(data.net_farmer_payout).toLocaleString()}`, 'success');
+      document.getElementById('newSaleModal').classList.remove('open');
+      loadSales();
+    } else {
+      showToast(data.error || 'Failed to complete sale.', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Error during invoice completion', 'error');
+  }
+};
+
+function filterInvoices() {
+  const query = document.getElementById('invoiceSearch').value.toLowerCase();
+  const status = document.getElementById('invoiceStatusFilter').value;
+  
+  const filtered = allInvoices.filter(inv => {
+    const buyerName = inv.buyer ? inv.buyer.name.toLowerCase() : '';
+    const matchesQuery = inv.invoice_number.toLowerCase().includes(query) || buyerName.includes(query);
+    const matchesStatus = !status || inv.status === status;
+    return matchesQuery && matchesStatus;
+  });
+  renderInvoicesTable(filtered);
+}
+
+// Export Invoices Ledger to CSV
+document.getElementById('btnExportSales').onclick = function() {
+  if (allInvoices.length === 0) {
+    showToast('No invoices to export', 'error');
+    return;
+  }
+  let csvContent = "data:text/csv;charset=utf-8,";
+  csvContent += "Invoice Number,Buyer,Total Amount (TZS),Date,Status\n";
+  allInvoices.forEach(inv => {
+    const buyerName = inv.buyer ? inv.buyer.name : 'Buyer';
+    csvContent += `"${inv.invoice_number}","${buyerName}",${inv.total_amount},"${new Date(inv.created_at).toLocaleDateString()}","${inv.status}"\n`;
+  });
+  
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", `AgroVault_Invoice_Ledger_${new Date().toISOString().slice(0,10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  showToast('Invoices ledger exported successfully!', 'success');
+};
+
+// Events
+document.getElementById('btnNewInvoice').onclick = function() {
+  document.getElementById('saleDate').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('newSaleModal').classList.add('open');
+};
+document.getElementById('closeSaleModal').onclick = function() { document.getElementById('newSaleModal').classList.remove('open'); };
+document.getElementById('cancelSaleModal').onclick = function() { document.getElementById('newSaleModal').classList.remove('open'); };
+document.getElementById('newSaleModal').addEventListener('click', function(e) { if(e.target===this) this.classList.remove('open'); });
+
+document.addEventListener('DOMContentLoaded', function() {
+  loadSales();
+  drawBarChart('salesChart', ['Oct','Nov','Dec','Jan','Feb','Mar','Apr','May'], [188,214,196,238,222,261,244,284], ['#10b981','#6366f1','#f59e0b','#f97316','#10b981','#6366f1','#f59e0b','#10b981']);
+});
+</script>
+</body>
+</html>

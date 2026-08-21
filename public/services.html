@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Services Catalog — AgroVault ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="assets/style.css"/>
+<style>
+  .service-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+  }
+  .service-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px var(--shadow-color);
+  }
+  .service-price {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--emerald-500);
+    margin: 8px 0;
+  }
+  .service-meta {
+    font-size: 12px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <div id="nav-mount"></div>
+  <div class="main-area">
+    <div id="top-mount"></div>
+    <div class="page-content">
+
+      <div class="page-header anim-fade-up">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;width:100%">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <a href="index.html" style="font-size:13px;color:var(--text3)" data-lang-en="Dashboard" data-lang-sw="Mwanzo">Dashboard</a>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg>
+              <span style="font-size:13px;font-weight:600;color:var(--text)" data-lang-en="Services Catalog" data-lang-sw="Orodha ya Huduma">Services Catalog</span>
+            </div>
+            <div class="page-title" data-lang-en="🛠️ Services & Rates Catalog" data-lang-sw="🛠️ Usimamizi wa Ada na Huduma">🛠️ Services & Rates Catalog</div>
+            <div class="page-desc" data-lang-en="Define, register, and update pricing formulas for Galanoki services" data-lang-sw="Sanidi, sajili na uhuishe fomula za bei za huduma za Galanoki">Define, register, and update pricing formulas for Galanoki services</div>
+          </div>
+          <div>
+            <button class="btn btn-primary" onclick="openAddModal()" data-lang-en="+ Register New Service" data-lang-sw="+ Sajili Huduma Mpya">+ Register New Service</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Stats -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:24px" class="anim-fade-up anim-delay-1">
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpiTotalServices">0</div>
+          <div class="kpi-label" data-lang-en="Total Configured Services" data-lang-sw="Jumla ya Huduma">Total Configured Services</div>
+        </div>
+      </div>
+
+      <!-- Services Grid -->
+      <div id="servicesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-bottom:28px" class="anim-fade-up anim-delay-2">
+        <!-- Dynamic cards load here -->
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Add / Edit Modal -->
+<div id="serviceModal" class="modal-overlay" style="z-index:10000">
+  <div class="modal" style="max-width:450px; width:95%">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle" data-lang-en="Register Service" data-lang-sw="Sajili Huduma">Register Service</div>
+      <button onclick="closeModal()" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="display:flex; flex-direction:column; gap:12px">
+      <input type="hidden" id="serviceId"/>
+      <input type="hidden" id="categorySelect" value="milling"/>
+      
+      <div>
+        <label class="form-label" data-lang-en="Service Name (Swahili) *" data-lang-sw="Jina la Huduma (Kiswahili) *">Jina la Huduma (Kiswahili) *</label>
+        <input type="text" id="nameSw" class="form-input" style="padding:8px" placeholder="e.g. Kukoboa Mpunga" required/>
+      </div>
+
+      <div>
+        <label class="form-label" data-lang-en="Service Name (English)" data-lang-sw="Jina la Huduma (Kiingereza)">Jina la Huduma (Kiingereza)</label>
+        <input type="text" id="nameEn" class="form-input" style="padding:8px" placeholder="e.g. Milling Paddy"/>
+      </div>
+
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px">
+          <label class="form-label" data-lang-en="Crop Type" data-lang-sw="Aina ya Zao">Aina ya Zao</label>
+          <a href="#" onclick="openQuickCropModal(); return false;" style="font-size:11px; color:var(--emerald-500); text-decoration:none; font-weight:600">+ Sajili Zao</a>
+        </div>
+        <select id="cropSelect" class="form-input form-select" style="padding:8px; width:100%">
+          <option value="">Zote (All)</option>
+        </select>
+      </div>
+
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px">
+          <label class="form-label" data-lang-en="Pricing Unit *" data-lang-sw="Kipimo cha Bei *">Kipimo cha Bei *</label>
+          <a href="#" onclick="openQuickUnitModal(); return false;" style="font-size:11px; color:var(--emerald-500); text-decoration:none; font-weight:600">+ Sajili Vipimo</a>
+        </div>
+        <select id="unitSelect" class="form-input form-select" style="padding:8px; width:100%"></select>
+      </div>
+
+      <div>
+        <label class="form-label" data-lang-en="Rate per Unit (Tsh) *" data-lang-sw="Bei kwa Kipimo (Tsh) *">Bei kwa Kipimo (Tsh) *</label>
+        <input type="number" step="0.01" id="rateInput" class="form-input" style="padding:8px" placeholder="e.g. 70" required/>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()" data-lang-en="Cancel" data-lang-sw="Ghairi">Ghairi</button>
+      <button class="btn btn-primary" onclick="saveService()" id="btnSaveSubmit" data-lang-en="Save Service" data-lang-sw="Hifadhi Huduma">Hifadhi Huduma</button>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Crop Modal -->
+<div id="quickCropModal" class="modal-overlay" style="z-index: 11000">
+  <div class="modal" style="max-width:350px; width:90%; background: var(--surface); padding: 20px; border-radius: 12px; box-shadow: var(--shadow-lg);">
+    <div class="modal-header" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: none; padding: 0;">
+      <div class="modal-title" style="font-weight: 700; color: var(--text); font-size: 16px;">Sajili Zao Jipya</div>
+      <button onclick="closeQuickCropModal()" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="display:flex; flex-direction:column; gap:12px; padding: 0;">
+      <div>
+        <label class="form-label" style="font-size:12px; margin-bottom: 4px; display: block;">Jina la Zao *</label>
+        <input type="text" id="newCropName" class="form-input" placeholder="e.g. Rice, Beans" style="padding:8px; width:100%"/>
+      </div>
+      <div style="font-size:12px; font-weight:600; color:var(--text2); margin-top:8px">Mazao Yaliyopo:</div>
+      <div id="cropListContainer" style="max-height:120px; overflow-y:auto; display:flex; flex-direction:column; gap:6px"></div>
+    </div>
+    <div class="modal-footer" style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px; border-top: none; padding: 0;">
+      <button class="btn btn-secondary" onclick="closeQuickCropModal()" style="padding: 6px 12px; font-size: 12px;">Ghairi</button>
+      <button class="btn btn-primary" onclick="saveQuickCrop()" style="padding: 6px 12px; font-size: 12px;">Sajili</button>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Unit Modal -->
+<div id="quickUnitModal" class="modal-overlay" style="z-index: 11000">
+  <div class="modal" style="max-width:350px; width:90%; background: var(--surface); padding: 20px; border-radius: 12px; box-shadow: var(--shadow-lg);">
+    <div class="modal-header" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: none; padding: 0;">
+      <div class="modal-title" style="font-weight: 700; color: var(--text); font-size: 16px;">Sajili Kipimo Kipya</div>
+      <button onclick="closeQuickUnitModal()" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="display:flex; flex-direction:column; gap:12px; padding: 0;">
+      <div>
+        <label class="form-label" style="font-size:12px; margin-bottom: 4px; display: block;">Jina la Kipimo *</label>
+        <input type="text" id="newUnitName" class="form-input" placeholder="e.g. Sado, Gunia, Kilo" style="padding:8px; width:100%"/>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; margin:4px 0 8px 0">
+        <input type="checkbox" id="unitUnknownWeight" style="cursor:pointer; width:16px; height:16px"/>
+        <label for="unitUnknownWeight" style="font-size:12px; color:var(--text2); cursor:pointer; user-select:none">Uzito haujulikani hadi ukobolewe (e.g. Mpunga)</label>
+      </div>
+      <div style="font-size:12px; font-weight:600; color:var(--text2); margin-top:8px">Vipimo Vilivyopo:</div>
+      <div id="unitListContainer" style="max-height:120px; overflow-y:auto; display:flex; flex-direction:column; gap:6px"></div>
+    </div>
+    <div class="modal-footer" style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px; border-top: none; padding: 0;">
+      <button class="btn btn-secondary" onclick="closeQuickUnitModal()" style="padding: 6px 12px; font-size: 12px;">Ghairi</button>
+      <button class="btn btn-primary" onclick="saveQuickUnit()" style="padding: 6px 12px; font-size: 12px;">Sajili</button>
+    </div>
+  </div>
+</div>
+
+<!-- Custom Confirmation Modal -->
+<div id="deleteConfirmModal" class="modal-overlay" style="z-index: 12000">
+  <div class="modal" style="max-width:380px; width:90%; background: var(--surface); padding: 24px; border-radius: 12px; box-shadow: var(--shadow-lg); text-align: center;">
+    <div style="color: var(--red-500); margin-bottom: 12px;">
+      <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin: 0 auto;">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+    </div>
+    <div class="modal-title" style="font-weight: 700; color: var(--text); font-size: 16px; margin-bottom: 8px;" id="deleteConfirmTitle">Futa Kipengele</div>
+    <div style="font-size: 13px; color: var(--text2); margin-bottom: 20px;" id="deleteConfirmMessage">Je, una uhakika unataka kukifuta kipengele hiki?</div>
+    <div style="display: flex; justify-content: center; gap: 10px;">
+      <button class="btn btn-secondary" onclick="closeDeleteConfirmModal()" style="padding: 8px 16px; font-size: 13px;">Ghairi</button>
+      <button class="btn btn-primary" id="btnDeleteConfirmAction" style="background: var(--red-500); border-color: var(--red-500); color: white; padding: 8px 16px; font-size: 13px;">Futa</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script src="assets/components.js"></script>
+<script>
+renderNav('services.html');
+
+let allServices = [];
+
+async function loadServices() {
+  try {
+    const res = await fetch('/api/v1/services');
+    allServices = await res.json();
+    
+    renderKPIs();
+    renderGrid();
+  } catch (err) {
+    console.error(err);
+    showToast('Failed to load services', 'error');
+  }
+}
+
+function renderKPIs() {
+  document.getElementById('kpiTotalServices').textContent = allServices.length;
+}
+
+function renderGrid() {
+  const container = document.getElementById('servicesGrid');
+  container.innerHTML = '';
+  
+  if (allServices.length === 0) {
+    container.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--text3);padding:40px" data-lang-en="No services registered." data-lang-sw="Hakuna huduma iliyosajiliwa.">Hakuna huduma iliyosajiliwa.</div>`;
+    return;
+  }
+
+  allServices.forEach(s => {
+    const name = currentLang === 'sw' ? s.name_sw : s.name_en;
+    const unitName = s.unit || 'Kg';
+
+    container.innerHTML += `
+      <div class="service-card anim-fade-up">
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
+            <span class="service-meta" style="background:var(--border-light); padding:2px 8px; border-radius:4px; color:var(--text3)">Kipimo: ${unitName}</span>
+            <span class="service-meta" style="background:var(--emerald-500); padding:2px 8px; border-radius:4px; color:white">${s.crop_type || 'Zote'}</span>
+          </div>
+          <h3 style="margin:0; font-size:16px; font-weight:700; color:var(--text)">${name}</h3>
+        </div>
+        
+        <div>
+          <div class="service-price">Tsh ${parseFloat(s.rate).toLocaleString()}</div>
+          <div style="display:flex; gap:8px; margin-top:12px">
+            <button class="btn btn-secondary btn-sm" style="flex:1; padding:6px" onclick="openEditModal('${s.id}')" data-lang-en="Edit" data-lang-sw="Hariri">Hariri</button>
+            <button class="btn btn-outline btn-sm" style="border-color:var(--red-500); color:var(--red-500); padding:6px" onclick="deleteService('${s.id}')" data-lang-en="Delete" data-lang-sw="Futa">Futa</button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+function openAddModal() {
+  document.getElementById('serviceId').value = '';
+  document.getElementById('nameSw').value = '';
+  document.getElementById('nameEn').value = '';
+  document.getElementById('categorySelect').value = 'milling';
+  document.getElementById('cropSelect').value = '';
+  document.getElementById('rateInput').value = '';
+  
+  renderUnitSelectOptions();
+  renderCropSelectOptions();
+  
+  document.getElementById('modalTitle').textContent = currentLang === 'sw' ? 'Sajili Huduma Mpya' : 'Register New Service';
+  document.getElementById('serviceModal').classList.add('open');
+}
+
+function openEditModal(id) {
+  const s = allServices.find(x => x.id === id);
+  if (!s) return;
+
+  document.getElementById('serviceId').value = s.id;
+  document.getElementById('nameSw').value = s.name_sw;
+  document.getElementById('nameEn').value = s.name_en;
+  document.getElementById('categorySelect').value = s.category;
+  
+  renderUnitSelectOptions();
+  renderCropSelectOptions();
+  document.getElementById('cropSelect').value = s.crop_type || '';
+  document.getElementById('unitSelect').value = s.unit;
+  document.getElementById('rateInput').value = s.rate;
+  
+  document.getElementById('modalTitle').textContent = currentLang === 'sw' ? 'Hariri Huduma' : 'Edit Service';
+  document.getElementById('serviceModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('serviceModal').classList.remove('open');
+}
+
+async function saveService() {
+  const id = document.getElementById('serviceId').value;
+  const nameSw = document.getElementById('nameSw').value.trim();
+  const nameEn = document.getElementById('nameEn').value.trim() || nameSw;
+  const category = document.getElementById('categorySelect').value;
+  const cropType = document.getElementById('cropSelect').value;
+  const unit = document.getElementById('unitSelect').value;
+  const rate = parseFloat(document.getElementById('rateInput').value);
+
+  if (!nameSw || isNaN(rate)) {
+    showToast(currentLang === 'sw' ? 'Tafadhali jaza jina la Kiswahili na bei' : 'Please fill Swahili name and price', 'error');
+    return;
+  }
+
+  const data = {
+    name_sw: nameSw,
+    name_en: nameEn,
+    category: category,
+    crop_type: cropType || null,
+    unit: unit,
+    rate: rate,
+    description: ''
+  };
+
+  try {
+    const url = id ? `/api/v1/services/${id}` : '/api/v1/services';
+    const method = id ? 'PUT' : 'POST';
+    
+    const res = await fetch(url, {
+      method: method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    
+    const resData = await res.json();
+    if (resData.success) {
+      showToast(currentLang === 'sw' ? 'Huduma imehifadhiwa!' : 'Service saved successfully!', 'success');
+      closeModal();
+      await loadServices();
+    } else {
+      showToast(resData.message || 'Error occurred', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Failed to save service', 'error');
+  }
+}
+
+function deleteService(id) {
+  const title = currentLang === 'sw' ? 'Futa Huduma' : 'Delete Service';
+  const msg = currentLang === 'sw' ? 'Je, una uhakika unataka kufuta huduma hii?' : 'Are you sure you want to delete this service?';
+  
+  showDeleteConfirmModal(title, msg, async () => {
+    try {
+      const res = await fetch(`/api/v1/services/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        showToast(currentLang === 'sw' ? 'Huduma imefutwa!' : 'Service deleted successfully!', 'success');
+        await loadServices();
+      } else {
+        showToast(data.message || 'Error occurred', 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to delete service', 'error');
+    }
+  });
+}
+
+// Custom confirmation modal implementation
+let onDeleteConfirmCallback = null;
+
+function showDeleteConfirmModal(title, message, callback) {
+  document.getElementById('deleteConfirmTitle').textContent = title;
+  document.getElementById('deleteConfirmMessage').textContent = message;
+  onDeleteConfirmCallback = callback;
+  document.getElementById('deleteConfirmModal').classList.add('open');
+}
+
+function closeDeleteConfirmModal() {
+  document.getElementById('deleteConfirmModal').classList.remove('open');
+  onDeleteConfirmCallback = null;
+}
+
+// Quick Unit Modal JavaScript implementation
+function openQuickUnitModal() {
+  document.getElementById('newUnitName').value = '';
+  document.getElementById('unitUnknownWeight').checked = false;
+  renderModalUnitList();
+  document.getElementById('quickUnitModal').classList.add('open');
+}
+
+function closeQuickUnitModal() {
+  document.getElementById('quickUnitModal').classList.remove('open');
+}
+
+function renderModalUnitList() {
+  const unitsStr = localStorage.getItem('agroUnitsList');
+  let units = [
+    { name: 'Kilo (Kg)', kg: 1 },
+    { name: 'Gunia (Bag)', kg: 100 },
+    { name: 'Roba', kg: 50 },
+    { name: 'Tani (Ton)', kg: 1000 }
+  ];
+  if (unitsStr) {
+    try { units = JSON.parse(unitsStr); } catch (e) {}
+  }
+  
+  const container = document.getElementById('unitListContainer');
+  if (!container) return;
+  
+  container.innerHTML = units.map(u => {
+    const uName = typeof u === 'string' ? u : u.name;
+    const uKg = typeof u === 'string' ? getKgWeightForUnitName(u) : (typeof u.kg === 'number' ? u.kg : 1);
+    const desc = uKg === 0 ? 'Uzito haujulikani' : `1 = ${uKg} Kg`;
+    return `
+      <div style="display:flex; justify-content:space-between; align-items:center; background:var(--surface2); padding:6px 10px; border-radius:6px; font-size:12px; margin-top:2px">
+        <span style="color:var(--text)">${uName} (${desc})</span>
+        <a href="#" onclick="deleteUnit('${uName.replace(/'/g, "\\'")}', ${uKg}); return false;" style="color:var(--red-500); font-weight:600; text-decoration:none; font-size:11px">Futa</a>
+      </div>
+    `;
+  }).join('');
+}
+
+function deleteUnit(unitName, kg) {
+  const title = currentLang === 'sw' ? 'Futa Kipimo' : 'Delete Unit';
+  const desc = kg === 0 ? (currentLang === 'sw' ? 'Uzito haujulikani' : 'Unknown weight') : `1 = ${kg} Kg`;
+  const msg = currentLang === 'sw' 
+    ? `Je, una uhakika unataka kufuta kipimo cha "${unitName}" (${desc})?` 
+    : `Are you sure you want to delete unit "${unitName}" (${desc})?`;
+  
+  showDeleteConfirmModal(title, msg, () => {
+    const unitsStr = localStorage.getItem('agroUnitsList');
+    let units = [
+      { name: 'Kilo (Kg)', kg: 1 },
+      { name: 'Gunia (Bag)', kg: 100 },
+      { name: 'Roba', kg: 50 },
+      { name: 'Tani (Ton)', kg: 1000 }
+    ];
+    if (unitsStr) {
+      try { units = JSON.parse(unitsStr); } catch (e) {}
+    }
+    units = units.filter(u => {
+      const uName = typeof u === 'string' ? u : u.name;
+      const uKg = typeof u === 'string' ? getKgWeightForUnitName(u) : (typeof u.kg === 'number' ? u.kg : 1);
+      return !(uName === unitName && uKg === kg);
+    });
+    localStorage.setItem('agroUnitsList', JSON.stringify(units));
+    renderUnitSelectOptions();
+    renderModalUnitList();
+    showToast(currentLang === 'sw' ? 'Kipimo kimefutwa!' : 'Unit deleted!', 'success');
+  });
+}
+
+function getKgWeightForUnitName(name) {
+  const nameLower = name.toLowerCase().trim();
+  if (nameLower.includes('kilo') || nameLower === 'kg') return 1;
+  if (nameLower.includes('gunia') || nameLower.includes('bag')) return 100;
+  if (nameLower.includes('roba')) return 50;
+  if (nameLower.includes('tani') || nameLower.includes('ton')) return 1000;
+  if (nameLower.includes('sado')) return 4;
+  if (nameLower.includes('pishi')) return 2;
+  if (nameLower.includes('lumbesa')) return 150;
+  
+  const match = nameLower.match(/(\d+(?:\.\d+)?)\s*k/);
+  if (match) return parseFloat(match[1]);
+  
+  const matchPure = nameLower.match(/(\d+(?:\.\d+)?)/);
+  if (matchPure) return parseFloat(matchPure[1]);
+  
+  return 1;
+}
+
+function saveQuickUnit() {
+  const name = document.getElementById('newUnitName').value.trim();
+  if (!name) {
+    showToast('Tafadhali jaza jina la kipimo', 'error');
+    return;
+  }
+  const isUnknown = document.getElementById('unitUnknownWeight').checked;
+  const kg = isUnknown ? 0 : getKgWeightForUnitName(name);
+  
+  const unitsStr = localStorage.getItem('agroUnitsList');
+  let units = [
+    { name: 'Kilo (Kg)', kg: 1 },
+    { name: 'Gunia (Bag)', kg: 100 },
+    { name: 'Roba', kg: 50 },
+    { name: 'Tani (Ton)', kg: 1000 }
+  ];
+  if (unitsStr) {
+    try { units = JSON.parse(unitsStr); } catch (e) {}
+  }
+  
+  const exists = units.some(u => {
+    const uName = typeof u === 'string' ? u : u.name;
+    const uKg = typeof u === 'string' ? getKgWeightForUnitName(u) : (typeof u.kg === 'number' ? u.kg : 1);
+    const uIsUnknown = (uKg === 0);
+    return uName.toLowerCase() === name.toLowerCase() && uIsUnknown === isUnknown;
+  });
+  
+  if (exists) {
+    showToast(currentLang === 'sw' ? 'Kipimo chenye sifa hizi tayari kimesajiliwa!' : 'A unit with these properties is already registered!', 'error');
+    return;
+  }
+  
+  units.push({ name, kg });
+  localStorage.setItem('agroUnitsList', JSON.stringify(units));
+  
+  renderUnitSelectOptions();
+  
+  const select = document.getElementById('unitSelect');
+  if (select) {
+    select.value = name;
+  }
+  
+  renderModalUnitList();
+  closeQuickUnitModal();
+  showToast('Kipimo kipya kimesajiliwa!', 'success');
+}
+
+function renderUnitSelectOptions() {
+  const unitsStr = localStorage.getItem('agroUnitsList');
+  let units = [
+    { name: 'Kilo (Kg)', kg: 1 },
+    { name: 'Gunia (Bag)', kg: 100 },
+    { name: 'Roba', kg: 50 },
+    { name: 'Tani (Ton)', kg: 1000 }
+  ];
+  if (unitsStr) {
+    try { units = JSON.parse(unitsStr); } catch (e) {}
+  }
+  const select = document.getElementById('unitSelect');
+  if (select) {
+    select.innerHTML = units.map(u => {
+      const uName = typeof u === 'string' ? u : u.name;
+      const uKg = typeof u === 'string' ? getKgWeightForUnitName(u) : (typeof u.kg === 'number' ? u.kg : 1);
+      const display = uKg === 0 ? `${uName} (Uzito haujulikani)` : `${uName} (1 = ${uKg} Kg)`;
+      return `<option value="${uName}">${display}</option>`;
+    }).join('');
+  }
+}
+
+// --- Quick Crop Logic ---
+function renderCropSelectOptions() {
+  const cropSelects = ['cropSelect'];
+  let crops = [];
+  try { crops = JSON.parse(localStorage.getItem('agroCropsList')) || ['Maize', 'Rice', 'Beans', 'Sunflower']; } 
+  catch(e){ crops = ['Maize', 'Rice', 'Beans', 'Sunflower']; }
+  
+  cropSelects.forEach(id => {
+    const sel = document.getElementById(id);
+    if(sel) {
+      const currentVal = sel.value;
+      sel.innerHTML = '<option value="">Zote (All)</option>';
+      crops.forEach(c => {
+        const o = document.createElement('option');
+        o.value = c; o.textContent = c;
+        sel.appendChild(o);
+      });
+      if(crops.includes(currentVal)) sel.value = currentVal;
+    }
+  });
+
+  const listContainer = document.getElementById('cropListContainer');
+  if(listContainer) {
+    listContainer.innerHTML = '';
+    crops.forEach(c => {
+      const d = document.createElement('div');
+      d.style = 'padding:6px 10px; background:var(--surface2); border-radius:6px; font-size:12px; display:flex; justify-content:space-between; align-items:center';
+      d.innerHTML = `<span>${c}</span> <button onclick="deleteCrop('${c.replace(/'/g, "\\'")}')" style="background:none;border:none;color:var(--red-500);cursor:pointer;font-weight:600;font-size:11px;text-decoration:none">Futa</button>`;
+      listContainer.appendChild(d);
+    });
+  }
+}
+
+function openQuickCropModal() {
+  document.getElementById('newCropName').value = '';
+  renderCropSelectOptions();
+  document.getElementById('quickCropModal').classList.add('open');
+}
+
+function closeQuickCropModal() {
+  document.getElementById('quickCropModal').classList.remove('open');
+}
+
+function saveQuickCrop() {
+  const val = document.getElementById('newCropName').value.trim();
+  if(!val) return;
+  let crops = [];
+  try { crops = JSON.parse(localStorage.getItem('agroCropsList')) || ['Maize', 'Rice', 'Beans', 'Sunflower']; } 
+  catch(e){ crops = ['Maize', 'Rice', 'Beans', 'Sunflower']; }
+  
+  if(!crops.includes(val)) {
+    crops.push(val);
+    localStorage.setItem('agroCropsList', JSON.stringify(crops));
+    renderCropSelectOptions();
+    document.getElementById('newCropName').value = '';
+    showToast('Zao limesajiliwa', 'success');
+    closeQuickCropModal();
+  } else {
+    showToast('Zao hili tayari lipo', 'error');
+  }
+}
+
+function deleteCrop(name) {
+  const title = currentLang === 'sw' ? 'Futa Zao' : 'Delete Crop';
+  const msg = currentLang === 'sw' 
+    ? `Je, una uhakika unataka kufuta zao la "${name}"?` 
+    : `Are you sure you want to delete crop "${name}"?`;
+  
+  showDeleteConfirmModal(title, msg, () => {
+    let crops = [];
+    try { crops = JSON.parse(localStorage.getItem('agroCropsList')) || ['Maize', 'Rice', 'Beans', 'Sunflower']; } 
+    catch(e){ crops = ['Maize', 'Rice', 'Beans', 'Sunflower']; }
+    
+    crops = crops.filter(c => c !== name);
+    localStorage.setItem('agroCropsList', JSON.stringify(crops));
+    renderCropSelectOptions();
+    showToast(currentLang === 'sw' ? 'Zao limefutwa' : 'Crop deleted', 'success');
+  });
+}
+// ------------------------
+
+// Bind custom confirmation click handler & initialize
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('btnDeleteConfirmAction');
+  if (btn) {
+    btn.onclick = function() {
+      if (onDeleteConfirmCallback) {
+        onDeleteConfirmCallback();
+      }
+      closeDeleteConfirmModal();
+    };
+  }
+  loadServices();
+});
+</script>
+</body>
+</html>

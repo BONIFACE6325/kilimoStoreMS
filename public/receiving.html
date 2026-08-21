@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Receiving — AgroVault ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="assets/style.css"/>
+<style>
+@media print {
+  body * { visibility: hidden; }
+  #receiptPrintArea, #receiptPrintArea * { visibility: visible; }
+  #receiptPrintArea { position: absolute; left: 0; top: 0; width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <div id="nav-mount"></div>
+  <div class="main-area">
+    <div id="top-mount"></div>
+    <div class="page-content">
+
+      <div class="page-header anim-fade-up">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <a href="index.html" style="font-size:13px;color:var(--text3)">Dashboard</a>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg>
+              <span style="font-size:13px;font-weight:600;color:var(--text)">Receiving</span>
+            </div>
+            <div class="page-title">📥 Receiving &amp; Intake</div>
+            <div class="page-desc">Record inbound grain deliveries, check moisture levels, and issue receipts</div>
+          </div>
+          <button class="btn btn-primary btn-sm" id="btnNewIntake">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Intake Receipt
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:24px" class="anim-fade-up anim-delay-1">
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpiTotalIntakes">0</div>
+          <div class="kpi-label">Total Intakes</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpiAvgMoisture" style="color:var(--indigo-500)">0.0%</div>
+          <div class="kpi-label">Average Moisture</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpiTotalWeight" style="color:var(--emerald-500)">0 MT</div>
+          <div class="kpi-label">Total Weight Received</div>
+        </div>
+      </div>
+
+      <!-- Main Log -->
+      <div class="card anim-fade-up anim-delay-2" style="overflow:hidden">
+        <div style="padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div class="section-title">Intake Records</div>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="intakeSearch" placeholder="Search batch or farmer…" class="form-input" style="width:220px" oninput="filterTable()"/>
+            <select id="cropFilter" class="form-input form-select" style="width:130px" onchange="filterTable()">
+              <option value="">All Crops</option>
+              <option value="Maize">Maize</option>
+              <option value="Rice">Rice</option>
+              <option value="Beans">Beans</option>
+              <option value="Sunflower">Sunflower</option>
+            </select>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Batch Code</th>
+                <th>Farmer Name</th>
+                <th>Crop Type</th>
+                <th>Variety</th>
+                <th>Weight (MT)</th>
+                <th>Moisture (%)</th>
+                <th>Date Received</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="intakeTableBody">
+              <tr>
+                <td colspan="9" style="text-align:center;color:var(--text3);padding:30px 0;">Loading intakes...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal to Record Intake -->
+<div id="intakeModal" class="modal-overlay">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-header">
+      <div class="modal-title">Record New Intake</div>
+      <button id="closeIntakeModal" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="intakeForm" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div style="grid-column:1/-1">
+          <label class="form-label">Farmer *</label>
+          <select id="intakeFarmer" class="form-input form-select" required>
+            <option value="">Select Farmer...</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Crop Type *</label>
+          <select id="intakeCrop" class="form-input form-select" required>
+            <option value="">Select Crop...</option>
+            <option value="Maize">Maize</option>
+            <option value="Rice">Rice</option>
+            <option value="Beans">Beans</option>
+            <option value="Sunflower">Sunflower</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Variety</label>
+          <input type="text" id="intakeVariety" class="form-input" placeholder="e.g. Katumani"/>
+        </div>
+        <div>
+          <label class="form-label">Weight (MT) *</label>
+          <input type="number" id="intakeWeight" step="0.01" class="form-input" placeholder="0.00" required/>
+        </div>
+        <div>
+          <label class="form-label">Moisture (%) *</label>
+          <input type="number" id="intakeMoisture" step="0.1" class="form-input" placeholder="12.5" required/>
+        </div>
+        <div style="grid-column:1/-1">
+          <label class="form-label">Storage Bin Placement (Optional)</label>
+          <select id="intakeBin" class="form-input form-select">
+            <option value="">Auto-Assign Bin</option>
+          </select>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cancelIntakeModal">Cancel</button>
+      <button class="btn btn-primary" id="saveIntakeBtn">Record intake</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal to Print Receipt -->
+<div id="receiptModal" class="modal-overlay">
+  <div class="modal" style="max-width:580px">
+    <div class="modal-header">
+      <div class="modal-title">AgroVault Intake Receipt</div>
+      <button id="closeReceiptModal" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="receiptPrintArea" style="padding:30px;background:#fff;color:#000;border:1px solid #ddd;border-radius:8px">
+      <div style="text-align:center;margin-bottom:24px">
+        <h2 style="margin:0;font-size:24px;font-weight:800;color:var(--emerald-600)">AgroVault ERP</h2>
+        <p style="margin:4px 0 0;font-size:12px;color:#666">Grain Storage &amp; Processing System</p>
+      </div>
+      <div style="display:flex;justify-content:between;margin-bottom:20px;font-size:13px;border-bottom:1px solid #eee;padding-bottom:12px">
+        <div>
+          <div><strong>Farmer Code:</strong> <span id="recFarmerCode"></span></div>
+          <div><strong>Farmer Name:</strong> <span id="recFarmerName"></span></div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <div><strong>Receipt #:</strong> <span id="recBatchCode"></span></div>
+          <div><strong>Date:</strong> <span id="recDate"></span></div>
+        </div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:24px">
+        <thead>
+          <tr style="border-bottom:2px solid #000;text-align:left">
+            <th style="padding:6px 0">Crop Type</th>
+            <th style="padding:6px 0">Variety</th>
+            <th style="padding:6px 0;text-align:right">Moisture</th>
+            <th style="padding:6px 0;text-align:right">Net Weight</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #eee">
+            <td style="padding:10px 0" id="recCrop"></td>
+            <td style="padding:10px 0" id="recVariety"></td>
+            <td style="padding:10px 0;text-align:right" id="recMoisture"></td>
+            <td style="padding:10px 0;text-align:right;font-weight:700" id="recWeight"></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="font-size:12px;color:#555;line-height:1.6;margin-bottom:30px">
+        * Batches with moisture levels exceeding 13.5% will be routed to the drying queue. Storage charges apply at TZS 500 per Metric Ton (MT) per day.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;font-size:13px;text-align:center;margin-top:20px">
+        <div style="border-top:1px dashed #999;padding-top:6px">Authorized Signature</div>
+        <div style="border-top:1px dashed #999;padding-top:6px">Farmer Signature</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cancelReceiptModal">Close</button>
+      <button class="btn btn-primary" onclick="window.print()">Print Receipt</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script src="assets/components.js"></script>
+<script>
+renderNav('receiving.html');
+
+let allBatches = [];
+let allFarmers = [];
+let allBins = [];
+
+async function loadData() {
+  try {
+    const batchesRes = await fetch('/api/v1/batches');
+    allBatches = await batchesRes.json();
+    
+    const farmersRes = await fetch('/api/v1/farmers');
+    allFarmers = await farmersRes.json();
+    
+    const binsRes = await fetch('/api/v1/bins/map');
+    allBins = await binsRes.json();
+
+    populateDropdowns();
+    renderStats();
+    renderTable(allBatches);
+  } catch (err) {
+    console.error(err);
+    showToast('Failed to load data', 'error');
+  }
+}
+
+function populateDropdowns() {
+  const fSelect = document.getElementById('intakeFarmer');
+  fSelect.innerHTML = '<option value="">Select Farmer...</option>';
+  allFarmers.forEach(f => {
+    fSelect.innerHTML += `<option value="${f.id}">${f.name} (${f.farmer_code})</option>`;
+  });
+
+  const bSelect = document.getElementById('intakeBin');
+  bSelect.innerHTML = '<option value="">Auto-Assign Bin</option>';
+  allBins.forEach(b => {
+    bSelect.innerHTML += `<option value="${b.id}">${b.name} (${b.crop_type || 'Empty'} - Occupancy: ${b.current_occupancy_mt} MT)</option>`;
+  });
+}
+
+function renderStats() {
+  document.getElementById('kpiTotalIntakes').textContent = allBatches.length;
+  
+  const totalWeight = allBatches.reduce((sum, b) => sum + parseFloat(b.current_weight), 0);
+  document.getElementById('kpiTotalWeight').textContent = `${totalWeight.toLocaleString()} MT`;
+
+  const avgMoisture = allBatches.length > 0 
+    ? (allBatches.reduce((sum, b) => sum + parseFloat(b.moisture), 0) / allBatches.length).toFixed(1)
+    : '0.0';
+  document.getElementById('kpiAvgMoisture').textContent = `${avgMoisture}%`;
+}
+
+function renderTable(data) {
+  const tbody = document.getElementById('intakeTableBody');
+  tbody.innerHTML = '';
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:20px 0;">No intakes recorded.</td></tr>';
+    return;
+  }
+  data.forEach(b => {
+    let stClass = 'badge-green';
+    if (b.status === 'received') stClass = 'badge-blue';
+    else if (b.status === 'drying') stClass = 'badge-amber';
+    else if (b.status === 'sold') stClass = 'badge-gray';
+
+    tbody.innerHTML += `
+      <tr>
+        <td><code style="font-weight:600;color:var(--indigo-600)">${b.batch_code}</code></td>
+        <td><strong>${b.farmer_name}</strong></td>
+        <td><span class="badge badge-green">${b.crop_type}</span></td>
+        <td>${b.variety || 'N/A'}</td>
+        <td><strong>${parseFloat(b.current_weight).toLocaleString()} MT</strong></td>
+        <td>${parseFloat(b.moisture).toFixed(1)}%</td>
+        <td style="color:var(--text3)">${b.created_at}</td>
+        <td><span class="badge ${stClass}"><span class="dot"></span>${b.status}</span></td>
+        <td>
+          <button class="btn btn-secondary btn-sm" onclick="showReceiptModal('${b.batch_code}', '${b.farmer_name}', '${b.crop_type}', '${b.variety || 'N/A'}', '${parseFloat(b.current_weight).toLocaleString()} MT', '${parseFloat(b.moisture).toFixed(1)}%', '${b.created_at}')">Print Receipt</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function filterTable() {
+  const query = document.getElementById('intakeSearch').value.toLowerCase();
+  const crop = document.getElementById('cropFilter').value;
+  
+  const filtered = allBatches.filter(b => {
+    const matchesQuery = b.batch_code.toLowerCase().includes(query) || b.farmer_name.toLowerCase().includes(query);
+    const matchesCrop = !crop || b.crop_type === crop;
+    return matchesQuery && matchesCrop;
+  });
+  renderTable(filtered);
+}
+
+// Receipt Modal display
+const receiptModal = document.getElementById('receiptModal');
+document.getElementById('closeReceiptModal').onclick = () => receiptModal.classList.remove('open');
+document.getElementById('cancelReceiptModal').onclick = () => receiptModal.classList.remove('open');
+
+function showReceiptModal(batchCode, farmerName, crop, variety, weight, moisture, date) {
+  document.getElementById('recBatchCode').textContent = batchCode;
+  document.getElementById('recFarmerName').textContent = farmerName;
+  
+  // Find matching farmer code
+  const farmer = allFarmers.find(f => f.name === farmerName);
+  document.getElementById('recFarmerCode').textContent = farmer ? farmer.farmer_code : 'N/A';
+  
+  document.getElementById('recCrop').textContent = crop;
+  document.getElementById('recVariety').textContent = variety;
+  document.getElementById('recWeight').textContent = weight;
+  document.getElementById('recMoisture').textContent = moisture;
+  document.getElementById('recDate').textContent = date;
+  
+  receiptModal.classList.add('open');
+}
+
+// Modal handling
+const modal = document.getElementById('intakeModal');
+document.getElementById('btnNewIntake').onclick = () => modal.classList.add('open');
+document.getElementById('closeIntakeModal').onclick = () => modal.classList.remove('open');
+document.getElementById('cancelIntakeModal').onclick = () => modal.classList.remove('open');
+
+document.getElementById('saveIntakeBtn').onclick = async (e) => {
+  e.preventDefault();
+  const farmerId = document.getElementById('intakeFarmer').value;
+  const cropType = document.getElementById('intakeCrop').value;
+  const variety = document.getElementById('intakeVariety').value;
+  const weight = parseFloat(document.getElementById('intakeWeight').value);
+  const moisture = parseFloat(document.getElementById('intakeMoisture').value);
+  const binId = document.getElementById('intakeBin').value;
+
+  if (!farmerId || !cropType || isNaN(weight) || isNaN(moisture)) {
+    showToast('Please fill out all required fields', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/v1/batches', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        farmer_id: farmerId,
+        crop_type: cropType,
+        variety: variety,
+        initial_weight_mt: weight,
+        initial_moisture: moisture,
+        bin_id: binId || null
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Intake recorded successfully!', 'success');
+      modal.classList.remove('open');
+      document.getElementById('intakeForm').reset();
+      loadData();
+    } else {
+      showToast(data.error || 'Failed to save intake', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Network error while saving intake', 'error');
+  }
+};
+
+document.addEventListener('DOMContentLoaded', loadData);
+</script>
+</body>
+</html>

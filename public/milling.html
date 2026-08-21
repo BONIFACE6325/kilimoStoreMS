@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Milling — AgroVault ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="assets/style.css"/>
+</head>
+<body>
+<div class="layout">
+  <div id="nav-mount"></div>
+  <div class="main-area">
+    <div id="top-mount"></div>
+    <div class="page-content">
+
+      <div class="page-header anim-fade-up">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <a href="index.html" style="font-size:13px;color:var(--text3)">Dashboard</a>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg>
+              <span style="font-size:13px;font-weight:600;color:var(--text)">Milling</span>
+            </div>
+            <div class="page-title">⚙️ Milling Operations</div>
+            <div class="page-desc">Track hulling, polishing, and milling output for all grains</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:24px" class="anim-fade-up anim-delay-1">
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpiActiveMill">3</div>
+          <div class="kpi-label">Active Millers</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpiTotalMilled" style="color:var(--indigo-500)">0 MT</div>
+          <div class="kpi-label">Total Grains Milled</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpiAvgMillingYield" style="color:var(--emerald-500)">92.4%</div>
+          <div class="kpi-label">Average Milling Yield</div>
+        </div>
+      </div>
+
+      <!-- Main Log -->
+      <div class="card anim-fade-up anim-delay-2" style="overflow:hidden">
+        <div style="padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div class="section-title">Stored Batches Available for Milling</div>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="millingSearch" placeholder="Search batch…" class="form-input" style="width:200px" oninput="filterTable()"/>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Batch Code</th>
+                <th>Farmer Name</th>
+                <th>Crop</th>
+                <th>Variety</th>
+                <th>Input Weight (MT)</th>
+                <th>Moisture (%)</th>
+                <th>Batch Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="millingTableBody">
+              <tr>
+                <td colspan="8" style="text-align:center;color:var(--text3);padding:30px 0;">Loading batches for milling...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal to complete milling job -->
+<div id="millingModal" class="modal-overlay">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title">Complete Milling Job</div>
+      <button id="closeMillingModal" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="millingForm" style="display:grid;grid-template-columns:1fr;gap:14px">
+        <input type="hidden" id="millingBatchId"/>
+        <div>
+          <label class="form-label">Batch Code</label>
+          <input type="text" id="millingBatchCode" class="form-input" readonly style="background:var(--surface2)"/>
+        </div>
+        <div>
+          <label class="form-label">Input Weight (MT)</label>
+          <input type="number" id="millingInputWeight" class="form-input" readonly style="background:var(--surface2)"/>
+        </div>
+        <div>
+          <label class="form-label">Output Weight (MT) *</label>
+          <input type="number" step="0.01" id="millingOutputWeight" class="form-input" placeholder="e.g. 220.0" required/>
+          <div style="font-size:11.5px;color:var(--text3);margin-top:4px">Output weight should account for cleaning &amp; husk loss.</div>
+        </div>
+        <div>
+          <label class="form-label">Milling Service Fee (TZS) *</label>
+          <input type="number" id="millingFee" class="form-input" placeholder="e.g. 150000" required/>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cancelMillingModal">Cancel</button>
+      <button class="btn btn-primary" id="saveMillingBtn">Confirm Completion</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script src="assets/components.js"></script>
+<script>
+renderNav('milling.html');
+
+let allBatches = [];
+
+async function loadData() {
+  try {
+    const res = await fetch('/api/v1/batches');
+    const batches = await res.json();
+    
+    // Stored batches that can be milled
+    allBatches = batches.filter(b => b.status === 'stored' || b.status === 'received');
+    
+    renderStats();
+    renderTable(allBatches);
+  } catch (err) {
+    console.error(err);
+    showToast('Failed to load milling data', 'error');
+  }
+}
+
+function renderStats() {
+  const milledCount = allBatches.filter(b => b.status === 'milled').length;
+  const totalWeight = allBatches.reduce((sum, b) => sum + parseFloat(b.current_weight), 0);
+  document.getElementById('kpiTotalMilled').textContent = `${totalWeight.toLocaleString()} MT`;
+}
+
+function renderTable(data) {
+  const tbody = document.getElementById('millingTableBody');
+  tbody.innerHTML = '';
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:20px 0;">No stored batches found ready for milling.</td></tr>';
+    return;
+  }
+  data.forEach(b => {
+    tbody.innerHTML += `
+      <tr>
+        <td><code style="font-weight:600;color:var(--indigo-600)">${b.batch_code}</code></td>
+        <td><strong>${b.farmer_name}</strong></td>
+        <td><span class="badge badge-green">${b.crop_type}</span></td>
+        <td>${b.variety || 'N/A'}</td>
+        <td><strong>${parseFloat(b.current_weight).toLocaleString()} MT</strong></td>
+        <td>${parseFloat(b.moisture).toFixed(1)}%</td>
+        <td><span class="badge badge-green"><span class="dot"></span>${b.status}</span></td>
+        <td>
+          <button class="btn btn-primary btn-sm" onclick="openMillingModal('${b.id}', '${b.batch_code}', '${b.current_weight}')">Process Mill</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function filterTable() {
+  const query = document.getElementById('millingSearch').value.toLowerCase();
+  const filtered = allBatches.filter(b => b.batch_code.toLowerCase().includes(query) || b.farmer_name.toLowerCase().includes(query));
+  renderTable(filtered);
+}
+
+const modal = document.getElementById('millingModal');
+function openMillingModal(id, code, weight) {
+  document.getElementById('millingBatchId').value = id;
+  document.getElementById('millingBatchCode').value = code;
+  document.getElementById('millingInputWeight').value = weight;
+  
+  // Set default output weight to 92% of input weight (typical recovery)
+  const defaultOutput = (parseFloat(weight) * 0.92).toFixed(2);
+  document.getElementById('millingOutputWeight').value = defaultOutput;
+  
+  // Set default milling fee: 600 TZS per MT
+  const defaultFee = Math.round(parseFloat(weight) * 600);
+  document.getElementById('millingFee').value = defaultFee;
+  
+  modal.classList.add('open');
+}
+
+document.getElementById('closeMillingModal').onclick = () => modal.classList.remove('open');
+document.getElementById('cancelMillingModal').onclick = () => modal.classList.remove('open');
+
+document.getElementById('saveMillingBtn').onclick = async (e) => {
+  e.preventDefault();
+  const id = document.getElementById('millingBatchId').value;
+  const outputWeight = parseFloat(document.getElementById('millingOutputWeight').value);
+  const fee = parseFloat(document.getElementById('millingFee').value);
+
+  if (isNaN(outputWeight) || isNaN(fee)) {
+    showToast('Please fill out all required fields', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/v1/batches/${id}/processing`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'milling',
+        status: 'completed',
+        final_value: outputWeight,
+        fee: fee
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(`Batch ${data.batch.batch_code} milled successfully. Output weight: ${outputWeight} MT. Fee of TZS ${fee.toLocaleString()} charged.`, 'success');
+      modal.classList.remove('open');
+      loadData();
+    } else {
+      showToast(data.error || 'Failed to complete milling', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Network error while completing job', 'error');
+  }
+};
+
+document.addEventListener('DOMContentLoaded', loadData);
+</script>
+</body>
+</html>

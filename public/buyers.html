@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Buyers — AgroVault ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="assets/style.css"/>
+</head>
+<body>
+<div class="layout">
+  <div id="nav-mount"></div>
+  <div class="main-area">
+    <div id="top-mount"></div>
+    <div class="page-content">
+
+      <div class="page-header anim-fade-up">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <a href="index.html" style="font-size:13px;color:var(--text3)">Dashboard</a>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg>
+              <span style="font-size:13px;font-weight:600;color:var(--text)">Buyers</span>
+            </div>
+            <div class="page-title">🤝 Registered Corporate Buyers</div>
+            <div class="page-desc">Manage crop buying corporations, export agents, and contract records</div>
+          </div>
+          <button class="btn btn-primary btn-sm" id="btnNewBuyer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add New Buyer
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:24px" class="anim-fade-up anim-delay-1">
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpiTotalBuyers">0</div>
+          <div class="kpi-label">Active Buyers</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpiContractedVolume" style="color:var(--emerald-500)">14,800 MT</div>
+          <div class="kpi-label">Contracted Sales MTD</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpiAvgDaysToSettle" style="color:var(--indigo-500)">12 Days</div>
+          <div class="kpi-label">Average Payout Term</div>
+        </div>
+      </div>
+
+      <!-- Main Log -->
+      <div class="card anim-fade-up anim-delay-2" style="overflow:hidden">
+        <div style="padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div class="section-title">Buyer Profiles</div>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="buyerSearch" placeholder="Search buyer name…" class="form-input" style="width:220px" oninput="filterTable()"/>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Company Name</th>
+                <th>Contact Person</th>
+                <th>Phone Number</th>
+                <th>Email Address</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="buyerTableBody">
+              <tr>
+                <td colspan="6" style="text-align:center;color:var(--text3);padding:30px 0;">Loading buyers...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Add Buyer Modal -->
+<div id="buyerModal" class="modal-overlay">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title">Register New Buyer</div>
+      <button id="closeBuyerModal" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="buyerForm" style="display:grid;grid-template-columns:1fr;gap:14px">
+        <div>
+          <label class="form-label">Company Name *</label>
+          <input type="text" id="buyerName" class="form-input" placeholder="e.g. AgriCo Ltd" required/>
+        </div>
+        <div>
+          <label class="form-label">Contact Person *</label>
+          <input type="text" id="buyerContact" class="form-input" placeholder="e.g. David Ouma" required/>
+        </div>
+        <div>
+          <label class="form-label">Phone Number *</label>
+          <input type="text" id="buyerPhone" class="form-input" placeholder="e.g. +255 788 111 222" required/>
+        </div>
+        <div>
+          <label class="form-label">Email Address *</label>
+          <input type="email" id="buyerEmail" class="form-input" placeholder="e.g. sales@agrico.co.tz" required/>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cancelBuyerModal">Cancel</button>
+      <button class="btn btn-primary" id="saveBuyerBtn">Register Buyer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Buyer History Modal -->
+<div id="buyerHistoryModal" class="modal-overlay">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-header">
+      <div class="modal-title" id="buyerHistoryTitle">Buyer Purchase Ledger</div>
+      <button id="closeHistoryModal" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="max-height:400px;overflow-y:auto">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Invoice Number</th>
+            <th>Subtotal</th>
+            <th>VAT Amount</th>
+            <th>Total Amount</th>
+            <th>Due Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="buyerHistoryBody">
+          <!-- Dynamic history -->
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="closeHistoryBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script src="assets/components.js"></script>
+<script>
+renderNav('buyers.html');
+
+let allBuyers = [];
+let allInvoices = [];
+
+async function loadData() {
+  try {
+    const res = await fetch('/api/v1/sales/buyers');
+    allBuyers = await res.json();
+    
+    const invRes = await fetch('/api/v1/sales/invoices');
+    allInvoices = await invRes.json();
+    
+    renderStats();
+    renderTable(allBuyers);
+  } catch (err) {
+    console.error(err);
+    showToast('Failed to load buyers', 'error');
+  }
+}
+
+function renderStats() {
+  document.getElementById('kpiTotalBuyers').textContent = allBuyers.length;
+}
+
+function renderTable(data) {
+  const tbody = document.getElementById('buyerTableBody');
+  tbody.innerHTML = '';
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:20px 0;">No buyers registered.</td></tr>';
+    return;
+  }
+  data.forEach(b => {
+    tbody.innerHTML += `
+      <tr>
+        <td><strong>${b.name}</strong></td>
+        <td>${b.contact_person}</td>
+        <td>${b.phone || 'N/A'}</td>
+        <td style="color:var(--indigo-600)">${b.email || 'N/A'}</td>
+        <td><span class="badge badge-green"><span class="dot"></span>Active</span></td>
+        <td>
+          <button class="btn btn-secondary btn-sm" onclick="viewBuyerHistory('${b.id}', '${b.name.replace(/'/g, "\\'")}')">History</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function filterTable() {
+  const query = document.getElementById('buyerSearch').value.toLowerCase();
+  const filtered = allBuyers.filter(b => b.name.toLowerCase().includes(query) || b.contact_person.toLowerCase().includes(query));
+  renderTable(filtered);
+}
+
+// Modal handling
+const modal = document.getElementById('buyerModal');
+document.getElementById('btnNewBuyer').onclick = () => modal.classList.add('open');
+document.getElementById('closeBuyerModal').onclick = () => modal.classList.remove('open');
+document.getElementById('cancelBuyerModal').onclick = () => modal.classList.remove('open');
+
+document.getElementById('saveBuyerBtn').onclick = (e) => {
+  e.preventDefault();
+  const name = document.getElementById('buyerName').value;
+  const contact = document.getElementById('buyerContact').value;
+  const phone = document.getElementById('buyerPhone').value;
+  const email = document.getElementById('buyerEmail').value;
+
+  if (!name || !contact || !phone || !email) {
+    showToast('Please fill out all required fields', 'error');
+    return;
+  }
+
+  showToast('Buyer registered successfully!', 'success');
+  modal.classList.remove('open');
+  document.getElementById('buyerForm').reset();
+  
+  allBuyers.push({
+    id: Date.now().toString(),
+    name: name,
+    contact_person: contact,
+    phone: phone,
+    email: email
+  });
+  renderStats();
+  renderTable(allBuyers);
+};
+
+// Buyer History Modal
+const historyModal = document.getElementById('buyerHistoryModal');
+document.getElementById('closeHistoryModal').onclick = () => historyModal.classList.remove('open');
+document.getElementById('closeHistoryBtn').onclick = () => historyModal.classList.remove('open');
+
+function viewBuyerHistory(buyerId, buyerName) {
+  document.getElementById('buyerHistoryTitle').textContent = `Purchase Ledger: ${buyerName}`;
+  const tbody = document.getElementById('buyerHistoryBody');
+  tbody.innerHTML = '';
+  
+  // Filter invoices for this buyer
+  const buyerInvoices = allInvoices.filter(inv => inv.buyer_id === buyerId);
+  
+  if (buyerInvoices.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:20px 0;">No purchase invoices recorded for this buyer.</td></tr>';
+  } else {
+    buyerInvoices.forEach(inv => {
+      const statusClass = inv.status === 'paid' ? 'badge-green' : 'badge-amber';
+      tbody.innerHTML += `
+        <tr>
+          <td><code style="font-weight:600;color:var(--indigo-600)">${inv.invoice_number}</code></td>
+          <td>TZS ${parseFloat(inv.subtotal).toLocaleString()}</td>
+          <td>TZS ${parseFloat(inv.vat_amount).toLocaleString()}</td>
+          <td><strong>TZS ${parseFloat(inv.total_amount).toLocaleString()}</strong></td>
+          <td style="color:var(--text3)">${inv.due_date || 'N/A'}</td>
+          <td><span class="badge ${statusClass}"><span class="dot"></span>${inv.status}</span></td>
+        </tr>
+      `;
+    });
+  }
+  historyModal.classList.add('open');
+}
+
+document.addEventListener('DOMContentLoaded', loadData);
+</script>
+</body>
+</html>

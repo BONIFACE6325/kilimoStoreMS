@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Dashboard — AgroVault ERP</title>
+<meta name="description" content="AgroVault ERP main dashboard"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="assets/style.css"/>
+</head>
+<body>
+<div class="layout">
+  <div id="nav-mount"></div>
+  <div class="main-area">
+    <div id="top-mount"></div>
+    <div class="page-content">
+
+      <!-- Page Header -->
+      <div class="page-header anim-fade-up">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div class="page-title">Good morning, James 👋</div>
+            <div class="page-desc">Here's what's happening at your warehouse today — Tuesday, 17 June 2026</div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-secondary btn-sm" id="btnExport">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Export
+            </button>
+            <button class="btn btn-primary btn-sm" id="btnNewTx">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              New Transaction
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI CARDS -->
+      <div id="kpiGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:28px"></div>
+
+      <!-- GODOWN & MACHINERY PERFORMANCE ANALYTICS -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px">
+        <!-- Godown Space Utilization Card -->
+        <div class="chart-box">
+          <div class="section-header">
+            <div>
+              <div class="section-title">Uchambuzi wa Godown (Warehouse Space)</div>
+              <div class="section-sub">Kiwango cha Ujazaji na Hali ya Bins</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:15px;background:var(--surface3);padding:14px;border-radius:10px">
+            <div>
+              <div style="font-size:12px;color:var(--text3)">Ujazo wa Jumla</div>
+              <div style="font-size:16px;font-weight:700;color:var(--text)" id="godownCapacityDisplay">0 MT</div>
+            </div>
+            <div>
+              <div style="font-size:12px;color:var(--text3)">Mzigo Uliopo</div>
+              <div style="font-size:16px;font-weight:700;color:var(--emerald-500)" id="godownOccupiedDisplay">0 MT</div>
+            </div>
+            <div>
+              <div style="font-size:12px;color:var(--text3)">Nafasi Wazi</div>
+              <div style="font-size:16px;font-weight:700;color:var(--text2)" id="godownFreeDisplay">0 MT</div>
+            </div>
+          </div>
+          <div style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px">
+              <span style="color:var(--text2)">Asilimia ya Ujazaji (Occupancy Rate)</span>
+              <span style="color:var(--text);font-weight:700" id="godownOccupancyPct">0%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="godownProgressBar" style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <!-- Machinery & Services Activity Card -->
+        <div class="chart-box">
+          <div class="section-header">
+            <div>
+              <div class="section-title">Uchambuzi wa Mashine na Huduma</div>
+              <div class="section-sub">Kiasi cha Kazi na Volume iliyochakatwa</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+            <!-- Machine drying -->
+            <div style="background:var(--surface3);padding:12px;border-radius:10px;text-align:center">
+              <div style="font-size:20px;margin-bottom:4px">☀️</div>
+              <div style="font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase">Kukausha</div>
+              <div style="font-size:15px;font-weight:700;color:var(--text);margin-top:2px" id="dryJobsCount">0 Kazi</div>
+              <div style="font-size:11.5px;color:var(--emerald-500);font-weight:600;margin-top:2px" id="dryQtyDisplay">0 Magunia</div>
+              <div style="font-size:10px;color:var(--text3);margin-top:4px" id="dryStatusDisplay">0 Active / 0 Done</div>
+            </div>
+            <!-- Machine milling -->
+            <div style="background:var(--surface3);padding:12px;border-radius:10px;text-align:center">
+              <div style="font-size:20px;margin-bottom:4px">⚙️</div>
+              <div style="font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase">Kukoboa</div>
+              <div style="font-size:15px;font-weight:700;color:var(--text);margin-top:2px" id="millJobsCount">0 Kazi</div>
+              <div style="font-size:11.5px;color:var(--indigo-500);font-weight:600;margin-top:2px" id="millQtyDisplay">0 Kg</div>
+              <div style="font-size:10px;color:var(--text3);margin-top:4px" id="millStatusDisplay">0 Active / 0 Done</div>
+            </div>
+            <!-- Machine grading -->
+            <div style="background:var(--surface3);padding:12px;border-radius:10px;text-align:center">
+              <div style="font-size:20px;margin-bottom:4px">📊</div>
+              <div style="font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase">Kugredi</div>
+              <div style="font-size:15px;font-weight:700;color:var(--text);margin-top:2px" id="gradeJobsCount">0 Kazi</div>
+              <div style="font-size:11.5px;color:var(--fuchsia-500);font-weight:600;margin-top:2px" id="gradeQtyDisplay">0 Kg</div>
+              <div style="font-size:10px;color:var(--text3);margin-top:4px">Grading Machine</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW 1 -->
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:20px">
+        <div class="chart-box">
+          <div class="section-header">
+            <div><div class="section-title">Mwenendo wa Mapato</div><div class="section-sub">TZS — Miezi 6 iliyopita (kutoka DB)</div></div>
+            <div style="display:flex;gap:8px">
+              <span style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2)"><span style="width:10px;height:10px;border-radius:50%;background:#10b981;display:inline-block"></span>Mapato ya Huduma</span>
+            </div>
+          </div>
+          <div style="height:220px;position:relative"><canvas id="revenueChart" style="width:100%;height:100%"></canvas></div>
+        </div>
+        <div class="chart-box">
+          <div class="section-header"><div><div class="section-title">Mchanganuo wa Mazao</div><div class="section-sub">Kwa aina (Kg)</div></div></div>
+          <div style="display:flex;justify-content:center;height:170px;position:relative"><canvas id="grainDonut" style="width:170px;height:170px;max-width:170px;max-height:170px"></canvas></div>
+          <div id="grainLegend" style="margin-top:14px;display:flex;flex-direction:column;gap:8px"></div>
+        </div>
+      </div>
+
+      <!-- SERVICE BREAKDOWN BAR -->
+      <div class="chart-box" style="margin-bottom:20px">
+        <div class="section-header">
+          <div><div class="section-title">Mchanganuo wa Mapato ya Huduma</div><div class="section-sub">Asilimia ya kila huduma kwenye jumla ya mapato</div></div>
+        </div>
+        <div id="serviceBreakdownBar"><div style="color:var(--text3);font-size:13px">Inapakia data...</div></div>
+      </div>
+
+      <!-- CHARTS ROW 2 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+        <div class="chart-box">
+          <div class="section-header">
+            <div><div class="section-title">Mwenendo wa Mzigo</div><div class="section-sub">Intake vs Kutoa — miezi 6 iliyopita (Kg)</div></div>
+            <div style="display:flex;gap:10px">
+              <span style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2)"><span style="width:8px;height:8px;border-radius:50%;background:#6366f1;display:inline-block"></span>Intake</span>
+              <span style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2)"><span style="width:8px;height:8px;border-radius:50%;background:#f59e0b;display:inline-block"></span>Dispatch</span>
+            </div>
+          </div>
+          <div style="height:180px"><canvas id="stockChart" style="width:100%;height:100%"></canvas></div>
+        </div>
+        <div class="chart-box">
+          <div class="section-header"><div class="section-title">Hali ya Bins</div><div class="section-sub">Ujazaji wa kila bin — sasa hivi</div></div>
+          <div id="utilGrid" style="display:flex;flex-direction:column;gap:12px;margin-top:4px"></div>
+        </div>
+      </div>
+
+      <!-- TABLES ROW -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+        <div class="card" style="padding:0;overflow:hidden">
+          <div style="padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div><div class="section-title">Wakulima Wakuu</div><div class="section-sub">Kwa mzigo uliowekwa msimu huu</div></div>
+            <a href="farmers.html" class="btn btn-secondary btn-sm">Angalia Wote</a>
+          </div>
+          <div style="overflow-x:auto"><table class="data-table"><thead><tr><th>#</th><th>Mkulima</th><th>Mkoa</th><th>Mzigo (Kg)</th><th>Hali</th></tr></thead><tbody id="topFarmersBody"></tbody></table></div>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden">
+          <div style="padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div><div class="section-title">Mauzo ya Hivi Karibuni</div><div class="section-sub">Ankara 5 za mwisho</div></div>
+            <a href="sales.html" class="btn btn-secondary btn-sm">Angalia Zote</a>
+          </div>
+          <div style="overflow-x:auto"><table class="data-table"><thead><tr><th>Ref</th><th>Aina</th><th>Kiasi</th><th>Tarehe</th><th>Hali</th></tr></thead><tbody id="txBody"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- Activity Feed -->
+      <div class="chart-box">
+        <div class="section-header"><div class="section-title">Shughuli za Mwisho</div><div class="section-sub">Makundi ya shughuli za mfumo — live</div></div>
+        <div id="activityFeed"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script src="assets/components.js"></script>
+<script>
+renderNav('index.html');
+
+document.getElementById('btnExport').onclick = () => showToast('Generating daily report…','info');
+document.getElementById('btnNewTx').onclick = () => window.location.href = 'sales.html';
+
+// Fetch stats and render dashboard
+async function loadDashboard() {
+  try {
+    // 1. Fetch Dashboard Stats
+    const statsRes = await fetch('/api/v1/dashboard/stats');
+    const statsData = await statsRes.json();
+    
+    const stats = statsData.stats;
+
+    // ── 6 KPI Cards with live data ──
+    const overdueCount = stats.overdue_loans_count || 0;
+    const kpiValues = [
+      {val: stats.registered_farmers.toString(), label: 'Wakulima Waliosajiliwa', color: '#10b981', bg: 'rgba(16,185,129,.1)', sub: 'Akaunti hai', emoji: '👨‍🌾'},
+      {val: parseFloat(stats.total_weight_stored_mt * 1000).toLocaleString() + ' Kg', label: 'Jumla ya Mzigo Ghalani', color: '#6366f1', bg: 'rgba(99,102,241,.1)', sub: 'Nafaka iliyohifadhiwa', emoji: '🌾'},
+      {val: 'TZS ' + parseFloat(stats.loan_portfolio_value || 0).toLocaleString(), label: 'Mikopo Inayodaiwa', color: '#d97706', bg: 'rgba(245,158,11,.1)', sub: `Mikopo ${stats.active_loans_count || 0} hai`, emoji: '🏦'},
+      {val: 'TZS ' + parseFloat(stats.total_revenue_tzs || 0).toLocaleString(), label: 'Mapato ya Huduma', color: '#10b981', bg: 'rgba(16,185,129,.1)', sub: 'Jumla makato ya huduma', emoji: '💰'},
+      {val: 'TZS ' + parseFloat(stats.stock_valuation_tzs || 0).toLocaleString(), label: 'Thamani ya Mzigo', color: '#8b5cf6', bg: 'rgba(139,92,246,.1)', sub: 'Bei soko – stima tu', emoji: '📈'},
+      {val: overdueCount.toString(), label: 'Mikopo Iliyochelewa', color: overdueCount > 0 ? '#ef4444' : '#10b981', bg: overdueCount > 0 ? 'rgba(239,68,68,.1)' : 'rgba(16,185,129,.1)', sub: overdueCount > 0 ? '⚠️ Inahitaji hatua' : '✅ Hali nzuri', emoji: overdueCount > 0 ? '⚠️' : '✅'},
+    ];
+
+    const kpiGrid = document.getElementById('kpiGrid');
+    kpiGrid.innerHTML = '';
+    kpiValues.forEach((k, i) => {
+      const d = document.createElement('div');
+      d.className = 'kpi-card anim-fade-up';
+      d.style.animationDelay = (i * 0.05) + 's';
+      d.innerHTML = `<div style="width:46px;height:46px;border-radius:12px;background:${k.bg};display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:22px">${k.emoji}</div><div class="kpi-value" style="font-size:18px;color:${k.color}">${k.val}</div><div class="kpi-label" style="font-size:12.5px;margin-top:4px">${k.label}</div><div style="font-size:11px;color:var(--text3);margin-top:6px">${k.sub}</div>`;
+      kpiGrid.appendChild(d);
+    });
+
+    // ── Godown Space Utilization ──
+    if (statsData.warehouse) {
+      const capKg = statsData.warehouse.capacity_mt * 1000;
+      const occKg = statsData.warehouse.occupied_mt * 1000;
+      const freeKg = Math.max(0, capKg - occKg);
+      document.getElementById('godownCapacityDisplay').textContent = capKg.toLocaleString() + ' Kg';
+      document.getElementById('godownOccupiedDisplay').textContent = occKg.toLocaleString() + ' Kg';
+      document.getElementById('godownFreeDisplay').textContent = freeKg.toLocaleString() + ' Kg';
+      document.getElementById('godownOccupancyPct').textContent = statsData.warehouse.occupancy_pct + '%';
+      const godownBar = document.getElementById('godownProgressBar');
+      godownBar.style.width = statsData.warehouse.occupancy_pct + '%';
+      const pct = statsData.warehouse.occupancy_pct;
+      godownBar.style.background = pct > 90 ? '#ef4444' : pct > 50 ? '#6366f1' : '#10b981';
+    }
+
+    // ── Machine Stats with Active / Completed ──
+    if (statsData.machine_stats) {
+      const ms = statsData.machine_stats;
+      document.getElementById('dryJobsCount').textContent = ms.drying_jobs + ' Kazi';
+      document.getElementById('dryQtyDisplay').textContent = parseFloat(ms.drying_qty || 0).toLocaleString() + ' Magunia';
+      const dryStatus = document.getElementById('dryStatusDisplay');
+      if (dryStatus) dryStatus.textContent = `${ms.drying_active || 0} Inaendelea / ${ms.drying_completed || 0} Imekamilika`;
+
+      document.getElementById('millJobsCount').textContent = ms.milling_jobs + ' Kazi';
+      document.getElementById('millQtyDisplay').textContent = parseFloat(ms.milling_qty || 0).toLocaleString() + ' Kg';
+      const millStatus = document.getElementById('millStatusDisplay');
+      if (millStatus) millStatus.textContent = `${ms.milling_active || 0} Inaendelea / ${ms.milling_completed || 0} Imekamilika`;
+
+      document.getElementById('gradeJobsCount').textContent = ms.grading_jobs + ' Kazi';
+      document.getElementById('gradeQtyDisplay').textContent = parseFloat(ms.grading_qty || 0).toLocaleString() + ' Kg';
+    }
+
+    // ── Service Breakdown Alert Banner ──
+    if (statsData.service_breakdown) {
+      const sb = statsData.service_breakdown;
+      const total = (parseFloat(sb.storage||0) + parseFloat(sb.drying||0) + parseFloat(sb.milling||0) + parseFloat(sb.grading||0));
+      const sbEl = document.getElementById('serviceBreakdownBar');
+      if (sbEl && total > 0) {
+        const pctStorage = Math.round((sb.storage/total)*100);
+        const pctDrying  = Math.round((sb.drying/total)*100);
+        const pctMilling = Math.round((sb.milling/total)*100);
+        const pctGrading = 100 - pctStorage - pctDrying - pctMilling;
+        sbEl.innerHTML = `
+          <div style="display:flex;gap:0;height:8px;border-radius:6px;overflow:hidden;margin-bottom:8px">
+            <div style="width:${pctStorage}%;background:#10b981" title="Hifadhi ${pctStorage}%"></div>
+            <div style="width:${pctDrying}%;background:#f59e0b" title="Kukausha ${pctDrying}%"></div>
+            <div style="width:${pctMilling}%;background:#6366f1" title="Kukoboa ${pctMilling}%"></div>
+            <div style="width:${pctGrading}%;background:#8b5cf6" title="Kugredi ${pctGrading}%"></div>
+          </div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap">
+            <span style="font-size:11.5px;color:var(--text2)"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;margin-right:4px"></span>Hifadhi ${pctStorage}% — TZS ${parseFloat(sb.storage||0).toLocaleString()}</span>
+            <span style="font-size:11.5px;color:var(--text2)"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;margin-right:4px"></span>Kukausha ${pctDrying}% — TZS ${parseFloat(sb.drying||0).toLocaleString()}</span>
+            <span style="font-size:11.5px;color:var(--text2)"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#6366f1;margin-right:4px"></span>Kukoboa ${pctMilling}% — TZS ${parseFloat(sb.milling||0).toLocaleString()}</span>
+            <span style="font-size:11.5px;color:var(--text2)"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8b5cf6;margin-right:4px"></span>Kugredi ${pctGrading}% — TZS ${parseFloat(sb.grading||0).toLocaleString()}</span>
+          </div>`;
+      }
+    }
+
+    // ── Grain Donut ──
+    const cropDist = statsData.crop_distribution;
+    const donutData = [
+      {label: 'Mahindi (Maize)', value: cropDist.Maize ? parseFloat(cropDist.Maize) : 0, color: '#10b981'},
+      {label: 'Mchele (Rice)',   value: cropDist.Rice  ? parseFloat(cropDist.Rice)  : 0, color: '#6366f1'},
+      {label: 'Maharage (Beans)',value: cropDist.Beans ? parseFloat(cropDist.Beans) : 0, color: '#f59e0b'},
+    ];
+    const legend = document.getElementById('grainLegend');
+    legend.innerHTML = '';
+    donutData.forEach(d => {
+      const r = document.createElement('div');
+      r.style.cssText = 'display:flex;align-items:center;gap:8px';
+      r.innerHTML = `<div style="width:8px;height:8px;border-radius:50%;background:${d.color};flex-shrink:0"></div><span style="font-size:12.5px;color:var(--text2);flex:1">${d.label}</span><span style="font-size:12.5px;font-weight:600;color:var(--text)">${(d.value * 1000).toLocaleString()} Kg</span>`;
+      legend.appendChild(r);
+    });
+    drawDonutChart('grainDonut', donutData, donutData.map(d => d.color));
+
+    // ── Revenue Trend Chart — live from DB ──
+    const trends = statsData.trends;
+    if (trends && trends.months && trends.months.length > 0) {
+      const revMil = trends.revenue.map(v => parseFloat(v) / 1000000);
+      drawLineChart('revenueChart', trends.months, [
+        {data: revMil, color: '#10b981'},
+      ], {yFormat: v => 'TZS ' + v.toFixed(1) + 'M'});
+    } else {
+      drawLineChart('revenueChart', ['Jan','Feb','Mar','Apr','May','Jun'], [{data:[0,0,0,0,0,0], color:'#10b981'}], {yFormat: v => 'TZS ' + v + 'M'});
+    }
+
+    // 2. Fetch Bins and Render Warehouse Utilization
+    const binsRes = await fetch('/api/v1/bins/map');
+    const bins = await binsRes.json();
+    const utilGrid = document.getElementById('utilGrid');
+    utilGrid.innerHTML = '';
+    bins.slice(0, 5).forEach(bin => {
+      const pct = Math.round((bin.current_occupancy_mt / bin.capacity_mt) * 100);
+      const color = pct > 90 ? '#ef4444' : pct > 50 ? '#6366f1' : '#10b981';
+      const d = document.createElement('div');
+      d.innerHTML = `<div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px"><span style="color:var(--text2);font-weight:500">Bin ${bin.name} (${bin.crop_type || 'Empty'})</span><span style="color:var(--text);font-weight:700">${pct}%</span></div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${color}"></div></div>`;
+      utilGrid.appendChild(d);
+    });
+
+    // 3. Fetch Farmers and render Top Farmers
+    const farmersRes = await fetch('/api/v1/farmers');
+    const farmers = await farmersRes.json();
+    const tb = document.getElementById('topFarmersBody');
+    tb.innerHTML = '';
+    farmers.slice(0, 5).forEach((f, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td style="color:var(--text3);font-weight:600">${i+1}</td><td><div style="display:flex;align-items:center;gap:10px"><div class="avatar avatar-sm">${f.name[0]}</div><strong>${f.name}</strong></div></td><td>${f.region}</td><td><strong>${(parseFloat(f.total_deposited) * 1000).toLocaleString()} Kg</strong></td><td><span class="badge ${f.status==='active'?'badge-green':'badge-gray'}"><span class="dot"></span>${f.status}</span></td>`;
+      tb.appendChild(tr);
+    });
+
+    // 4. Fetch Invoices and render Recent Transactions
+    const invoicesRes = await fetch('/api/v1/sales/invoices');
+    const invoices = await invoicesRes.json();
+    const txb = document.getElementById('txBody');
+    txb.innerHTML = '';
+    if (invoices.length === 0) {
+      txb.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3)">No recent sales transactions.</td></tr>';
+    } else {
+      invoices.slice(0, 5).forEach(inv => {
+        const statusClass = inv.status === 'paid' ? 'badge-green' : inv.status === 'unpaid' ? 'badge-amber' : 'badge-red';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td><code style="font-size:11.5px;color:var(--text3)">${inv.invoice_number}</code></td><td><span class="badge badge-indigo">Sale</span></td><td><strong>TZS ${parseFloat(inv.total_amount).toLocaleString()}</strong></td><td style="color:var(--text3)">${new Date(inv.created_at).toLocaleDateString()}</td><td><span class="badge ${statusClass}"><span class="dot"></span>${inv.status}</span></td>`;
+        txb.appendChild(tr);
+      });
+    }
+
+    // 5. Activity Feed (Dynamic based on batches & invoices)
+    const batchesRes = await fetch('/api/v1/batches');
+    const batches = await batchesRes.json();
+    const feed = document.getElementById('activityFeed');
+    feed.innerHTML = '';
+    
+    // Combine activities
+    const activities = [];
+    batches.slice(0, 3).forEach(b => {
+      activities.push({
+        time: new Date(b.created_at).toLocaleDateString('sw-TZ', {day:'2-digit',month:'short'}) + ' ' + new Date(b.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+        msg: `🌾 Mzigo uliopokelewa — ${(parseFloat(b.current_weight) * 1000).toLocaleString()} Kg ya ${b.crop_type} kutoka ${b.farmer_name}`,
+        type: 'info',
+        meta: b.batch_code
+      });
+    });
+    invoices.slice(0, 3).forEach(inv => {
+      activities.push({
+        time: new Date(inv.created_at).toLocaleDateString('sw-TZ', {day:'2-digit',month:'short'}) + ' ' + new Date(inv.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+        msg: `💰 Ankara imetolewa — ${inv.buyer ? inv.buyer.name : 'Mnunuzi'}`,
+        type: 'success',
+        meta: `TZS ${parseFloat(inv.total_amount).toLocaleString()}`
+      });
+    });
+
+    if (activities.length === 0) {
+      feed.innerHTML = '<div style="text-align:center;color:var(--text3);padding:24px 0;font-size:13.5px">Hakuna shughuli zilizorekodiwa leo.</div>';
+    } else {
+      activities.forEach((act, i) => {
+        const dotColor = act.type==='success'?'#10b981':act.type==='warning'?'#f59e0b':act.type==='error'?'#ef4444':'#6366f1';
+        const d = document.createElement('div');
+        d.style.cssText = 'display:flex;gap:14px;padding:14px 0;' + (i < activities.length-1 ? 'border-bottom:1px solid var(--border)' : '');
+        d.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center"><div style="width:10px;height:10px;border-radius:50%;margin-top:3px;flex-shrink:0;background:${dotColor}"></div>${i<activities.length-1?`<div style="width:1px;flex:1;background:var(--border);margin-top:4px"></div>`:''}</div><div style="flex:1;min-width:0"><div style="font-size:13.5px;color:var(--text);font-weight:500">${act.msg}</div><div style="display:flex;gap:10px;margin-top:4px"><span style="font-size:12px;color:var(--text3)">${act.time}</span><span style="font-size:12px;font-weight:600;color:var(--text2)">${act.meta}</span></div></div>`;
+        feed.appendChild(d);
+      });
+    }
+
+    // Static layout animations
+    animateProgress();
+
+    // ── Stock Intake vs Dispatch Chart — live from DB ──
+    if (trends && trends.months && trends.months.length > 0) {
+      drawLineChart('stockChart', trends.months, [
+        {data: trends.intake.map(v => parseFloat(v)), color: '#6366f1'},
+        {data: trends.dispatch.map(v => parseFloat(v)), color: '#f59e0b'},
+      ], {yFormat: v => Math.round(v).toLocaleString() + ' Kg'});
+    } else {
+      drawBarChart('stockChart', ['Jan','Feb','Mar','Apr','May','Jun'], [0,0,0,0,0,0], '#6366f1');
+    }
+
+  } catch (err) {
+    console.error('Error loading dashboard:', err);
+    showToast('Failed to sync live dashboard data', 'error');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadDashboard);
+</script>
+</body>
+</html>

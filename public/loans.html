@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Loans — AgroVault ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="assets/style.css"/>
+</head>
+<body>
+<div class="layout">
+  <div id="nav-mount"></div>
+  <div class="main-area">
+    <div id="top-mount"></div>
+    <div class="page-content">
+
+      <div class="page-header anim-fade-up">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <a href="index.html" style="font-size:13px;color:var(--text3)">Dashboard</a>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg>
+              <span style="font-size:13px;font-weight:600;color:var(--text)">Loans</span>
+            </div>
+            <div class="page-title">Loan Management</div>
+            <div class="page-desc">Track farmer loans, collateral coverage, and repayments</div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-secondary btn-sm" id="btnExportLoans">Export Portfolio</button>
+            <button class="btn btn-primary btn-sm" id="btnNewLoan">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              New Loan Request
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div id="loanKpis" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:24px" class="anim-fade-up anim-delay-1"></div>
+
+      <!-- Alert Banner -->
+      <div style="background:linear-gradient(135deg,rgba(249,115,22,.1),rgba(245,158,11,.08));border:1.5px solid rgba(249,115,22,.3);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px" class="anim-fade-up anim-delay-2">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(249,115,22,.15);display:flex;align-items:center;justify-content:center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div>
+            <div style="font-weight:700;color:var(--text)">Outstanding Loan Requests Queue</div>
+            <div style="font-size:13px;color:var(--text3)">Review, authorize or reject collateralized crop loan applications</div>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm" id="btnReviewQueue">Review Queue</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px">
+        <!-- Table -->
+        <div class="card anim-fade-up anim-delay-3" style="overflow:hidden">
+          <div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+            <div id="loanTabs" style="display:flex;gap:8px;margin-bottom:12px"></div>
+            <input type="text" id="loanSearch" placeholder="Search loans by farmer…" class="form-input" style="max-width:280px" oninput="filterLoans()"/>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead><tr><th>Loan ID</th><th>Farmer</th><th>Amount</th><th>Balance</th><th>Rate</th><th>Due Date</th><th>Risk</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="loanBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div style="display:flex;flex-direction:column;gap:16px" class="anim-fade-up anim-delay-4">
+          <div class="chart-box">
+            <div class="section-title" style="margin-bottom:14px">Loan Risk Distribution</div>
+            <div style="display:flex;justify-content:center;margin-bottom:14px"><canvas id="loanDonut" style="width:150px;height:150px"></canvas></div>
+            <div id="riskLegend"></div>
+          </div>
+          <div class="chart-box">
+            <div class="section-title" style="margin-bottom:14px">Upcoming Payments</div>
+            <div id="paymentSchedule">
+              <div style="padding: 10px 0; border-bottom: 1px solid var(--border)">
+                <div style="display:flex;justify-content:space-between;font-size:13px">
+                  <strong>John Ochieng</strong>
+                  <span style="color:var(--red-500);font-weight:600">TZS 1,200,000</span>
+                </div>
+                <div style="font-size:11.5px;color:var(--text3);margin-top:2px">Due in 5 days</div>
+              </div>
+              <div style="padding: 10px 0;">
+                <div style="display:flex;justify-content:space-between;font-size:13px">
+                  <strong>Amina Mwangi</strong>
+                  <span style="color:var(--text3)">TZS 850,000</span>
+                </div>
+                <div style="font-size:11.5px;color:var(--text3);margin-top:2px">Due in 14 days</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="newLoanModal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">New Loan Application</div>
+      <button id="closeLoanModal" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div style="grid-column:1/-1"><label class="form-label">Farmer *</label><select id="loanFarmer" class="form-input form-select"><option>Select farmer…</option></select></div>
+        <div><label class="form-label">Loan Amount (TZS) *</label><input type="number" id="loanAmount" class="form-input" placeholder="0.00"/></div>
+        <div><label class="form-label">Interest Rate (%)</label><input type="number" id="loanInterest" class="form-input" value="8" step="0.5"/></div>
+        <div><label class="form-label">Repayment Period</label><select class="form-input form-select"><option>3 months</option><option>6 months</option><option>12 months</option></select></div>
+        <div><label class="form-label">Due Date</label><input type="date" id="loanDueDate" class="form-input"/></div>
+        <div style="grid-column:1/-1;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-radius:9px;padding:12px">
+          <div style="font-size:12.5px;font-weight:600;color:#059669;margin-bottom:4px">Collateral: Stock on Hand</div>
+          <div style="font-size:12px;color:var(--text3)">The system verifies deposited grain collateral automatically to limit default exposure.</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cancelLoanModal">Cancel</button>
+      <button class="btn btn-primary" id="submitLoanForm">Submit for Approval</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script src="assets/components.js"></script>
+<script>
+renderNav('loans.html');
+
+let allLoans = [];
+let allFarmers = [];
+let allBatches = [];
+
+async function loadLoans(statusFilter = '') {
+  try {
+    let url = '/api/v1/loans?';
+    if (statusFilter && statusFilter !== 'All') {
+      url += `status=${statusFilter.toLowerCase()}`;
+    }
+    const res = await fetch(url);
+    allLoans = await res.json();
+
+    const farmersRes = await fetch('/api/v1/farmers');
+    allFarmers = await farmersRes.json();
+
+    const batchesRes = await fetch('/api/v1/batches');
+    allBatches = await batchesRes.json();
+
+    populateFarmersSelect();
+    renderKPIs();
+    renderLoansTable(allLoans);
+    updateRiskDistributionChart();
+
+  } catch (err) {
+    console.error(err);
+    showToast('Failed to load loans portfolio', 'error');
+  }
+}
+
+function populateFarmersSelect() {
+  const select = document.getElementById('loanFarmer');
+  select.innerHTML = '<option value="">Select farmer…</option>';
+  allFarmers.forEach(f => {
+    select.innerHTML += `<option value="${f.id}">${f.name} (${f.farmer_code})</option>`;
+  });
+
+  select.onchange = function() {
+    const farmerId = this.value;
+    const farmerBatches = allBatches.filter(b => b.farmer_id == farmerId);
+    
+    let collateralDiv = document.getElementById('collateralSelectDiv');
+    if (!collateralDiv) {
+      collateralDiv = document.createElement('div');
+      collateralDiv.id = 'collateralSelectDiv';
+      collateralDiv.style.gridColumn = '1 / -1';
+      collateralDiv.innerHTML = '<label class="form-label">Collateral Batch *</label><select class="form-input form-select"></select>';
+      select.parentElement.insertAdjacentElement('afterend', collateralDiv);
+    }
+    
+    const batchSelect = collateralDiv.querySelector('select');
+    batchSelect.innerHTML = '<option value="">Select collateral batch…</option>';
+    
+    if (farmerBatches.length === 0) {
+      batchSelect.innerHTML = '<option value="">No stock batches available for collateral</option>';
+    } else {
+      farmerBatches.forEach(b => {
+        batchSelect.innerHTML += `<option value="${b.id}">${b.batch_code} - ${b.crop_type} (${b.current_weight} MT)</option>`;
+      });
+    }
+  };
+}
+
+function renderKPIs() {
+  const totalOutstanding = allLoans.filter(l => l.status === 'active' || l.status === 'overdue').reduce((sum, l) => sum + parseFloat(l.current_balance), 0);
+  const activeCount = allLoans.filter(l => l.status === 'active').length;
+  const pendingCount = allLoans.filter(l => l.status === 'pending_approval').length;
+  const overdueBalance = allLoans.filter(l => l.status === 'overdue').reduce((sum, l) => sum + parseFloat(l.current_balance), 0);
+
+  const loanKpiData = [
+    ['TZS ' + totalOutstanding.toLocaleString(), 'Total Outstanding', '#d97706'],
+    [activeCount.toString(), 'Active Borrowers', '#6366f1'],
+    [pendingCount.toString(), 'Pending Approvals', '#f97316'],
+    ['TZS ' + overdueBalance.toLocaleString(), 'Overdue Balance', '#dc2626'],
+    ['100%', 'Collateral Coverage', '#10b981'],
+    [allLoans.length.toString(), 'Total Loans Logged', '#10b981']
+  ];
+
+  const loanKpis = document.getElementById('loanKpis');
+  loanKpis.innerHTML = '';
+  loanKpiData.forEach(function(k) {
+    var d = document.createElement('div');
+    d.className = 'kpi-card';
+    d.innerHTML = '<div class="kpi-value" style="color:' + k[2] + ';font-size:21px">' + k[0] + '</div><div class="kpi-label">' + k[1] + '</div>';
+    loanKpis.appendChild(d);
+  });
+}
+
+function renderLoansTable(loans) {
+  var loanBody = document.getElementById('loanBody');
+  loanBody.innerHTML = '';
+  if (loans.length === 0) {
+    loanBody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:20px 0;">No loans found.</td></tr>';
+    return;
+  }
+  
+  loans.forEach(function(l) {
+    var risk = l.status === 'overdue' ? 'high' : 'low';
+    var riskColor = risk==='low'?'#10b981':'#ef4444';
+    var dueTxtColor = l.status==='overdue'?'#dc2626':'var(--text3)';
+    var stClass = l.status==='active'?'badge-green':l.status==='overdue'?'badge-red':l.status==='pending_approval'?'badge-amber':'badge-gray';
+    
+    let actionBtn = `<button class="btn btn-secondary btn-sm" style="padding:5px 10px;font-size:12px" onclick="showToast(\'Loan collateral verified\',\'success\')">Details</button>`;
+    if (l.status === 'pending_approval') {
+      actionBtn = `<button class="btn btn-primary btn-sm" style="padding:5px 10px;font-size:12px" onclick="approveLoan('${l.id}')">Approve</button>`;
+    }
+
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td><code style="font-size:12px;color:var(--text3)">' + l.loan_code + '</code></td>'
+      + '<td><div style="display:flex;align-items:center;gap:8px"><div class="avatar avatar-sm">' + l.farmer_name[0] + '</div><strong>' + l.farmer_name + '</strong></div></td>'
+      + '<td style="font-weight:600">TZS ' + parseFloat(l.principal_amount).toLocaleString() + '</td>'
+      + '<td style="color:' + (parseFloat(l.current_balance)===0?'var(--text3)':'var(--text)') + ';font-weight:' + (parseFloat(l.current_balance)===0?'400':'600') + '">TZS ' + parseFloat(l.current_balance).toLocaleString() + '</td>'
+      + '<td>' + l.interest_rate + '%</td>'
+      + '<td style="color:' + dueTxtColor + ';font-weight:' + (l.status==='overdue'?'600':'400') + '">' + l.due_date + '</td>'
+      + '<td><div style="display:flex;align-items:center;gap:5px"><div style="width:8px;height:8px;border-radius:50%;background:' + riskColor + '"></div><span style="font-size:12.5px;color:var(--text2)">' + risk + '</span></div></td>'
+      + '<td><span class="badge ' + stClass + '"><span class="dot"></span>' + l.status + '</span></td>'
+      + '<td>' + actionBtn + '</td>';
+    loanBody.appendChild(tr);
+  });
+}
+
+async function approveLoan(id) {
+  try {
+    const res = await fetch(`/api/v1/loans/${id}/approve`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'}
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Loan approved and disbursed successfully!', 'success');
+      loadLoans();
+    } else {
+      showToast(data.error || 'Approval failed', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Failed to approve loan', 'error');
+  }
+}
+
+function filterLoans() {
+  const query = document.getElementById('loanSearch').value.toLowerCase();
+  const filtered = allLoans.filter(l => l.farmer_name.toLowerCase().includes(query));
+  renderLoansTable(filtered);
+}
+
+// Submit New Loan Application
+document.getElementById('submitLoanForm').onclick = async function() {
+  const farmerId = document.getElementById('loanFarmer').value;
+  const amount = document.getElementById('loanAmount').value;
+  const interest = document.getElementById('loanInterest').value;
+  const dueDate = document.getElementById('loanDueDate').value;
+  
+  const collateralSelect = document.querySelector('#collateralSelectDiv select');
+  const collateralBatchId = collateralSelect ? collateralSelect.value : null;
+
+  if (!farmerId || !amount || !dueDate || !collateralBatchId) {
+    showToast('Please fill in all required fields including collateral batch.', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/v1/loans', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        farmer_id: farmerId,
+        collateral_batch_id: collateralBatchId,
+        principal_amount: parseFloat(amount),
+        interest_rate: parseFloat(interest),
+        due_date: dueDate
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Loan request submitted successfully!', 'success');
+      document.getElementById('newLoanModal').classList.remove('open');
+      loadLoans();
+    } else {
+      showToast(data.error || 'Application failed', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Failed to submit loan request', 'error');
+  }
+};
+
+function updateRiskDistributionChart() {
+  const riskLeg = document.getElementById('riskLegend');
+  riskLeg.innerHTML = '';
+  
+  const lowCount = allLoans.filter(l => l.status !== 'overdue').length;
+  const highCount = allLoans.filter(l => l.status === 'overdue').length;
+  const total = allLoans.length || 1;
+
+  const lowPct = Math.round((lowCount / total) * 100);
+  const highPct = 100 - lowPct;
+
+  const risks = [
+    ['Low Risk', '#10b981', lowPct + '%'],
+    ['High Risk', '#ef4444', highPct + '%']
+  ];
+
+  risks.forEach(function(r) {
+    var d = document.createElement('div');
+    d.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)';
+    d.innerHTML = '<div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2)"><div style="width:8px;height:8px;border-radius:50%;background:' + r[1] + '"></div>' + r[0] + '</div><strong style="color:var(--text)">' + r[2] + '</strong>';
+    riskLeg.appendChild(d);
+  });
+
+  drawDonutChart('loanDonut', [{value: lowPct}, {value: highPct}], ['#10b981', '#ef4444']);
+}
+
+// Export Loans Portfolio to CSV
+document.getElementById('btnExportLoans').onclick = function() {
+  if (allLoans.length === 0) {
+    showToast('No loans to export', 'error');
+    return;
+  }
+  let csvContent = "data:text/csv;charset=utf-8,";
+  csvContent += "Loan Code,Farmer,Principal Amount,Current Balance,Interest Rate,Due Date,Status\n";
+  allLoans.forEach(l => {
+    csvContent += `"${l.loan_code}","${l.farmer_name}",${l.principal_amount},${l.current_balance},${l.interest_rate},"${l.due_date}","${l.status}"\n`;
+  });
+  
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", `AgroVault_Loans_Portfolio_${new Date().toISOString().slice(0,10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  showToast('Loans portfolio exported successfully!', 'success');
+};
+
+// Review Queue Banner button
+document.getElementById('btnReviewQueue').onclick = function() {
+  // Select the Pending tab button and trigger click
+  const pendingTabBtn = [...document.querySelectorAll('#loanTabs button')].find(b => b.textContent === 'Pending');
+  if (pendingTabBtn) pendingTabBtn.click();
+};
+
+// Tabs
+var tabs = ['All','Pending','Active','Overdue'];
+var tabsDiv = document.getElementById('loanTabs');
+tabsDiv.innerHTML = '';
+tabs.forEach(function(t, i) {
+  var btn = document.createElement('button');
+  btn.className = 'btn btn-sm ' + (i === 0 ? 'btn-primary' : 'btn-secondary');
+  btn.style.cssText = 'font-size:12px';
+  btn.textContent = t;
+  btn.onclick = function() {
+    tabsDiv.querySelectorAll('button').forEach(b => {
+      b.classList.remove('btn-primary');
+      b.classList.add('btn-secondary');
+    });
+    btn.classList.add('btn-primary');
+    btn.classList.remove('btn-secondary');
+    
+    loadLoans(t === 'Pending' ? 'pending_approval' : t);
+  };
+  tabsDiv.appendChild(btn);
+});
+
+// Modal events
+document.getElementById('btnNewLoan').onclick = function() { document.getElementById('newLoanModal').classList.add('open'); };
+document.getElementById('closeLoanModal').onclick = function() { document.getElementById('newLoanModal').classList.remove('open'); };
+document.getElementById('cancelLoanModal').onclick = function() { document.getElementById('newLoanModal').classList.remove('open'); };
+document.getElementById('newLoanModal').addEventListener('click', function(e) { if(e.target===this) this.classList.remove('open'); });
+
+document.addEventListener('DOMContentLoaded', () => loadLoans());
+</script>
+</body>
+</html>

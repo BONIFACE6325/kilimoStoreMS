@@ -1,0 +1,3072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Farmers — AgroVault ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="assets/style.css"/>
+</head>
+<body>
+<div class="layout">
+  <div id="nav-mount"></div>
+  <div class="main-area">
+    <div id="top-mount"></div>
+    <div class="page-content">
+
+      <div class="page-header anim-fade-up">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <a href="index.html" style="font-size:13px;color:var(--text3);font-weight:500">Dashboard</a>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg>
+              <span style="font-size:13px;font-weight:600;color:var(--text)">Farmers</span>
+            </div>
+            <div class="page-title">Farmer Management</div>
+            <div class="page-desc">Registered farmers and account status across regions</div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-secondary btn-sm" id="btnExport">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export
+            </button>
+            <button class="btn btn-primary btn-sm" id="btnAdd">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Farmer
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats chips -->
+      <div id="statsRow" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:24px" class="anim-fade-up anim-delay-1"></div>
+
+      <!-- Filters -->
+      <div class="card anim-fade-up anim-delay-2" style="padding:16px;margin-bottom:20px">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+          <div style="flex:1;min-width:200px;position:relative">
+            <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text3)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="searchInput" placeholder="Search by name, ID, phone…" class="form-input" style="padding-left:38px"/>
+          </div>
+          <select id="regionFilter" class="form-input form-select" style="width:140px">
+            <option value="">All Regions</option>
+            <option>Arusha</option><option>Mwanza</option><option>Dodoma</option>
+            <option>Iringa</option><option>Morogoro</option>
+          </select>
+          <select id="statusFilter" class="form-input form-select" style="width:130px">
+            <option value="">All Status</option><option>Active</option><option>Inactive</option>
+          </select>
+          <button class="btn btn-secondary btn-sm" id="btnClear">Clear</button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="card anim-fade-up anim-delay-3" style="overflow:hidden; display:flex; flex-direction:column">
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead><tr>
+              <th><input type="checkbox" id="chkAll" style="accent-color:var(--emerald-500)"/></th>
+              <th>Farmer ID</th><th>Name</th><th>Region</th><th>Phone</th>
+              <th>Crop(s)</th><th>Stock (Kg)</th><th>Loan Balance</th><th>Status</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="farmerBody"></tbody>
+          </table>
+        </div>
+        <!-- Pagination Controls -->
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:16px; border-top:1px solid var(--border)">
+          <div style="font-size:13px; color:var(--text2)">
+            Inaonyesha <span id="pageStart" style="font-weight:600; color:var(--text)">0</span> hadi <span id="pageEnd" style="font-weight:600; color:var(--text)">0</span> kati ya <span id="pageTotal" style="font-weight:600; color:var(--text)">0</span>
+          </div>
+          <div style="display:flex; gap:8px">
+            <button id="btnPrevPage" class="btn btn-outline btn-sm" onclick="changePage(-1)" disabled style="padding:6px 12px">Iliyopita</button>
+            <button id="btnNextPage" class="btn btn-outline btn-sm" onclick="changePage(1)" disabled style="padding:6px 12px">Ifuatayo</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Add Farmer Modal -->
+<div id="addFarmerModal" class="modal-overlay">
+  <div class="modal" style="max-width:550px; width:95%">
+    <div class="modal-header">
+      <div class="modal-title" data-lang-en="Register New Farmer" data-lang-sw="Sajili Mkulima Mpya">Sajili Mkulima Mpya</div>
+      <button id="btnCloseModal" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:4px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div><label class="form-label" data-lang-en="First Name *" data-lang-sw="Jina la Kwanza *">Jina la Kwanza *</label><input type="text" id="addFirstName" class="form-input" placeholder="e.g. Amina"/></div>
+        <div><label class="form-label" data-lang-en="Last Name *" data-lang-sw="Jina la Mwisho *">Jina la Mwisho *</label><input type="text" id="addLastName" class="form-input" placeholder="e.g. Mwangi"/></div>
+        <div><label class="form-label" data-lang-en="Phone Number *" data-lang-sw="Namba ya Simu *">Namba ya Simu *</label><input type="tel" id="addPhone" class="form-input" placeholder="+255 7XX XXX XXX"/></div>
+        <div><label class="form-label" data-lang-en="National ID" data-lang-sw="Namba ya NIDA">Namba ya NIDA</label><input type="text" id="addNationalId" class="form-input" placeholder="NIDA Number"/></div>
+        <div>
+          <label class="form-label" data-lang-en="Region *" data-lang-sw="Mkoa *">Mkoa *</label>
+          <input type="text" id="addRegion" class="form-input" placeholder="e.g. Arusha" list="regionList"/>
+          <datalist id="regionList"></datalist>
+        </div>
+        <div>
+          <label class="form-label" data-lang-en="District" data-lang-sw="Wilaya">Wilaya</label>
+          <input type="text" id="addDistrict" class="form-input" placeholder="e.g. Arumeru" list="districtList"/>
+          <datalist id="districtList"></datalist>
+        </div>
+        <div>
+          <label class="form-label" data-lang-en="Ward" data-lang-sw="Kata">Kata</label>
+          <input type="text" id="addWard" class="form-input" placeholder="e.g. Usa River" list="wardList"/>
+          <datalist id="wardList"></datalist>
+        </div>
+        <div>
+          <label class="form-label" data-lang-en="Village" data-lang-sw="Kijiji">Kijiji</label>
+          <input type="text" id="addVillage" class="form-input" placeholder="e.g. Leganga" list="villageList"/>
+          <datalist id="villageList"></datalist>
+        </div>
+        <div style="grid-column:1/-1">
+          <label class="form-label" data-lang-en="Street / Neighborhood" data-lang-sw="Mtaa / Kitongoji">Mtaa / Kitongoji</label>
+          <input type="text" id="addStreet" class="form-input" placeholder="e.g. Majengo" list="streetList"/>
+          <datalist id="streetList"></datalist>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="btnCancelModal" data-lang-en="Cancel" data-lang-sw="Ghairi">Ghairi</button>
+      <button class="btn btn-primary" id="btnSubmitFarmer" data-lang-en="Register Farmer" data-lang-sw="Sajili Mkulima">Sajili Mkulima</button>
+    </div>
+  </div>
+</div>
+
+<!-- Farmer Profile View Modal -->
+<!-- Farmer Profile View Modal -->
+<div id="profileModal" class="modal-overlay">
+  <div class="modal" style="max-width:1350px; width:96%; height:90vh; display:flex; flex-direction:column">
+    <div class="modal-header">
+      <div class="modal-title" id="profileTitle" style="font-weight:700; letter-spacing:-0.01em">Farmer Profile &amp; Services</div>
+      <button id="closeProfileModal" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:8px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background 0.2s,color 0.2s" onmouseover="this.style.background='var(--surface2)';this.style.color='var(--text)'" onmouseout="this.style.background='none';this.style.color='var(--text3)'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="display:flex; gap:24px; flex-wrap:wrap; padding-bottom:10px; overflow-y:auto; flex:1">
+      
+      <!-- LEFT COLUMN: Profile Info & Summary -->
+      <div style="flex:1; min-width:300px; border-right:1px solid var(--border); padding-right:24px; display:flex; flex-direction:column; gap:20px">
+        <div style="display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--border);padding-bottom:18px">
+          <div class="avatar" style="width:56px;height:56px;font-size:24px;font-weight:700;background:var(--emerald-500);color:white;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(16,185,129,0.2)" id="profAvatar">A</div>
+          <div>
+            <div id="profName" style="font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.02em">Amina Mwangi</div>
+            <div id="profCode" style="font-size:12.5px;color:var(--text3);font-family:monospace;margin-top:2px">FMR-1004</div>
+          </div>
+          <span class="badge badge-green" style="margin-left:auto;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:700" id="profStatus">Active</span>
+          <button onclick="toggleFarmerEditMode()" id="btnToggleEditFarmer" style="background:var(--indigo-50);color:var(--indigo-600);border:1px solid var(--indigo-100);padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all 0.2s;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Hariri
+          </button>
+        </div>
+        
+        <div style="display:flex; flex-direction:column; gap:14px; font-size:13.5px">
+          <div style="display:flex; align-items:center; gap:10px">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span style="color:var(--text3); width:130px; flex-shrink:0">Phone Number:</span>
+            <strong id="profPhone" style="color:var(--text); word-break:break-all"></strong>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span style="color:var(--text3); width:130px; flex-shrink:0">Mkoa:</span>
+            <strong id="profRegion" style="color:var(--text)"></strong>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span style="color:var(--text3); width:130px; flex-shrink:0">Wilaya:</span>
+            <strong id="profDistrict" style="color:var(--text)"></strong>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span style="color:var(--text3); width:130px; flex-shrink:0">Kata:</span>
+            <strong id="profWard" style="color:var(--text)"></strong>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span style="color:var(--text3); width:130px; flex-shrink:0">Kijiji:</span>
+            <strong id="profVillage" style="color:var(--text)"></strong>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span style="color:var(--text3); width:130px; flex-shrink:0">Mtaa / Kitongoji:</span>
+            <strong id="profStreet" style="color:var(--text)"></strong>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" ry="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="13" y2="16"/></svg>
+            <span style="color:var(--text3); width:130px; flex-shrink:0">National ID:</span>
+            <strong id="profNationalId" style="color:var(--text)"></strong>
+          </div>
+          
+          <div style="background:linear-gradient(135deg, rgba(16,185,129,0.06), rgba(16,185,129,0.01)); border:1px solid rgba(16,185,129,0.15); padding:14px; border-radius:10px; margin-top:8px; display:flex; justify-content:space-between; align-items:center">
+            <div>
+              <div style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--emerald-600)" data-lang-en="Total Deposited Stock" data-lang-sw="Jumla ya Mzigo">Jumla ya Mzigo</div>
+              <div id="profStock" style="font-size:20px; font-weight:850; color:var(--emerald-500); margin-top:4px">0 Kg</div>
+            </div>
+            <div style="background:rgba(16,185,129,0.1); padding:8px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--emerald-500)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 12H16l-3 9L7 3l-3 9H2.5"/></svg>
+            </div>
+          </div>
+          
+          <div style="background:linear-gradient(135deg, rgba(239,68,68,0.06), rgba(239,68,68,0.01)); border:1px solid rgba(239,68,68,0.15); padding:14px; border-radius:10px; display:flex; justify-content:space-between; align-items:center">
+            <div>
+              <div style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--red-600)" data-lang-en="Outstanding Loan Balance" data-lang-sw="Mkopo Bado">Mkopo Bado</div>
+              <div id="profLoan" style="font-size:20px; font-weight:850; color:var(--red-500); margin-top:4px">Tsh 0</div>
+            </div>
+            <div style="background:rgba(239,68,68,0.1); padding:8px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--red-500)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+            </div>
+          </div>
+          <div id="editFarmerPanel" style="display:none; flex-direction:column; gap:12px; padding:16px; background:var(--surface2); border-radius:12px; border:1px solid var(--border)">
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">✏️ Hariri Taarifa za Mkulima</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div style="grid-column:1/-1">
+                <label class="form-label" style="font-size:12px">Jina Kamili *</label>
+                <input type="text" id="editFarmerName" class="form-input" style="padding:8px"/>
+              </div>
+              <div>
+                <label class="form-label" style="font-size:12px">Simu *</label>
+                <input type="text" id="editFarmerPhone" class="form-input" style="padding:8px"/>
+              </div>
+              <div>
+                <label class="form-label" style="font-size:12px">Namba ya NIDA</label>
+                <input type="text" id="editFarmerNid" class="form-input" style="padding:8px"/>
+              </div>
+              <div>
+                <label class="form-label" style="font-size:12px">Mkoa</label>
+                <input type="text" id="editFarmerRegion" class="form-input" style="padding:8px" list="editRegionList" autocomplete="off"/>
+                <datalist id="editRegionList"></datalist>
+              </div>
+              <div>
+                <label class="form-label" style="font-size:12px">Wilaya</label>
+                <input type="text" id="editFarmerDistrict" class="form-input" style="padding:8px" list="editDistrictList" autocomplete="off"/>
+                <datalist id="editDistrictList"></datalist>
+              </div>
+              <div>
+                <label class="form-label" style="font-size:12px">Kata</label>
+                <input type="text" id="editFarmerWard" class="form-input" style="padding:8px" list="editWardList" autocomplete="off"/>
+                <datalist id="editWardList"></datalist>
+              </div>
+              <div>
+                <label class="form-label" style="font-size:12px">Kijiji</label>
+                <input type="text" id="editFarmerVillage" class="form-input" style="padding:8px" list="editVillageList" autocomplete="off"/>
+                <datalist id="editVillageList"></datalist>
+              </div>
+              <div>
+                <label class="form-label" style="font-size:12px">Mtaa / Kitongoji</label>
+                <input type="text" id="editFarmerStreet" class="form-input" style="padding:8px" list="editStreetList" autocomplete="off"/>
+                <datalist id="editStreetList"></datalist>
+              </div>
+              <div style="grid-column:1/-1">
+                <label class="form-label" style="font-size:12px">Hali ya Akaunti</label>
+                <select id="editFarmerStatus" class="form-input form-select" style="padding:8px">
+                  <option value="active">Active (Hai)</option>
+                  <option value="inactive">Inactive (Isiyo Hai)</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+              <button onclick="toggleFarmerEditMode()" class="btn btn-secondary btn-sm">Ghairi</button>
+              <button onclick="saveEditFarmer()" class="btn btn-primary btn-sm" style="display:flex;align-items:center;gap:6px">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Hifadhi Mabadiliko
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- RIGHT COLUMN: Action Tabs & Forms -->
+      <div style="flex:2; min-width:450px; display:flex; flex-direction:column; gap:20px">
+        <!-- Tabs Header -->
+        <div style="display:flex; border-bottom:1px solid var(--border); gap:6px; flex-wrap:wrap; padding-bottom:4px">
+          <button class="tab-link active" onclick="switchProfileTab('batches')" id="tabBtnBatches" style="background:none; border:none; padding:10px 14px; font-weight:600; cursor:pointer; color:var(--text); border-bottom:2px solid var(--emerald-500); font-size:13.5px; display:flex; align-items:center; gap:6px; transition:all 0.2s">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            <span data-lang-en="Current Stock" data-lang-sw="Mzigo">Mzigo</span>
+          </button>
+          <button class="tab-link" onclick="switchProfileTab('newIntake')" id="tabBtnNewIntake" style="background:none; border:none; padding:10px 14px; font-weight:600; cursor:pointer; color:var(--text3); font-size:13.5px; display:flex; align-items:center; gap:6px; transition:all 0.2s">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            <span data-lang-en="New Intake" data-lang-sw="Pokea">Pokea</span>
+          </button>
+          <button class="tab-link" onclick="switchProfileTab('applyService')" id="tabBtnApplyService" style="background:none; border:none; padding:10px 14px; font-weight:600; cursor:pointer; color:var(--text3); font-size:13.5px; display:flex; align-items:center; gap:6px; transition:all 0.2s">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            <span data-lang-en="New Service" data-lang-sw="Huduma">Huduma</span>
+          </button>
+          <button class="tab-link" onclick="switchProfileTab('newLoan')" id="tabBtnNewLoan" style="background:none; border:none; padding:10px 14px; font-weight:600; cursor:pointer; color:var(--text3); font-size:13.5px; display:flex; align-items:center; gap:6px; transition:all 0.2s">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/><line x1="1" y1="14" x2="23" y2="14"/><line x1="1" y1="18" x2="23" y2="18"/></svg>
+            <span data-lang-en="New Loan" data-lang-sw="Mkopo">Mkopo</span>
+          </button>
+          <button class="tab-link" onclick="switchProfileTab('settlement')" id="tabBtnSettlement" style="background:none; border:none; padding:10px 14px; font-weight:600; cursor:pointer; color:var(--text3); font-size:13.5px; display:flex; align-items:center; gap:6px; transition:all 0.2s">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+            <span data-lang-en="Settlements" data-lang-sw="Mauzo">Mauzo</span>
+          </button>
+          <button class="tab-link" onclick="switchProfileTab('serviceHistory')" id="tabBtnServiceHistory" style="background:none; border:none; padding:10px 14px; font-weight:600; cursor:pointer; color:var(--text3); font-size:13.5px; display:flex; align-items:center; gap:6px; transition:all 0.2s">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <span data-lang-en="Service History" data-lang-sw="Historia">Historia</span>
+          </button>
+        </div>
+         <div id="tabContentServiceHistory" class="tab-content" style="display:none">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
+            <h4 style="margin:0; font-size:13.5px; font-weight:700; color:var(--text)" data-lang-en="Service History" data-lang-sw="Historia ya Huduma">Historia ya Huduma</h4>
+            <button class="btn btn-outline btn-sm" onclick="switchProfileTab('applyService')" style="padding: 6px 12px; font-size:12px; display:flex; align-items:center; gap:4px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Huduma Mpya
+            </button>
+          </div>
+          <div class="table-responsive" style="max-height:400px; overflow-y:auto; border:1px solid var(--border); border-radius:10px">
+            <table class="table" style="font-size:12.5px; margin:0">
+              <thead style="position:sticky; top:0; z-index:1; background:var(--surface2)">
+                <tr>
+                  <th data-lang-en="Date" data-lang-sw="Tarehe">Tarehe</th>
+                  <th data-lang-en="Batch Code" data-lang-sw="Namba ya Shehena">Namba ya Shehena</th>
+                  <th data-lang-en="Service Type" data-lang-sw="Aina ya Huduma">Aina ya Huduma</th>
+                  <th data-lang-en="Description" data-lang-sw="Maelezo">Maelezo</th>
+                  <th data-lang-en="Fee" data-lang-sw="Gharama">Gharama</th>
+                  <th data-lang-en="Status" data-lang-sw="Hali">Hali</th>
+                </tr>
+              </thead>
+              <tbody id="profServicesBody">
+                <!-- Services will be listed here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="tabContentBatches" class="tab-content" style="display:block">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
+            <h4 style="margin:0; font-size:13.5px; font-weight:700; color:var(--text)">Orodha ya Mzigo Uliopo</h4>
+            <button class="btn btn-primary btn-sm" onclick="switchProfileTab('newIntake')" style="padding: 6px 12px; font-size:12px; background:var(--emerald-600); border-color:var(--emerald-600); display:flex; align-items:center; gap:4px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span data-lang-en="New Stock" data-lang-sw="Pokea Mpya">Pokea Mpya</span>
+            </button>
+          </div>
+          <div style="overflow-x:auto; max-height:280px">
+            <table class="data-table" style="font-size:12.5px">
+              <thead>
+                <tr>
+                  <th>Batch Code</th>
+                  <th>Zao</th>
+                  <th>Uzito</th>
+                  <th>Unyevu</th>
+                  <th>Hali</th>
+                  <th>Vitendo</th>
+                </tr>
+              </thead>
+              <tbody id="profBatchesBody">
+                <tr><td colspan="6" style="text-align:center;color:var(--text3)">Hakuna shehena yoyote.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- Tab 2: New Intake Form -->
+        <div id="tabContentNewIntake" class="tab-content" style="display:none">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+            <div style="grid-column: 1 / -1">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px">
+                <label class="form-label" style="font-size:12px; margin:0">Aina ya Zao *</label>
+                <a href="#" onclick="openQuickCropModal(); return false;" style="font-size:11px; color:var(--emerald-500); text-decoration:none; font-weight:600; display:flex; align-items:center; gap:2px">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Sajili Zao
+                </a>
+              </div>
+              <select id="intakeCrop" class="form-input form-select" style="padding:8px; width:100%">
+                <!-- Dynamically loaded -->
+              </select>
+            </div>
+            <div>
+              <label class="form-label" style="font-size:12px">Kiasi *</label>
+              <input type="number" step="0.01" id="intakeKiasi" class="form-input" placeholder="e.g. 10" oninput="calculateIntakeWeightMT()" style="padding:8px"/>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px">
+                <label class="form-label" style="font-size:12px; margin:0">Vipimo / Units *</label>
+                <a href="#" onclick="openQuickUnitModal(); return false;" style="font-size:11px; color:var(--emerald-500); text-decoration:none; font-weight:600; display:flex; align-items:center; gap:2px">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Sajili Vipimo
+                </a>
+              </div>
+              <select id="intakeUnitSelect" class="form-input form-select" style="padding:8px; width:100%" onchange="calculateIntakeWeightMT()">
+                <!-- Dynamically loaded -->
+              </select>
+            </div>
+            <div style="grid-column: 1 / -1; background: var(--surface2); padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size:12px; font-weight:600; color:var(--text2)">Kikokotoo cha Uzito (Kg)</span>
+              <span style="font-size:12px; font-weight:700; color:var(--emerald-500)" id="intakeWeightHelper">Uzito wa Jumla: 0 Kg</span>
+            </div>
+            <!-- Hidden Fields required by backend -->
+            <input type="hidden" id="intakeWeight" value="0"/>
+            <input type="hidden" id="intakeMoisture" value="13.5"/>
+            <input type="hidden" id="intakeVariety" value=""/>
+            <select id="intakeBin" style="display:none"></select>
+          </div>
+          <div style="display:flex; justify-content:flex-end; margin-top:16px">
+            <button class="btn btn-primary" onclick="submitNewIntake()" style="padding:8px 16px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:6px">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Sajili Upokeaji Mpya
+            </button>
+          </div>
+        </div>
+        
+        <!-- Tab 3: Apply Service Form -->
+        <div id="tabContentApplyService" class="tab-content" style="display:none">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px">
+            <div>
+              <label class="form-label" style="font-size:12px" data-lang-en="Select Batch *" data-lang-sw="Chagua Shehena *">Chagua Shehena *</label>
+              <select id="applyServiceBatchSelect" class="form-input form-select" style="padding:8px" onchange="onApplyServiceBatchChange()">
+                <option value="">Chagua shehena...</option>
+              </select>
+            </div>
+            
+            <div>
+              <label class="form-label" style="font-size:12px" data-lang-en="Select Service *" data-lang-sw="Chagua Huduma *">Chagua Huduma *</label>
+              <select id="applyServiceCatalogSelect" class="form-input form-select" style="padding:8px" onchange="onApplyServiceCatalogChange()">
+                <option value="">Chagua huduma...</option>
+              </select>
+            </div>
+            
+            <div>
+              <label class="form-label" style="font-size:12px" data-lang-en="Rate (Tsh)" data-lang-sw="Bei ya Huduma (Tsh)">Bei ya Huduma (Tsh)</label>
+              <input type="text" id="applyServiceRate" class="form-input" style="padding:8px; background:var(--surface2)" readonly />
+            </div>
+ 
+            <div>
+              <label class="form-label" style="font-size:12px" data-lang-en="Quantity / Units *" data-lang-sw="Kiasi / Vipimo *">Kiasi / Vipimo *</label>
+              <input type="number" step="0.01" id="applyServiceQty" class="form-input" style="padding:8px" placeholder="e.g. 3200" oninput="calculateApplyServiceTotal()" />
+              <span style="font-size:10px; color:var(--text3)" id="applyServiceUnitLabel"></span>
+            </div>
+ 
+            <div id="applyServiceOutputDiv" style="display:none">
+              <label class="form-label" style="font-size:12px" id="applyServiceOutputLabel">Kiwango cha Kutoa (Final value)</label>
+              <input type="number" step="0.1" id="applyServiceOutputValue" class="form-input" style="padding:8px" />
+            </div>
+ 
+            <div>
+              <label class="form-label" style="font-size:12px" data-lang-en="Assigned Machine / Station" data-lang-sw="Mashine / Kinu Kilichopangiwa">Mashine / Kinu Kilichopangiwa</label>
+              <input type="text" id="applyServiceMachine" class="form-input" style="padding:8px" placeholder="e.g. Kinu Block A" />
+            </div>
+ 
+            <div style="grid-column:1/-1; background:var(--surface2); border-radius:10px; padding:14px; display:flex; justify-content:space-between; align-items:center">
+              <div>
+                <div style="font-size:12px; color:var(--text3)" data-lang-en="Total Service Cost" data-lang-sw="Jumla ya Gharama ya Huduma">Jumla ya Gharama ya Huduma</div>
+                <div id="applyServiceTotalCost" style="font-size:20px; font-weight:800; color:var(--text); margin-top:2px">Tsh 0</div>
+              </div>
+              <button class="btn btn-primary" onclick="submitApplyService()" style="padding:8px 16px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:6px" data-lang-en="Apply Service" data-lang-sw="Weka Huduma">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Weka Huduma
+              </button>
+            </div>
+          </div>
+
+          <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px;">
+            <h4 style="margin:0 0 12px 0; font-size:13px; font-weight:700; color:var(--text)" data-lang-en="Recent Applied Services" data-lang-sw="Historia Fupi ya Huduma Zilizotolewa">Historia Fupi ya Huduma Zilizotolewa</h4>
+            <div class="table-responsive" style="max-height:220px; overflow-y:auto; border:1px solid var(--border); border-radius:10px">
+              <table class="table" style="font-size:11.5px; margin:0">
+                <thead style="position:sticky; top:0; z-index:1; background:var(--surface2)">
+                  <tr>
+                    <th data-lang-en="Date" data-lang-sw="Tarehe">Tarehe</th>
+                    <th data-lang-en="Batch" data-lang-sw="Shehena">Shehena</th>
+                    <th data-lang-en="Service" data-lang-sw="Huduma">Huduma</th>
+                    <th data-lang-en="Cost" data-lang-sw="Gharama">Gharama</th>
+                    <th data-lang-en="Status" data-lang-sw="Hali">Hali</th>
+                  </tr>
+                </thead>
+                <tbody id="applyServiceHistoryBody">
+                  <!-- Services populated here dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Tab 3: Loan History & New Loan Form -->
+        <div id="tabContentNewLoan" class="tab-content" style="display:none">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
+            <h4 style="margin:0; font-size:13.5px; font-weight:700; color:var(--text)" data-lang-en="Loan History" data-lang-sw="Historia ya Mikopo">Historia ya Mikopo</h4>
+            <button class="btn btn-outline btn-sm" onclick="toggleNewLoanForm()" style="padding: 6px 12px; font-size:12px; display:flex; align-items:center; gap:4px" id="btnToggleLoanForm">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Mkopo Mpya
+            </button>
+          </div>
+
+          <!-- Loan History Table -->
+          <div id="loanHistorySection" class="table-responsive" style="max-height:400px; overflow-y:auto; border:1px solid var(--border); border-radius:10px">
+            <table class="table" style="font-size:12.5px; margin:0">
+              <thead style="position:sticky; top:0; z-index:1; background:var(--surface2)">
+                <tr>
+                  <th data-lang-en="Date" data-lang-sw="Tarehe">Tarehe</th>
+                  <th data-lang-en="Amount" data-lang-sw="Kiasi">Kiasi</th>
+                  <th data-lang-en="Balance" data-lang-sw="Salio">Salio</th>
+                  <th data-lang-en="Due Date" data-lang-sw="Tarehe ya Kulipa">Tarehe ya Kulipa</th>
+                  <th data-lang-en="Status" data-lang-sw="Hali">Hali</th>
+                </tr>
+              </thead>
+              <tbody id="profLoansBody">
+                <!-- Loans will be listed here -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- New Loan Form (Hidden by default) -->
+          <div id="newLoanFormSection" style="display:none; background:var(--surface2); padding:16px; border-radius:10px; border:1px solid var(--border)">
+            <h5 style="margin:0 0 12px 0; font-size:13px; font-weight:700">Maombi ya Mkopo Mpya</h5>
+            <div style="display:grid; grid-template-columns:1fr; gap:12px">
+              <div>
+                <label class="form-label" style="font-size:12px">Kiasi cha Mkopo (Tsh) *</label>
+                <input type="number" id="loanAmount" class="form-input" placeholder="e.g. 1000000" style="padding:8px"/>
+              </div>
+              <div>
+                <label class="form-label" style="font-size:12px">Tarehe ya Kulipa *</label>
+                <input type="date" id="loanDueDate" class="form-input" style="padding:8px"/>
+              </div>
+              <div>
+                <label class="form-label" style="font-size:12px">Mazao ya Dhamana (Collateral Batch) *</label>
+                <select id="loanCollateral" class="form-input form-select" style="padding:8px">
+                  <option value="">Chagua batch ya dhamana...</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:flex; justify-content:flex-end; margin-top:16px">
+              <button class="btn btn-primary" id="btnSubmitLoan" style="padding:8px 16px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:6px">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Tuma Ombi
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Tab 5: Settlement & Payout Dashboard -->
+        <div id="tabContentSettlement" class="tab-content" style="display:none">
+          
+          <!-- Top mini-dashboard KPI grid -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:18px">
+            <div style="background:var(--surface2); border:1px solid var(--border); padding:16px; border-radius:12px; display:flex; flex-direction:column">
+              <span style="font-size:11.5px; color:var(--text3)" data-lang-en="Gross Grain Value" data-lang-sw="Thamani Ghafi ya Mauzo">Thamani Ghafi ya Mauzo</span>
+              <strong id="settleGrossSales" style="font-size:20px; font-weight:800; color:var(--indigo-500); margin-top:4px">Tsh 0</strong>
+            </div>
+            <div style="background:var(--surface2); border:1px solid var(--border); padding:16px; border-radius:12px; display:flex; flex-direction:column">
+              <span style="font-size:11.5px; color:var(--text3)" data-lang-en="Total System Deductions" data-lang-sw="Jumla ya Makato">Jumla ya Makato</span>
+              <strong id="settleTotalDeductions" style="font-size:20px; font-weight:800; color:var(--red-500); margin-top:4px">Tsh 0</strong>
+            </div>
+            <div style="background:var(--surface2); border:2px solid var(--emerald-500); padding:16px; border-radius:12px; display:flex; flex-direction:column; box-shadow:var(--shadow-sm)">
+              <span style="font-size:11.5px; color:var(--text2); font-weight:600" data-lang-en="Final Payout (Net)" data-lang-sw="Malipo Halisi (Remis)">Malipo Halisi (Remis)</span>
+              <strong id="settleNetPayout" style="font-size:22px; font-weight:800; color:var(--emerald-500); margin-top:4px">Tsh 0</strong>
+            </div>
+          </div>
+
+          <!-- Bottom Columns -->
+          <div style="display:grid; grid-template-columns:1.4fr 1fr; gap:16px; flex-wrap:wrap">
+            
+            <!-- LEFT PANEL: Deduction Analytics -->
+            <div style="background:var(--surface2); border-radius:12px; padding:18px; border:1px solid var(--border)">
+              <h4 style="margin:0 0 14px 0; font-size:14px; font-weight:700" data-lang-en="Deductions Analytics &amp; Breakdown" data-lang-sw="Uchambuzi na Mchanganuo wa Makato">Uchambuzi na Mchanganuo wa Makato</h4>
+              
+              <div id="settleDetailsArea" style="display:none; flex-direction:column; gap:12px">
+                
+                <!-- Storage Fee -->
+                <div>
+                  <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:4px">
+                    <span data-lang-en="Storage Fees" data-lang-sw="Ada ya Hifadhi ya Ghala">Ada ya Hifadhi ya Ghala</span>
+                    <strong id="settleStorageFee">Tsh 0</strong>
+                  </div>
+                  <div style="height:6px; background:var(--border); border-radius:3px; overflow:hidden">
+                    <div id="settleStorageProgress" style="width:0%; height:100%; background:var(--amber-500); transition:width 0.3s"></div>
+                  </div>
+                </div>
+
+                <!-- Drying Fee -->
+                <div>
+                  <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:4px">
+                    <span data-lang-en="Drying &amp; Sunning Fees" data-lang-sw="Ada za Kukausha">Ada za Kukausha</span>
+                    <strong id="settleDryingFee">Tsh 0</strong>
+                  </div>
+                  <div style="height:6px; background:var(--border); border-radius:3px; overflow:hidden">
+                    <div id="settleDryingProgress" style="width:0%; height:100%; background:var(--indigo-500); transition:width 0.3s"></div>
+                  </div>
+                </div>
+
+                <!-- Milling Fee -->
+                <div>
+                  <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:4px">
+                    <span data-lang-en="Milling &amp; Processing Fees" data-lang-sw="Ada za Kukoboa / Kusaga">Ada za Kukoboa / Kusaga</span>
+                    <strong id="settleMillingFee">Tsh 0</strong>
+                  </div>
+                  <div style="height:6px; background:var(--border); border-radius:3px; overflow:hidden">
+                    <div id="settleMillingProgress" style="width:0%; height:100%; background:var(--purple-500); transition:width 0.3s"></div>
+                  </div>
+                </div>
+
+                <!-- Grading Fee -->
+                <div>
+                  <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:4px">
+                    <span data-lang-en="Quality Grading &amp; Assaying" data-lang-sw="Ada za Kugiredi">Ada za Kugiredi</span>
+                    <strong id="settleGradingFee">Tsh 0</strong>
+                  </div>
+                  <div style="height:6px; background:var(--border); border-radius:3px; overflow:hidden">
+                    <div id="settleGradingProgress" style="width:0%; height:100%; background:var(--pink-500); transition:width 0.3s"></div>
+                  </div>
+                </div>
+
+                <!-- Loan Principal -->
+                <div>
+                  <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:4px">
+                    <span data-lang-en="Loan Principal Repayment" data-lang-sw="Rejesho la Mtaji wa Mkopo">Rejesho la Mtaji wa Mkopo</span>
+                    <strong id="settleLoanPrincipal">Tsh 0</strong>
+                  </div>
+                  <div style="height:6px; background:var(--border); border-radius:3px; overflow:hidden">
+                    <div id="settleLoanPrincipalProgress" style="width:0%; height:100%; background:var(--red-500); transition:width 0.3s"></div>
+                  </div>
+                </div>
+
+                <!-- Loan Interest -->
+                <div>
+                  <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:4px">
+                    <span data-lang-en="Accrued Loan Interest" data-lang-sw="Riba ya Mikopo">Riba ya Mikopo</span>
+                    <strong id="settleLoanInterest">Tsh 0</strong>
+                  </div>
+                  <div style="height:6px; background:var(--border); border-radius:3px; overflow:hidden">
+                    <div id="settleLoanInterestProgress" style="width:0%; height:100%; background:var(--red-600); transition:width 0.3s"></div>
+                  </div>
+                </div>
+
+              </div>
+              <div id="settleEmptyState" style="text-align:center; color:var(--text3); padding:30px 10px" data-lang-en="Select a crop batch to analyze deductions." data-lang-sw="Chagua shehena ya mazao kufanya uchambuzi wa makato.">
+                Chagua shehena ya mazao kufanya uchambuzi wa makato.
+              </div>
+            </div>
+
+            <!-- RIGHT PANEL: Settlement Actions -->
+            <div style="display:flex; flex-direction:column; gap:12px">
+              
+              <div>
+                <label class="form-label" style="font-size:12px" data-lang-en="Crop Batch *" data-lang-sw="Shehena ya Mazao *">Shehena ya Mazao *</label>
+                <select id="settleBatchSelect" class="form-input form-select" style="padding:8px" onchange="previewSettleDeductions()">
+                  <option value="">Chagua shehena...</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="form-label" style="font-size:12px" data-lang-en="Buyer / Client *" data-lang-sw="Mnunuzi wa Mazao *">Mnunuzi wa Mazao *</label>
+                <select id="settleBuyerSelect" class="form-input form-select" style="padding:8px">
+                  <option value="">Chagua mnunuzi...</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="form-label" style="font-size:12px" data-lang-en="Negotiated Price (Tsh / MT) *" data-lang-sw="Bei ya Mauzo (Tsh kwa Tani) *">Bei ya Mauzo (Tsh kwa Tani) *</label>
+                <input type="number" id="settlePriceInput" class="form-input" style="padding:8px" placeholder="e.g. 800000" oninput="recalculatePayout()"/>
+              </div>
+
+              <div style="background:var(--surface2); border-radius:10px; padding:12px; font-size:12px; color:var(--text3); border:1px dashed var(--border)">
+                <span data-lang-en="* Finalizing this sale generates a TAX Invoice for the buyer, settles all outstanding processing fees and loan balances for this farmer." data-lang-sw="* Kukamilisha mauzo haya kutatengeneza Ankara ya Kodi ya mnunuzi, na kulipa ada zote na mikopo ya mkulima.">* Kukamilisha mauzo haya kutatengeneza Ankara ya Kodi ya mnunuzi, na kulipa ada zote na mikopo ya mkulima.</span>
+              </div>
+
+              <button class="btn btn-primary" onclick="confirmFarmerSale()" style="width:100%; padding:9px; font-size:13.5px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:8px" id="btnConfirmSale" data-lang-en="Finalize Sale &amp; Settlement" data-lang-sw="Kamilisha Makato &amp; Mauzo">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Kamilisha Makato &amp; Mauzo
+              </button>
+            </div>
+
+          </div>
+        </div>  </div>
+        
+      </div>
+      
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cancelProfileModal" style="padding:8px 16px; font-size:13px">Funga</button>
+    </div>
+  </div>
+</div>
+
+<!-- Dynamic Processing Job Mini Modal (Galanoki Custom Services) -->
+<div id="processingModal" class="modal-overlay" style="z-index: 10000">
+  <div class="modal" style="max-width:450px; width:90%">
+    <div class="modal-header">
+      <div class="modal-title" id="procModalTitle">Huduma ya Kiusindikaji</div>
+      <button id="closeProcModal" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="display:flex; flex-direction:column; gap:12px">
+      <input type="hidden" id="procBatchId"/>
+      <input type="hidden" id="procType"/>
+      
+      <div>
+        <label class="form-label">Chagua Huduma *</label>
+        <select id="procServiceSelect" class="form-input form-select" style="padding:8px" onchange="onProcServiceChange()"></select>
+      </div>
+
+      <div>
+        <label class="form-label" id="procUnitsLabel">Idadi ya Kilo (Kg) *</label>
+        <input type="number" id="procUnitsInput" class="form-input" style="padding:8px" oninput="calculateProcFee()"/>
+      </div>
+      
+      <!-- Dynamic outcome variables (Moisture or Milled Output or Grade) -->
+      <div id="procInputContainer">
+        <label class="form-label" id="procValueLabel">Kiwango cha Mwisho</label>
+        <input type="number" step="0.01" id="procFinalValue" class="form-input" style="padding:8px"/>
+      </div>
+      
+      <div id="procGradeContainer" style="display:none">
+        <label class="form-label">Daraja la Mwisho (Grade)</label>
+        <select id="procGrade" class="form-input form-select" style="padding:8px">
+          <option>A</option>
+          <option>B</option>
+          <option>C</option>
+        </select>
+      </div>
+      
+      <div>
+        <label class="form-label">Ada ya Huduma (Tsh) *</label>
+        <input type="number" id="procFee" class="form-input" placeholder="Inakokotolewa..." style="padding:8px"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="btnCancelProc">Ghairi</button>
+      <button class="btn btn-primary" id="btnConfirmProc">Kamilisha Huduma</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Batch Modal -->
+<div id="editBatchModal" class="modal-overlay" style="z-index: 10500">
+  <div class="modal" style="max-width:400px; width:90%; background: var(--surface); padding: 20px; border-radius: 12px; box-shadow: var(--shadow-lg);">
+    <div class="modal-header" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: none; padding: 0;">
+      <div class="modal-title" style="font-weight: 700; color: var(--text); font-size: 16px;">Hariri Mzigo (Batch)</div>
+      <button onclick="closeEditBatchModal()" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="display:flex; flex-direction:column; gap:12px; padding: 0;">
+      <input type="hidden" id="editBatchId"/>
+      <input type="hidden" id="editBatchMoisture" value="13.5"/>
+      <input type="hidden" id="editBatchWeight" value="0"/>
+      
+      <div>
+        <label class="form-label" style="font-size:12px; margin-bottom: 4px; display: block;">Aina ya Zao *</label>
+        <select id="editBatchCropType" class="form-input form-select" style="padding:8px; width:100%"></select>
+      </div>
+
+      <div>
+        <label class="form-label" style="font-size:12px; margin-bottom: 4px; display: block;">Kiasi *</label>
+        <input type="number" step="0.01" id="editBatchKiasi" class="form-input" placeholder="e.g. 10" oninput="calculateEditBatchWeightMT()" style="padding:8px; width:100%"/>
+      </div>
+
+      <div>
+        <label class="form-label" style="font-size:12px; margin-bottom: 4px; display: block;">Vipimo / Units *</label>
+        <select id="editBatchUnitSelect" class="form-input form-select" style="padding:8px; width:100%" onchange="calculateEditBatchWeightMT()"></select>
+      </div>
+
+      <div style="background: var(--surface2); padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size:11px; font-weight:600; color:var(--text2)">Kikokotoo cha Uzito (Kg)</span>
+        <span style="font-size:11px; font-weight:700; color:var(--emerald-500)" id="editBatchWeightHelper">Uzito wa Jumla: 0 Kg</span>
+      </div>
+
+      <div>
+        <label class="form-label" style="font-size:12px; margin-bottom: 4px; display: block;">Hali ya Mzigo (Status) *</label>
+        <select id="editBatchStatus" class="form-input form-select" style="padding:8px; width:100%">
+          <option value="received">Imepokelewa (Received)</option>
+          <option value="drying">Kwenye Kukaushwa (Drying)</option>
+          <option value="stored">Imegulwa / Imehifadhiwa (Stored)</option>
+          <option value="released">Imetolewa (Released)</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer" style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px; border-top: none; padding: 0;">
+      <button class="btn btn-secondary" onclick="closeEditBatchModal()" style="padding: 6px 12px; font-size: 12px;">Ghairi</button>
+      <button class="btn btn-primary" onclick="submitEditBatch()" style="padding: 6px 12px; font-size: 12px;">Hifadhi</button>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Crop Modal -->
+<div id="quickCropModal" class="modal-overlay" style="z-index: 11000">
+  <div class="modal" style="max-width:350px; width:90%; background: var(--surface); padding: 20px; border-radius: 12px; box-shadow: var(--shadow-lg);">
+    <div class="modal-header" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: none; padding: 0;">
+      <div class="modal-title" style="font-weight: 700; color: var(--text); font-size: 16px;">Sajili Zao Jipya</div>
+      <button onclick="closeQuickCropModal()" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="display:flex; flex-direction:column; gap:12px; padding: 0;">
+      <div>
+        <label class="form-label" style="font-size:12px; margin-bottom: 4px; display: block;">Jina la Zao *</label>
+        <input type="text" id="newCropName" class="form-input" placeholder="e.g. Rice, Beans" style="padding:8px; width:100%"/>
+      </div>
+      <div style="font-size:12px; font-weight:600; color:var(--text2); margin-top:8px">Mazao Yaliyopo:</div>
+      <div id="cropListContainer" style="max-height:120px; overflow-y:auto; display:flex; flex-direction:column; gap:6px"></div>
+    </div>
+    <div class="modal-footer" style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px; border-top: none; padding: 0;">
+      <button class="btn btn-secondary" onclick="closeQuickCropModal()" style="padding: 6px 12px; font-size: 12px;">Ghairi</button>
+      <button class="btn btn-primary" onclick="saveQuickCrop()" style="padding: 6px 12px; font-size: 12px;">Sajili</button>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Unit Modal -->
+<div id="quickUnitModal" class="modal-overlay" style="z-index: 11000">
+  <div class="modal" style="max-width:350px; width:90%; background: var(--surface); padding: 20px; border-radius: 12px; box-shadow: var(--shadow-lg);">
+    <div class="modal-header" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: none; padding: 0;">
+      <div class="modal-title" style="font-weight: 700; color: var(--text); font-size: 16px;">Sajili Kipimo Kipya</div>
+      <button onclick="closeQuickUnitModal()" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="display:flex; flex-direction:column; gap:12px; padding: 0;">
+      <div>
+        <label class="form-label" style="font-size:12px; margin-bottom: 4px; display: block;">Jina la Kipimo *</label>
+        <input type="text" id="newUnitName" class="form-input" placeholder="e.g. Sado, Gunia, Kilo" style="padding:8px; width:100%"/>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; margin:4px 0 8px 0">
+        <input type="checkbox" id="unitUnknownWeight" style="cursor:pointer; width:16px; height:16px"/>
+        <label for="unitUnknownWeight" style="font-size:12px; color:var(--text2); cursor:pointer; user-select:none">Uzito haujulikani hadi ukobolewe (e.g. Mpunga)</label>
+      </div>
+      <div style="font-size:12px; font-weight:600; color:var(--text2); margin-top:8px">Vipimo Vilivyopo:</div>
+      <div id="unitListContainer" style="max-height:120px; overflow-y:auto; display:flex; flex-direction:column; gap:6px"></div>
+    </div>
+    <div class="modal-footer" style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px; border-top: none; padding: 0;">
+      <button class="btn btn-secondary" onclick="closeQuickUnitModal()" style="padding: 6px 12px; font-size: 12px;">Ghairi</button>
+      <button class="btn btn-primary" onclick="saveQuickUnit()" style="padding: 6px 12px; font-size: 12px;">Sajili</button>
+    </div>
+  </div>
+</div>
+<!-- Custom Confirmation Modal -->
+<div id="deleteConfirmModal" class="modal-overlay" style="z-index: 12000">
+  <div class="modal" style="max-width:380px; width:90%; background: var(--surface); padding: 24px; border-radius: 12px; box-shadow: var(--shadow-lg); text-align: center;">
+    <div style="color: var(--red-500); margin-bottom: 12px;">
+      <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin: 0 auto;">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+    </div>
+    <div class="modal-title" style="font-weight: 700; color: var(--text); font-size: 16px; margin-bottom: 8px;" id="deleteConfirmTitle">Futa Kipengele</div>
+    <div style="font-size: 13px; color: var(--text2); margin-bottom: 20px;" id="deleteConfirmMessage">Je, una uhakika unataka kukifuta kipengele hiki?</div>
+    <div style="display: flex; justify-content: center; gap: 10px;">
+      <button class="btn btn-secondary" onclick="closeDeleteConfirmModal()" style="padding: 8px 16px; font-size: 13px;">Ghairi</button>
+      <button class="btn btn-primary" id="btnDeleteConfirmAction" style="background: var(--red-500); border-color: var(--red-500); color: white; padding: 8px 16px; font-size: 13px;">Futa</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script src="assets/components.js"></script>
+<script>
+renderNav('farmers.html');
+
+let tanzaniaGeoData = null;
+
+function findKeyCaseInsensitive(obj, searchKey) {
+  if (!obj || !searchKey) return null;
+  const cleanSearch = searchKey.trim().toLowerCase().replace(/\s+/g, '');
+  for (const key of Object.keys(obj)) {
+    const cleanKey = key.trim().toLowerCase().replace(/\s+/g, '').replace(/\n/g, '').replace(/\r/g, '');
+    if (cleanKey === cleanSearch) {
+      return key;
+    }
+  }
+  return null;
+}
+
+async function initTanzaniaGeo() {
+  try {
+    const response = await fetch('/tanzania_geo.json');
+    tanzaniaGeoData = await response.json();
+    populateRegions();
+  } catch (error) {
+    console.error('Failed to load tanzania_geo.json:', error);
+  }
+
+  // Bind event listeners
+  const addRegion = document.getElementById('addRegion');
+  const addDistrict = document.getElementById('addDistrict');
+  const addWard = document.getElementById('addWard');
+  const addVillage = document.getElementById('addVillage');
+  const addStreet = document.getElementById('addStreet');
+
+  if (addRegion) {
+    addRegion.addEventListener('input', function() {
+      const selectedRegion = findKeyCaseInsensitive(tanzaniaGeoData, this.value);
+      const districtDatalist = document.getElementById('districtList');
+      const districtInput = document.getElementById('addDistrict');
+      const wardDatalist = document.getElementById('wardList');
+      const wardInput = document.getElementById('addWard');
+      const villageDatalist = document.getElementById('villageList');
+      const villageInput = document.getElementById('addVillage');
+      const streetDatalist = document.getElementById('streetList');
+      const streetInput = document.getElementById('addStreet');
+
+      // Clear children
+      if (districtInput) districtInput.value = '';
+      if (districtDatalist) districtDatalist.innerHTML = '';
+      if (wardInput) wardInput.value = '';
+      if (wardDatalist) wardDatalist.innerHTML = '';
+      if (villageInput) villageInput.value = '';
+      if (villageDatalist) villageDatalist.innerHTML = '';
+      if (streetInput) streetInput.value = '';
+      if (streetDatalist) streetDatalist.innerHTML = '';
+
+      if (!tanzaniaGeoData || !selectedRegion || !tanzaniaGeoData[selectedRegion]) return;
+
+      const districtsObj = tanzaniaGeoData[selectedRegion].districts || {};
+      Object.keys(districtsObj).sort().forEach(dist => {
+        const option = document.createElement('option');
+        option.value = dist.replace(/\n/g, ' ').replace(/\r/g, ' ').trim();
+        if (districtDatalist) districtDatalist.appendChild(option);
+      });
+    });
+  }
+
+  if (addDistrict) {
+    addDistrict.addEventListener('input', function() {
+      const regionVal = document.getElementById('addRegion') ? document.getElementById('addRegion').value : '';
+      const selectedRegion = findKeyCaseInsensitive(tanzaniaGeoData, regionVal);
+      if (!tanzaniaGeoData || !selectedRegion || !tanzaniaGeoData[selectedRegion]) return;
+
+      const districtsObj = tanzaniaGeoData[selectedRegion].districts || {};
+      const selectedDistrict = findKeyCaseInsensitive(districtsObj, this.value);
+
+      const wardDatalist = document.getElementById('wardList');
+      const wardInput = document.getElementById('addWard');
+      const villageDatalist = document.getElementById('villageList');
+      const villageInput = document.getElementById('addVillage');
+      const streetDatalist = document.getElementById('streetList');
+      const streetInput = document.getElementById('addStreet');
+
+      // Clear children
+      if (wardInput) wardInput.value = '';
+      if (wardDatalist) wardDatalist.innerHTML = '';
+      if (villageInput) villageInput.value = '';
+      if (villageDatalist) villageDatalist.innerHTML = '';
+      if (streetInput) streetInput.value = '';
+      if (streetDatalist) streetDatalist.innerHTML = '';
+
+      if (!selectedDistrict || !districtsObj[selectedDistrict]) return;
+
+      const wardsObj = districtsObj[selectedDistrict].wards || {};
+      Object.keys(wardsObj).sort().forEach(ward => {
+        const option = document.createElement('option');
+        option.value = ward.replace(/\n/g, ' ').replace(/\r/g, ' ').trim();
+        if (wardDatalist) wardDatalist.appendChild(option);
+      });
+    });
+  }
+
+  if (addWard) {
+    addWard.addEventListener('input', function() {
+      const regionVal = document.getElementById('addRegion') ? document.getElementById('addRegion').value : '';
+      const selectedRegion = findKeyCaseInsensitive(tanzaniaGeoData, regionVal);
+      if (!tanzaniaGeoData || !selectedRegion || !tanzaniaGeoData[selectedRegion]) return;
+
+      const districtsObj = tanzaniaGeoData[selectedRegion].districts || {};
+      const districtVal = document.getElementById('addDistrict') ? document.getElementById('addDistrict').value : '';
+      const selectedDistrict = findKeyCaseInsensitive(districtsObj, districtVal);
+      if (!selectedDistrict || !districtsObj[selectedDistrict]) return;
+
+      const wardsObj = districtsObj[selectedDistrict].wards || {};
+      const selectedWard = findKeyCaseInsensitive(wardsObj, this.value);
+
+      const villageDatalist = document.getElementById('villageList');
+      const villageInput = document.getElementById('addVillage');
+      const streetDatalist = document.getElementById('streetList');
+      const streetInput = document.getElementById('addStreet');
+
+      // Clear children
+      if (villageInput) villageInput.value = '';
+      if (villageDatalist) villageDatalist.innerHTML = '';
+      if (streetInput) streetInput.value = '';
+      if (streetDatalist) streetDatalist.innerHTML = '';
+
+      if (!selectedWard || !wardsObj[selectedWard]) return;
+
+      const streetsObj = wardsObj[selectedWard].streets || {};
+      
+      const uniqueStreets = new Set();
+      Object.keys(streetsObj).sort().forEach(village => {
+        const option = document.createElement('option');
+        option.value = village.replace(/\n/g, ' ').replace(/\r/g, ' ').trim();
+        if (villageDatalist) villageDatalist.appendChild(option);
+
+        const substreets = streetsObj[village];
+        if (Array.isArray(substreets)) {
+          substreets.forEach(sub => {
+            if (sub && sub.trim()) {
+              uniqueStreets.add(sub.replace(/\n/g, ' ').replace(/\r/g, ' ').trim());
+            }
+          });
+        }
+      });
+
+      Array.from(uniqueStreets).sort().forEach(str => {
+        const option = document.createElement('option');
+        option.value = str;
+        if (streetDatalist) streetDatalist.appendChild(option);
+      });
+    });
+  }
+
+  if (addVillage) {
+    addVillage.addEventListener('input', function() {
+      const regionVal = document.getElementById('addRegion') ? document.getElementById('addRegion').value : '';
+      const selectedRegion = findKeyCaseInsensitive(tanzaniaGeoData, regionVal);
+      if (!tanzaniaGeoData || !selectedRegion || !tanzaniaGeoData[selectedRegion]) return;
+
+      const districtsObj = tanzaniaGeoData[selectedRegion].districts || {};
+      const districtVal = document.getElementById('addDistrict') ? document.getElementById('addDistrict').value : '';
+      const selectedDistrict = findKeyCaseInsensitive(districtsObj, districtVal);
+      if (!selectedDistrict || !districtsObj[selectedDistrict]) return;
+
+      const wardsObj = districtsObj[selectedDistrict].wards || {};
+      const wardVal = document.getElementById('addWard') ? document.getElementById('addWard').value : '';
+      const selectedWard = findKeyCaseInsensitive(wardsObj, wardVal);
+      if (!selectedWard || !wardsObj[selectedWard]) return;
+
+      const streetsObj = wardsObj[selectedWard].streets || {};
+      const selectedVillage = findKeyCaseInsensitive(streetsObj, this.value);
+
+      const streetDatalist = document.getElementById('streetList');
+      const streetInput = document.getElementById('addStreet');
+
+      if (selectedVillage && streetsObj[selectedVillage]) {
+        if (streetInput) streetInput.value = '';
+        if (streetDatalist) streetDatalist.innerHTML = '';
+        const substreets = streetsObj[selectedVillage];
+        if (Array.isArray(substreets)) {
+          substreets.forEach(sub => {
+            if (sub && sub.trim()) {
+              const option = document.createElement('option');
+              option.value = sub.replace(/\n/g, ' ').replace(/\r/g, ' ').trim();
+              if (streetDatalist) streetDatalist.appendChild(option);
+            }
+          });
+        }
+      }
+    });
+  }
+}
+
+function populateRegions() {
+  // Populate Add form datalist
+  const datalist = document.getElementById('regionList');
+  if (datalist && tanzaniaGeoData) {
+    datalist.innerHTML = '';
+    Object.keys(tanzaniaGeoData).sort().forEach(region => {
+      const option = document.createElement('option');
+      option.value = region.replace(/\n/g, ' ').replace(/\r/g, ' ').trim();
+      datalist.appendChild(option);
+    });
+  }
+  // Populate Edit form datalist
+  const editList = document.getElementById('editRegionList');
+  if (editList && tanzaniaGeoData) {
+    editList.innerHTML = '';
+    Object.keys(tanzaniaGeoData).sort().forEach(region => {
+      const option = document.createElement('option');
+      option.value = region.replace(/\n/g, ' ').replace(/\r/g, ' ').trim();
+      editList.appendChild(option);
+    });
+  }
+}
+
+function setupEditLocationAutocomplete() {
+  const editRegion   = document.getElementById('editFarmerRegion');
+  const editDistrict = document.getElementById('editFarmerDistrict');
+  const editWard     = document.getElementById('editFarmerWard');
+  const editVillage  = document.getElementById('editFarmerVillage');
+  const editStreet   = document.getElementById('editFarmerStreet');
+
+  function clearDatalist(id) {
+    const dl = document.getElementById(id);
+    if (dl) dl.innerHTML = '';
+  }
+  function populateDatalist(id, items) {
+    const dl = document.getElementById(id);
+    if (!dl) return;
+    dl.innerHTML = '';
+    items.sort().forEach(val => {
+      const opt = document.createElement('option');
+      opt.value = val.replace(/\n/g, ' ').replace(/\r/g, ' ').trim();
+      dl.appendChild(opt);
+    });
+  }
+
+  if (editRegion) {
+    editRegion.addEventListener('input', function() {
+      // Reset downstream
+      if (editDistrict) editDistrict.value = '';
+      if (editWard) editWard.value = '';
+      if (editVillage) editVillage.value = '';
+      if (editStreet) editStreet.value = '';
+      clearDatalist('editDistrictList'); clearDatalist('editWardList');
+      clearDatalist('editVillageList'); clearDatalist('editStreetList');
+
+      const selectedRegion = findKeyCaseInsensitive(tanzaniaGeoData, this.value);
+      if (!selectedRegion) return;
+      const districts = Object.keys(tanzaniaGeoData[selectedRegion].districts || {});
+      populateDatalist('editDistrictList', districts);
+    });
+  }
+
+  if (editDistrict) {
+    editDistrict.addEventListener('input', function() {
+      if (editWard) editWard.value = '';
+      if (editVillage) editVillage.value = '';
+      if (editStreet) editStreet.value = '';
+      clearDatalist('editWardList'); clearDatalist('editVillageList'); clearDatalist('editStreetList');
+
+      const selReg = findKeyCaseInsensitive(tanzaniaGeoData, editRegion.value);
+      if (!selReg) return;
+      const districtsObj = tanzaniaGeoData[selReg].districts || {};
+      const selDist = findKeyCaseInsensitive(districtsObj, this.value);
+      if (!selDist) return;
+      const wards = Object.keys(districtsObj[selDist].wards || {});
+      populateDatalist('editWardList', wards);
+    });
+  }
+
+  if (editWard) {
+    editWard.addEventListener('input', function() {
+      if (editVillage) editVillage.value = '';
+      if (editStreet) editStreet.value = '';
+      clearDatalist('editVillageList'); clearDatalist('editStreetList');
+
+      const selReg = findKeyCaseInsensitive(tanzaniaGeoData, editRegion.value);
+      if (!selReg) return;
+      const districtsObj = tanzaniaGeoData[selReg].districts || {};
+      const selDist = findKeyCaseInsensitive(districtsObj, editDistrict.value);
+      if (!selDist) return;
+      const wardsObj = districtsObj[selDist].wards || {};
+      const selWard = findKeyCaseInsensitive(wardsObj, this.value);
+      if (!selWard) return;
+      const streetsObj = wardsObj[selWard].streets || {};
+      const villages = Object.keys(streetsObj);
+      populateDatalist('editVillageList', villages);
+      const uniqueStreets = new Set();
+      villages.forEach(v => {
+        (streetsObj[v] || []).forEach(s => { if (s && s.trim()) uniqueStreets.add(s.trim()); });
+      });
+      populateDatalist('editStreetList', Array.from(uniqueStreets));
+    });
+  }
+
+  if (editVillage) {
+    editVillage.addEventListener('input', function() {
+      if (editStreet) editStreet.value = '';
+      clearDatalist('editStreetList');
+
+      const selReg = findKeyCaseInsensitive(tanzaniaGeoData, editRegion.value);
+      if (!selReg) return;
+      const districtsObj = tanzaniaGeoData[selReg].districts || {};
+      const selDist = findKeyCaseInsensitive(districtsObj, editDistrict.value);
+      if (!selDist) return;
+      const wardsObj = districtsObj[selDist].wards || {};
+      const selWard = findKeyCaseInsensitive(wardsObj, editWard.value);
+      if (!selWard) return;
+      const streetsObj = wardsObj[selWard].streets || {};
+      const selVillage = findKeyCaseInsensitive(streetsObj, this.value);
+      if (!selVillage) return;
+      const subs = streetsObj[selVillage] || [];
+      populateDatalist('editStreetList', subs.filter(Boolean));
+    });
+  }
+}
+
+// Crops and Units Dynamic Local List Handling
+function initCropAndUnitLists() {
+  if (!localStorage.getItem('agroCropsList')) {
+    localStorage.setItem('agroCropsList', JSON.stringify(['Maize', 'Rice', 'Beans', 'Sunflower']));
+  }
+  
+  const existingUnits = localStorage.getItem('agroUnitsList');
+  let units = [
+    { name: 'Kilo (Kg)', kg: 1 },
+    { name: 'Gunia (Bag)', kg: 100 },
+    { name: 'Roba', kg: 50 },
+    { name: 'Tani (Ton)', kg: 1000 }
+  ];
+  
+  if (existingUnits) {
+    try {
+      const parsed = JSON.parse(existingUnits);
+      if (Array.isArray(parsed)) {
+        units = parsed.map(u => {
+          if (typeof u === 'string') {
+            return { name: u, kg: getKgWeightForUnitName(u) };
+          }
+          if (u && typeof u === 'object') {
+            return {
+              name: u.name || '',
+              kg: typeof u.kg === 'number' ? u.kg : getKgWeightForUnitName(u.name || '')
+            };
+          }
+          return u;
+        }).filter(Boolean);
+      }
+    } catch (e) {}
+  }
+  
+  localStorage.setItem('agroUnitsList', JSON.stringify(units));
+  
+  renderCropSelectOptions();
+  renderUnitSelectOptions();
+}
+
+function renderCropSelectOptions() {
+  const cropsStr = localStorage.getItem('agroCropsList');
+  let crops = ['Maize', 'Rice', 'Beans', 'Sunflower'];
+  if (cropsStr) {
+    try { crops = JSON.parse(cropsStr); } catch (e) {}
+  }
+  const select = document.getElementById('intakeCrop');
+  if (select) {
+    select.innerHTML = crops.map(c => `<option value="${c}">${c}</option>`).join('');
+  }
+}
+
+function renderUnitSelectOptions() {
+  const unitsStr = localStorage.getItem('agroUnitsList');
+  let units = [
+    { name: 'Kilo (Kg)', kg: 1 },
+    { name: 'Gunia (Bag)', kg: 100 },
+    { name: 'Roba', kg: 50 },
+    { name: 'Tani (Ton)', kg: 1000 }
+  ];
+  if (unitsStr) {
+    try { units = JSON.parse(unitsStr); } catch (e) {}
+  }
+  const select = document.getElementById('intakeUnitSelect');
+  if (select) {
+    select.innerHTML = units.map(u => {
+      const uName = typeof u === 'string' ? u : u.name;
+      const uKg = typeof u === 'string' ? getKgWeightForUnitName(u) : (typeof u.kg === 'number' ? u.kg : 1);
+      const display = uKg === 0 ? `${uName} (Uzito haujulikani)` : `${uName} (1 = ${uKg} Kg)`;
+      return `<option value="${uName}" data-kg="${uKg}">${display}</option>`;
+    }).join('');
+  }
+}
+
+function openQuickCropModal() {
+  document.getElementById('quickCropModal').classList.add('open');
+  document.getElementById('newCropName').value = '';
+  renderModalCropList();
+}
+
+function closeQuickCropModal() {
+  document.getElementById('quickCropModal').classList.remove('open');
+}
+
+function renderModalCropList() {
+  const cropsStr = localStorage.getItem('agroCropsList');
+  let crops = ['Maize', 'Rice', 'Beans', 'Sunflower'];
+  if (cropsStr) {
+    try { crops = JSON.parse(cropsStr); } catch (e) {}
+  }
+  const container = document.getElementById('cropListContainer');
+  if (!container) return;
+  
+  if (crops.length === 0) {
+    container.innerHTML = '<span style="font-size:11px; color:var(--text3); padding:4px 0">Hakuna mazao yaliyopo.</span>';
+    return;
+  }
+  
+  container.innerHTML = crops.map(c => `
+    <div style="display:flex; justify-content:space-between; align-items:center; background:var(--surface2); padding:6px 10px; border-radius:6px; font-size:12px; margin-top:2px">
+      <span style="color:var(--text)">${c}</span>
+      <a href="#" onclick="deleteCrop('${c}'); return false;" style="color:var(--red-500); font-weight:600; text-decoration:none; font-size:11px">Futa</a>
+    </div>
+  `).join('');
+}
+
+let onDeleteConfirmCallback = null;
+
+function showDeleteConfirmModal(title, message, callback) {
+  document.getElementById('deleteConfirmTitle').textContent = title;
+  document.getElementById('deleteConfirmMessage').textContent = message;
+  onDeleteConfirmCallback = callback;
+  document.getElementById('deleteConfirmModal').classList.add('open');
+}
+
+function closeDeleteConfirmModal() {
+  document.getElementById('deleteConfirmModal').classList.remove('open');
+  onDeleteConfirmCallback = null;
+}
+
+// Bind click on confirmation button
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('btnDeleteConfirmAction');
+  if (btn) {
+    btn.onclick = function() {
+      if (onDeleteConfirmCallback) {
+        onDeleteConfirmCallback();
+      }
+      closeDeleteConfirmModal();
+    };
+  }
+});
+
+function deleteCrop(cropName) {
+  const title = currentLang === 'sw' ? 'Futa Zao' : 'Delete Crop';
+  const msg = currentLang === 'sw' ? `Je, una uhakika unataka kufuta zao la "${cropName}"?` : `Are you sure you want to delete crop "${cropName}"?`;
+  
+  showDeleteConfirmModal(title, msg, () => {
+    const cropsStr = localStorage.getItem('agroCropsList');
+    let crops = ['Maize', 'Rice', 'Beans', 'Sunflower'];
+    if (cropsStr) {
+      try { crops = JSON.parse(cropsStr); } catch (e) {}
+    }
+    crops = crops.filter(c => c !== cropName);
+    localStorage.setItem('agroCropsList', JSON.stringify(crops));
+    renderCropSelectOptions();
+    renderModalCropList();
+    showToast(currentLang === 'sw' ? 'Zao limefutwa!' : 'Crop deleted!', 'success');
+  });
+}
+
+function saveQuickCrop() {
+  const name = document.getElementById('newCropName').value.trim();
+  if (!name) {
+    showToast('Tafadhali jaza jina la zao', 'error');
+    return;
+  }
+  const cropsStr = localStorage.getItem('agroCropsList');
+  let crops = ['Maize', 'Rice', 'Beans', 'Sunflower'];
+  if (cropsStr) {
+    try { crops = JSON.parse(cropsStr); } catch (e) {}
+  }
+  if (!crops.includes(name)) {
+    crops.push(name);
+    localStorage.setItem('agroCropsList', JSON.stringify(crops));
+  }
+  renderCropSelectOptions();
+  document.getElementById('intakeCrop').value = name;
+  renderModalCropList();
+  closeQuickCropModal();
+  showToast('Zao jipya limesajiliwa!', 'success');
+}
+
+function openQuickUnitModal() {
+  document.getElementById('quickUnitModal').classList.add('open');
+  document.getElementById('newUnitName').value = '';
+  document.getElementById('unitUnknownWeight').checked = false;
+  renderModalUnitList();
+}
+
+function closeQuickUnitModal() {
+  document.getElementById('quickUnitModal').classList.remove('open');
+}
+
+function renderModalUnitList() {
+  const unitsStr = localStorage.getItem('agroUnitsList');
+  let units = [
+    { name: 'Kilo (Kg)', kg: 1 },
+    { name: 'Gunia (Bag)', kg: 100 },
+    { name: 'Roba', kg: 50 },
+    { name: 'Tani (Ton)', kg: 1000 }
+  ];
+  if (unitsStr) {
+    try { units = JSON.parse(unitsStr); } catch (e) {}
+  }
+  const container = document.getElementById('unitListContainer');
+  if (!container) return;
+  
+  if (units.length === 0) {
+    container.innerHTML = '<span style="font-size:11px; color:var(--text3); padding:4px 0">Hakuna vipimo vilivyopo.</span>';
+    return;
+  }
+  
+  container.innerHTML = units.map(u => {
+    const uName = typeof u === 'string' ? u : u.name;
+    const uKg = typeof u === 'string' ? getKgWeightForUnitName(u) : (typeof u.kg === 'number' ? u.kg : 1);
+    const desc = uKg === 0 ? 'Uzito haujulikani' : `1 = ${uKg} Kg`;
+    return `
+      <div style="display:flex; justify-content:space-between; align-items:center; background:var(--surface2); padding:6px 10px; border-radius:6px; font-size:12px; margin-top:2px">
+        <span style="color:var(--text)">${uName} (${desc})</span>
+        <a href="#" onclick="deleteUnit('${uName.replace(/'/g, "\\'")}', ${uKg}); return false;" style="color:var(--red-500); font-weight:600; text-decoration:none; font-size:11px">Futa</a>
+      </div>
+    `;
+  }).join('');
+}
+
+function deleteUnit(unitName, kg) {
+  const title = currentLang === 'sw' ? 'Futa Kipimo' : 'Delete Unit';
+  const desc = kg === 0 ? (currentLang === 'sw' ? 'Uzito haujulikani' : 'Unknown weight') : `1 = ${kg} Kg`;
+  const msg = currentLang === 'sw' 
+    ? `Je, una uhakika unataka kufuta kipimo cha "${unitName}" (${desc})?` 
+    : `Are you sure you want to delete unit "${unitName}" (${desc})?`;
+  
+  showDeleteConfirmModal(title, msg, () => {
+    const unitsStr = localStorage.getItem('agroUnitsList');
+    let units = [
+      { name: 'Kilo (Kg)', kg: 1 },
+      { name: 'Gunia (Bag)', kg: 100 },
+      { name: 'Roba', kg: 50 },
+      { name: 'Tani (Ton)', kg: 1000 }
+    ];
+    if (unitsStr) {
+      try { units = JSON.parse(unitsStr); } catch (e) {}
+    }
+    units = units.filter(u => {
+      const uName = typeof u === 'string' ? u : u.name;
+      const uKg = typeof u === 'string' ? getKgWeightForUnitName(u) : (typeof u.kg === 'number' ? u.kg : 1);
+      return !(uName === unitName && uKg === kg);
+    });
+    localStorage.setItem('agroUnitsList', JSON.stringify(units));
+    renderUnitSelectOptions();
+    renderEditBatchUnitOptions();
+    calculateIntakeWeightMT();
+    renderModalUnitList();
+    showToast(currentLang === 'sw' ? 'Kipimo kimefutwa!' : 'Unit deleted!', 'success');
+  });
+}
+
+function getKgWeightForUnitName(name) {
+  const nameLower = name.toLowerCase().trim();
+  if (nameLower.includes('kilo') || nameLower === 'kg') return 1;
+  if (nameLower.includes('gunia') || nameLower.includes('bag')) return 100;
+  if (nameLower.includes('roba')) return 50;
+  if (nameLower.includes('tani') || nameLower.includes('ton')) return 1000;
+  if (nameLower.includes('sado')) return 4;
+  if (nameLower.includes('pishi')) return 2;
+  if (nameLower.includes('lumbesa')) return 150;
+  
+  // Try to match a number inside the name, e.g. "Gunia 50kg" -> 50
+  const match = nameLower.match(/(\d+(?:\.\d+)?)\s*k/);
+  if (match) return parseFloat(match[1]);
+  
+  const matchPure = nameLower.match(/(\d+(?:\.\d+)?)/);
+  if (matchPure) return parseFloat(matchPure[1]);
+  
+  return 1; // Default fallback to 1 Kg
+}
+
+function saveQuickUnit() {
+  const name = document.getElementById('newUnitName').value.trim();
+  if (!name) {
+    showToast('Tafadhali jaza jina la kipimo', 'error');
+    return;
+  }
+  const isUnknown = document.getElementById('unitUnknownWeight').checked;
+  const kg = isUnknown ? 0 : getKgWeightForUnitName(name);
+  
+  const unitsStr = localStorage.getItem('agroUnitsList');
+  let units = [
+    { name: 'Kilo (Kg)', kg: 1 },
+    { name: 'Gunia (Bag)', kg: 100 },
+    { name: 'Roba', kg: 50 },
+    { name: 'Tani (Ton)', kg: 1000 }
+  ];
+  if (unitsStr) {
+    try { units = JSON.parse(unitsStr); } catch (e) {}
+  }
+  
+  const exists = units.some(u => {
+    const uName = typeof u === 'string' ? u : u.name;
+    const uKg = typeof u === 'string' ? getKgWeightForUnitName(u) : (typeof u.kg === 'number' ? u.kg : 1);
+    const uIsUnknown = (uKg === 0);
+    return uName.toLowerCase() === name.toLowerCase() && uIsUnknown === isUnknown;
+  });
+  
+  if (exists) {
+    showToast(currentLang === 'sw' ? 'Kipimo chenye sifa hizi tayari kimesajiliwa!' : 'A unit with these properties is already registered!', 'error');
+    return;
+  }
+  
+  units.push({ name, kg });
+  localStorage.setItem('agroUnitsList', JSON.stringify(units));
+  
+  renderUnitSelectOptions();
+  renderEditBatchUnitOptions();
+  
+  // Select the newly added option
+  const select = document.getElementById('intakeUnitSelect');
+  if (select) {
+    for (let i = 0; i < select.options.length; i++) {
+      const opt = select.options[i];
+      const optKg = parseFloat(opt.getAttribute('data-kg'));
+      if (opt.value === name && ((isUnknown && optKg === 0) || (!isUnknown && optKg > 0))) {
+        select.selectedIndex = i;
+        break;
+      }
+    }
+  }
+  
+  calculateIntakeWeightMT();
+  renderModalUnitList();
+  closeQuickUnitModal();
+  showToast('Kipimo kipya kimesajiliwa!', 'success');
+}
+
+function calculateIntakeWeightMT() {
+  const kiasi = parseFloat(document.getElementById('intakeKiasi').value) || 0;
+  const select = document.getElementById('intakeUnitSelect');
+  if (!select) return;
+  const selectedOption = select.options[select.selectedIndex];
+  if (!selectedOption) return;
+  const kg = parseFloat(selectedOption.getAttribute('data-kg'));
+  
+  if (isNaN(kg) || kg === 0) {
+    document.getElementById('intakeWeight').value = 0;
+    const helper = document.getElementById('intakeWeightHelper');
+    if (helper) {
+      helper.textContent = `Uzito wa Jumla: Haujulikani (Hadi ukobolewe)`;
+      helper.style.color = 'var(--yellow-500)';
+    }
+  } else {
+    const weightKg = kiasi * kg;
+    const weightMT = weightKg / 1000;
+    document.getElementById('intakeWeight').value = weightMT;
+    const helper = document.getElementById('intakeWeightHelper');
+    if (helper) {
+      helper.textContent = `Uzito wa Jumla: ${weightKg.toLocaleString()} Kg`;
+      helper.style.color = 'var(--emerald-500)';
+    }
+  }
+}
+
+let allFarmers = [];
+let currentPage = 1;
+let lastPage = 1;
+
+async function fetchFarmers(search = '', region = '', status = '', page = 1) {
+  try {
+    let url = `/api/v1/farmers?page=${page}&per_page=10&`;
+    if (search) url += `search=${encodeURIComponent(search)}&`;
+    if (status) url += `status=${encodeURIComponent(status.toLowerCase())}&`;
+    
+    const res = await fetch(url);
+    const data = await res.json();
+    
+    allFarmers = data.data || [];
+    currentPage = data.current_page || 1;
+    lastPage = data.last_page || 1;
+    
+    // Update pagination UI
+    document.getElementById('pageStart').textContent = data.from || 0;
+    document.getElementById('pageEnd').textContent = data.to || 0;
+    document.getElementById('pageTotal').textContent = data.total || 0;
+    document.getElementById('btnPrevPage').disabled = (currentPage <= 1);
+    document.getElementById('btnNextPage').disabled = (currentPage >= lastPage);
+    
+    let displayFarmers = allFarmers;
+    if (region) {
+      displayFarmers = allFarmers.filter(f => f.region && f.region.toLowerCase() === region.toLowerCase());
+    }
+
+    renderFarmersTable(displayFarmers);
+    if(data.stats) renderStats(data.stats);
+  } catch (err) {
+    console.error(err);
+    showToast('Failed to load farmers', 'error');
+  }
+}
+
+function changePage(delta) {
+  const newPage = currentPage + delta;
+  if (newPage >= 1 && newPage <= lastPage) {
+    const search = document.getElementById('searchInput').value;
+    const region = document.getElementById('regionFilter').value;
+    const status = document.getElementById('statusFilter').value;
+    fetchFarmers(search, region, status, newPage);
+  }
+}
+
+function renderStats(stats) {
+  const statsData = [
+    [stats.total.toString(), 'Total Farmers', '#10b981'],
+    [stats.active.toString(), 'Active', '#10b981'],
+    [stats.inactive.toString(), 'Inactive', 'var(--text3)'],
+    [stats.with_loans.toString(), 'With Loans', '#d97706'],
+    [stats.regions.toString(), 'Regions', '#6366f1']
+  ];
+
+  const statsRow = document.getElementById('statsRow');
+  statsRow.innerHTML = '';
+  statsData.forEach(function(s) {
+    var d = document.createElement('div');
+    d.className = 'card';
+    d.style.cssText = 'padding:16px;text-align:center';
+    d.innerHTML = '<div style="font-size:22px;font-weight:800;color:' + s[2] + '">' + s[0] + '</div><div style="font-size:12px;color:var(--text3);margin-top:2px;font-weight:500">' + s[1] + '</div>';
+    statsRow.appendChild(d);
+  });
+}
+
+function getAvatarColor(name) {
+  const colors = ['#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#f43f5e', '#14b8a6', '#6366f1'];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return colors[Math.abs(hash) % colors.length];
+}
+
+function renderFarmersTable(data) {
+  var tbody = document.getElementById('farmerBody');
+  tbody.innerHTML = '';
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--text3);padding:20px 0;">No farmers found.</td></tr>';
+    return;
+  }
+  data.forEach(function(f) {
+    var lColor = parseFloat(f.loan_balance) === 0 ? 'var(--text3)' : '#d97706';
+    var lWeight = parseFloat(f.loan_balance) === 0 ? '400' : '600';
+    var stClass = f.status === 'active' ? 'badge-green' : 'badge-gray';
+    
+    var fName = f.name || 'Unknown';
+    var initial = fName.charAt(0).toUpperCase();
+    var aColor = getAvatarColor(fName);
+
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td><input type="checkbox" style="accent-color:var(--emerald-500)"/></td>'
+      + '<td><code style="font-size:12px;color:var(--text3)">' + f.farmer_code + '</code></td>'
+      + '<td><div style="display:flex;align-items:center;gap:10px"><div class="avatar avatar-sm" style="background:'+aColor+';color:white;display:flex;align-items:center;justify-content:center;border-radius:8px;width:34px;height:34px;font-weight:700;font-size:14px;box-shadow:0 2px 5px rgba(0,0,0,0.1)">' + initial + '</div><div><div style="font-weight:600;font-size:13.5px;color:var(--text)">' + fName + '</div><div style="font-size:11.5px;color:var(--text3)">NID: ' + (f.national_id || 'N/A') + '</div></div></div></td>'
+      + '<td>' + (f.region || 'N/A') + '</td>'
+      + '<td style="color:var(--text3)">' + f.phone + '</td>'
+      + '<td><span class="badge badge-green">Maize</span></td>'
+      + '<td><strong>' + (parseFloat(f.total_deposited) * 1000).toLocaleString() + ' Kg</strong></td>'
+      + '<td style="color:' + lColor + ';font-weight:' + lWeight + '">Tsh ' + parseFloat(f.loan_balance).toLocaleString() + '</td>'
+      + '<td><span class="badge ' + stClass + '"><span class="dot"></span>' + f.status + '</span></td>'
+      + '<td><div style="display:flex;gap:6px"><button class="btn btn-secondary btn-sm" style="padding:5px 10px;font-size:12px" onclick="showProfileModal(\'' + f.id + '\')">View</button><button class="btn btn-outline btn-sm" style="padding:5px 10px;font-size:12px" onclick="window.location.href=\'loans.html\'">Loan</button></div></td>';
+    tbody.appendChild(tr);
+  });
+}
+
+// Global state
+let currentFarmerId = null;
+let farmerBatches = [];
+let currentFarmerData = null; // Store current farmer data for edit pre-fill
+
+function toggleFarmerEditMode() {
+  const panel = document.getElementById('editFarmerPanel');
+  const btn = document.getElementById('btnToggleEditFarmer');
+  const isOpen = panel.style.display === 'flex';
+  
+  if (isOpen) {
+    panel.style.display = 'none';
+    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Hariri`;
+  } else {
+    // Pre-fill form with current farmer data
+    if (currentFarmerData) {
+      document.getElementById('editFarmerName').value = currentFarmerData.name || '';
+      document.getElementById('editFarmerPhone').value = currentFarmerData.phone || '';
+      document.getElementById('editFarmerNid').value = currentFarmerData.national_id || '';
+      document.getElementById('editFarmerRegion').value = currentFarmerData.region || '';
+      document.getElementById('editFarmerDistrict').value = currentFarmerData.district || '';
+      document.getElementById('editFarmerWard').value = currentFarmerData.ward || '';
+      document.getElementById('editFarmerVillage').value = currentFarmerData.village || '';
+      document.getElementById('editFarmerStreet').value = currentFarmerData.street || '';
+      document.getElementById('editFarmerStatus').value = currentFarmerData.status || 'active';
+    }
+    panel.style.display = 'flex';
+    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Funga`;
+  }
+}
+
+async function saveEditFarmer() {
+  if (!currentFarmerId) return;
+  const payload = {
+    name: document.getElementById('editFarmerName').value.trim(),
+    phone: document.getElementById('editFarmerPhone').value.trim(),
+    national_id: document.getElementById('editFarmerNid').value.trim(),
+    region: document.getElementById('editFarmerRegion').value.trim(),
+    district: document.getElementById('editFarmerDistrict').value.trim(),
+    ward: document.getElementById('editFarmerWard').value.trim(),
+    village: document.getElementById('editFarmerVillage').value.trim(),
+    street: document.getElementById('editFarmerStreet').value.trim(),
+    status: document.getElementById('editFarmerStatus').value,
+  };
+
+  if (!payload.name || !payload.phone) {
+    showToast('Jina na Simu ni lazima', 'error'); return;
+  }
+
+  try {
+    const res = await fetch(`/api/v1/farmers/${currentFarmerId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showToast('Taarifa zimehifadhiwa kikamilifu ✓');
+      // Update displayed profile info live
+      document.getElementById('profName').textContent = payload.name;
+      document.getElementById('profPhone').textContent = payload.phone;
+      document.getElementById('profNationalId').textContent = payload.national_id || '—';
+      document.getElementById('profRegion').textContent = payload.region || '—';
+      document.getElementById('profDistrict').textContent = payload.district || '—';
+      document.getElementById('profWard').textContent = payload.ward || '—';
+      document.getElementById('profVillage').textContent = payload.village || '—';
+      document.getElementById('profStreet').textContent = payload.street || '—';
+      document.getElementById('profAvatar').textContent = payload.name.charAt(0).toUpperCase();
+      // Update status badge
+      const statusBadge = document.getElementById('profStatus');
+      statusBadge.textContent = payload.status === 'active' ? 'Active' : 'Inactive';
+      statusBadge.className = payload.status === 'active' ? 'badge badge-green' : 'badge badge-gray';
+      statusBadge.style = 'margin-left:auto;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:700';
+      // Update currentFarmerData cache
+      currentFarmerData = { ...currentFarmerData, ...payload };
+      // Close edit panel
+      toggleFarmerEditMode();
+      // Refresh main table
+      fetchFarmers();
+    } else {
+      showToast(data.message || 'Kuna hitilafu', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Imeshindwa kuhifadhi', 'error');
+  }
+}
+
+// Profile tab switcher
+function switchProfileTab(tabName) {
+  // Hide all tab contents
+  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+  // Deactivate all tab buttons
+  document.querySelectorAll('.tab-link').forEach(el => {
+    el.style.color = 'var(--text3)';
+    el.style.borderBottom = 'none';
+  });
+
+  // Show active tab content
+  const activeTab = document.getElementById('tabContent' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+  if (activeTab) activeTab.style.display = 'block';
+
+  // Highlight active tab button
+  const activeBtn = document.getElementById('tabBtn' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+  if (activeBtn) {
+    activeBtn.style.color = 'var(--text)';
+    activeBtn.style.borderBottom = '2px solid var(--emerald-500)';
+  }
+}
+
+// Convert functions between Bags and Metric Tons (MT)
+// Assuming 1 bag of grain is 100 kg (0.1 MT)
+function calculateBagsFromWeight() {
+  const weightInput = document.getElementById('intakeWeight');
+  const bagsInput = document.getElementById('intakeBags');
+  const weight = parseFloat(weightInput.value);
+  if (!isNaN(weight)) {
+    bagsInput.value = Math.round(weight * 10);
+  } else {
+    bagsInput.value = '';
+  }
+}
+
+function calculateWeightFromBags() {
+  const weightInput = document.getElementById('intakeWeight');
+  const bagsInput = document.getElementById('intakeBags');
+  const bags = parseInt(bagsInput.value);
+  if (!isNaN(bags)) {
+    weightInput.value = (bags * 0.1).toFixed(2);
+  } else {
+    weightInput.value = '';
+  }
+}
+
+// Fetch and load bins into the intake dropdown
+async function loadBinsList() {
+  try {
+    const res = await fetch('/api/v1/bins/map');
+    const bins = await res.json();
+    const select = document.getElementById('intakeBin');
+    select.innerHTML = '<option value="">Chagua ghala...</option>';
+    bins.forEach(bin => {
+      const opt = document.createElement('option');
+      opt.value = bin.id;
+      opt.textContent = `${bin.name} (${parseFloat(bin.current_occupancy_mt).toFixed(1)} / ${parseFloat(bin.capacity_mt).toFixed(0)} MT) - ${bin.crop_type || 'Tupu'}`;
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    console.error('Error fetching bins:', err);
+  }
+}
+
+// Load farmer batches for Tab 1 and Tab 3 (collateral dropdown)
+async function loadFarmerBatches(farmerId) {
+  try {
+    const res = await fetch(`/api/v1/batches?farmer_id=${farmerId}`);
+    farmerBatches = await res.json();
+    
+    // 1. Populate Batches Table in Tab 1
+    const tbody = document.getElementById('profBatchesBody');
+    tbody.innerHTML = '';
+    
+    if (farmerBatches.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:14px 0">Hakuna shehena yoyote.</td></tr>';
+    } else {
+      farmerBatches.forEach(b => {
+        const tr = document.createElement('tr');
+        
+        let actionButtons = `
+          <button class="btn btn-secondary btn-sm" style="padding:2px 8px; font-size:11px; margin-right:4px; background:var(--surface3); color:var(--text)" onclick="openEditBatchModal('${b.id}')">✏️ Hariri</button>
+          <button class="btn btn-secondary btn-sm" style="padding:2px 8px; font-size:11px; background:var(--red-500); color:white; border-color:var(--red-500)" onclick="deleteBatch('${b.id}', '${b.batch_code}')">🗑️ Futa</button>
+        `;
+        
+        const currentWeightKg = parseFloat(b.current_weight) * 1000;
+        let weightDisplay = `${currentWeightKg.toLocaleString()} Kg`;
+        if (currentWeightKg === 0) {
+          if (b.intake_quantity && b.intake_unit) {
+            weightDisplay = `${parseFloat(b.intake_quantity)} ${b.intake_unit}`;
+          } else {
+            weightDisplay = (currentLang === 'sw' ? 'Uzito haujulikani' : 'Unknown weight');
+          }
+        }
+        tr.innerHTML = `
+          <td><code style="font-family:monospace;font-size:11.5px;color:var(--text2)">${b.batch_code}</code></td>
+          <td><span class="badge badge-green">${b.crop_type}</span></td>
+          <td><strong>${weightDisplay}</strong></td>
+          <td style="color:${parseFloat(b.moisture) > 13.5 ? 'var(--red-500)' : 'var(--emerald-500)'}; font-weight:600">${parseFloat(b.moisture).toFixed(1)}%</td>
+          <td>
+            <span class="badge badge-gray" style="font-size:10.5px">${b.status.toUpperCase()}</span>
+            <span style="display:block; font-size:10px; color:var(--text3); margin-top:2px">${b.days_stored} siku</span>
+          </td>
+          <td>${actionButtons}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+    
+    // 2. Populate Collateral dropdown in Tab 3 (filtering stored batches)
+    const colSelect = document.getElementById('loanCollateral');
+    colSelect.innerHTML = '<option value="">Chagua batch ya dhamana...</option>';
+    
+    const eligibleBatches = farmerBatches.filter(b => b.status === 'stored' || b.status === 'received');
+    eligibleBatches.forEach(b => {
+      const opt = document.createElement('option');
+      opt.value = b.id;
+      const currentWeightKg = parseFloat(b.current_weight) * 1000;
+      let weightDisplay = `${currentWeightKg.toLocaleString()} Kg`;
+      if (currentWeightKg === 0) {
+        if (b.intake_quantity && b.intake_unit) {
+          weightDisplay = `${parseFloat(b.intake_quantity)} ${b.intake_unit}`;
+        } else {
+          weightDisplay = (currentLang === 'sw' ? 'Uzito haujulikani' : 'Unknown weight');
+        }
+      }
+      opt.textContent = `${b.batch_code} (${b.crop_type} - ${weightDisplay})`;
+      colSelect.appendChild(opt);
+    });
+
+    // 3. Populate Settlement batch dropdown in Tab 4
+    const settleBatchSelect = document.getElementById('settleBatchSelect');
+    settleBatchSelect.innerHTML = '<option value="">Chagua shehena...</option>';
+    eligibleBatches.forEach(b => {
+      const opt = document.createElement('option');
+      opt.value = b.id;
+      const currentWeightKg = parseFloat(b.current_weight) * 1000;
+      let weightDisplay = `${currentWeightKg.toLocaleString()} Kg`;
+      if (currentWeightKg === 0) {
+        if (b.intake_quantity && b.intake_unit) {
+          weightDisplay = `${parseFloat(b.intake_quantity)} ${b.intake_unit}`;
+        } else {
+          weightDisplay = (currentLang === 'sw' ? 'Uzito haujulikani' : 'Unknown weight');
+        }
+      }
+      opt.textContent = `${b.batch_code} (${b.crop_type} - ${weightDisplay})`;
+      settleBatchSelect.appendChild(opt);
+    });
+
+    // 4. Populate Apply Service batch dropdown in Tab 3
+    const applySvcBatchSelect = document.getElementById('applyServiceBatchSelect');
+    applySvcBatchSelect.innerHTML = '<option value="">Chagua shehena...</option>';
+    farmerBatches.forEach(b => {
+      const opt = document.createElement('option');
+      opt.value = b.id;
+      const currentWeightKg = parseFloat(b.current_weight) * 1000;
+      let weightDisplay = `${currentWeightKg.toLocaleString()} Kg`;
+      if (currentWeightKg === 0) {
+        if (b.intake_quantity && b.intake_unit) {
+          weightDisplay = `${parseFloat(b.intake_quantity)} ${b.intake_unit}`;
+        } else {
+          weightDisplay = (currentLang === 'sw' ? 'Uzito haujulikani' : 'Unknown weight');
+        }
+      }
+      opt.textContent = `${b.batch_code} (${b.crop_type} - ${weightDisplay})`;
+      applySvcBatchSelect.appendChild(opt);
+    });
+    
+  } catch (err) {
+    console.error('Error fetching farmer batches:', err);
+  }
+}
+
+async function loadFarmerApiDetails(farmerId) {
+  try {
+    const res = await fetch(`/api/v1/farmers/${farmerId}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    
+    // 1. Populate Services
+    const services = data.services || [];
+    const svcBody = document.getElementById('profServicesBody');
+    const miniTbody = document.getElementById('applyServiceHistoryBody');
+    if (svcBody) {
+      svcBody.innerHTML = '';
+      if (miniTbody) miniTbody.innerHTML = '';
+      if (services.length === 0) {
+        svcBody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:14px 0">Hakuna huduma yoyote.</td></tr>';
+        if (miniTbody) miniTbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:14px 0">Hakuna huduma yoyote.</td></tr>';
+      } else {
+        services.forEach(s => {
+          const tr = document.createElement('tr');
+          let stClass = 'badge-gray';
+          if (s.status === 'completed') stClass = 'badge-green';
+          else if (s.status === 'in_progress') stClass = 'badge-blue';
+          else if (s.status === 'queued') stClass = 'badge-orange';
+          
+          const fee = parseFloat(s.fee_amount) || 0;
+          
+          tr.innerHTML = `
+            <td><div style="font-size:11.5px;color:var(--text3)">${s.created_at}</div></td>
+            <td><code style="font-family:monospace;font-size:11.5px;color:var(--text2)">${s.batch_code}</code></td>
+            <td><strong>${s.type}</strong></td>
+            <td>${s.service_name}</td>
+            <td><strong style="color:var(--text)">Tsh ${fee.toLocaleString()}</strong></td>
+            <td><span class="badge ${stClass}" style="font-size:10.5px">${(s.status || '').toUpperCase()}</span></td>
+          `;
+          svcBody.appendChild(tr);
+          
+          // Also append to the mini table in Tab 3
+          const miniTbody = document.getElementById('applyServiceHistoryBody');
+          if (miniTbody) {
+            const trMini = document.createElement('tr');
+            trMini.innerHTML = `
+              <td><div style="font-size:10.5px;color:var(--text3)">${s.created_at}</div></td>
+              <td><code style="font-family:monospace;font-size:10.5px;color:var(--text2)">${s.batch_code}</code></td>
+              <td style="font-size:11px">${s.service_name}</td>
+              <td><strong style="font-size:11px;color:var(--text)">Tsh ${fee.toLocaleString()}</strong></td>
+              <td><span class="badge ${stClass}" style="font-size:9.5px">${(s.status || '').toUpperCase()}</span></td>
+            `;
+            miniTbody.appendChild(trMini);
+          }
+        });
+      }
+    }
+
+    // 2. Populate Loans
+    const loans = data.loans || [];
+    const loanBody = document.getElementById('profLoansBody');
+    if (loanBody) {
+      loanBody.innerHTML = '';
+      if (loans.length === 0) {
+        loanBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:14px 0">Hakuna mikopo yoyote.</td></tr>';
+      } else {
+        loans.forEach(l => {
+          const tr = document.createElement('tr');
+          let stClass = 'badge-gray';
+          if (l.status === 'active') stClass = 'badge-blue';
+          else if (l.status === 'paid') stClass = 'badge-green';
+          else if (l.status === 'defaulted') stClass = 'badge-red';
+          
+          const amount = parseFloat(l.principal_amount) || 0;
+          const balance = parseFloat(l.remaining_balance) || 0;
+          const date = l.created_at ? l.created_at.split('T')[0] : 'N/A';
+          const dueDate = l.due_date ? l.due_date.split('T')[0] : 'N/A';
+          
+          tr.innerHTML = `
+            <td><div style="font-size:11.5px;color:var(--text3)">${date}</div></td>
+            <td><strong style="color:var(--text)">Tsh ${amount.toLocaleString()}</strong></td>
+            <td><strong style="color:${balance > 0 ? 'var(--red-500)' : 'var(--emerald-500)'}">Tsh ${balance.toLocaleString()}</strong></td>
+            <td><div style="font-size:11.5px;color:var(--text3)">${dueDate}</div></td>
+            <td><span class="badge ${stClass}" style="font-size:10.5px">${(l.status || '').toUpperCase()}</span></td>
+          `;
+          loanBody.appendChild(tr);
+        });
+      }
+    }
+
+  } catch (err) {
+    console.error('Error fetching API details:', err);
+  }
+}
+
+function toggleNewLoanForm() {
+  const tableSec = document.getElementById('loanHistorySection');
+  const formSec = document.getElementById('newLoanFormSection');
+  const btn = document.getElementById('btnToggleLoanForm');
+  
+  if (formSec.style.display === 'none') {
+    formSec.style.display = 'block';
+    tableSec.style.display = 'none';
+    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg> Rudi Nyuma`;
+  } else {
+    formSec.style.display = 'none';
+    tableSec.style.display = 'block';
+    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Mkopo Mpya`;
+  }
+}
+
+// Profile modal handling
+const profileModal = document.getElementById('profileModal');
+document.getElementById('closeProfileModal').onclick = () => profileModal.classList.remove('open');
+document.getElementById('cancelProfileModal').onclick = () => profileModal.classList.remove('open');
+
+async function showProfileModal(farmerId) {
+  currentFarmerId = farmerId;
+  const f = allFarmers.find(x => x.id == farmerId);
+  if (!f) return;
+  currentFarmerData = f; // Cache for edit pre-fill
+  
+  // Reset edit panel if open
+  const editPanel = document.getElementById('editFarmerPanel');
+  if (editPanel) editPanel.style.display = 'none';
+  const editBtn = document.getElementById('btnToggleEditFarmer');
+  if (editBtn) editBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Hariri`;
+  
+  var fName = f.name || 'Unknown';
+  document.getElementById('profAvatar').textContent = fName.charAt(0).toUpperCase();
+  document.getElementById('profAvatar').style.background = getAvatarColor(fName);
+  
+  document.getElementById('profName').textContent = fName;
+  document.getElementById('profCode').textContent = f.farmer_code;
+  document.getElementById('profPhone').textContent = f.phone;
+  document.getElementById('profRegion').textContent = f.region || 'N/A';
+  document.getElementById('profDistrict').textContent = f.district || 'N/A';
+  document.getElementById('profWard').textContent = f.ward || 'N/A';
+  document.getElementById('profVillage').textContent = f.village || 'N/A';
+  document.getElementById('profStreet').textContent = f.street || 'N/A';
+  document.getElementById('profNationalId').textContent = f.national_id || 'N/A';
+  
+  // Set summary numbers
+  document.getElementById('profStock').textContent = `${(parseFloat(f.total_deposited) * 1000).toLocaleString()} Kg`;
+  document.getElementById('profLoan').textContent = `Tsh ${parseFloat(f.loan_balance).toLocaleString()}`;
+  
+  const statusBadge = document.getElementById('profStatus');
+  statusBadge.textContent = f.status.toUpperCase();
+  statusBadge.className = f.status === 'active' ? 'badge badge-green' : 'badge badge-gray';
+  
+  // Clear forms
+  renderCropSelectOptions();
+  renderUnitSelectOptions();
+  if (document.getElementById('intakeKiasi')) document.getElementById('intakeKiasi').value = '';
+  document.getElementById('intakeWeight').value = '0';
+  document.getElementById('intakeVariety').value = '';
+  document.getElementById('intakeMoisture').value = '13.5';
+  const helper = document.getElementById('intakeWeightHelper');
+  if (helper) {
+    helper.textContent = 'Uzito wa Jumla: 0 Kg';
+  }
+  document.getElementById('loanAmount').value = '';
+  document.getElementById('loanDueDate').value = '';
+  
+  // Clear settlement tab
+  document.getElementById('settlePriceInput').value = '';
+  document.getElementById('settleDetailsArea').style.display = 'none';
+  document.getElementById('settleEmptyState').style.display = 'block';
+  document.getElementById('settleGrossSales').textContent = 'Tsh 0';
+  document.getElementById('settleTotalDeductions').textContent = 'Tsh 0';
+  document.getElementById('settleNetPayout').textContent = 'Tsh 0';
+
+  // Clear apply service tab
+  document.getElementById('applyServiceRate').value = '';
+  document.getElementById('applyServiceQty').value = '';
+  document.getElementById('applyServiceUnitLabel').textContent = '';
+  document.getElementById('applyServiceOutputValue').value = '';
+  document.getElementById('applyServiceOutputDiv').style.display = 'none';
+  document.getElementById('applyServiceMachine').value = '';
+  document.getElementById('applyServiceTotalCost').textContent = 'Tsh 0';
+
+  // Switch to first tab
+  switchProfileTab('batches');
+  
+  // Show modal immediately for perceived performance
+  profileModal.classList.add('open');
+  
+  // Load dynamic data concurrently to save time
+  try {
+    await Promise.all([
+      loadBinsList(),
+      loadFarmerBatches(farmerId),
+      loadSettleBuyers(),
+      loadServicesForApply(),
+      loadFarmerApiDetails(farmerId)
+    ]);
+  } catch(err) {
+    console.error('Error loading profile dynamic data:', err);
+  }
+}
+
+// Submit new grain intake
+async function submitNewIntake() {
+  const crop = document.getElementById('intakeCrop').value;
+  const variety = document.getElementById('intakeVariety').value;
+  const weight = parseFloat(document.getElementById('intakeWeight').value);
+  const moisture = parseFloat(document.getElementById('intakeMoisture').value);
+  const binId = document.getElementById('intakeBin') ? document.getElementById('intakeBin').value : null;
+
+  const kiasi = parseFloat(document.getElementById('intakeKiasi').value) || 0;
+  if (!crop || kiasi <= 0 || isNaN(weight) || weight < 0) {
+    showToast(currentLang === 'sw' ? 'Tafadhali weka kiasi sahihi zaidi ya 0!' : 'Please enter a valid amount greater than 0!', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/v1/batches', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        farmer_id: currentFarmerId,
+        crop_type: crop,
+        variety: variety,
+        intake_quantity: kiasi,
+        intake_unit: document.getElementById('intakeUnitSelect') ? document.getElementById('intakeUnitSelect').value : null,
+        initial_moisture: moisture,
+        initial_weight_mt: weight,
+        bin_id: binId || null
+      })
+    });
+    
+    const data = await res.json();
+    if (data.success) {
+      showToast(currentLang === 'sw' ? 'Upokeaji nafaka umesajiliwa kikamilifu!' : 'Intake registered successfully!', 'success');
+      
+      // Reset input fields
+      if (document.getElementById('intakeKiasi')) document.getElementById('intakeKiasi').value = '';
+      document.getElementById('intakeWeight').value = '0';
+      document.getElementById('intakeVariety').value = '';
+      const helper = document.getElementById('intakeWeightHelper');
+      if (helper) {
+        helper.textContent = 'Uzito wa Jumla: 0 Kg';
+      }
+      
+      // Reload lists
+      await loadFarmerBatches(currentFarmerId);
+      await fetchFarmers();
+      
+      // Update profile summary card
+      const updatedFarmer = allFarmers.find(x => x.id == currentFarmerId);
+      if (updatedFarmer) {
+        document.getElementById('profStock').textContent = `${(parseFloat(updatedFarmer.total_deposited) * 1000).toLocaleString()} Kg`;
+      }
+    } else {
+      showToast(data.message || 'Error occurred', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Network error during registration', 'error');
+  }
+}
+
+// Submit new loan application
+async function submitNewLoan() {
+  const amount = parseFloat(document.getElementById('loanAmount').value);
+  const dueDate = document.getElementById('loanDueDate').value;
+  const collateralId = document.getElementById('loanCollateral').value;
+
+  if (isNaN(amount) || !dueDate || !collateralId) {
+    showToast(currentLang === 'sw' ? 'Tafadhali jaza sehemu zote za mkopo' : 'Please fill all loan fields', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/v1/loans', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        farmer_id: currentFarmerId,
+        collateral_batch_id: collateralId,
+        principal_amount: amount,
+        due_date: dueDate
+      })
+    });
+    
+    const data = await res.json();
+    if (data.success) {
+      showToast(currentLang === 'sw' ? 'Ombi la mkopo limewasilishwa kikamilifu!' : 'Loan application submitted successfully!', 'success');
+      
+      // Reset form
+      document.getElementById('loanAmount').value = '';
+      document.getElementById('loanDueDate').value = '';
+      
+      // Reload lists
+      await loadFarmerBatches(currentFarmerId);
+      await fetchFarmers();
+      
+      // Update profile summary card
+      const updatedFarmer = allFarmers.find(x => x.id == currentFarmerId);
+      if (updatedFarmer) {
+        document.getElementById('profLoan').textContent = `Tsh ${parseFloat(updatedFarmer.loan_balance).toLocaleString()}`;
+      }
+    } else {
+      showToast(data.error || 'Error occurred', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Network error during loan request', 'error');
+  }
+}
+
+// Dynamic Services catalog loaded from backend
+let servicesCatalog = [];
+
+// Processing modal events
+const processingModal = document.getElementById('processingModal');
+document.getElementById('closeProcModal').onclick = () => processingModal.classList.remove('open');
+document.getElementById('btnCancelProc').onclick = () => processingModal.classList.remove('open');
+document.getElementById('btnConfirmProc').onclick = submitProcessingJob;
+
+// Open the processing modal and configure it dynamically
+async function openProcessingModal(batchId, type, initialVal) {
+  document.getElementById('procBatchId').value = batchId;
+  document.getElementById('procType').value = type;
+  
+  const title = document.getElementById('procModalTitle');
+  const select = document.getElementById('procServiceSelect');
+  select.innerHTML = '<option value="">Loading services...</option>';
+  
+  title.textContent = currentLang === 'sw' ? 'Kamilisha Huduma ya Usindikaji' : 'Complete Processing Service';
+
+  try {
+    const res = await fetch('/api/v1/services');
+    servicesCatalog = await res.json();
+  } catch (err) {
+    console.error(err);
+    showToast('Failed to load services catalog', 'error');
+  }
+
+  select.innerHTML = '';
+  // Populate service options based on the action selected (drying / milling / grading)
+  servicesCatalog.forEach(s => {
+    if (s.category === type) {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      const sName = currentLang === 'sw' ? s.name_sw : s.name_en;
+      opt.textContent = `${sName} (Tsh ${parseFloat(s.rate).toLocaleString()}/${s.unit})`;
+      select.appendChild(opt);
+    }
+  });
+
+  // If none matched, populate all
+  if (select.children.length === 0) {
+    servicesCatalog.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      const sName = currentLang === 'sw' ? s.name_sw : s.name_en;
+      opt.textContent = `${sName} (Tsh ${parseFloat(s.rate).toLocaleString()}/${s.unit})`;
+      select.appendChild(opt);
+    });
+  }
+
+  // Save current batch weight for suggestions
+  window.currentProcBatchWeightMt = parseFloat(initialVal) || 0;
+
+  onProcServiceChange();
+
+  // Set default output value suggestions
+  if (type === 'drying') {
+    document.getElementById('procFinalValue').value = '12.5';
+  } else if (type === 'milling') {
+    document.getElementById('procFinalValue').value = (window.currentProcBatchWeightMt * 0.85).toFixed(2);
+  }
+  
+  processingModal.classList.add('open');
+}
+
+function onProcServiceChange() {
+  const serviceId = document.getElementById('procServiceSelect').value;
+  const service = servicesCatalog.find(x => x.id === serviceId);
+  if (!service) return;
+
+  const unitsLabel = document.getElementById('procUnitsLabel');
+  const unitsInput = document.getElementById('procUnitsInput');
+  const type = service.category;
+  
+  // Update Type hidden field
+  document.getElementById('procType').value = type;
+
+  // Set units label and suggest default
+  if (service.unit === 'kg') {
+    unitsLabel.textContent = currentLang === 'sw' ? 'Idadi ya Kilo (Kg) *' : 'Quantity in Kilograms (Kg) *';
+    unitsInput.value = Math.round(window.currentProcBatchWeightMt * 1000);
+  } else if (service.unit === 'gunia') {
+    unitsLabel.textContent = currentLang === 'sw' ? 'Idadi ya Magunia (Bags) *' : 'Quantity in Bags *';
+    unitsInput.value = Math.round(window.currentProcBatchWeightMt * 10);
+  } else if (service.unit === 'roba') {
+    unitsLabel.textContent = currentLang === 'sw' ? 'Idadi ya Roba (100kg) *' : 'Quantity in Roba (100kg) *';
+    unitsInput.value = Math.round(window.currentProcBatchWeightMt * 10);
+  }
+
+  // Toggle outcome inputs based on type
+  const inputContainer = document.getElementById('procInputContainer');
+  const valueLabel = document.getElementById('procValueLabel');
+  const gradeContainer = document.getElementById('procGradeContainer');
+
+  inputContainer.style.display = 'none';
+  gradeContainer.style.display = 'none';
+
+  if (type === 'drying') {
+    inputContainer.style.display = 'block';
+    valueLabel.textContent = currentLang === 'sw' ? 'Unyevu wa Mwisho (%) *' : 'Final Moisture Level (%) *';
+  } else if (type === 'milling') {
+    inputContainer.style.display = 'block';
+    valueLabel.textContent = currentLang === 'sw' ? 'Uzito wa Pato (Tani / MT) *' : 'Output Weight (MT) *';
+  } else if (type === 'grading') {
+    gradeContainer.style.display = 'block';
+  }
+
+  calculateProcFee();
+}
+
+function calculateProcFee() {
+  const serviceId = document.getElementById('procServiceSelect').value;
+  const service = servicesCatalog.find(x => x.id === serviceId);
+  if (!service) return;
+
+  const units = parseFloat(document.getElementById('procUnitsInput').value) || 0;
+  const fee = units * parseFloat(service.rate);
+  
+  document.getElementById('procFee').value = Math.round(fee);
+}
+
+// Submit dynamic processing job
+async function submitProcessingJob() {
+  const batchId = document.getElementById('procBatchId').value;
+  const type = document.getElementById('procType').value;
+  const finalValue = parseFloat(document.getElementById('procFinalValue').value);
+  const grade = document.getElementById('procGrade').value;
+  const fee = parseFloat(document.getElementById('procFee').value);
+
+  const serviceId = document.getElementById('procServiceSelect').value;
+  const service = servicesCatalog.find(x => x.id === serviceId);
+
+  if (type !== 'grading' && isNaN(finalValue)) {
+    showToast(currentLang === 'sw' ? 'Tafadhali weka kiwango cha mwisho!' : 'Please specify final value!', 'error');
+    return;
+  }
+  if (isNaN(fee)) {
+    showToast(currentLang === 'sw' ? 'Tafadhali weka ada ya huduma!' : 'Please specify service fee!', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/v1/batches/${batchId}/processing`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: type,
+        status: 'completed',
+        final_value: type !== 'grading' ? finalValue : null,
+        fee: fee,
+        grade: type === 'grading' ? grade : null,
+        service_id: serviceId
+      })
+    });
+    
+    const data = await res.json();
+    if (data.success) {
+      showToast(currentLang === 'sw' ? 'Huduma imerekodiwa kikamilifu!' : 'Processing completed successfully!', 'success');
+      processingModal.classList.remove('open');
+      
+      // Reload lists
+      await loadFarmerBatches(currentFarmerId);
+      await fetchFarmers();
+      
+      // Update profile summary card
+      const updatedFarmer = allFarmers.find(x => x.id == currentFarmerId);
+      if (updatedFarmer) {
+        document.getElementById('profStock').textContent = `${(parseFloat(updatedFarmer.total_deposited) * 1000).toLocaleString()} Kg`;
+      }
+    } else {
+      showToast(data.message || 'Error occurred', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Network error during job completion', 'error');
+  }
+}
+
+// Export as CSV
+document.getElementById('btnExport').onclick = function() {
+  if (allFarmers.length === 0) {
+    showToast('No farmer data to export', 'error');
+    return;
+  }
+  let csvContent = "data:text/csv;charset=utf-8,";
+  csvContent += "Farmer Code,Name,Region,Phone,Total Deposited (Kg),Loan Balance (Tsh),Status\n";
+  allFarmers.forEach(f => {
+    const totalDepositedKg = parseFloat(f.total_deposited) * 1000;
+    csvContent += `"${f.farmer_code}","${f.name}","${f.region || ''}","${f.phone}",${totalDepositedKg},${f.loan_balance},"${f.status}"\n`;
+  });
+  
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", `AgroVault_Farmers_List_${new Date().toISOString().slice(0,10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  showToast('Farmers list CSV downloaded successfully!', 'success');
+};
+
+// Register Farmer Submit
+document.getElementById('btnSubmitFarmer').onclick = async function() {
+  const firstName = document.getElementById('addFirstName').value.trim();
+  const lastName = document.getElementById('addLastName').value.trim();
+  const phone = document.getElementById('addPhone').value.trim();
+  const nid = document.getElementById('addNationalId').value.trim();
+  const region = document.getElementById('addRegion').value.trim();
+  const district = document.getElementById('addDistrict').value.trim();
+  const ward = document.getElementById('addWard').value.trim();
+  const village = document.getElementById('addVillage').value.trim();
+  const street = document.getElementById('addStreet').value.trim();
+
+  if (!firstName || !lastName || !phone || !region) {
+    showToast(currentLang === 'sw' ? 'Tafadhali jaza Jina la kwanza, la pili, Namba ya simu na Mkoa' : 'Please fill out all required fields', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/v1/farmers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: firstName + ' ' + lastName,
+        phone: phone,
+        national_id: nid,
+        region: region,
+        district: district,
+        ward: ward,
+        village: village,
+        street: street
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(currentLang === 'sw' ? 'Mkulima amesajiliwa kikamilifu!' : 'Farmer registered successfully!', 'success');
+      document.getElementById('addFarmerModal').classList.remove('open');
+      fetchFarmers();
+    } else {
+      showToast(data.message || 'Registration failed', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Network error during registration', 'error');
+  }
+};
+
+// Bind Events
+document.getElementById('btnAdd').onclick = function() {
+  document.getElementById('addFirstName').value = '';
+  document.getElementById('addLastName').value = '';
+  document.getElementById('addPhone').value = '';
+  document.getElementById('addNationalId').value = '';
+  document.getElementById('addRegion').value = '';
+  document.getElementById('addDistrict').value = '';
+  document.getElementById('addWard').value = '';
+  document.getElementById('addVillage').value = '';
+  document.getElementById('addStreet').value = '';
+  document.getElementById('addFarmerModal').classList.add('open');
+};
+document.getElementById('btnCloseModal').onclick = function() { document.getElementById('addFarmerModal').classList.remove('open'); };
+document.getElementById('btnCancelModal').onclick = function() { document.getElementById('addFarmerModal').classList.remove('open'); };
+document.getElementById('btnClear').onclick = function() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('regionFilter').value = '';
+  document.getElementById('statusFilter').value = '';
+  fetchFarmers();
+  showToast('Filters cleared', 'info');
+};
+
+document.getElementById('chkAll').onchange = function() {
+  document.querySelectorAll('#farmerBody input[type=checkbox]').forEach(function(c) { c.checked = document.getElementById('chkAll').checked; });
+};
+
+// Search & Filter event binding
+document.getElementById('searchInput').oninput = function() {
+  fetchFarmers(this.value, document.getElementById('regionFilter').value, document.getElementById('statusFilter').value);
+};
+document.getElementById('regionFilter').onchange = function() {
+  fetchFarmers(document.getElementById('searchInput').value, this.value, document.getElementById('statusFilter').value);
+};
+document.getElementById('statusFilter').onchange = function() {
+  fetchFarmers(document.getElementById('searchInput').value, document.getElementById('regionFilter').value, this.value);
+};
+
+// Active Settlement state
+let currentSettlePreview = null;
+let currentSettleBatch = null;
+
+// Fetch and load all services into the Apply Service dropdown catalog
+async function loadServicesForApply() {
+  try {
+    const res = await fetch('/api/v1/services');
+    servicesCatalog = await res.json();
+    const select = document.getElementById('applyServiceCatalogSelect');
+    select.innerHTML = '<option value="">Chagua huduma...</option>';
+    servicesCatalog.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      const sName = currentLang === 'sw' ? s.name_sw : s.name_en;
+      opt.textContent = `${sName} (Tsh ${parseFloat(s.rate).toLocaleString()}/${s.unit})`;
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    console.error('Error fetching services catalog:', err);
+  }
+}
+
+// When batch selection changes in Apply Service
+function onApplyServiceBatchChange() {
+  const batchId = document.getElementById('applyServiceBatchSelect').value;
+  const select = document.getElementById('applyServiceCatalogSelect');
+  
+  const batch = farmerBatches.find(b => b.id == batchId);
+  const appliedServices = batch ? (batch.applied_services || []) : [];
+
+  for (let i = 0; i < select.options.length; i++) {
+    const opt = select.options[i];
+    if (!opt.value) continue;
+
+    const service = servicesCatalog.find(s => s.id == opt.value);
+    if (service) {
+      const sName = currentLang === 'sw' ? service.name_sw : service.name_en;
+      const rateText = `Tsh ${parseFloat(service.rate).toLocaleString()}/${service.unit}`;
+      
+      let isApplicable = true;
+      if (batch && service.crop_type) {
+        // Strict matching using the registered crop_type in the service
+        if (service.crop_type.toLowerCase() !== batch.crop_type.toLowerCase()) {
+           isApplicable = false;
+        }
+      }
+
+      if (!isApplicable) {
+        opt.hidden = true;
+        opt.disabled = true;
+      } else if (appliedServices.includes(opt.value)) {
+        opt.hidden = false;
+        opt.textContent = `${sName} (${rateText}) - [${currentLang === 'sw' ? 'TAYARI IMETUMIKA' : 'ALREADY APPLIED'}]`;
+        opt.disabled = true;
+      } else {
+        opt.hidden = false;
+        opt.textContent = `${sName} (${rateText})`;
+        opt.disabled = false;
+      }
+    }
+  }
+
+  if (select.value && select.options[select.selectedIndex].disabled) {
+    select.value = '';
+  }
+
+  onApplyServiceCatalogChange();
+}
+
+// When service selection changes in Apply Service
+function onApplyServiceCatalogChange() {
+  const batchId = document.getElementById('applyServiceBatchSelect').value;
+  const serviceId = document.getElementById('applyServiceCatalogSelect').value;
+  
+  if (!serviceId) {
+    document.getElementById('applyServiceRate').value = '';
+    document.getElementById('applyServiceQty').value = '';
+    document.getElementById('applyServiceUnitLabel').textContent = '';
+    document.getElementById('applyServiceTotalCost').textContent = 'Tsh 0';
+    document.getElementById('applyServiceOutputDiv').style.display = 'none';
+    return;
+  }
+
+  const service = servicesCatalog.find(s => s.id == serviceId);
+  if (!service) return;
+
+  document.getElementById('applyServiceRate').value = parseFloat(service.rate);
+  document.getElementById('applyServiceUnitLabel').textContent = `* Bei ni kwa kila ${service.unit.toUpperCase()}`;
+
+  // Default quantity calculation
+  if (batchId) {
+    const batch = farmerBatches.find(b => b.id == batchId);
+    if (batch) {
+      const weight = parseFloat(batch.current_weight) || 0;
+      const unitLower = (service.unit || '').toLowerCase();
+      const intakeQty = parseFloat(batch.intake_quantity) || 0;
+      const intakeUnit = (batch.intake_unit || '').toLowerCase();
+      
+      let qty = '';
+      
+      if (weight === 0 && intakeQty > 0) {
+        // We don't know the exact weight, try to match units
+        if (unitLower === intakeUnit || 
+           (unitLower === 'gunia' && intakeUnit.includes('gunia')) ||
+           (unitLower === 'kg' && intakeUnit.includes('kilo'))) {
+          qty = intakeQty;
+        } else {
+          // Cannot reliably convert unknown weight to a different unit, fallback to intakeQty
+          qty = intakeQty; 
+        }
+      } else if (weight > 0) {
+        if (unitLower === 'kg' || unitLower === 'kilo') {
+          qty = Math.round(weight * 1000);
+        } else if (unitLower === 'gunia' || unitLower === 'bags' || unitLower === 'bag') {
+          qty = Math.round(weight * 10);
+        } else if (unitLower === 'roba') {
+          qty = Math.round(weight * 20);
+        } else {
+          qty = Math.round(weight);
+        }
+      }
+      document.getElementById('applyServiceQty').value = qty;
+    }
+  } else {
+    document.getElementById('applyServiceQty').value = '';
+  }
+
+  // Handle category specific final value inputs
+  const outDiv = document.getElementById('applyServiceOutputDiv');
+  const outLabel = document.getElementById('applyServiceOutputLabel');
+  const outVal = document.getElementById('applyServiceOutputValue');
+
+  if (service.category === 'drying') {
+    outDiv.style.display = 'block';
+    outLabel.textContent = currentLang === 'sw' ? 'Unyevu wa Mwisho utakaofikiwa (%)' : 'Target moisture level (%)';
+    outVal.value = '13.5';
+  } else if (service.category === 'milling') {
+    outDiv.style.display = 'block';
+    outLabel.textContent = currentLang === 'sw' ? 'Uzito wa Output utakaozalishwa (MT)' : 'Milling output weight (MT)';
+    if (batchId) {
+      const batch = farmerBatches.find(b => b.id == batchId);
+      outVal.value = batch ? (parseFloat(batch.current_weight) * 0.65).toFixed(2) : '';
+    } else {
+      outVal.value = '';
+    }
+  } else {
+    outDiv.style.display = 'none';
+    outVal.value = '';
+  }
+
+  calculateApplyServiceTotal();
+}
+
+// Calculate service total cost client-side
+function calculateApplyServiceTotal() {
+  const rate = parseFloat(document.getElementById('applyServiceRate').value) || 0;
+  const qty = parseFloat(document.getElementById('applyServiceQty').value) || 0;
+  const total = rate * qty;
+  document.getElementById('applyServiceTotalCost').textContent = `Tsh ${Math.round(total).toLocaleString()}`;
+}
+
+// Submit applied service job to backend API
+async function submitApplyService() {
+  const batchId = document.getElementById('applyServiceBatchSelect').value;
+  const serviceId = document.getElementById('applyServiceCatalogSelect').value;
+  const rate = parseFloat(document.getElementById('applyServiceRate').value);
+  const qty = parseFloat(document.getElementById('applyServiceQty').value);
+  const finalValue = parseFloat(document.getElementById('applyServiceOutputValue').value);
+  const machine = document.getElementById('applyServiceMachine').value;
+
+  if (!batchId || !serviceId || isNaN(qty) || qty <= 0) {
+    showToast(currentLang === 'sw' ? 'Tafadhali chagua shehena, huduma na uweke kiwango!' : 'Please select batch, service, and valid quantity!', 'error');
+    return;
+  }
+
+  const batch = farmerBatches.find(b => b.id == batchId);
+  if (batch && batch.applied_services && batch.applied_services.includes(serviceId)) {
+    showToast(currentLang === 'sw' ? 'Huduma hii tayari imeshatolewa kwa shehena hii!' : 'This service has already been applied to this batch!', 'error');
+    return;
+  }
+
+  const service = servicesCatalog.find(s => s.id == serviceId);
+  if (!service) return;
+
+  const totalFee = rate * qty;
+
+  try {
+    const res = await fetch(`/api/v1/batches/${batchId}/processing`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: service.category,
+        status: 'completed',
+        fee: totalFee,
+        service_id: service.id,
+        final_value: !isNaN(finalValue) ? finalValue : null,
+        service_name: machine || service.name_sw
+      })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      showToast(currentLang === 'sw' ? 'Huduma imesajiliwa na kukamilika!' : 'Service registered and finalized successfully!', 'success');
+      
+      // Reload batches list to recalculate fees
+      await loadFarmerBatches(currentFarmerId);
+      await fetchFarmers();
+
+      // Clear applied fields
+      document.getElementById('applyServiceCatalogSelect').value = '';
+      onApplyServiceCatalogChange();
+      
+      // Navigate back to batches list tab
+      switchProfileTab('batches');
+    } else {
+      showToast(data.message || 'Failed to apply service', 'error');
+    }
+  } catch (err) {
+    console.error('Error applying service:', err);
+    showToast('Network error during service application', 'error');
+  }
+}
+
+// Load buyers list for settlement dropdown
+async function loadSettleBuyers() {
+  try {
+    const res = await fetch('/api/v1/sales/buyers');
+    const buyers = await res.json();
+    const select = document.getElementById('settleBuyerSelect');
+    select.innerHTML = '<option value="">Chagua mnunuzi...</option>';
+    buyers.forEach(b => {
+      const opt = document.createElement('option');
+      opt.value = b.id;
+      opt.textContent = b.name;
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    console.error('Error loading buyers for settlement:', err);
+  }
+}
+
+// Fetch preview deductions for the selected batch
+async function previewSettleDeductions() {
+  const batchId = document.getElementById('settleBatchSelect').value;
+  if (!batchId) {
+    document.getElementById('settleDetailsArea').style.display = 'none';
+    document.getElementById('settleEmptyState').style.display = 'block';
+    currentSettlePreview = null;
+    currentSettleBatch = null;
+    recalculatePayout();
+    return;
+  }
+
+  currentSettleBatch = farmerBatches.find(b => b.id === batchId);
+
+  if (currentSettleBatch && parseFloat(currentSettleBatch.current_weight) <= 0) {
+    showToast(currentLang === 'sw' ? 'Shehena hii haina uzito unaojulikana. Tafadhali ipe huduma ya kukoboa kwanza kupata uzito.' : 'This batch has no known weight. Please apply milling service first to determine weight.', 'error');
+    document.getElementById('settleBatchSelect').value = '';
+    document.getElementById('settleDetailsArea').style.display = 'none';
+    document.getElementById('settleEmptyState').style.display = 'block';
+    currentSettlePreview = null;
+    currentSettleBatch = null;
+    recalculatePayout();
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/v1/sales/preview-deductions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        batch_id: batchId,
+        negotiated_price_per_mt: 0
+      })
+    });
+    
+    const data = await res.json();
+    if (!res.ok) {
+      showToast(data.message || 'Failed to preview deductions', 'error');
+      document.getElementById('settleBatchSelect').value = '';
+      document.getElementById('settleDetailsArea').style.display = 'none';
+      document.getElementById('settleEmptyState').style.display = 'block';
+      currentSettlePreview = null;
+      currentSettleBatch = null;
+      recalculatePayout();
+      return;
+    }
+    
+    currentSettlePreview = data;
+    
+    // Display breakdown
+    document.getElementById('settleStorageFee').textContent = `Tsh ${Math.round(data.deductions.storage_fees).toLocaleString()}`;
+    document.getElementById('settleDryingFee').textContent = `Tsh ${Math.round(data.deductions.drying_fees).toLocaleString()}`;
+    document.getElementById('settleMillingFee').textContent = `Tsh ${Math.round(data.deductions.milling_fees).toLocaleString()}`;
+    document.getElementById('settleGradingFee').textContent = `Tsh ${Math.round(data.deductions.grading_fees).toLocaleString()}`;
+    document.getElementById('settleLoanPrincipal').textContent = `Tsh ${Math.round(data.deductions.loan_principal).toLocaleString()}`;
+    document.getElementById('settleLoanInterest').textContent = `Tsh ${Math.round(data.deductions.loan_interest).toLocaleString()}`;
+    document.getElementById('settleTotalDeductions').textContent = `Tsh ${Math.round(data.total_deductions).toLocaleString()}`;
+    
+    // Update progress bars relative to total deductions
+    const total = parseFloat(data.total_deductions) || 1;
+    document.getElementById('settleStorageProgress').style.width = `${Math.min(100, (parseFloat(data.deductions.storage_fees) / total) * 100)}%`;
+    document.getElementById('settleDryingProgress').style.width = `${Math.min(100, (parseFloat(data.deductions.drying_fees) / total) * 100)}%`;
+    document.getElementById('settleMillingProgress').style.width = `${Math.min(100, (parseFloat(data.deductions.milling_fees) / total) * 100)}%`;
+    document.getElementById('settleGradingProgress').style.width = `${Math.min(100, (parseFloat(data.deductions.grading_fees) / total) * 100)}%`;
+    document.getElementById('settleLoanPrincipalProgress').style.width = `${Math.min(100, (parseFloat(data.deductions.loan_principal) / total) * 100)}%`;
+    document.getElementById('settleLoanInterestProgress').style.width = `${Math.min(100, (parseFloat(data.deductions.loan_interest) / total) * 100)}%`;
+
+    document.getElementById('settleDetailsArea').style.display = 'flex';
+    document.getElementById('settleEmptyState').style.display = 'none';
+    
+    recalculatePayout();
+  } catch (err) {
+    console.error('Error previewing deductions:', err);
+    showToast('Failed to preview deductions', 'error');
+  }
+}
+
+// Calculate payouts client side for instant UI update
+function recalculatePayout() {
+  if (!currentSettlePreview || !currentSettleBatch) {
+    document.getElementById('settleGrossSales').textContent = 'Tsh 0';
+    document.getElementById('settleTotalDeductions').textContent = 'Tsh 0';
+    document.getElementById('settleNetPayout').textContent = 'Tsh 0';
+    return;
+  }
+
+  const priceInput = parseFloat(document.getElementById('settlePriceInput').value) || 0;
+  const weight = parseFloat(currentSettleBatch.current_weight);
+  
+  const grossSales = weight * priceInput;
+  const deductions = parseFloat(currentSettlePreview.total_deductions);
+  const netPayout = Math.max(0, grossSales - deductions);
+
+  document.getElementById('settleGrossSales').textContent = `Tsh ${Math.round(grossSales).toLocaleString()}`;
+  document.getElementById('settleTotalDeductions').textContent = `Tsh ${Math.round(deductions).toLocaleString()}`;
+  document.getElementById('settleNetPayout').textContent = `Tsh ${Math.round(netPayout).toLocaleString()}`;
+}
+
+// Confirm sale & settle payouts
+async function confirmFarmerSale() {
+  const batchId = document.getElementById('settleBatchSelect').value;
+  const buyerId = document.getElementById('settleBuyerSelect').value;
+  const price = parseFloat(document.getElementById('settlePriceInput').value);
+
+  if (!batchId || !buyerId || isNaN(price) || price <= 0) {
+    showToast(currentLang === 'sw' ? 'Tafadhali jaza sehemu zote zinazohitajika na uweke bei sahihi!' : 'Please fill all required fields with valid values!', 'error');
+    return;
+  }
+
+  const batch = farmerBatches.find(b => b.id === batchId);
+  if (batch && parseFloat(batch.current_weight) <= 0) {
+    showToast(currentLang === 'sw' ? 'Shehena hii haina uzito unaojulikana. Tafadhali ipe huduma ya kukoboa kwanza kupata uzito.' : 'This batch has no known weight. Please apply milling service first to determine weight.', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/v1/sales/confirm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        batch_id: batchId,
+        buyer_id: buyerId,
+        negotiated_price_per_mt: price
+      })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      showToast(currentLang === 'sw' ? 'Malipo na mauzo yamekamilika kikamilifu!' : 'Sale finalized and farmer payout processed successfully!', 'success');
+      
+      // Close profile modal and reload lists
+      profileModal.classList.remove('open');
+      fetchFarmers();
+    } else {
+      showToast(data.message || 'Failed to confirm sale', 'error');
+    }
+  } catch (err) {
+    console.error('Error confirming farmer sale:', err);
+    showToast('Network error during sale confirmation', 'error');
+  }
+}
+
+async function refreshFarmerProfile() {
+  await fetchFarmers();
+  showProfileModal(currentFarmerId);
+}
+
+function renderEditBatchCropOptions() {
+  const cropsStr = localStorage.getItem('agroCropsList');
+  let crops = ['Maize', 'Rice', 'Beans', 'Sunflower'];
+  if (cropsStr) {
+    try { crops = JSON.parse(cropsStr); } catch (e) {}
+  }
+  const select = document.getElementById('editBatchCropType');
+  if (select) {
+    select.innerHTML = crops.map(c => `<option value="${c}">${c}</option>`).join('');
+  }
+}
+
+function renderEditBatchUnitOptions() {
+  const unitsStr = localStorage.getItem('agroUnitsList');
+  let units = [
+    { name: 'Kilo (Kg)', kg: 1 },
+    { name: 'Gunia (Bag)', kg: 100 },
+    { name: 'Roba', kg: 50 },
+    { name: 'Tani (Ton)', kg: 1000 }
+  ];
+  if (unitsStr) {
+    try { units = JSON.parse(unitsStr); } catch (e) {}
+  }
+  const select = document.getElementById('editBatchUnitSelect');
+  if (select) {
+    select.innerHTML = units.map(u => {
+      const uName = typeof u === 'string' ? u : u.name;
+      const uKg = typeof u === 'string' ? getKgWeightForUnitName(u) : (typeof u.kg === 'number' ? u.kg : 1);
+      const display = uKg === 0 ? `${uName} (Uzito haujulikani)` : `${uName} (1 = ${uKg} Kg)`;
+      return `<option value="${uName}" data-kg="${uKg}">${display}</option>`;
+    }).join('');
+  }
+}
+
+function calculateEditBatchWeightMT() {
+  const kiasi = parseFloat(document.getElementById('editBatchKiasi').value) || 0;
+  const select = document.getElementById('editBatchUnitSelect');
+  if (!select) return;
+  const selectedOption = select.options[select.selectedIndex];
+  if (!selectedOption) return;
+  const kg = parseFloat(selectedOption.getAttribute('data-kg'));
+  
+  if (isNaN(kg) || kg === 0) {
+    document.getElementById('editBatchWeight').value = 0;
+    const helper = document.getElementById('editBatchWeightHelper');
+    if (helper) {
+      helper.textContent = `Uzito wa Jumla: Haujulikani (Hadi ukobolewe)`;
+      helper.style.color = 'var(--yellow-500)';
+    }
+  } else {
+    const weightKg = kiasi * kg;
+    const weightMT = weightKg / 1000;
+    document.getElementById('editBatchWeight').value = weightMT;
+    const helper = document.getElementById('editBatchWeightHelper');
+    if (helper) {
+      helper.textContent = `Uzito wa Jumla: ${weightKg.toLocaleString()} Kg`;
+      helper.style.color = 'var(--emerald-500)';
+    }
+  }
+}
+
+function openEditBatchModal(batchId) {
+  const batch = farmerBatches.find(b => b.id === batchId);
+  if (!batch) return;
+  
+  document.getElementById('editBatchId').value = batchId;
+  renderEditBatchCropOptions();
+  document.getElementById('editBatchCropType').value = batch.crop_type;
+  
+  renderEditBatchUnitOptions();
+  
+  const weightMT = parseFloat(batch.current_weight) || 0;
+  if (weightMT === 0) {
+    document.getElementById('editBatchKiasi').value = '';
+    document.getElementById('editBatchUnitSelect').selectedIndex = 0;
+  } else {
+    const weightKg = weightMT * 1000;
+    const unitSelect = document.getElementById('editBatchUnitSelect');
+    
+    let options = Array.from(unitSelect.options).map(opt => ({
+      value: opt.value,
+      kg: parseFloat(opt.getAttribute('data-kg')) || 0
+    })).filter(o => o.kg > 0).sort((a, b) => b.kg - a.kg);
+    
+    let bestUnit = null;
+    let bestKiasi = weightKg;
+    
+    for (let opt of options) {
+      // Find the largest unit that divides perfectly without remainder
+      if (Math.abs(weightKg % opt.kg) < 0.001) {
+        bestUnit = opt.value;
+        bestKiasi = weightKg / opt.kg;
+        break;
+      }
+    }
+    
+    // Fallback if no perfect division is found
+    if (!bestUnit) {
+      let kgUnit = options.find(o => o.kg === 1);
+      if (kgUnit) {
+         bestUnit = kgUnit.value;
+         bestKiasi = weightKg;
+      } else if (options.length > 0) {
+         bestUnit = options[options.length - 1].value; // Smallest unit
+         bestKiasi = (weightKg / options[options.length - 1].kg).toFixed(2);
+      }
+    }
+    
+    document.getElementById('editBatchKiasi').value = bestKiasi;
+    if (bestUnit) {
+      unitSelect.value = bestUnit;
+    }
+  }
+  
+  document.getElementById('editBatchMoisture').value = batch.moisture;
+  document.getElementById('editBatchStatus').value = batch.status;
+  
+  calculateEditBatchWeightMT();
+  document.getElementById('editBatchModal').classList.add('open');
+}
+
+function closeEditBatchModal() {
+  document.getElementById('editBatchModal').classList.remove('open');
+}
+
+async function submitEditBatch() {
+  const batchId = document.getElementById('editBatchId').value;
+  const cropType = document.getElementById('editBatchCropType').value;
+  const kiasi = parseFloat(document.getElementById('editBatchKiasi').value) || 0;
+  const weight = parseFloat(document.getElementById('editBatchWeight').value);
+  const moisture = parseFloat(document.getElementById('editBatchMoisture').value);
+  const status = document.getElementById('editBatchStatus').value;
+  
+  if (kiasi <= 0 || isNaN(weight) || isNaN(moisture)) {
+    showToast('Tafadhali jaza kiasi cha kutosha zaidi ya 0!', 'error');
+    return;
+  }
+  
+  try {
+    const res = await fetch(`/api/v1/batches/${batchId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        crop_type: cropType,
+        current_weight_mt: weight,
+        current_moisture: moisture,
+        status: status,
+        intake_quantity: kiasi,
+        intake_unit: document.getElementById('editBatchUnitSelect') ? document.getElementById('editBatchUnitSelect').value : null
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Mzigo umesasishwa kikamilifu!', 'success');
+      closeEditBatchModal();
+      await refreshFarmerProfile();
+    } else {
+      showToast(data.message || 'Kushindwa kusasisha mzigo', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Kuna kosa limetokea wakati wa kusasisha mzigo', 'error');
+  }
+}
+
+function deleteBatch(batchId, batchCode) {
+  const title = 'Futa Mzigo';
+  const msg = `Je, una uhakika unataka kufuta mzigo wenye code "${batchCode}"? Kitendo hiki hakirejeshwi.`;
+  
+  showDeleteConfirmModal(title, msg, async () => {
+    try {
+      const res = await fetch(`/api/v1/batches/${batchId}`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Mzigo umefutwa kikamilifu!', 'success');
+        await refreshFarmerProfile();
+      } else {
+        showToast(data.message || 'Kushindwa kufuta mzigo', 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Kuna kosa limetokea wakati wa kufuta mzigo', 'error');
+    }
+  });
+}
+
+// Load on start
+document.addEventListener('DOMContentLoaded', () => {
+  initCropAndUnitLists();
+  initTanzaniaGeo();
+  setupEditLocationAutocomplete();
+  fetchFarmers();
+});
+</script>
+</body>
+</html>

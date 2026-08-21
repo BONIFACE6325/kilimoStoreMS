@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Settings — AgroVault ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="assets/style.css"/>
+</head>
+<body>
+<div class="layout">
+  <div id="nav-mount"></div>
+  <div class="main-area">
+    <div id="top-mount"></div>
+    <div class="page-content">
+
+      <div class="page-header anim-fade-up">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <a href="index.html" style="font-size:13px;color:var(--text3)">Dashboard</a>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg>
+              <span style="font-size:13px;font-weight:600;color:var(--text)">Settings</span>
+            </div>
+            <div class="page-title">⚙️ System Configuration</div>
+            <div class="page-desc">Manage tenant settings, warehouse charge rates, notification criteria, and users</div>
+          </div>
+          <button class="btn btn-primary btn-sm" id="btnSaveAllConfig">
+            Save All Configurations
+          </button>
+        </div>
+      </div>
+
+      <!-- Settings Layout Grid -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start" class="anim-fade-up anim-delay-1">
+        
+        <!-- Column 1: ERP Rules & Rates -->
+        <div style="display:flex;flex-direction:column;gap:20px">
+          
+          <!-- Rates Config -->
+          <div class="card" style="padding:22px">
+            <div class="section-title" style="margin-bottom:14px">Warehouse Fee Rates &amp; Tariffs</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div>
+                <label class="form-label">Storage Fee (TZS / MT / Day)</label>
+                <input type="number" id="cfgStorageFee" class="form-input" value="500"/>
+              </div>
+              <div>
+                <label class="form-label">Drying Service Flat Fee (TZS)</label>
+                <input type="number" id="cfgDryingFee" class="form-input" value="45000"/>
+              </div>
+              <div>
+                <label class="form-label">Milling Service Flat Fee (TZS)</label>
+                <input type="number" id="cfgMillingFee" class="form-input" value="150000"/>
+              </div>
+              <div>
+                <label class="form-label">Grading &amp; Lab Fee (TZS)</label>
+                <input type="number" id="cfgGradingFee" class="form-input" value="50000"/>
+              </div>
+              <div style="grid-column:1/-1">
+                <label class="form-label">Default VAT Rate (%)</label>
+                <input type="number" id="cfgVatRate" class="form-input" value="18"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preferences -->
+          <div class="card" style="padding:22px">
+            <div class="section-title" style="margin-bottom:14px">System preferences &amp; Alerts</div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <label style="display:flex;align-items:center;justify-content:space-between;font-size:13.5px;color:var(--text2)">
+                Enable SMS Alert Broadcasts to Farmers
+                <input type="checkbox" checked id="cfgSMSAlerts" style="accent-color:var(--emerald-500)"/>
+              </label>
+              <label style="display:flex;align-items:center;justify-content:space-between;font-size:13.5px;color:var(--text2)">
+                Auto-Trigger Loan Overdue Emails
+                <input type="checkbox" checked id="cfgAutoOverdue" style="accent-color:var(--emerald-500)"/>
+              </label>
+              <label style="display:flex;align-items:center;justify-content:space-between;font-size:13.5px;color:var(--text2)">
+                Notify on Critical Bin Capacities
+                <input type="checkbox" checked id="cfgCriticalBin" style="accent-color:var(--emerald-500)"/>
+              </label>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Column 2: Users & Organization -->
+        <div style="display:flex;flex-direction:column;gap:20px">
+          
+          <!-- Tenant Profile -->
+          <div class="card" style="padding:22px">
+            <div class="section-title" style="margin-bottom:14px">Tenant Corporation Profile</div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div>
+                <label class="form-label">Company Legal Name</label>
+                <input type="text" id="cfgOrgName" class="form-input" value="AgroVault East Africa Ltd"/>
+              </div>
+              <div>
+                <label class="form-label">System Subdomain</label>
+                <input type="text" id="cfgSubdomain" class="form-input" value="kilimo.agrovault.com" readonly style="background:var(--surface2)"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- Users List -->
+          <div class="card" style="overflow:hidden">
+            <div style="padding:18px 20px 12px;border-bottom:1px solid var(--border)">
+              <div class="section-title">Warehouse Team &amp; Operators</div>
+            </div>
+            <div style="overflow-x:auto">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email Address</th>
+                    <th>System Role</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>James Makori</strong></td>
+                    <td>manager@agrovault.com</td>
+                    <td><span class="badge badge-indigo">Manager</span></td>
+                    <td><span class="badge badge-green"><span class="dot"></span>Active</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Sarah Kimani</strong></td>
+                    <td>accountant@agrovault.com</td>
+                    <td><span class="badge badge-indigo">Accountant</span></td>
+                    <td><span class="badge badge-green"><span class="dot"></span>Active</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Tom Njoroge</strong></td>
+                    <td>operator@agrovault.com</td>
+                    <td><span class="badge badge-indigo">Operator</span></td>
+                    <td><span class="badge badge-green"><span class="dot"></span>Active</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script src="assets/components.js"></script>
+<script>
+renderNav('settings.html');
+
+document.getElementById('btnSaveAllConfig').onclick = () => {
+  // Save settings values to localStorage so they persist across sessions
+  localStorage.setItem('cfg_storage_fee', document.getElementById('cfgStorageFee').value);
+  localStorage.setItem('cfg_drying_fee', document.getElementById('cfgDryingFee').value);
+  localStorage.setItem('cfg_milling_fee', document.getElementById('cfgMillingFee').value);
+  localStorage.setItem('cfg_grading_fee', document.getElementById('cfgGradingFee').value);
+  localStorage.setItem('cfg_vat_rate', document.getElementById('cfgVatRate').value);
+  
+  localStorage.setItem('cfg_sms_alerts', document.getElementById('cfgSMSAlerts').checked);
+  localStorage.setItem('cfg_auto_overdue', document.getElementById('cfgAutoOverdue').checked);
+  localStorage.setItem('cfg_critical_bin', document.getElementById('cfgCriticalBin').checked);
+
+  localStorage.setItem('cfg_org_name', document.getElementById('cfgOrgName').value);
+
+  showToast('All configurations updated successfully!', 'success');
+};
+
+function loadStoredConfig() {
+  if (localStorage.getItem('cfg_storage_fee')) {
+    document.getElementById('cfgStorageFee').value = localStorage.getItem('cfg_storage_fee');
+  }
+  if (localStorage.getItem('cfg_drying_fee')) {
+    document.getElementById('cfgDryingFee').value = localStorage.getItem('cfg_drying_fee');
+  }
+  if (localStorage.getItem('cfg_milling_fee')) {
+    document.getElementById('cfgMillingFee').value = localStorage.getItem('cfg_milling_fee');
+  }
+  if (localStorage.getItem('cfg_grading_fee')) {
+    document.getElementById('cfgGradingFee').value = localStorage.getItem('cfg_grading_fee');
+  }
+  if (localStorage.getItem('cfg_vat_rate')) {
+    document.getElementById('cfgVatRate').value = localStorage.getItem('cfg_vat_rate');
+  }
+  if (localStorage.getItem('cfg_org_name')) {
+    document.getElementById('cfgOrgName').value = localStorage.getItem('cfg_org_name');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadStoredConfig);
+</script>
+</body>
+</html>
