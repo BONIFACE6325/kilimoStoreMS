@@ -1,59 +1,123 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🌱 KilimoStoreMS - Enterprise Agricultural Warehouse & Financial Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+![KilimoStoreMS Banner](https://img.shields.io/badge/KilimoStore-Enterprise_System-10b981?style=for-the-badge&logo=laravel&logoColor=white)
 
-## About Laravel
+**KilimoStoreMS** ni mfumo wa kisasa wa kiwango cha *Enterprise* ulioundwa maalum kwa ajili ya usimamizi wa maghala ya mazao ya kilimo, utoaji wa huduma za kuchakata mazao (kama kukoboa, kukausha, kupanga madaraja), na usimamizi wa kifedha ikiwemo mikopo na malipo kwa wakulima. 
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Mfumo huu umejengwa kwa kutumia **Laravel API (Backend)** yenye nguvu sana, na muonekano wa **HTML/CSS/JS (Frontend)** uliobuniwa kwa umahiri ukiwa na uhuishaji (animations), responsiveness, na uzoefu bora sana kwa mtumiaji (Premium UX).
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## ✨ Sifa Kuu za Mfumo (Key Features)
 
-## Learning Laravel
+### 👥 1. Usimamizi wa Wakulima (Farmer Management)
+* Usajili wa wakulima na taarifa zao (NIDA, Simu, Mkoa, n.k).
+* *Profile Dashboard* ya kila mkulima inayoonyesha historia nzima ya mzigo, mikopo na huduma alizopata.
+* **Server-side Pagination** ili kuhakikisha mfumo haulemewi hata ukiwa na wakulima laki moja.
+* *Dynamic Avatars* (Picha za wasifu) zenye rangi na herufi zinazotengenezwa moja kwa moja kutokana na jina la mkulima.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 📦 2. Udhibiti wa Mizigo & Maghala (Stock & Inventory)
+* Kupokea mzigo ukiwa na uzito kamili (Kg, Tani) au **Uzito Usiojulikana** (mfano: Gunia za Mpunga usio kobolewa).
+* Ubadilishaji wa vipimo (Unit conversions) kati ya Gunia, Roba, Kilo, Tani, n.k.
+* Kufuatilia mizigo iliyohifadhiwa, inayosubiri huduma, au iliyochukuliwa.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 🛠️ 3. Huduma & Uchakataji (Services Catalog)
+* Usanidi wa huduma kama vile *Milling* (Kukoboa), *Drying* (Kukausha), *Cleaning*, n.k.
+* **Crop-Specific Validation:** Mfumo una akili ya kuzuia huduma za zao moja kupewa zao lingine (Mfano: Hauruhusu huduma ya kukoboa mpunga itumike kwenye mzigo wa mahindi).
+* Kuweka gharama za huduma kulingana na kizio (Unit Rate).
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### 💰 4. Miamala ya Kifedha (Financial & Loans)
+* Kutoa na kusimamia mikopo ya wakulima.
+* Kufanya malipo (Settlement) ambapo makato yote (Gharama za kuhifadhi, mikopo, huduma) yanakatwa moja kwa moja kabla ya kumlipa mkulima.
 
-## Agentic Development
+---
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## 🚀 Teknolojia Zilizotumika (Tech Stack)
 
+* **Backend:** PHP 8.x, Laravel 11.x, Eloquent ORM, RESTful API
+* **Frontend:** Vanilla HTML5, CSS3 (Custom Variables, Glassmorphism, Micro-animations), Vanilla JavaScript (ES6+), Fetch API
+* **Database:** MySQL / SQLite
+* **Architecture:** Multi-tenancy ready
+
+---
+
+## 💻 Namna ya Ku-Install Kwenye Kompyuta Yako (Local Setup)
+
+Ili kuwasha mradi huu kwenye kompyuta yako *(Local Environment)*, fuata hatua hizi kwa umakini:
+
+### Mahitaji (Prerequisites)
+Hakikisha kompyuta yako ina:
+* PHP (v8.2 au zaidi)
+* Composer (Kwa ajili ya Laravel packages)
+* MySQL Server (Au SQLite ikiwa unataka kutumia hifadhidata nyepesi)
+* Git
+
+### Hatua za Usakinishaji (Installation Steps)
+
+**1. Pakua Mradi (Clone Repository)**
+Fungua *terminal/CMD* na andika:
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/BONIFACE6325/kilimoStoreMS.git
+cd kilimoStoreMS
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+**2. Weka Dependencies (Install Packages)**
+```bash
+composer install
+```
 
-## Contributing
+**3. Tengeneza Faili la Mazingira (Environment Setup)**
+```bash
+cp .env.example .env
+```
+*(Kwa watumiaji wa Windows CMD, tumia: `copy .env.example .env`)*
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+**4. Unganisha na Database**
+Fungua faili la `.env` lililotengenezwa na uweke jina la database yako, username, na password (kama unatumia MySQL). 
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=kilimo_store_db
+DB_USERNAME=root
+DB_PASSWORD=
+```
+*Ikiwa unataka kutumia SQLite (njia rahisi zaidi), badilisha hapo juu iwe:*
+```env
+DB_CONNECTION=sqlite
+# Kisha futa mistari ya DB_HOST, DB_PORT, DB_DATABASE, n.k.
+```
 
-## Code of Conduct
+**5. Tengeneza Key ya Usalama (Application Key)**
+```bash
+php artisan key:generate
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+**6. Panga Hifadhidata (Run Migrations)**
+Hii itatengeneza *tables* zote kwenye Database yako.
+```bash
+php artisan migrate
+```
+*(Kama mfumo unakuuliza utengeneze database kwasababu haipo, bofya 'Yes')*
 
-## Security Vulnerabilities
+**7. Washa Seva ya Mfumo (Start the Development Server)**
+```bash
+php artisan serve
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## 🌐 Jinsi ya Kutumia (Usage)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# kilimoStoreMS
+Baada ya kuwasha seva, fungua kivinjari (Browser) chochote (mf. Chrome) na uende kwenye kiungo hiki:
+
+👉 **`http://localhost:8000/index.html`** *(Au `http://localhost:8000/login.html`)*
+
+Kwa kuwa muonekano wote (UI) upo kwenye folda la `public/`, utaweza kuingiliana na API za mfumo moja kwa moja. Unaweza kwenda kwenye menyu ya **Farmers** kuanza kusajili wakulima na kupokea mizigo.
+
+---
+
+<div align="center">
+  <b>Tengeneza mazingira bora ya kilimo. Kuza uchumi.</b><br>
+  <i>Imejengwa na Timu ya KilimoStore</i>
+</div>
