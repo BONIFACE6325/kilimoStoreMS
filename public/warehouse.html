@@ -130,7 +130,7 @@ function renderBins() {
         <div>
           <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:6px">
             <span>Capacity</span>
-            <strong>${occ.toLocaleString()} / ${cap.toLocaleString()} MT</strong>
+            <strong>${(parseFloat(occ)*1000).toLocaleString()} / ${(parseFloat(cap)*1000).toLocaleString()} Kg</strong>
           </div>
           <div class="progress-bar">
             <div class="progress-fill" style="width:${utilPct}%;background:${progressColor}"></div>

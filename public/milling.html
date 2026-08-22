@@ -34,7 +34,7 @@
           <div class="kpi-label">Active Millers</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-value" id="kpiTotalMilled" style="color:var(--indigo-500)">0 MT</div>
+          <div class="kpi-value" id="kpiTotalMilled" style="color:var(--indigo-500)">0 Kg</div>
           <div class="kpi-label">Total Grains Milled</div>
         </div>
         <div class="kpi-card">
@@ -59,8 +59,8 @@
                 <th>Farmer Name</th>
                 <th>Crop</th>
                 <th>Variety</th>
-                <th>Input Weight (MT)</th>
-                <th>Moisture (%)</th>
+                <th>Input Weight (Kg)</th>
+                
                 <th>Batch Status</th>
                 <th>Actions</th>
               </tr>
@@ -95,11 +95,11 @@
           <input type="text" id="millingBatchCode" class="form-input" readonly style="background:var(--surface2)"/>
         </div>
         <div>
-          <label class="form-label">Input Weight (MT)</label>
+          <label class="form-label">Input Weight (Kg)</label>
           <input type="number" id="millingInputWeight" class="form-input" readonly style="background:var(--surface2)"/>
         </div>
         <div>
-          <label class="form-label">Output Weight (MT) *</label>
+          <label class="form-label">Output Weight (Kg) *</label>
           <input type="number" step="0.01" id="millingOutputWeight" class="form-input" placeholder="e.g. 220.0" required/>
           <div style="font-size:11.5px;color:var(--text3);margin-top:4px">Output weight should account for cleaning &amp; husk loss.</div>
         </div>
@@ -142,7 +142,7 @@ async function loadData() {
 function renderStats() {
   const milledCount = allBatches.filter(b => b.status === 'milled').length;
   const totalWeight = allBatches.reduce((sum, b) => sum + parseFloat(b.current_weight), 0);
-  document.getElementById('kpiTotalMilled').textContent = `${totalWeight.toLocaleString()} MT`;
+  document.getElementById('kpiTotalMilled').textContent = `${(totalWeight*1000).toLocaleString()} Kg`;
 }
 
 function renderTable(data) {
@@ -159,8 +159,8 @@ function renderTable(data) {
         <td><strong>${b.farmer_name}</strong></td>
         <td><span class="badge badge-green">${b.crop_type}</span></td>
         <td>${b.variety || 'N/A'}</td>
-        <td><strong>${parseFloat(b.current_weight).toLocaleString()} MT</strong></td>
-        <td>${parseFloat(b.moisture).toFixed(1)}%</td>
+        <td><strong>${(parseFloat(b.current_weight)*1000).toLocaleString()} Kg</strong></td>
+        
         <td><span class="badge badge-green"><span class="dot"></span>${b.status}</span></td>
         <td>
           <button class="btn btn-primary btn-sm" onclick="openMillingModal('${b.id}', '${b.batch_code}', '${b.current_weight}')">Process Mill</button>
@@ -186,7 +186,7 @@ function openMillingModal(id, code, weight) {
   const defaultOutput = (parseFloat(weight) * 0.92).toFixed(2);
   document.getElementById('millingOutputWeight').value = defaultOutput;
   
-  // Set default milling fee: 600 TZS per MT
+  // Set default milling fee: 600 TZS per Kg
   const defaultFee = Math.round(parseFloat(weight) * 600);
   document.getElementById('millingFee').value = defaultFee;
   
@@ -220,7 +220,7 @@ document.getElementById('saveMillingBtn').onclick = async (e) => {
     });
     const data = await res.json();
     if (data.success) {
-      showToast(`Batch ${data.batch.batch_code} milled successfully. Output weight: ${outputWeight} MT. Fee of TZS ${fee.toLocaleString()} charged.`, 'success');
+      showToast(`Batch ${data.batch.batch_code} milled successfully. Output weight: ${${outputWeight*1000} Kg. Fee of TZS ${fee.toLocaleString()} charged.`, 'success');
       modal.classList.remove('open');
       loadData();
     } else {

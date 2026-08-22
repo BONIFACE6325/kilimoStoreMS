@@ -58,8 +58,8 @@
                 <th>Batch Code</th>
                 <th>Farmer Name</th>
                 <th>Crop</th>
-                <th>Weight (MT)</th>
-                <th>Moisture (%)</th>
+                <th>Weight (Kg)</th>
+                
                 <th>Current Status</th>
                 <th>Actions</th>
               </tr>
@@ -154,8 +154,8 @@ function renderTable(data) {
         <td><code style="font-weight:600;color:var(--indigo-600)">${b.batch_code}</code></td>
         <td><strong>${b.farmer_name}</strong></td>
         <td><span class="badge badge-green">${b.crop_type}</span></td>
-        <td><strong>${parseFloat(b.current_weight).toLocaleString()} MT</strong></td>
-        <td>${parseFloat(b.moisture).toFixed(1)}%</td>
+        <td><strong>${(parseFloat(b.current_weight)*1000).toLocaleString()} Kg</strong></td>
+        
         <td><span class="badge badge-indigo"><span class="dot"></span>${b.status}</span></td>
         <td>
           <button class="btn btn-primary btn-sm" onclick="openGradingModal('${b.id}', '${b.batch_code}')">Inspect &amp; Grade</button>

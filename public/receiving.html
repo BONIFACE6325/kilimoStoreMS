@@ -24,48 +24,33 @@
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
           <div>
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-              <a href="index.html" style="font-size:13px;color:var(--text3)">Dashboard</a>
+              <a href="index.html" style="font-size:13px;color:var(--text3)" data-lang-en="Dashboard" data-lang-sw="Dashibodi">Dashibodi</a>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg>
-              <span style="font-size:13px;font-weight:600;color:var(--text)">Receiving</span>
+              <span style="font-size:13px;font-weight:600;color:var(--text)" data-lang-en="Receiving" data-lang-sw="Mapokezi">Mapokezi</span>
             </div>
-            <div class="page-title">📥 Receiving &amp; Intake</div>
-            <div class="page-desc">Record inbound grain deliveries, check moisture levels, and issue receipts</div>
+            <div class="page-title" data-lang-en="📥 Receiving &amp; Intake" data-lang-sw="📥 Mapokezi ya Mzigo">📥 Mapokezi ya Mzigo</div>
+            <div class="page-desc" data-lang-en="Record inbound deliveries and issue receipts" data-lang-sw="Sajili mizigo inayoingia na utoe risiti">Sajili mizigo inayoingia na utoe risiti</div>
           </div>
           <button class="btn btn-primary btn-sm" id="btnNewIntake">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            New Intake Receipt
+            <span data-lang-en="New Intake" data-lang-sw="Pokea Mpya">Pokea Mpya</span>
           </button>
         </div>
       </div>
 
-      <!-- Stats Grid -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:24px" class="anim-fade-up anim-delay-1">
-        <div class="kpi-card">
-          <div class="kpi-value" id="kpiTotalIntakes">0</div>
-          <div class="kpi-label">Total Intakes</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-value" id="kpiAvgMoisture" style="color:var(--indigo-500)">0.0%</div>
-          <div class="kpi-label">Average Moisture</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-value" id="kpiTotalWeight" style="color:var(--emerald-500)">0 MT</div>
-          <div class="kpi-label">Total Weight Received</div>
-        </div>
+      <!-- Dynamic Stock Stats Grid -->
+      <div id="dynamicStatsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:24px" class="anim-fade-up anim-delay-1">
+        <!-- populated dynamically via JS -->
       </div>
 
       <!-- Main Log -->
       <div class="card anim-fade-up anim-delay-2" style="overflow:hidden">
         <div style="padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
-          <div class="section-title">Intake Records</div>
+          <div class="section-title" data-lang-en="Intake Records" data-lang-sw="Kumbukumbu za Mapokezi">Kumbukumbu za Mapokezi</div>
           <div style="display:flex;gap:8px">
-            <input type="text" id="intakeSearch" placeholder="Search batch or farmer…" class="form-input" style="width:220px" oninput="filterTable()"/>
+            <input type="text" id="intakeSearch" placeholder="Tafuta shehena / mkulima..." data-lang-en="Search batch or farmer..." data-lang-sw="Tafuta shehena / mkulima..." class="form-input" style="width:220px" oninput="filterTable()"/>
             <select id="cropFilter" class="form-input form-select" style="width:130px" onchange="filterTable()">
-              <option value="">All Crops</option>
-              <option value="Maize">Maize</option>
-              <option value="Rice">Rice</option>
-              <option value="Beans">Beans</option>
-              <option value="Sunflower">Sunflower</option>
+              <option value="">Zao Lote...</option>
             </select>
           </div>
         </div>
@@ -73,15 +58,15 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th>Batch Code</th>
-                <th>Farmer Name</th>
-                <th>Crop Type</th>
-                <th>Variety</th>
-                <th>Weight (MT)</th>
-                <th>Moisture (%)</th>
-                <th>Date Received</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th data-lang-en="Batch Code" data-lang-sw="Namba ya Shehena">Namba ya Shehena</th>
+                <th data-lang-en="Farmer Name" data-lang-sw="Jina la Mkulima">Jina la Mkulima</th>
+                <th data-lang-en="Crop Type" data-lang-sw="Aina ya Zao">Aina ya Zao</th>
+                <th data-lang-en="Variety" data-lang-sw="Aina Ndogo (Variety)">Aina Ndogo</th>
+                <th data-lang-en="Weight" data-lang-sw="Uzito (Kg)">Uzito (Kg)</th>
+                
+                <th data-lang-en="Date" data-lang-sw="Tarehe">Tarehe</th>
+                <th data-lang-en="Status" data-lang-sw="Hali">Hali</th>
+                <th data-lang-en="Actions" data-lang-sw="Vitendo">Vitendo</th>
               </tr>
             </thead>
             <tbody id="intakeTableBody">
@@ -101,7 +86,7 @@
 <div id="intakeModal" class="modal-overlay">
   <div class="modal" style="max-width:540px">
     <div class="modal-header">
-      <div class="modal-title">Record New Intake</div>
+      <div class="modal-title" data-lang-en="Record New Intake" data-lang-sw="Sajili Mapokezi Mapya">Sajili Mapokezi Mapya</div>
       <button id="closeIntakeModal" style="background:none;border:none;cursor:pointer;color:var(--text3)">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -109,33 +94,36 @@
     <div class="modal-body">
       <form id="intakeForm" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
         <div style="grid-column:1/-1">
-          <label class="form-label">Farmer *</label>
+          <label class="form-label" data-lang-en="Farmer *" data-lang-sw="Mkulima *">Mkulima *</label>
           <select id="intakeFarmer" class="form-input form-select" required>
-            <option value="">Select Farmer...</option>
+            <option value="">Chagua Mkulima...</option>
           </select>
         </div>
         <div>
-          <label class="form-label">Crop Type *</label>
+          <label class="form-label" data-lang-en="Crop Type *" data-lang-sw="Aina ya Zao *">Aina ya Zao *</label>
           <select id="intakeCrop" class="form-input form-select" required>
-            <option value="">Select Crop...</option>
-            <option value="Maize">Maize</option>
-            <option value="Rice">Rice</option>
-            <option value="Beans">Beans</option>
-            <option value="Sunflower">Sunflower</option>
+            <option value="">Chagua Zao...</option>
           </select>
         </div>
         <div>
-          <label class="form-label">Variety</label>
-          <input type="text" id="intakeVariety" class="form-input" placeholder="e.g. Katumani"/>
+          <label class="form-label" data-lang-en="Quantity *" data-lang-sw="Kiasi *">Kiasi *</label>
+          <input type="number" step="0.01" id="intakeKiasi" class="form-input" placeholder="e.g. 10" oninput="calculateIntakeWeightMT()" required/>
         </div>
         <div>
-          <label class="form-label">Weight (MT) *</label>
-          <input type="number" id="intakeWeight" step="0.01" class="form-input" placeholder="0.00" required/>
+          <label class="form-label" data-lang-en="Units *" data-lang-sw="Vipimo *">Vipimo *</label>
+          <select id="intakeUnitSelect" class="form-input form-select" onchange="calculateIntakeWeightMT()" required>
+          </select>
         </div>
+        <input type="hidden" id="intakeMoisture" value="13.5" />
         <div>
-          <label class="form-label">Moisture (%) *</label>
-          <input type="number" id="intakeMoisture" step="0.1" class="form-input" placeholder="12.5" required/>
+          <label class="form-label" data-lang-en="Variety" data-lang-sw="Aina Ndogo (Variety)">Aina Ndogo</label>
+          <input type="text" id="intakeVariety" class="form-input" placeholder="Mf. Katumani"/>
         </div>
+        <div style="grid-column: 1 / -1; background: var(--surface2); padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size:12px; font-weight:600; color:var(--text2)" data-lang-en="Weight Calculator (Kg)" data-lang-sw="Kikokotoo cha Uzito (Kg)">Kikokotoo cha Uzito (Kg)</span>
+          <span style="font-size:12px; font-weight:700; color:var(--emerald-500)" id="intakeWeightHelper">Uzito wa Jumla: 0 Kg</span>
+        </div>
+        <input type="hidden" id="intakeWeight" value="0"/>
         <div style="grid-column:1/-1">
           <label class="form-label">Storage Bin Placement (Optional)</label>
           <select id="intakeBin" class="form-input form-select">
@@ -145,8 +133,8 @@
       </form>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-secondary" id="cancelIntakeModal">Cancel</button>
-      <button class="btn btn-primary" id="saveIntakeBtn">Record intake</button>
+      <button class="btn btn-secondary" id="cancelIntakeModal" data-lang-en="Cancel" data-lang-sw="Ghairi">Ghairi</button>
+      <button class="btn btn-primary" id="saveIntakeBtn" data-lang-en="Save" data-lang-sw="Sajili Mapokezi">Sajili Mapokezi</button>
     </div>
   </div>
 </div>
@@ -180,7 +168,7 @@
           <tr style="border-bottom:2px solid #000;text-align:left">
             <th style="padding:6px 0">Crop Type</th>
             <th style="padding:6px 0">Variety</th>
-            <th style="padding:6px 0;text-align:right">Moisture</th>
+            
             <th style="padding:6px 0;text-align:right">Net Weight</th>
           </tr>
         </thead>
@@ -188,14 +176,12 @@
           <tr style="border-bottom:1px solid #eee">
             <td style="padding:10px 0" id="recCrop"></td>
             <td style="padding:10px 0" id="recVariety"></td>
-            <td style="padding:10px 0;text-align:right" id="recMoisture"></td>
+            
             <td style="padding:10px 0;text-align:right;font-weight:700" id="recWeight"></td>
           </tr>
         </tbody>
       </table>
-      <div style="font-size:12px;color:#555;line-height:1.6;margin-bottom:30px">
-        * Batches with moisture levels exceeding 13.5% will be routed to the drying queue. Storage charges apply at TZS 500 per Metric Ton (MT) per day.
-      </div>
+      
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;font-size:13px;text-align:center;margin-top:20px">
         <div style="border-top:1px dashed #999;padding-top:6px">Authorized Signature</div>
         <div style="border-top:1px dashed #999;padding-top:6px">Farmer Signature</div>
@@ -203,7 +189,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" id="cancelReceiptModal">Close</button>
-      <button class="btn btn-primary" onclick="window.print()">Print Receipt</button>
+      <button class="btn btn-primary" onclick="window.print()">Chapisha Risiti</button>
     </div>
   </div>
 </div>
@@ -228,6 +214,7 @@ async function loadData() {
     const binsRes = await fetch('/api/v1/bins/map');
     allBins = await binsRes.json();
 
+    initLists();
     populateDropdowns();
     renderStats();
     renderTable(allBatches);
@@ -235,6 +222,47 @@ async function loadData() {
     console.error(err);
     showToast('Failed to load data', 'error');
   }
+}
+
+
+function initLists() {
+  let crops = ['Mpunga', 'Mahindi', 'Maharage', 'Alizeti'];
+  try { crops = JSON.parse(localStorage.getItem('agroCropsList')) || crops; } catch(e){}
+  
+  let units = [
+    { name: 'Kilo (Kg)', value: 'Kilo', kg: 1 },
+    { name: 'Lita (L)', value: 'Lita', kg: 1 },
+    { name: 'Gunia (100Kg)', value: 'Gunia', kg: 100 },
+    { name: 'Tani (Kg)', value: 'Tani', kg: 1000 }
+  ];
+  try { units = JSON.parse(localStorage.getItem('agroUnitsList')) || units; } catch(e){}
+
+  const cSelect = document.getElementById('intakeCrop');
+  const filter = document.getElementById('cropFilter');
+  cSelect.innerHTML = '<option value="">Chagua Zao...</option>';
+  filter.innerHTML = '<option value="">Zao Lote...</option>';
+  crops.forEach(c => {
+    cSelect.innerHTML += `<option value="${c}">${c}</option>`;
+    filter.innerHTML += `<option value="${c}">${c}</option>`;
+  });
+
+  const uSelect = document.getElementById('intakeUnitSelect');
+  uSelect.innerHTML = '';
+  units.forEach(u => {
+    uSelect.innerHTML += `<option value="${u.value}" data-kg="${u.kg}">${u.name}</option>`;
+  });
+}
+
+function calculateIntakeWeightMT() {
+  const kiasi = parseFloat(document.getElementById('intakeKiasi').value) || 0;
+  const unitSel = document.getElementById('intakeUnitSelect');
+  const opt = unitSel.options[unitSel.selectedIndex];
+  if (!opt) return;
+  const kg = parseFloat(opt.getAttribute('data-kg')) || 0;
+  const totalKg = kiasi * kg;
+  
+  document.getElementById('intakeWeightHelper').textContent = 'Uzito wa Jumla: ' + totalKg.toLocaleString() + ' Kg';
+  document.getElementById('intakeWeight').value = (totalKg / 1000).toFixed(4); // store MT
 }
 
 function populateDropdowns() {
@@ -247,30 +275,89 @@ function populateDropdowns() {
   const bSelect = document.getElementById('intakeBin');
   bSelect.innerHTML = '<option value="">Auto-Assign Bin</option>';
   allBins.forEach(b => {
-    bSelect.innerHTML += `<option value="${b.id}">${b.name} (${b.crop_type || 'Empty'} - Occupancy: ${b.current_occupancy_mt} MT)</option>`;
+    bSelect.innerHTML += `<option value="${b.id}">${b.name} (${b.crop_type || 'Empty'} - Occupancy: ${(parseFloat(b.current_occupancy_mt)*1000).toLocaleString()} Kg)</option>`;
   });
 }
 
 function renderStats() {
-  document.getElementById('kpiTotalIntakes').textContent = allBatches.length;
+  const container = document.getElementById('dynamicStatsGrid');
+  if (!container) return;
+  container.innerHTML = '';
   
-  const totalWeight = allBatches.reduce((sum, b) => sum + parseFloat(b.current_weight), 0);
-  document.getElementById('kpiTotalWeight').textContent = `${totalWeight.toLocaleString()} MT`;
-
-  const avgMoisture = allBatches.length > 0 
-    ? (allBatches.reduce((sum, b) => sum + parseFloat(b.moisture), 0) / allBatches.length).toFixed(1)
-    : '0.0';
-  document.getElementById('kpiAvgMoisture').textContent = `${avgMoisture}%`;
+  let groups = {};
+  
+  allBatches.forEach(b => {
+    // Mapokezi (Receiving) strictly records what came through the gate.
+    // Skip internally generated batches (like Milled output).
+    if (b.parent_batch_id) return;
+    
+    const crop = b.crop_type || 'Nafaka Nyingine';
+    const unit = b.intake_unit || 'Kilo';
+    
+    // For Mapokezi, we want the INITIAL quantity received, not current weight!
+    const initialQty = parseFloat(b.intake_quantity) || 0;
+    const initialWt = parseFloat(b.initial_weight) || 0;
+    
+    let qtyInUnit = initialQty;
+    if (qtyInUnit === 0) {
+      qtyInUnit = initialWt * 1000; // fallback to Kg if no unit qty
+    }
+    if (qtyInUnit <= 0) return;
+    
+    // Group by Crop + Unit
+    const key = crop + '|' + (initialQty > 0 ? unit : 'Kilo');
+    
+    if (!groups[key]) {
+      groups[key] = {
+        crop: crop,
+        unit: initialQty > 0 ? unit : 'Kilo',
+        totalQty: 0
+      };
+    }
+    
+    groups[key].totalQty += qtyInUnit;
+  });
+  
+  const keys = Object.keys(groups);
+  if (keys.length === 0) {
+    container.innerHTML = '<div style="color:var(--text3); font-size:13px; padding:10px">Hakuna mzigo wowote ghalani kwa sasa.</div>';
+    return;
+  }
+  
+  // Render dynamic cards
+  const colors = ['--emerald-500', '--indigo-500', '--orange-500', '--blue-500', '--purple-500', '--fuchsia-500'];
+  let colorIdx = 0;
+  
+  keys.forEach(k => {
+    const g = groups[k];
+    // Ignore if total quantity rounds to 0
+    if (g.totalQty < 0.1) return;
+    
+    const card = document.createElement('div');
+    card.className = 'kpi-card';
+    card.innerHTML = `
+      <div class="kpi-value" style="color:var(${colors[colorIdx % colors.length]}); font-size: 26px;">
+        ${g.totalQty.toLocaleString(undefined, {maximumFractionDigits:1})} <span style="font-size:14px; color:var(--text3)">${g.unit}</span>
+      </div>
+      <div class="kpi-label" style="font-weight:700; font-size:14.5px; margin-top:4px">${g.crop}</div>
+    `;
+    container.appendChild(card);
+    colorIdx++;
+  });
 }
 
 function renderTable(data) {
   const tbody = document.getElementById('intakeTableBody');
   tbody.innerHTML = '';
-  if (data.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:20px 0;">No intakes recorded.</td></tr>';
+  
+  // Filter only original intakes (no parent_batch_id)
+  const intakeData = data.filter(b => !b.parent_batch_id);
+  
+  if (intakeData.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:20px 0;">Hakuna mapokezi yoyote (No intakes).</td></tr>';
     return;
   }
-  data.forEach(b => {
+  intakeData.forEach(b => {
     let stClass = 'badge-green';
     if (b.status === 'received') stClass = 'badge-blue';
     else if (b.status === 'drying') stClass = 'badge-amber';
@@ -282,12 +369,12 @@ function renderTable(data) {
         <td><strong>${b.farmer_name}</strong></td>
         <td><span class="badge badge-green">${b.crop_type}</span></td>
         <td>${b.variety || 'N/A'}</td>
-        <td><strong>${parseFloat(b.current_weight).toLocaleString()} MT</strong></td>
-        <td>${parseFloat(b.moisture).toFixed(1)}%</td>
+        <td><strong>${(parseFloat(b.initial_weight)*1000).toLocaleString()} Kg</strong></td>
+        
         <td style="color:var(--text3)">${b.created_at}</td>
         <td><span class="badge ${stClass}"><span class="dot"></span>${b.status}</span></td>
         <td>
-          <button class="btn btn-secondary btn-sm" onclick="showReceiptModal('${b.batch_code}', '${b.farmer_name}', '${b.crop_type}', '${b.variety || 'N/A'}', '${parseFloat(b.current_weight).toLocaleString()} MT', '${parseFloat(b.moisture).toFixed(1)}%', '${b.created_at}')">Print Receipt</button>
+          <button class="btn btn-secondary btn-sm" onclick="showReceiptModal('${b.batch_code}', '${b.farmer_name}', '${b.crop_type}', '${b.variety || 'N/A'}', '${(parseFloat(b.initial_weight)*1000).toLocaleString()} Kg', '${b.created_at}')">Chapisha Risiti</button>
         </td>
       </tr>
     `;
@@ -311,7 +398,7 @@ const receiptModal = document.getElementById('receiptModal');
 document.getElementById('closeReceiptModal').onclick = () => receiptModal.classList.remove('open');
 document.getElementById('cancelReceiptModal').onclick = () => receiptModal.classList.remove('open');
 
-function showReceiptModal(batchCode, farmerName, crop, variety, weight, moisture, date) {
+function showReceiptModal(batchCode, farmerName, crop, variety, weight, date) {
   document.getElementById('recBatchCode').textContent = batchCode;
   document.getElementById('recFarmerName').textContent = farmerName;
   
@@ -322,7 +409,7 @@ function showReceiptModal(batchCode, farmerName, crop, variety, weight, moisture
   document.getElementById('recCrop').textContent = crop;
   document.getElementById('recVariety').textContent = variety;
   document.getElementById('recWeight').textContent = weight;
-  document.getElementById('recMoisture').textContent = moisture;
+  
   document.getElementById('recDate').textContent = date;
   
   receiptModal.classList.add('open');
@@ -340,10 +427,12 @@ document.getElementById('saveIntakeBtn').onclick = async (e) => {
   const cropType = document.getElementById('intakeCrop').value;
   const variety = document.getElementById('intakeVariety').value;
   const weight = parseFloat(document.getElementById('intakeWeight').value);
-  const moisture = parseFloat(document.getElementById('intakeMoisture').value);
+  const moisture = 13.5;
   const binId = document.getElementById('intakeBin').value;
+  const kiasi = document.getElementById('intakeKiasi').value;
+  const unit = document.getElementById('intakeUnitSelect').value;
 
-  if (!farmerId || !cropType || isNaN(weight) || isNaN(moisture)) {
+  if (!farmerId || !cropType || isNaN(weight) || !kiasi) {
     showToast('Please fill out all required fields', 'error');
     return;
   }
@@ -358,6 +447,8 @@ document.getElementById('saveIntakeBtn').onclick = async (e) => {
         variety: variety,
         initial_weight_mt: weight,
         initial_moisture: moisture,
+        intake_quantity: parseFloat(kiasi),
+        intake_unit: unit,
         bin_id: binId || null
       })
     });

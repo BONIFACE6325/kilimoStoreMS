@@ -12,6 +12,8 @@ class GradingRecord extends Model
 
     protected $fillable = [
         'batch_id',
+        'status',
+        'service_id',
         'grader_id',
         'moisture_pct',
         'foreign_matter_pct',

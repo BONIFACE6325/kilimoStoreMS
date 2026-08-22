@@ -16,6 +16,7 @@ class Batch extends Model
         'tenant_id',
         'branch_id',
         'farmer_id',
+        'parent_batch_id',
         'batch_code',
         'crop_type',
         'variety',
@@ -64,8 +65,8 @@ class Batch extends Model
         return $this->hasMany(MillingJob::class);
     }
 
-    public function gradingRecord(): HasOne
+    public function gradingRecords(): HasMany
     {
-        return $this->hasOne(GradingRecord::class);
+        return $this->hasMany(GradingRecord::class);
     }
 }

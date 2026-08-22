@@ -26,60 +26,64 @@ class FarmerController extends Controller
             $query->where('status', $request->input('status'));
         }
 
-        $perPage = $request->input('per_page', 15);
-        $paginated = $query->orderBy('name')->paginate($perPage);
+        if ($request->has('page') || $request->has('per_page')) {
+            $perPage = $request->input('per_page', 15);
+            $paginated = $query->orderBy('name')->paginate($perPage);
 
-        // Map stats to match UI design requirements
-        $result = $paginated->getCollection()->map(function ($farmer) {
-            $batches = $farmer->batches()->get();
-            $loans = $farmer->loans()->get();
+            $result = $paginated->getCollection()->map(function ($farmer) {
+                return self::mapFarmerStats($farmer);
+            });
 
-            $totalDeposited = $batches->sum('initial_weight_mt');
-            $activeStock = $batches->where('status', 'stored')->sum('current_weight_mt');
-            $loansActiveCount = $loans->where('status', 'active')->count();
-            $loansBalance = $loans->whereIn('status', ['active', 'overdue'])->sum('current_balance');
+            $paginatedArray = $paginated->toArray();
+            $paginatedArray['data'] = $result;
 
-            return [
-                'id' => $farmer->id,
-                'farmer_code' => $farmer->farmer_code,
-                'name' => $farmer->name,
-                'phone' => $farmer->phone,
-                'national_id' => $farmer->national_id,
-                'region' => $farmer->region,
-                'district' => $farmer->district,
-                'ward' => $farmer->ward,
-                'village' => $farmer->village,
-                'street' => $farmer->street,
-                'status' => $farmer->status,
-                'total_deposited' => $totalDeposited,
-                'active_stock' => $activeStock,
-                'active_loans' => $loansActiveCount,
-                'loan_balance' => $loansBalance,
-                'created_at' => $farmer->created_at->format('Y-m-d H:i'),
+            $globalTotal = Farmer::count();
+            $globalActive = Farmer::where('status', 'active')->count();
+            $globalLoans = Farmer::whereHas('loans', function($q) {
+                $q->whereIn('status', ['active', 'overdue']);
+            })->count();
+            $globalRegions = Farmer::whereNotNull('region')->distinct('region')->count('region');
+
+            $paginatedArray['stats'] = [
+                'total' => $globalTotal,
+                'active' => $globalActive,
+                'inactive' => $globalTotal - $globalActive,
+                'with_loans' => $globalLoans,
+                'regions' => $globalRegions
             ];
-        });
 
-        $paginatedArray = $paginated->toArray();
-        $paginatedArray['data'] = $result;
+            return response()->json($paginatedArray);
+        } else {
+            $farmers = $query->orderBy('name')->get();
+            $result = $farmers->map(function ($farmer) {
+                return self::mapFarmerStats($farmer);
+            });
+            return response()->json($result);
+        }
+    }
 
-        // Global Stats
-        $globalTotal = Farmer::count();
-        $globalActive = Farmer::where('status', 'active')->count();
-        // Farmers with active/overdue loans
-        $globalLoans = Farmer::whereHas('loans', function($q) {
-            $q->whereIn('status', ['active', 'overdue']);
-        })->count();
-        $globalRegions = Farmer::whereNotNull('region')->distinct('region')->count('region');
+    private static function mapFarmerStats($farmer) {
+        $batches = $farmer->batches()->get();
+        $loans = $farmer->loans()->get();
 
-        $paginatedArray['stats'] = [
-            'total' => $globalTotal,
-            'active' => $globalActive,
-            'inactive' => $globalTotal - $globalActive,
-            'with_loans' => $globalLoans,
-            'regions' => $globalRegions
+        return [
+            'id' => $farmer->id,
+            'farmer_code' => $farmer->farmer_code,
+            'name' => $farmer->name,
+            'phone' => $farmer->phone,
+            'national_id' => $farmer->national_id,
+            'region' => $farmer->region,
+            'district' => $farmer->district,
+            'ward' => $farmer->ward,
+            'village' => $farmer->village,
+            'street' => $farmer->street,
+            'status' => $farmer->status,
+            'total_deposited' => $batches->sum('initial_weight_mt'),
+            'active_stock' => $batches->where('status', 'stored')->sum('current_weight_mt'),
+            'active_loans' => $loans->where('status', 'active')->count(),
+            'loan_balance' => $loans->whereIn('status', ['active', 'overdue'])->sum('current_balance'),
+            'created_at' => $farmer->created_at->format('Y-m-d H:i'),
         ];
-
-        return response()->json($paginatedArray);
     }
 
     public function store(Request $request)
@@ -125,7 +129,7 @@ class FarmerController extends Controller
     {
         $farmer = Farmer::findOrFail($id);
         $batches = $farmer->batches()
-            ->with(['dryingJobs.service', 'millingJobs.service', 'gradingRecord'])
+            ->with(['dryingJobs.service', 'millingJobs.service', 'gradingRecords'])
             ->orderBy('created_at', 'desc')
             ->get();
             
@@ -142,6 +146,8 @@ class FarmerController extends Controller
                 if ($job->service_id) $appliedServices[] = $job->service_id;
                 $services->push([
                     'id' => $job->id,
+                    'job_id' => $job->id,
+                    'service_id' => $job->service_id,
                     'batch_code' => $batch->batch_code,
                     'type' => 'Drying',
                     'service_name' => $job->service ? $job->service->name_sw : ($job->machine_id ?? 'Kukausha'),
@@ -155,6 +161,8 @@ class FarmerController extends Controller
                 if ($job->service_id) $appliedServices[] = $job->service_id;
                 $services->push([
                     'id' => $job->id,
+                    'job_id' => $job->id,
+                    'service_id' => $job->service_id,
                     'batch_code' => $batch->batch_code,
                     'type' => 'Milling',
                     'service_name' => $job->service ? $job->service->name_sw : ($job->machine_id ?? 'Kukoboa'),
@@ -164,15 +172,18 @@ class FarmerController extends Controller
                 ]);
             }
 
-            if ($batch->gradingRecord) {
+            foreach ($batch->gradingRecords as $job) {
+                if ($job->service_id) $appliedServices[] = $job->service_id;
                 $services->push([
-                    'id' => $batch->gradingRecord->id,
+                    'id' => $job->id,
+                    'job_id' => $job->id,
+                    'service_id' => $job->service_id,
                     'batch_code' => $batch->batch_code,
                     'type' => 'Grading',
-                    'service_name' => 'Grading',
-                    'fee_amount' => $batch->gradingRecord->fee_amount,
-                    'status' => 'completed',
-                    'created_at' => $batch->gradingRecord->created_at->format('Y-m-d H:i:s'),
+                    'service_name' => 'Kupanga / Grading',
+                    'fee_amount' => $job->fee_amount,
+                    'status' => $job->status,
+                    'created_at' => $job->created_at->format('Y-m-d H:i:s'),
                 ]);
             }
 

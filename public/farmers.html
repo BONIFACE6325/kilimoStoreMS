@@ -286,37 +286,29 @@
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
             <span data-lang-en="Current Stock" data-lang-sw="Mzigo">Mzigo</span>
           </button>
-          <button class="tab-link" onclick="switchProfileTab('newIntake')" id="tabBtnNewIntake" style="background:none; border:none; padding:10px 14px; font-weight:600; cursor:pointer; color:var(--text3); font-size:13.5px; display:flex; align-items:center; gap:6px; transition:all 0.2s">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-            <span data-lang-en="New Intake" data-lang-sw="Pokea">Pokea</span>
-          </button>
-          <button class="tab-link" onclick="switchProfileTab('applyService')" id="tabBtnApplyService" style="background:none; border:none; padding:10px 14px; font-weight:600; cursor:pointer; color:var(--text3); font-size:13.5px; display:flex; align-items:center; gap:6px; transition:all 0.2s">
+          <button class="tab-link" onclick="switchProfileTab('serviceHistory')" id="tabBtnServiceHistory" style="background:none; border:none; padding:10px 14px; font-weight:600; cursor:pointer; color:var(--text3); font-size:13.5px; display:flex; align-items:center; gap:6px; transition:all 0.2s">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-            <span data-lang-en="New Service" data-lang-sw="Huduma">Huduma</span>
+            <span data-lang-en="Services" data-lang-sw="Huduma">Huduma</span>
           </button>
           <button class="tab-link" onclick="switchProfileTab('newLoan')" id="tabBtnNewLoan" style="background:none; border:none; padding:10px 14px; font-weight:600; cursor:pointer; color:var(--text3); font-size:13.5px; display:flex; align-items:center; gap:6px; transition:all 0.2s">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/><line x1="1" y1="14" x2="23" y2="14"/><line x1="1" y1="18" x2="23" y2="18"/></svg>
-            <span data-lang-en="New Loan" data-lang-sw="Mkopo">Mkopo</span>
+            <span data-lang-en="Loans" data-lang-sw="Mikopo">Mikopo</span>
           </button>
           <button class="tab-link" onclick="switchProfileTab('settlement')" id="tabBtnSettlement" style="background:none; border:none; padding:10px 14px; font-weight:600; cursor:pointer; color:var(--text3); font-size:13.5px; display:flex; align-items:center; gap:6px; transition:all 0.2s">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
             <span data-lang-en="Settlements" data-lang-sw="Mauzo">Mauzo</span>
           </button>
-          <button class="tab-link" onclick="switchProfileTab('serviceHistory')" id="tabBtnServiceHistory" style="background:none; border:none; padding:10px 14px; font-weight:600; cursor:pointer; color:var(--text3); font-size:13.5px; display:flex; align-items:center; gap:6px; transition:all 0.2s">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-            <span data-lang-en="Service History" data-lang-sw="Historia">Historia</span>
-          </button>
         </div>
          <div id="tabContentServiceHistory" class="tab-content" style="display:none">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
             <h4 style="margin:0; font-size:13.5px; font-weight:700; color:var(--text)" data-lang-en="Service History" data-lang-sw="Historia ya Huduma">Historia ya Huduma</h4>
-            <button class="btn btn-outline btn-sm" onclick="switchProfileTab('applyService')" style="padding: 6px 12px; font-size:12px; display:flex; align-items:center; gap:4px">
+            <button class="btn btn-outline btn-sm" onclick="document.getElementById('applyServiceModal').classList.add('open')" style="padding: 6px 12px; font-size:12px; display:flex; align-items:center; gap:4px">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Huduma Mpya
             </button>
           </div>
           <div class="table-responsive" style="max-height:400px; overflow-y:auto; border:1px solid var(--border); border-radius:10px">
-            <table class="table" style="font-size:12.5px; margin:0">
+            <table class="data-table" style="font-size:12.5px; margin:0">
               <thead style="position:sticky; top:0; z-index:1; background:var(--surface2)">
                 <tr>
                   <th data-lang-en="Date" data-lang-sw="Tarehe">Tarehe</th>
@@ -325,6 +317,7 @@
                   <th data-lang-en="Description" data-lang-sw="Maelezo">Maelezo</th>
                   <th data-lang-en="Fee" data-lang-sw="Gharama">Gharama</th>
                   <th data-lang-en="Status" data-lang-sw="Hali">Hali</th>
+                  <th data-lang-en="Action" data-lang-sw="Kitendo">Kitendo</th>
                 </tr>
               </thead>
               <tbody id="profServicesBody">
@@ -337,7 +330,7 @@
         <div id="tabContentBatches" class="tab-content" style="display:block">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
             <h4 style="margin:0; font-size:13.5px; font-weight:700; color:var(--text)">Orodha ya Mzigo Uliopo</h4>
-            <button class="btn btn-primary btn-sm" onclick="switchProfileTab('newIntake')" style="padding: 6px 12px; font-size:12px; background:var(--emerald-600); border-color:var(--emerald-600); display:flex; align-items:center; gap:4px">
+            <button class="btn btn-primary btn-sm" onclick="document.getElementById('intakeModal').classList.add('open')" style="padding: 6px 12px; font-size:12px; background:var(--emerald-600); border-color:var(--emerald-600); display:flex; align-items:center; gap:4px">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               <span data-lang-en="New Stock" data-lang-sw="Pokea Mpya">Pokea Mpya</span>
             </button>
@@ -349,7 +342,7 @@
                   <th>Batch Code</th>
                   <th>Zao</th>
                   <th>Uzito</th>
-                  <th>Unyevu</th>
+                  
                   <th>Hali</th>
                   <th>Vitendo</th>
                 </tr>
@@ -361,8 +354,22 @@
           </div>
         </div>
         
-        <!-- Tab 2: New Intake Form -->
-        <div id="tabContentNewIntake" class="tab-content" style="display:none">
+        
+        
+        
+
+        
+<!-- Intake Modal -->
+<div id="intakeModal" class="modal-overlay">
+  <div class="modal" style="max-width:500px; width:95%">
+    <div class="modal-header">
+      <div class="modal-title">Sajili Upokeaji Mpya</div>
+      <button onclick="document.getElementById('intakeModal').classList.remove('open')" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
             <div style="grid-column: 1 / -1">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px">
@@ -402,16 +409,27 @@
             <input type="hidden" id="intakeVariety" value=""/>
             <select id="intakeBin" style="display:none"></select>
           </div>
-          <div style="display:flex; justify-content:flex-end; margin-top:16px">
-            <button class="btn btn-primary" onclick="submitNewIntake()" style="padding:8px 16px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:6px">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              Sajili Upokeaji Mpya
-            </button>
-          </div>
-        </div>
-        
-        <!-- Tab 3: Apply Service Form -->
-        <div id="tabContentApplyService" class="tab-content" style="display:none">
+          
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="document.getElementById('intakeModal').classList.remove('open')">Ghairi</button>
+      <button class="btn btn-primary" onclick="submitNewIntake()">Sajili (Save)</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Apply Service Modal -->
+<div id="applyServiceModal" class="modal-overlay">
+  <div class="modal" style="max-width:600px; width:95%">
+    <div class="modal-header">
+      <div class="modal-title">Sajili Huduma (Apply Service)</div>
+      <button onclick="document.getElementById('applyServiceModal').classList.remove('open')" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px">
             <div>
               <label class="form-label" style="font-size:12px" data-lang-en="Select Batch *" data-lang-sw="Chagua Shehena *">Chagua Shehena *</label>
@@ -438,10 +456,7 @@
               <span style="font-size:10px; color:var(--text3)" id="applyServiceUnitLabel"></span>
             </div>
  
-            <div id="applyServiceOutputDiv" style="display:none">
-              <label class="form-label" style="font-size:12px" id="applyServiceOutputLabel">Kiwango cha Kutoa (Final value)</label>
-              <input type="number" step="0.1" id="applyServiceOutputValue" class="form-input" style="padding:8px" />
-            </div>
+            <!-- Output fields moved to Complete Modal -->
  
             <div>
               <label class="form-label" style="font-size:12px" data-lang-en="Assigned Machine / Station" data-lang-sw="Mashine / Kinu Kilichopangiwa">Mashine / Kinu Kilichopangiwa</label>
@@ -460,58 +475,23 @@
             </div>
           </div>
 
-          <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px;">
-            <h4 style="margin:0 0 12px 0; font-size:13px; font-weight:700; color:var(--text)" data-lang-en="Recent Applied Services" data-lang-sw="Historia Fupi ya Huduma Zilizotolewa">Historia Fupi ya Huduma Zilizotolewa</h4>
-            <div class="table-responsive" style="max-height:220px; overflow-y:auto; border:1px solid var(--border); border-radius:10px">
-              <table class="table" style="font-size:11.5px; margin:0">
-                <thead style="position:sticky; top:0; z-index:1; background:var(--surface2)">
-                  <tr>
-                    <th data-lang-en="Date" data-lang-sw="Tarehe">Tarehe</th>
-                    <th data-lang-en="Batch" data-lang-sw="Shehena">Shehena</th>
-                    <th data-lang-en="Service" data-lang-sw="Huduma">Huduma</th>
-                    <th data-lang-en="Cost" data-lang-sw="Gharama">Gharama</th>
-                    <th data-lang-en="Status" data-lang-sw="Hali">Hali</th>
-                  </tr>
-                </thead>
-                <tbody id="applyServiceHistoryBody">
-                  <!-- Services populated here dynamically -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Tab 3: Loan History & New Loan Form -->
-        <div id="tabContentNewLoan" class="tab-content" style="display:none">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
-            <h4 style="margin:0; font-size:13.5px; font-weight:700; color:var(--text)" data-lang-en="Loan History" data-lang-sw="Historia ya Mikopo">Historia ya Mikopo</h4>
-            <button class="btn btn-outline btn-sm" onclick="toggleNewLoanForm()" style="padding: 6px 12px; font-size:12px; display:flex; align-items:center; gap:4px" id="btnToggleLoanForm">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Mkopo Mpya
-            </button>
-          </div>
+          
+    </div>
+  </div>
+</div>
 
-          <!-- Loan History Table -->
-          <div id="loanHistorySection" class="table-responsive" style="max-height:400px; overflow-y:auto; border:1px solid var(--border); border-radius:10px">
-            <table class="table" style="font-size:12.5px; margin:0">
-              <thead style="position:sticky; top:0; z-index:1; background:var(--surface2)">
-                <tr>
-                  <th data-lang-en="Date" data-lang-sw="Tarehe">Tarehe</th>
-                  <th data-lang-en="Amount" data-lang-sw="Kiasi">Kiasi</th>
-                  <th data-lang-en="Balance" data-lang-sw="Salio">Salio</th>
-                  <th data-lang-en="Due Date" data-lang-sw="Tarehe ya Kulipa">Tarehe ya Kulipa</th>
-                  <th data-lang-en="Status" data-lang-sw="Hali">Hali</th>
-                </tr>
-              </thead>
-              <tbody id="profLoansBody">
-                <!-- Loans will be listed here -->
-              </tbody>
-            </table>
-          </div>
 
-          <!-- New Loan Form (Hidden by default) -->
-          <div id="newLoanFormSection" style="display:none; background:var(--surface2); padding:16px; border-radius:10px; border:1px solid var(--border)">
-            <h5 style="margin:0 0 12px 0; font-size:13px; font-weight:700">Maombi ya Mkopo Mpya</h5>
+<!-- New Loan Modal -->
+<div id="newLoanModal" class="modal-overlay">
+  <div class="modal" style="max-width:500px; width:95%">
+    <div class="modal-header">
+      <div class="modal-title">Maombi ya Mkopo Mpya</div>
+      <button onclick="document.getElementById('newLoanModal').classList.remove('open')" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      
             <div style="display:grid; grid-template-columns:1fr; gap:12px">
               <div>
                 <label class="form-label" style="font-size:12px">Kiasi cha Mkopo (Tsh) *</label>
@@ -528,13 +508,154 @@
                 </select>
               </div>
             </div>
-            <div style="display:flex; justify-content:flex-end; margin-top:16px">
-              <button class="btn btn-primary" id="btnSubmitLoan" style="padding:8px 16px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:6px">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                Tuma Ombi
+            
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="document.getElementById('newLoanModal').classList.remove('open')">Ghairi</button>
+      <button class="btn btn-primary" id="btnSubmitLoan" onclick="submitNewLoan()">Tuma Ombi</button>
+    </div>
+  </div>
+</div>
+
+<!-- Complete Service Modal (Injected at bottom of Tab 2) -->
+        <div id="completeServiceModal" class="modal-overlay">
+          <div class="modal" style="max-width:400px; width:95%">
+            <div class="modal-header">
+              <div class="modal-title">Kamilisha Huduma</div>
+              <button onclick="document.getElementById('completeServiceModal').classList.remove('open')" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>
+            <div class="modal-body" style="display:flex; flex-direction:column; gap:14px">
+              <input type="hidden" id="completeBatchId" />
+              <input type="hidden" id="completeServiceId" />
+              <input type="hidden" id="completeType" />
+              <input type="hidden" id="completeJobId" />
+              
+              <div style="margin-bottom:8px">
+                <label class="form-label" style="font-size:12.5px; font-weight:700; color:var(--text); margin-bottom:8px; display:block">Je, Zao limebadilika? (Mf. Mpunga kuwa Mchele)</label>
+                <div style="display:flex; gap:16px; margin-top:4px">
+                  <label style="display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; color:var(--text2)">
+                    <input type="radio" name="completeHasChanged" value="no" checked onchange="toggleCompleteCropFields()" style="accent-color:var(--emerald-500); width:16px; height:16px" /> Hapana, Zao ni lilelile
+                  </label>
+                  <label style="display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; color:var(--text2)">
+                    <input type="radio" name="completeHasChanged" value="yes" onchange="toggleCompleteCropFields()" style="accent-color:var(--emerald-500); width:16px; height:16px" /> Ndiyo, Zao limebadilika
+                  </label>
+                </div>
+              </div>
+
+              <!-- IF NO (Zao ni Lilelile) -->
+              <div id="completeSameCropDiv" style="margin-top: 6px;">
+                <label class="form-label" style="font-size:12px">Kiasi Kilichotumika / Kilichohudumiwa (Kg)</label>
+                <input type="number" step="0.01" id="completeSameInputUsed" class="form-input" style="padding:8px"/>
+                <small style="color:var(--text3); font-size:10px">Hakikisha hakizidi mzigo uliopo ghalani.</small>
+              </div>
+
+              <!-- IF YES (Zao Limebadilika) -->
+              <div id="completeNewCropDiv" style="display:none; flex-direction:column; gap:12px; margin-top:10px; border-top:1px solid var(--border); padding-top:12px">
+                
+                <div style="margin-bottom:4px">
+                  <label class="form-label" style="font-size:12px; font-weight:600">Je, umehudumia mzigo WOTE?</label>
+                  <div style="display:flex; gap:16px; margin-top:4px">
+                    <label style="display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; color:var(--text2)">
+                      <input type="radio" name="completeUsedAll" value="yes" checked onchange="toggleUsedAllFields()" style="accent-color:var(--emerald-500); width:16px; height:16px" /> Kiasi Chote
+                    </label>
+                    <label style="display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; color:var(--text2)">
+                      <input type="radio" name="completeUsedAll" value="no" onchange="toggleUsedAllFields()" style="accent-color:var(--emerald-500); width:16px; height:16px" /> Kiasi Fulani
+                    </label>
+                  </div>
+                </div>
+
+                <div id="partialInputDiv" style="display:none">
+                  <label class="form-label" style="font-size:12px">Kiasi Kilichotumika (Kg)</label>
+                  <input type="number" step="0.01" id="completePartialInputUsed" class="form-input" style="padding:8px"/>
+                  <small style="color:var(--text3); font-size:10px">Kiasi ulichotoa ghalani kupeleka kwenye mashine.</small>
+                </div>
+
+                <div style="display:flex; gap:10px">
+                  <div style="flex:1">
+                    <label class="form-label" style="font-size:12px">Kilibadilika kuwa nini? (Zao Jipya)</label>
+                    <select id="completeOutputCrop" class="form-input form-select" style="padding:8px"></select>
+                  </div>
+                  <div style="flex:1">
+                    <label class="form-label" style="font-size:12px">Kipimo Kipya</label>
+                    <select id="completeOutputUnit" class="form-input form-select" style="padding:8px">
+                      <option value="Kilo">Kilo (Kg)</option>
+                      <option value="Gunia">Gunia</option>
+                      <option value="Tani">Tani (Kg)</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label class="form-label" style="font-size:12px">Kiasi Kilichopatikana Mwisho (Final Output)</label>
+                  <input type="number" step="0.01" id="completeOutputValue" class="form-input" style="padding:8px"/>
+                </div>
+
+                <div style="margin-top:10px; border-top:1px dashed var(--border); padding-top:10px">
+                  <label style="display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; font-weight:700">
+                    <input type="checkbox" id="hasByProduct" onchange="toggleByProductFields()" style="accent-color:var(--emerald-500)"/>
+                    Kuna Zao la Ziada? (Mf. Pumba)
+                  </label>
+                </div>
+
+                <div id="byProductDiv" style="display:none; flex-direction:column; gap:10px; margin-top:6px; padding:10px; background:var(--surface2); border-radius:8px">
+                  <div style="display:flex; gap:10px">
+                    <div style="flex:1">
+                      <label class="form-label" style="font-size:12px">Zao la Ziada</label>
+                      <input type="text" id="byProductCrop" class="form-input" style="padding:8px" placeholder="Mf. Pumba"/>
+                    </div>
+                    <div style="flex:1">
+                      <label class="form-label" style="font-size:12px">Kipimo</label>
+                      <select id="byProductUnit" class="form-input form-select" style="padding:8px">
+                        <option value="Kilo">Kilo (Kg)</option>
+                        <option value="Gunia">Gunia</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="form-label" style="font-size:12px">Kiasi (By-Product Qty)</label>
+                    <input type="number" step="0.01" id="byProductValue" class="form-input" style="padding:8px"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-secondary" onclick="document.getElementById('completeServiceModal').classList.remove('open')">Ghairi</button>
+              <button class="btn btn-primary" onclick="submitCompleteService()">Thibitisha (Complete)</button>
+            </div>
           </div>
+        </div>
+        
+        <!-- Tab 3: Loan History -->
+        <div id="tabContentNewLoan" class="tab-content" style="display:none">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
+            <h4 style="margin:0; font-size:13.5px; font-weight:700; color:var(--text)" data-lang-en="Loan History" data-lang-sw="Historia ya Mikopo">Historia ya Mikopo</h4>
+            <button class="btn btn-outline btn-sm" onclick="document.getElementById('newLoanModal').classList.add('open')" style="padding: 6px 12px; font-size:12px; display:flex; align-items:center; gap:4px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Mkopo Mpya
+            </button>
+          </div>
+
+          <!-- Loan History Table -->
+          <div id="loanHistorySection" class="table-responsive" style="max-height:400px; overflow-y:auto; border:1px solid var(--border); border-radius:10px">
+            <table class="data-table" style="font-size:12.5px; margin:0">
+              <thead style="position:sticky; top:0; z-index:1; background:var(--surface2)">
+                <tr>
+                  <th data-lang-en="Date" data-lang-sw="Tarehe">Tarehe</th>
+                  <th data-lang-en="Amount" data-lang-sw="Kiasi">Kiasi</th>
+                  <th data-lang-en="Balance" data-lang-sw="Salio">Salio</th>
+                  <th data-lang-en="Due Date" data-lang-sw="Tarehe ya Kulipa">Tarehe ya Kulipa</th>
+                  <th data-lang-en="Status" data-lang-sw="Hali">Hali</th>
+                  <th data-lang-en="Action" data-lang-sw="Kitendo">Kitendo</th>
+                </tr>
+              </thead>
+              <tbody id="profLoansBody">
+                <!-- Loans will be listed here -->
+              </tbody>
+            </table>
+          </div>
+
+          
         </div>
         <!-- Tab 5: Settlement & Payout Dashboard -->
         <div id="tabContentSettlement" class="tab-content" style="display:none">
@@ -654,7 +775,7 @@
               </div>
 
               <div>
-                <label class="form-label" style="font-size:12px" data-lang-en="Negotiated Price (Tsh / MT) *" data-lang-sw="Bei ya Mauzo (Tsh kwa Tani) *">Bei ya Mauzo (Tsh kwa Tani) *</label>
+                <label class="form-label" style="font-size:12px" data-lang-en="Negotiated Price (Tsh / Kg) *" data-lang-sw="Bei ya Mauzo (Tsh kwa Tani) *">Bei ya Mauzo (Tsh kwa Tani) *</label>
                 <input type="number" id="settlePriceInput" class="form-input" style="padding:8px" placeholder="e.g. 800000" oninput="recalculatePayout()"/>
               </div>
 
@@ -1740,8 +1861,8 @@ function switchProfileTab(tabName) {
   }
 }
 
-// Convert functions between Bags and Metric Tons (MT)
-// Assuming 1 bag of grain is 100 kg (0.1 MT)
+// Convert functions between Bags and Metric Tons (Kg)
+// Assuming 1 bag of grain is 100 kg (0.1 Kg)
 function calculateBagsFromWeight() {
   const weightInput = document.getElementById('intakeWeight');
   const bagsInput = document.getElementById('intakeBags');
@@ -1774,7 +1895,7 @@ async function loadBinsList() {
     bins.forEach(bin => {
       const opt = document.createElement('option');
       opt.value = bin.id;
-      opt.textContent = `${bin.name} (${parseFloat(bin.current_occupancy_mt).toFixed(1)} / ${parseFloat(bin.capacity_mt).toFixed(0)} MT) - ${bin.crop_type || 'Tupu'}`;
+      opt.textContent = `${bin.name} (${parseFloat(bin.current_occupancy_mt).toFixed(1)} / ${parseFloat(bin.capacity_mt).toFixed(0)} Kg) - ${bin.crop_type || 'Tupu'}`;
       select.appendChild(opt);
     });
   } catch (err) {
@@ -1816,7 +1937,7 @@ async function loadFarmerBatches(farmerId) {
           <td><code style="font-family:monospace;font-size:11.5px;color:var(--text2)">${b.batch_code}</code></td>
           <td><span class="badge badge-green">${b.crop_type}</span></td>
           <td><strong>${weightDisplay}</strong></td>
-          <td style="color:${parseFloat(b.moisture) > 13.5 ? 'var(--red-500)' : 'var(--emerald-500)'}; font-weight:600">${parseFloat(b.moisture).toFixed(1)}%</td>
+          
           <td>
             <span class="badge badge-gray" style="font-size:10.5px">${b.status.toUpperCase()}</span>
             <span style="display:block; font-size:10px; color:var(--text3); margin-top:2px">${b.days_stored} siku</span>
@@ -1900,13 +2021,13 @@ async function loadFarmerApiDetails(farmerId) {
     // 1. Populate Services
     const services = data.services || [];
     const svcBody = document.getElementById('profServicesBody');
-    const miniTbody = document.getElementById('applyServiceHistoryBody');
+    
     if (svcBody) {
       svcBody.innerHTML = '';
-      if (miniTbody) miniTbody.innerHTML = '';
+      
       if (services.length === 0) {
         svcBody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:14px 0">Hakuna huduma yoyote.</td></tr>';
-        if (miniTbody) miniTbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:14px 0">Hakuna huduma yoyote.</td></tr>';
+        
       } else {
         services.forEach(s => {
           const tr = document.createElement('tr');
@@ -1917,29 +2038,19 @@ async function loadFarmerApiDetails(farmerId) {
           
           const fee = parseFloat(s.fee_amount) || 0;
           
+          const batch = farmerBatches.find(b => b.batch_code === s.batch_code) || {id: '', current_weight: 0};
           tr.innerHTML = `
-            <td><div style="font-size:11.5px;color:var(--text3)">${s.created_at}</div></td>
+            <td><div style="font-size:11.5px;color:var(--text3)">${new Date(s.created_at).toLocaleDateString()}</div></td>
             <td><code style="font-family:monospace;font-size:11.5px;color:var(--text2)">${s.batch_code}</code></td>
             <td><strong>${s.type}</strong></td>
             <td>${s.service_name}</td>
             <td><strong style="color:var(--text)">Tsh ${fee.toLocaleString()}</strong></td>
             <td><span class="badge ${stClass}" style="font-size:10.5px">${(s.status || '').toUpperCase()}</span></td>
+            <td>
+              ${s.status !== 'completed' ? `<button class="btn btn-outline btn-sm" style="font-size:10px; padding:4px 8px" onclick="openCompleteServiceModal('${batch.id}', '${s.service_id}', '${s.type}', '${batch.current_weight}', '${s.job_id}')">Kamilisha</button>` : '<span style="font-size:10px; color:var(--text3)">-</span>'}
+            </td>
           `;
           svcBody.appendChild(tr);
-          
-          // Also append to the mini table in Tab 3
-          const miniTbody = document.getElementById('applyServiceHistoryBody');
-          if (miniTbody) {
-            const trMini = document.createElement('tr');
-            trMini.innerHTML = `
-              <td><div style="font-size:10.5px;color:var(--text3)">${s.created_at}</div></td>
-              <td><code style="font-family:monospace;font-size:10.5px;color:var(--text2)">${s.batch_code}</code></td>
-              <td style="font-size:11px">${s.service_name}</td>
-              <td><strong style="font-size:11px;color:var(--text)">Tsh ${fee.toLocaleString()}</strong></td>
-              <td><span class="badge ${stClass}" style="font-size:9.5px">${(s.status || '').toUpperCase()}</span></td>
-            `;
-            miniTbody.appendChild(trMini);
-          }
         });
       }
     }
@@ -2003,38 +2114,53 @@ document.getElementById('closeProfileModal').onclick = () => profileModal.classL
 document.getElementById('cancelProfileModal').onclick = () => profileModal.classList.remove('open');
 
 async function showProfileModal(farmerId) {
-  currentFarmerId = farmerId;
-  const f = allFarmers.find(x => x.id == farmerId);
-  if (!f) return;
-  currentFarmerData = f; // Cache for edit pre-fill
-  
-  // Reset edit panel if open
-  const editPanel = document.getElementById('editFarmerPanel');
-  if (editPanel) editPanel.style.display = 'none';
-  const editBtn = document.getElementById('btnToggleEditFarmer');
-  if (editBtn) editBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Hariri`;
-  
-  var fName = f.name || 'Unknown';
-  document.getElementById('profAvatar').textContent = fName.charAt(0).toUpperCase();
-  document.getElementById('profAvatar').style.background = getAvatarColor(fName);
-  
-  document.getElementById('profName').textContent = fName;
-  document.getElementById('profCode').textContent = f.farmer_code;
-  document.getElementById('profPhone').textContent = f.phone;
-  document.getElementById('profRegion').textContent = f.region || 'N/A';
-  document.getElementById('profDistrict').textContent = f.district || 'N/A';
-  document.getElementById('profWard').textContent = f.ward || 'N/A';
-  document.getElementById('profVillage').textContent = f.village || 'N/A';
-  document.getElementById('profStreet').textContent = f.street || 'N/A';
-  document.getElementById('profNationalId').textContent = f.national_id || 'N/A';
-  
-  // Set summary numbers
-  document.getElementById('profStock').textContent = `${(parseFloat(f.total_deposited) * 1000).toLocaleString()} Kg`;
-  document.getElementById('profLoan').textContent = `Tsh ${parseFloat(f.loan_balance).toLocaleString()}`;
-  
-  const statusBadge = document.getElementById('profStatus');
-  statusBadge.textContent = f.status.toUpperCase();
-  statusBadge.className = f.status === 'active' ? 'badge badge-green' : 'badge badge-gray';
+  try {
+    currentFarmerId = farmerId;
+    const f = allFarmers.find(x => x.id == farmerId);
+    if (!f) {
+      showToast('Hakuna taarifa za mkulima huyu.', 'error');
+      return;
+    }
+    
+    // Always open modal first so user sees feedback immediately
+    profileModal.classList.add('open');
+    
+    currentFarmerData = f; // Cache for edit pre-fill
+    
+    // Reset edit panel if open
+    const editPanel = document.getElementById('editFarmerPanel');
+    if (editPanel) editPanel.style.display = 'none';
+    const editBtn = document.getElementById('btnToggleEditFarmer');
+    if (editBtn) editBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Hariri`;
+    
+    var fName = f.name || 'Unknown';
+    if(document.getElementById('profAvatar')) {
+      document.getElementById('profAvatar').textContent = fName.charAt(0).toUpperCase();
+      document.getElementById('profAvatar').style.background = getAvatarColor(fName);
+    }
+    
+    if(document.getElementById('profName')) document.getElementById('profName').textContent = fName;
+    if(document.getElementById('profCode')) document.getElementById('profCode').textContent = f.farmer_code;
+    if(document.getElementById('profPhone')) document.getElementById('profPhone').textContent = f.phone;
+    if(document.getElementById('profRegion')) document.getElementById('profRegion').textContent = f.region || 'N/A';
+    if(document.getElementById('profDistrict')) document.getElementById('profDistrict').textContent = f.district || 'N/A';
+    if(document.getElementById('profWard')) document.getElementById('profWard').textContent = f.ward || 'N/A';
+    if(document.getElementById('profVillage')) document.getElementById('profVillage').textContent = f.village || 'N/A';
+    if(document.getElementById('profStreet')) document.getElementById('profStreet').textContent = f.street || 'N/A';
+    if(document.getElementById('profNationalId')) document.getElementById('profNationalId').textContent = f.national_id || 'N/A';
+    
+    // Set summary numbers
+    if(document.getElementById('profStock')) document.getElementById('profStock').textContent = `${(parseFloat(f.total_deposited || 0) * 1000).toLocaleString()} Kg`;
+    if(document.getElementById('profLoan')) document.getElementById('profLoan').textContent = `Tsh ${parseFloat(f.loan_balance || 0).toLocaleString()}`;
+    
+    const statusBadge = document.getElementById('profStatus');
+    if(statusBadge) {
+      statusBadge.textContent = (f.status || 'ACTIVE').toUpperCase();
+      statusBadge.className = f.status === 'active' ? 'badge badge-green' : 'badge badge-gray';
+    }
+  } catch(e) {
+    console.error(e);
+  }
   
   // Clear forms
   renderCropSelectOptions();
@@ -2062,16 +2188,11 @@ async function showProfileModal(farmerId) {
   document.getElementById('applyServiceRate').value = '';
   document.getElementById('applyServiceQty').value = '';
   document.getElementById('applyServiceUnitLabel').textContent = '';
-  document.getElementById('applyServiceOutputValue').value = '';
-  document.getElementById('applyServiceOutputDiv').style.display = 'none';
   document.getElementById('applyServiceMachine').value = '';
   document.getElementById('applyServiceTotalCost').textContent = 'Tsh 0';
 
   // Switch to first tab
   switchProfileTab('batches');
-  
-  // Show modal immediately for perceived performance
-  profileModal.classList.add('open');
   
   // Load dynamic data concurrently to save time
   try {
@@ -2120,6 +2241,7 @@ async function submitNewIntake() {
     const data = await res.json();
     if (data.success) {
       showToast(currentLang === 'sw' ? 'Upokeaji nafaka umesajiliwa kikamilifu!' : 'Intake registered successfully!', 'success');
+      document.getElementById('intakeModal').classList.remove('open');
       
       // Reset input fields
       if (document.getElementById('intakeKiasi')) document.getElementById('intakeKiasi').value = '';
@@ -2174,6 +2296,7 @@ async function submitNewLoan() {
     const data = await res.json();
     if (data.success) {
       showToast(currentLang === 'sw' ? 'Ombi la mkopo limewasilishwa kikamilifu!' : 'Loan application submitted successfully!', 'success');
+      document.getElementById('newLoanModal').classList.remove('open');
       
       // Reset form
       document.getElementById('loanAmount').value = '';
@@ -2297,10 +2420,10 @@ function onProcServiceChange() {
 
   if (type === 'drying') {
     inputContainer.style.display = 'block';
-    valueLabel.textContent = currentLang === 'sw' ? 'Unyevu wa Mwisho (%) *' : 'Final Moisture Level (%) *';
+    valueLabel.textContent = currentLang === 'sw' ? 'Uzito wa Mwisho (Kg) *' : 'Final Weight (Kg) *';
   } else if (type === 'milling') {
     inputContainer.style.display = 'block';
-    valueLabel.textContent = currentLang === 'sw' ? 'Uzito wa Pato (Tani / MT) *' : 'Output Weight (MT) *';
+    valueLabel.textContent = currentLang === 'sw' ? 'Uzito wa Pato (Tani / Kg) *' : 'Output Weight (Kg) *';
   } else if (type === 'grading') {
     gradeContainer.style.display = 'block';
   }
@@ -2563,7 +2686,6 @@ function onApplyServiceCatalogChange() {
     document.getElementById('applyServiceQty').value = '';
     document.getElementById('applyServiceUnitLabel').textContent = '';
     document.getElementById('applyServiceTotalCost').textContent = 'Tsh 0';
-    document.getElementById('applyServiceOutputDiv').style.display = 'none';
     return;
   }
 
@@ -2611,29 +2733,6 @@ function onApplyServiceCatalogChange() {
     document.getElementById('applyServiceQty').value = '';
   }
 
-  // Handle category specific final value inputs
-  const outDiv = document.getElementById('applyServiceOutputDiv');
-  const outLabel = document.getElementById('applyServiceOutputLabel');
-  const outVal = document.getElementById('applyServiceOutputValue');
-
-  if (service.category === 'drying') {
-    outDiv.style.display = 'block';
-    outLabel.textContent = currentLang === 'sw' ? 'Unyevu wa Mwisho utakaofikiwa (%)' : 'Target moisture level (%)';
-    outVal.value = '13.5';
-  } else if (service.category === 'milling') {
-    outDiv.style.display = 'block';
-    outLabel.textContent = currentLang === 'sw' ? 'Uzito wa Output utakaozalishwa (MT)' : 'Milling output weight (MT)';
-    if (batchId) {
-      const batch = farmerBatches.find(b => b.id == batchId);
-      outVal.value = batch ? (parseFloat(batch.current_weight) * 0.65).toFixed(2) : '';
-    } else {
-      outVal.value = '';
-    }
-  } else {
-    outDiv.style.display = 'none';
-    outVal.value = '';
-  }
-
   calculateApplyServiceTotal();
 }
 
@@ -2651,7 +2750,6 @@ async function submitApplyService() {
   const serviceId = document.getElementById('applyServiceCatalogSelect').value;
   const rate = parseFloat(document.getElementById('applyServiceRate').value);
   const qty = parseFloat(document.getElementById('applyServiceQty').value);
-  const finalValue = parseFloat(document.getElementById('applyServiceOutputValue').value);
   const machine = document.getElementById('applyServiceMachine').value;
 
   if (!batchId || !serviceId || isNaN(qty) || qty <= 0) {
@@ -2676,34 +2774,180 @@ async function submitApplyService() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         type: service.category,
-        status: 'completed',
+        status: 'queued',
         fee: totalFee,
         service_id: service.id,
-        final_value: !isNaN(finalValue) ? finalValue : null,
         service_name: machine || service.name_sw
       })
     });
 
     const data = await res.json();
     if (data.success) {
-      showToast(currentLang === 'sw' ? 'Huduma imesajiliwa na kukamilika!' : 'Service registered and finalized successfully!', 'success');
+      showToast(currentLang === 'sw' ? 'Huduma imewekwa kwenye foleni kikamilifu!' : 'Service queued successfully!', 'success');
+      document.getElementById('applyServiceModal').classList.remove('open');
       
       // Reload batches list to recalculate fees
       await loadFarmerBatches(currentFarmerId);
       await fetchFarmers();
+      await loadFarmerApiDetails(currentFarmerId);
 
       // Clear applied fields
       document.getElementById('applyServiceCatalogSelect').value = '';
+      document.getElementById('applyServiceQty').value = '';
+      document.getElementById('applyServiceMachine').value = '';
+      document.getElementById('applyServiceTotalCost').textContent = 'Tsh 0';
       onApplyServiceCatalogChange();
       
       // Navigate back to batches list tab
       switchProfileTab('batches');
     } else {
-      showToast(data.message || 'Failed to apply service', 'error');
+      showToast(data.error || 'Failed to queue service', 'error');
     }
   } catch (err) {
     console.error('Error applying service:', err);
     showToast('Network error during service application', 'error');
+  }
+}
+
+// Complete Service Functions
+function toggleCompleteCropFields() {
+  const isChanged = document.querySelector('input[name="completeHasChanged"]:checked').value === 'yes';
+  document.getElementById('completeNewCropDiv').style.display = isChanged ? 'flex' : 'none';
+  document.getElementById('completeSameCropDiv').style.display = isChanged ? 'none' : 'block';
+}
+
+function toggleUsedAllFields() {
+  const isAll = document.querySelector('input[name="completeUsedAll"]:checked').value === 'yes';
+  document.getElementById('partialInputDiv').style.display = isAll ? 'none' : 'block';
+}
+
+function toggleByProductFields() {
+  const isChecked = document.getElementById('hasByProduct').checked;
+  document.getElementById('byProductDiv').style.display = isChecked ? 'flex' : 'none';
+}
+
+let currentBatchWeightCache = 0; // store so we can validate
+
+function openCompleteServiceModal(batchId, serviceId, type, currentWeight, jobId) {
+  document.getElementById('completeBatchId').value = batchId;
+  document.getElementById('completeServiceId').value = serviceId;
+  document.getElementById('completeType').value = type;
+  document.getElementById('completeJobId').value = jobId || '';
+  
+  const currentWeightKg = parseFloat(currentWeight) * 1000 || 0;
+  currentBatchWeightCache = currentWeightKg;
+  
+  // Resets
+  document.querySelector('input[name="completeHasChanged"][value="no"]').checked = true;
+  document.querySelector('input[name="completeUsedAll"][value="yes"]').checked = true;
+  document.getElementById('completeSameInputUsed').value = currentWeightKg;
+  document.getElementById('completePartialInputUsed').value = '';
+  document.getElementById('completeOutputValue').value = '';
+  document.getElementById('hasByProduct').checked = false;
+  document.getElementById('byProductCrop').value = '';
+  document.getElementById('byProductValue').value = '';
+  
+  toggleCompleteCropFields();
+  toggleUsedAllFields();
+  toggleByProductFields();
+  
+  // Populate crops
+  let crops = ['Maize', 'Rice', 'Beans', 'Sunflower'];
+  try { crops = JSON.parse(localStorage.getItem('agroCropsList')) || crops; } catch(e){}
+  const outCropSel = document.getElementById('completeOutputCrop');
+  outCropSel.innerHTML = '';
+  crops.forEach(c => {
+     const opt = document.createElement('option');
+     opt.value = c; opt.textContent = c;
+     outCropSel.appendChild(opt);
+  });
+  
+  document.getElementById('completeServiceModal').classList.add('open');
+}
+
+async function submitCompleteService() {
+  const batchId = document.getElementById('completeBatchId').value;
+  const serviceId = document.getElementById('completeServiceId').value;
+  const type = document.getElementById('completeType').value;
+  const jobId = document.getElementById('completeJobId').value;
+  
+  const hasChanged = document.querySelector('input[name="completeHasChanged"]:checked').value === 'yes';
+  
+  let payload = {
+    type: type,
+    status: 'completed',
+    service_id: serviceId,
+    job_id: jobId
+  };
+  
+  if (!hasChanged) {
+    const inputUsedRaw = parseFloat(document.getElementById('completeSameInputUsed').value);
+    if (isNaN(inputUsedRaw) || inputUsedRaw <= 0) {
+      showToast('Weka kiasi kilichotumika kwa usahihi!', 'error'); return;
+    }
+    if (inputUsedRaw > currentBatchWeightCache) {
+      showToast('Kiasi ulichoweka kinazidi mzigo uliopo ghalani!', 'error'); return;
+    }
+    // If no crop change, input == output, so the batch weight is just updated identically
+    payload.input_used = inputUsedRaw / 1000;
+    payload.final_value = inputUsedRaw / 1000;
+  } else {
+    // Crop Changed
+    const usedAll = document.querySelector('input[name="completeUsedAll"]:checked').value === 'yes';
+    let inputUsedRaw = currentBatchWeightCache;
+    if (!usedAll) {
+      inputUsedRaw = parseFloat(document.getElementById('completePartialInputUsed').value);
+      if (isNaN(inputUsedRaw) || inputUsedRaw <= 0) {
+        showToast('Weka kiasi kilichotumika kwa usahihi!', 'error'); return;
+      }
+      if (inputUsedRaw > currentBatchWeightCache) {
+        showToast('Kiasi ulichoweka kinazidi mzigo uliopo ghalani!', 'error'); return;
+      }
+    }
+    
+    payload.input_used = inputUsedRaw / 1000;
+    
+    // Outputs
+    payload.output_crop = document.getElementById('completeOutputCrop').value;
+    payload.output_unit = document.getElementById('completeOutputUnit').value;
+    
+    const outputValueRaw = parseFloat(document.getElementById('completeOutputValue').value);
+    if (isNaN(outputValueRaw) || outputValueRaw <= 0) {
+      showToast('Weka kiasi kilichopatikana kwa usahihi!', 'error'); return;
+    }
+    
+    // Convert to MT if Kilo
+    payload.final_value = payload.output_unit === 'Kilo' ? outputValueRaw / 1000 : outputValueRaw;
+    
+    // By-product
+    if (document.getElementById('hasByProduct').checked) {
+      payload.by_product_crop = document.getElementById('byProductCrop').value;
+      payload.by_product_unit = document.getElementById('byProductUnit').value;
+      const bpRaw = parseFloat(document.getElementById('byProductValue').value);
+      payload.by_product_value = payload.by_product_unit === 'Kilo' ? bpRaw / 1000 : bpRaw;
+    }
+  }
+
+  try {
+    const res = await fetch(`/api/v1/batches/${batchId}/processing`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (data.success || res.ok) {
+      showToast('Huduma imekamilishwa kikamilifu!', 'success');
+      document.getElementById('completeServiceModal').classList.remove('open');
+      await loadFarmerBatches(currentFarmerId);
+      await fetchFarmers();
+      await loadFarmerApiDetails(currentFarmerId);
+    } else {
+      showToast(data.message || 'Kuna kosa limetokea!', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Mtandao unasumbua, tafadhali jaribu tena.', 'error');
   }
 }
 
@@ -2986,7 +3230,7 @@ function openEditBatchModal(batchId) {
     }
   }
   
-  document.getElementById('editBatchMoisture').value = batch.moisture;
+  
   document.getElementById('editBatchStatus').value = batch.status;
   
   calculateEditBatchWeightMT();
@@ -3002,10 +3246,10 @@ async function submitEditBatch() {
   const cropType = document.getElementById('editBatchCropType').value;
   const kiasi = parseFloat(document.getElementById('editBatchKiasi').value) || 0;
   const weight = parseFloat(document.getElementById('editBatchWeight').value);
-  const moisture = parseFloat(document.getElementById('editBatchMoisture').value);
+  const moisture = 13.5;
   const status = document.getElementById('editBatchStatus').value;
   
-  if (kiasi <= 0 || isNaN(weight) || isNaN(moisture)) {
+  if (kiasi <= 0 || isNaN(weight)) {
     showToast('Tafadhali jaza kiasi cha kutosha zaidi ya 0!', 'error');
     return;
   }

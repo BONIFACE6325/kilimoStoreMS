@@ -89,13 +89,8 @@
       <input type="hidden" id="categorySelect" value="milling"/>
       
       <div>
-        <label class="form-label" data-lang-en="Service Name (Swahili) *" data-lang-sw="Jina la Huduma (Kiswahili) *">Jina la Huduma (Kiswahili) *</label>
+        <label class="form-label" data-lang-en="Service Name *" data-lang-sw="Jina la Huduma *">Jina la Huduma *</label>
         <input type="text" id="nameSw" class="form-input" style="padding:8px" placeholder="e.g. Kukoboa Mpunga" required/>
-      </div>
-
-      <div>
-        <label class="form-label" data-lang-en="Service Name (English)" data-lang-sw="Jina la Huduma (Kiingereza)">Jina la Huduma (Kiingereza)</label>
-        <input type="text" id="nameEn" class="form-input" style="padding:8px" placeholder="e.g. Milling Paddy"/>
       </div>
 
       <div>
@@ -260,7 +255,6 @@ function renderGrid() {
 function openAddModal() {
   document.getElementById('serviceId').value = '';
   document.getElementById('nameSw').value = '';
-  document.getElementById('nameEn').value = '';
   document.getElementById('categorySelect').value = 'milling';
   document.getElementById('cropSelect').value = '';
   document.getElementById('rateInput').value = '';
@@ -278,7 +272,6 @@ function openEditModal(id) {
 
   document.getElementById('serviceId').value = s.id;
   document.getElementById('nameSw').value = s.name_sw;
-  document.getElementById('nameEn').value = s.name_en;
   document.getElementById('categorySelect').value = s.category;
   
   renderUnitSelectOptions();
@@ -298,7 +291,7 @@ function closeModal() {
 async function saveService() {
   const id = document.getElementById('serviceId').value;
   const nameSw = document.getElementById('nameSw').value.trim();
-  const nameEn = document.getElementById('nameEn').value.trim() || nameSw;
+  const nameEn = nameSw; // Use the same name for both to avoid breaking API
   const category = document.getElementById('categorySelect').value;
   const cropType = document.getElementById('cropSelect').value;
   const unit = document.getElementById('unitSelect').value;

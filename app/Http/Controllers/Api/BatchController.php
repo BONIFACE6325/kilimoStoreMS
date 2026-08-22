@@ -55,6 +55,7 @@ class BatchController extends Controller
                 'variety' => $batch->variety,
                 'intake_quantity' => $batch->intake_quantity,
                 'intake_unit' => $batch->intake_unit,
+                'parent_batch_id' => $batch->parent_batch_id,
                 'current_weight' => $batch->current_weight_mt,
                 'initial_weight' => $batch->initial_weight_mt,
                 'moisture' => $batch->current_moisture,
@@ -75,7 +76,7 @@ class BatchController extends Controller
             'farmer_id' => 'required|exists:farmers,id',
             'crop_type' => 'required|string|max:100',
             'variety' => 'nullable|string|max:100',
-            'initial_moisture' => 'required|numeric',
+            'initial_moisture' => 'nullable|numeric',
             'initial_weight_mt' => 'required|numeric',
             'intake_quantity' => 'nullable|numeric',
             'intake_unit' => 'nullable|string|max:50',
@@ -106,8 +107,8 @@ class BatchController extends Controller
                 'variety' => $validated['variety'] ?? null,
                 'intake_quantity' => $validated['intake_quantity'] ?? null,
                 'intake_unit' => $validated['intake_unit'] ?? null,
-                'initial_moisture' => $validated['initial_moisture'],
-                'current_moisture' => $validated['initial_moisture'],
+                'initial_moisture' => $validated['initial_moisture'] ?? 12.0,
+                'current_moisture' => $validated['initial_moisture'] ?? 12.0,
                 'initial_weight_mt' => $validated['initial_weight_mt'],
                 'current_weight_mt' => $validated['initial_weight_mt'],
                 'current_bin_id' => $validated['bin_id'] ?? null,
@@ -130,16 +131,7 @@ class BatchController extends Controller
                 ]);
             }
 
-            // If moisture level is > 13.5%, auto-queue for drying job
-            if ($validated['initial_moisture'] > 13.50) {
-                DryingJob::create([
-                    'batch_id' => $batch->id,
-                    'initial_moisture' => $validated['initial_moisture'],
-                    'weight_before_mt' => $validated['initial_weight_mt'],
-                    'status' => 'queued',
-                ]);
-                $batch->update(['status' => 'drying']);
-            }
+            // Moisture check and auto-drying removed as per user requirement
 
             return $batch;
         });
@@ -211,37 +203,26 @@ class BatchController extends Controller
         $validated = $request->validate([
             'status' => 'required|string',
             'final_value' => 'nullable|numeric',
+            'input_used' => 'nullable|numeric',
             'fee' => 'nullable|numeric',
+            'job_id' => 'nullable|exists:milling_jobs,id', // or drying_jobs depending on type
         ]);
 
         $serviceId = $request->input('service_id');
-        $service = $serviceId ? Service::find($serviceId) : null;
+        $service = $serviceId && $serviceId !== 'undefined' ? Service::find($serviceId) : null;
         $serviceName = $service ? $service->name_sw : $request->input('service_name');
-
-        if ($serviceId) {
-            if ($type === 'drying' && DryingJob::where('batch_id', $batch->id)->where('service_id', $serviceId)->exists()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Huduma hii tayari imeshatolewa kwa shehena hii.'
-                ], 422);
-            }
-            if ($type === 'milling' && MillingJob::where('batch_id', $batch->id)->where('service_id', $serviceId)->exists()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Huduma hii tayari imeshatolewa kwa shehena hii.'
-                ], 422);
-            }
-        }
+        
+        $jobId = $request->input('job_id');
 
         if ($type === 'drying') {
-            $job = DryingJob::where('batch_id', $batch->id)->orderBy('created_at', 'desc')->first();
+            $job = $jobId ? DryingJob::find($jobId) : DryingJob::where('batch_id', $batch->id)->orderBy('created_at', 'desc')->first();
             if (!$job) {
                 $job = DryingJob::create([
                     'batch_id' => $batch->id,
-                    'initial_moisture' => $batch->current_moisture,
+                    'initial_moisture' => $batch->current_moisture ?? 12.0,
                     'weight_before_mt' => $batch->current_weight_mt,
                     'status' => 'queued',
-                    'service_id' => $serviceId,
+                    'service_id' => $serviceId !== 'undefined' ? $serviceId : null,
                 ]);
             }
             $job->update([
@@ -249,22 +230,27 @@ class BatchController extends Controller
                 'final_moisture' => $validated['final_value'] ?? $job->final_moisture,
                 'fee_amount' => $validated['fee'] ?? $job->fee_amount,
                 'machine_id' => $serviceName ?? $job->machine_id,
-                'service_id' => $serviceId ?? $job->service_id,
+                'service_id' => ($serviceId !== 'undefined' ? $serviceId : null) ?? $job->service_id,
                 'end_time' => now(),
             ]);
             if ($validated['status'] === 'completed') {
+                $inputUsed = $request->input('input_used') ?? $batch->current_weight_mt;
+                $finalValue = $validated['final_value'] ?? $inputUsed;
+                // For drying, we lose moisture weight.
+                // Subtract input used, add back final dried weight
+                $newWeight = max(0, $batch->current_weight_mt - $inputUsed + $finalValue);
                 $batch->update([
-                    'current_moisture' => $validated['final_value'] ?? $batch->current_moisture,
-                    'status' => 'stored'
+                    'current_weight_mt' => $newWeight,
+                    'status' => $newWeight <= 0 ? 'transformed' : 'stored'
                 ]);
             }
         } elseif ($type === 'milling') {
-            $job = MillingJob::where('batch_id', $batch->id)->orderBy('created_at', 'desc')->first();
+            $job = $jobId ? MillingJob::find($jobId) : MillingJob::where('batch_id', $batch->id)->orderBy('created_at', 'desc')->first();
             if (!$job) {
                 $job = MillingJob::create([
                     'batch_id' => $batch->id,
                     'input_weight_mt' => $batch->current_weight_mt,
-                    'service_id' => $serviceId,
+                    'service_id' => $serviceId !== 'undefined' ? $serviceId : null,
                 ]);
             }
             $job->update([
@@ -272,25 +258,152 @@ class BatchController extends Controller
                 'output_weight_mt' => $validated['final_value'] ?? $job->output_weight_mt,
                 'fee_amount' => $validated['fee'] ?? $job->fee_amount,
                 'machine_id' => $serviceName ?? $job->machine_id,
-                'service_id' => $serviceId ?? $job->service_id,
+                'service_id' => ($serviceId !== 'undefined' ? $serviceId : null) ?? $job->service_id,
                 'end_time' => now(),
             ]);
+            
             if ($validated['status'] === 'completed') {
-                $batch->update([
-                    'current_weight_mt' => $validated['final_value'] ?? $batch->current_weight_mt,
-                    'status' => 'stored'
-                ]);
+                $inputUsed = $request->input('input_used') ?? $batch->current_weight_mt;
+                $outputCrop = $request->input('output_crop');
+                $outputUnit = $request->input('output_unit', 'Kilo'); 
+                $finalValue = $validated['final_value'] ?? 0;
+                
+                // Deduct the consumed input from the parent batch
+                $batch->decrement('current_weight_mt', $inputUsed);
+                
+                if (!empty($outputCrop) && $outputCrop !== $batch->crop_type) {
+                    // Create Primary Output Batch
+                    Batch::create([
+                        'tenant_id' => $batch->tenant_id,
+                        'branch_id' => $batch->branch_id,
+                        'farmer_id' => $batch->farmer_id,
+                        'parent_batch_id' => $batch->id,
+                        'batch_code' => $batch->batch_code . '-PR1',
+                        'crop_type' => $outputCrop,
+                        'variety' => $batch->variety,
+                        'intake_quantity' => $finalValue,
+                        'intake_unit' => $outputUnit,
+                        'initial_moisture' => $batch->current_moisture ?? 12.0,
+                        'current_moisture' => $batch->current_moisture ?? 12.0,
+                        'initial_weight_mt' => $finalValue,
+                        'current_weight_mt' => $finalValue,
+                        'current_bin_id' => null,
+                        'status' => 'stored'
+                    ]);
+                } else {
+                    // Same crop, just return the weight to the parent batch
+                    $batch->increment('current_weight_mt', $finalValue);
+                }
+                
+                // Handle By-Product (e.g. Pumba)
+                $byProductCrop = $request->input('by_product_crop');
+                if (!empty($byProductCrop)) {
+                    $byProductValue = $request->input('by_product_value', 0);
+                    $byProductUnit = $request->input('by_product_unit', 'Kilo');
+                    
+                    Batch::create([
+                        'tenant_id' => $batch->tenant_id,
+                        'branch_id' => $batch->branch_id,
+                        'farmer_id' => $batch->farmer_id,
+                        'parent_batch_id' => $batch->id,
+                        'batch_code' => $batch->batch_code . '-PR2',
+                        'crop_type' => $byProductCrop,
+                        'variety' => $batch->variety,
+                        'intake_quantity' => $byProductValue,
+                        'intake_unit' => $byProductUnit,
+                        'initial_moisture' => $batch->current_moisture ?? 12.0,
+                        'current_moisture' => $batch->current_moisture ?? 12.0,
+                        'initial_weight_mt' => $byProductValue,
+                        'current_weight_mt' => $byProductValue,
+                        'current_bin_id' => null,
+                        'status' => 'stored'
+                    ]);
+                }
+                
+                // If parent batch is completely used up, mark as transformed
+                if ($batch->current_weight_mt <= 0.001) {
+                    $batch->update(['status' => 'transformed', 'current_weight_mt' => 0]);
+                }
             }
         } elseif ($type === 'grading') {
-            GradingRecord::create([
-                'batch_id' => $batch->id,
-                'moisture_pct' => $batch->current_moisture,
-                'foreign_matter_pct' => 1.5,
-                'broken_kernels_pct' => 2.0,
-                'grade_assigned' => $request->input('grade', 'A'),
-                'fee_amount' => $validated['fee'] ?? 50000.00,
+            $job = $jobId ? GradingRecord::find($jobId) : GradingRecord::where('batch_id', $batch->id)->orderBy('created_at', 'desc')->first();
+            if (!$job) {
+                $job = GradingRecord::create([
+                    'batch_id' => $batch->id,
+                    'status' => 'queued',
+                    'service_id' => $serviceId !== 'undefined' ? $serviceId : null,
+                    'moisture_pct' => $batch->current_moisture ?? 12.0,
+                    'foreign_matter_pct' => 1.5,
+                    'broken_kernels_pct' => 2.0,
+                    'grade_assigned' => 'A',
+                    'fee_amount' => $validated['fee'] ?? 0,
+                ]);
+            }
+            $job->update([
+                'status' => $validated['status'],
+                'fee_amount' => $validated['fee'] ?? $job->fee_amount,
+                'service_id' => ($serviceId !== 'undefined' ? $serviceId : null) ?? $job->service_id,
+                'grade_assigned' => $request->input('grade') ?? $job->grade_assigned,
             ]);
-            $batch->update(['status' => 'stored']);
+            
+            if ($validated['status'] === 'completed') {
+                $inputUsed = $request->input('input_used') ?? $batch->current_weight_mt;
+                $outputCrop = $request->input('output_crop');
+                $outputUnit = $request->input('output_unit', 'Kilo'); 
+                $finalValue = $validated['final_value'] ?? 0;
+                
+                $batch->decrement('current_weight_mt', $inputUsed);
+                
+                if (!empty($outputCrop) && $outputCrop !== $batch->crop_type) {
+                    Batch::create([
+                        'tenant_id' => $batch->tenant_id,
+                        'branch_id' => $batch->branch_id,
+                        'farmer_id' => $batch->farmer_id,
+                        'parent_batch_id' => $batch->id,
+                        'batch_code' => $batch->batch_code . '-GRD1',
+                        'crop_type' => $outputCrop,
+                        'variety' => $batch->variety,
+                        'intake_quantity' => $finalValue,
+                        'intake_unit' => $outputUnit,
+                        'initial_moisture' => $batch->current_moisture ?? 12.0,
+                        'current_moisture' => $batch->current_moisture ?? 12.0,
+                        'initial_weight_mt' => $finalValue,
+                        'current_weight_mt' => $finalValue,
+                        'current_bin_id' => null,
+                        'status' => 'stored'
+                    ]);
+                } else {
+                    $batch->increment('current_weight_mt', $finalValue);
+                }
+                
+                $byProductCrop = $request->input('by_product_crop');
+                if (!empty($byProductCrop)) {
+                    $byProductValue = $request->input('by_product_value', 0);
+                    $byProductUnit = $request->input('by_product_unit', 'Kilo');
+                    
+                    Batch::create([
+                        'tenant_id' => $batch->tenant_id,
+                        'branch_id' => $batch->branch_id,
+                        'farmer_id' => $batch->farmer_id,
+                        'parent_batch_id' => $batch->id,
+                        'batch_code' => $batch->batch_code . '-GRD2',
+                        'crop_type' => $byProductCrop,
+                        'variety' => $batch->variety,
+                        'intake_quantity' => $byProductValue,
+                        'intake_unit' => $byProductUnit,
+                        'initial_moisture' => $batch->current_moisture ?? 12.0,
+                        'current_moisture' => $batch->current_moisture ?? 12.0,
+                        'initial_weight_mt' => $byProductValue,
+                        'current_weight_mt' => $byProductValue,
+                        'current_bin_id' => null,
+                        'status' => 'stored'
+                    ]);
+                }
+                
+                if ($batch->current_weight_mt <= 0.001) {
+                    $batch->update(['status' => 'transformed', 'current_weight_mt' => 0]);
+                }
+            }
         }
 
         return response()->json([

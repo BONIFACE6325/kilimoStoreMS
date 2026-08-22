@@ -190,7 +190,7 @@ function populateFarmersSelect() {
       batchSelect.innerHTML = '<option value="">No stock batches available for collateral</option>';
     } else {
       farmerBatches.forEach(b => {
-        batchSelect.innerHTML += `<option value="${b.id}">${b.batch_code} - ${b.crop_type} (${b.current_weight} MT)</option>`;
+        batchSelect.innerHTML += `<option value="${b.id}">${b.batch_code} - ${b.crop_type} (${b.current_weight} Kg)</option>`;
       });
     }
   };

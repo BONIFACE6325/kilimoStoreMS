@@ -70,7 +70,7 @@
         </div>
         <div style="overflow-x:auto">
           <table class="data-table">
-            <thead><tr><th>Batch ID</th><th>Farmer</th><th>Crop</th><th>Bay / Bin</th><th>Qty (MT)</th><th>Moisture %</th><th>Grade</th><th>Date In</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Batch ID</th><th>Farmer</th><th>Crop</th><th>Bay / Bin</th><th>Qty (Kg)</th><th>Grade</th><th>Date In</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="batchBody"></tbody>
           </table>
         </div>
@@ -93,8 +93,8 @@
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
         <div><label class="form-label">Farmer *</label><select class="form-input form-select"><option>Select farmer…</option><option>Amina Mwangi</option><option>John Ochieng</option></select></div>
         <div><label class="form-label">Crop Type *</label><select class="form-input form-select"><option>Select crop…</option><option>Maize</option><option>Rice</option><option>Beans</option></select></div>
-        <div><label class="form-label">Quantity (MT) *</label><input type="number" class="form-input" placeholder="0.00"/></div>
-        <div><label class="form-label">Moisture % *</label><input type="number" class="form-input" placeholder="e.g. 12.5" step="0.1"/></div>
+        <div><label class="form-label">Quantity (Kg) *</label><input type="number" class="form-input" placeholder="0.00"/></div>
+        
         <div><label class="form-label">Bay</label><select class="form-input form-select"><option>Auto-assign</option><option>Bay A</option><option>Bay B</option><option>Bay C</option><option>Bay D</option></select></div>
         <div><label class="form-label">Date Received</label><input type="date" class="form-input"/></div>
         <div style="grid-column:1/-1"><label class="form-label">Notes</label><textarea class="form-input" rows="2" style="resize:vertical"></textarea></div>
@@ -151,27 +151,81 @@ function populateFarmersDropdown() {
 }
 
 function renderKPIs() {
-  const totalStock = allBatches.filter(b => b.status === 'stored' || b.status === 'drying').reduce((sum, b) => sum + parseFloat(b.current_weight), 0);
-  const avgMoisture = allBatches.length > 0 ? (allBatches.reduce((sum, b) => sum + parseFloat(b.moisture), 0) / allBatches.length).toFixed(1) : '0';
+  const kpiContainer = document.getElementById('invKpis');
+  if (!kpiContainer) return;
+  kpiContainer.innerHTML = '';
+  
+  let groups = {};
+  
+  allBatches.forEach(b => {
+    // Only count active stock
+    if (b.status === 'sold' || b.status === 'dispatched') return;
+    
+    const cw = parseFloat(b.current_weight) || 0;
+    if (cw <= 0.001) return;
+    
+    const crop = b.crop_type || 'Nafaka Nyingine';
+    const unit = b.intake_unit || 'Kilo';
+    
+    let qtyInUnit = 0;
+    const initialWt = parseFloat(b.initial_weight_mt) || cw;
+    const initialQty = parseFloat(b.intake_quantity) || 0;
+    
+    if (initialQty > 0 && initialWt > 0) {
+      const ratio = cw / initialWt;
+      qtyInUnit = initialQty * ratio;
+    } else {
+      qtyInUnit = cw * 1000;
+    }
+    
+    const key = crop + '|' + (initialQty > 0 ? unit : 'Kilo');
+    
+    if (!groups[key]) {
+      groups[key] = { crop: crop, unit: initialQty > 0 ? unit : 'Kilo', totalQty: 0 };
+    }
+    
+    groups[key].totalQty += qtyInUnit;
+  });
+  
+  const keys = Object.keys(groups);
+  if (keys.length === 0) {
+    kpiContainer.innerHTML = '<div style="color:var(--text3); font-size:13px; padding:10px">Hakuna mzigo wowote ghalani kwa sasa.</div>';
+  } else {
+    const colors = ['--emerald-500', '--indigo-500', '--orange-500', '--blue-500', '--purple-500', '--fuchsia-500'];
+    let colorIdx = 0;
+    
+    keys.forEach(k => {
+      const g = groups[k];
+      if (g.totalQty < 0.1) return;
+      
+      const card = document.createElement('div');
+      card.className = 'kpi-card';
+      card.innerHTML = `
+        <div class="kpi-value" style="color:var(${colors[colorIdx % colors.length]}); font-size: 26px;">
+          ${g.totalQty.toLocaleString(undefined, {maximumFractionDigits:1})} <span style="font-size:14px; color:var(--text3)">${g.unit}</span>
+        </div>
+        <div class="kpi-label" style="font-weight:700; font-size:14.5px; margin-top:4px">${g.crop}</div>
+      `;
+      kpiContainer.appendChild(card);
+      colorIdx++;
+    });
+  }
+
+  // Also append the Occupancy card at the end
   const totalBins = allBins.length;
   const occupiedBins = allBins.filter(b => b.current_occupancy_mt > 0).length;
   const occupancyRate = totalBins > 0 ? Math.round((occupiedBins / totalBins) * 100) : 0;
-
-  const invKpis = [
-    [totalStock.toLocaleString() + ' MT', 'Total Stock Stored', '#10b981', 'Active stored grain'],
-    [occupancyRate + '%', 'Occupancy Rate', '#6366f1', `${occupiedBins} of ${totalBins} bins in use`],
-    [allBatches.length.toString(), 'Active Batches', '#d97706', 'Stored + processing'],
-    [avgMoisture + '%', 'Avg. Moisture', '#f97316', 'Target safety: <13.5%'],
-  ];
-
-  const kpiContainer = document.getElementById('invKpis');
-  kpiContainer.innerHTML = '';
-  invKpis.forEach(function(k) {
-    var d = document.createElement('div');
-    d.className = 'kpi-card';
-    d.innerHTML = '<div class="kpi-value" style="color:' + k[2] + ';font-size:22px">' + k[0] + '</div><div class="kpi-label">' + k[1] + '</div><div style="font-size:11.5px;color:var(--text3);margin-top:4px">' + k[3] + '</div>';
-    kpiContainer.appendChild(d);
-  });
+  
+  const occCard = document.createElement('div');
+  occCard.className = 'kpi-card';
+  occCard.style.background = 'var(--surface3)';
+  occCard.innerHTML = `
+    <div class="kpi-value" style="color:var(--text2); font-size: 20px;">
+      ${occupancyRate}% <span style="font-size:12px; font-weight:normal">Ujazaji</span>
+    </div>
+    <div class="kpi-label" style="font-weight:600; font-size:13px; margin-top:4px; color:var(--text)">Bins ${occupiedBins} kati ya ${totalBins} zinatumika</div>
+  `;
+  kpiContainer.appendChild(occCard);
 }
 
 function renderWarehouseMap() {
@@ -204,7 +258,7 @@ function renderWarehouseMap() {
       var binDiv = document.createElement('div');
       binDiv.className = 'bin ' + statusClass;
       binDiv.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px">Bin ' + b.name + '</div><div style="font-size:16px;font-weight:800;color:' + pctColor + '">' + (pct===0?'—':pct+'%') + '</div><div style="font-size:9.5px;color:var(--text3);margin-top:2px">' + (b.crop_type || '—') + '</div>';
-      binDiv.onclick = function() { showToast('Bin ' + b.name + ': ' + b.current_occupancy_mt + ' MT occupied out of ' + b.capacity_mt + ' MT capacity.', 'info'); };
+      binDiv.onclick = function() { showToast('Bin ' + b.name + ': ' + (parseFloat(b.current_occupancy_mt)*1000).toLocaleString() + ' Kg occupied out of ' + (parseFloat(b.capacity_mt)*1000).toLocaleString() + ' Kg capacity.', 'info'); };
       grid.appendChild(binDiv);
     });
     
@@ -222,15 +276,15 @@ function renderBatchesTable(data) {
   }
   data.forEach(function(b) {
     var mVal = parseFloat(b.current_weight);
-    var mColor = parseFloat(b.moisture) > 14.5 ? '#dc2626' : parseFloat(b.moisture) > 13.5 ? '#d97706' : '#059669';
+    
     var sClass = b.status==='stored'?'badge-green':b.status==='drying'?'badge-amber':'badge-indigo';
     var tr = document.createElement('tr');
     tr.innerHTML = '<td><code style="font-size:12px;color:var(--text3)">' + b.batch_code + '</code></td>'
       + '<td><div style="display:flex;align-items:center;gap:8px"><div class="avatar avatar-sm">' + b.farmer_name[0] + '</div><strong>' + b.farmer_name + '</strong></div></td>'
       + '<td><span class="badge badge-green" style="font-size:11px">' + b.crop_type + '</span></td>'
       + '<td style="color:var(--text3)">Bin ' + b.bin_name + '</td>'
-      + '<td><strong>' + b.current_weight + ' MT</strong></td>'
-      + '<td><span style="color:' + mColor + ';font-weight:600">' + b.moisture + '%</span></td>'
+      + '<td><strong>' + (parseFloat(b.current_weight)*1000).toLocaleString() + ' Kg</strong></td>'
+      
       + '<td><span class="badge badge-green">Grade A</span></td>'
       + '<td style="color:var(--text3)">' + b.created_at + '</td>'
       + '<td><span class="badge ' + sClass + '"><span class="dot"></span>' + b.status + '</span></td>'
@@ -244,9 +298,9 @@ document.getElementById('submitBatch').onclick = async function() {
   const farmerId = document.querySelector('#addBatchModal select:nth-of-type(1)').value;
   const cropType = document.querySelector('#addBatchModal select:nth-of-type(2)').value;
   const qty = document.querySelector('#addBatchModal input[type="number"]:nth-of-type(1)').value;
-  const moisture = document.querySelector('#addBatchModal input[type="number"]:nth-of-type(2)').value;
+  const moisture = 13.5;
 
-  if (!farmerId || !cropType || !qty || !moisture) {
+  if (!farmerId || !cropType || !qty ) {
     showToast('Please fill in all required fields.', 'error');
     return;
   }
@@ -262,7 +316,7 @@ document.getElementById('submitBatch').onclick = async function() {
       body: JSON.stringify({
         farmer_id: farmerId,
         crop_type: cropType,
-        initial_weight_mt: parseFloat(qty),
+        initial_weight_mt: parseFloat(qty)/1000,
         initial_moisture: parseFloat(moisture),
         bin_id: binId
       })
