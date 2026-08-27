@@ -78,8 +78,8 @@ class FarmerController extends Controller
             'village' => $farmer->village,
             'street' => $farmer->street,
             'status' => $farmer->status,
-            'total_deposited' => $batches->sum('initial_weight_mt'),
-            'active_stock' => $batches->where('status', 'stored')->sum('current_weight_mt'),
+            'total_deposited' => $batches->whereNull('parent_batch_id')->sum('initial_weight_mt'),
+            'active_stock' => $batches->whereIn('status', ['received', 'stored'])->sum('current_weight_mt'),
             'active_loans' => $loans->where('status', 'active')->count(),
             'loan_balance' => $loans->whereIn('status', ['active', 'overdue'])->sum('current_balance'),
             'created_at' => $farmer->created_at->format('Y-m-d H:i'),
@@ -133,8 +133,8 @@ class FarmerController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
             
-        $loans = $farmer->loans()->orderBy('created_at', 'desc')->get();
-        $settlements = $farmer->settlements()->orderBy('created_at', 'desc')->get();
+        $loans = $farmer->loans()->with(['collateralBatch', 'transactions'])->orderBy('created_at', 'desc')->get();
+        $settlements = $farmer->settlements()->with(['invoice.buyer', 'invoice.items.batch', 'deductions'])->orderBy('created_at', 'desc')->get();
 
         $services = collect();
 

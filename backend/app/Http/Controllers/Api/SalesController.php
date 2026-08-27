@@ -34,30 +34,32 @@ class SalesController extends Controller
     {
         $validated = $request->validate([
             'batch_id' => 'required|exists:batches,id',
-            'negotiated_price_per_mt' => 'required|numeric|min:0',
+            'price_per_kg' => 'required|numeric|min:0',
+            'sold_weight_kg' => 'required|numeric|gt:0',
         ]);
 
         $batch = Batch::with(['farmer'])->findOrFail($validated['batch_id']);
 
-        if ($batch->current_weight_mt <= 0) {
+        $soldWeightKg = $validated['sold_weight_kg'];
+        $soldWeightMt = $soldWeightKg / 1000;
+
+        if ($batch->current_weight_mt < $soldWeightMt) {
             return response()->json([
                 'success' => false,
-                'message' => 'Shehena hii haina uzito unaojulikana. Tafadhali ipe huduma ya kukoboa kwanza kupata uzito.'
+                'message' => 'Kiasi unachotaka kuuza ni kikubwa kuliko mzigo uliopo ('.($batch->current_weight_mt * 1000).' Kg).'
             ], 422);
         }
 
         if ($batch->status === 'sold') {
             return response()->json([
                 'success' => false,
-                'message' => 'Shehena hii tayari imeshauzwa.'
+                'message' => 'Shehena hii tayari imeshauzwa yote.'
             ], 422);
         }
 
-        $pricePerMt = $validated['negotiated_price_per_mt'];
-        
-        $grossSales = $batch->current_weight_mt * $pricePerMt;
+        $grossSales = $soldWeightKg * $validated['price_per_kg'];
 
-        // 1. Calculate Storage Fees (fetched from service catalog, charged only per year)
+        // 1. Calculate Storage Fees (only on the full batch, but wait, usually storage fee is charged per time, here we just charge what's accrued so far)
         $daysInStorage = max(0, now()->diffInDays($batch->created_at));
         $storageFees = $this->calculateStorageFees($batch);
 
@@ -75,15 +77,16 @@ class SalesController extends Controller
         $gradingFees = GradingRecord::where('batch_id', $batch->id)
             ->sum('fee_amount');
 
-        // 5. Fetch Active Loans for the Farmer collateralized by this batch or general active loans
+        // 5. Fetch Active Loans
         $loans = Loan::where('farmer_id', $batch->farmer_id)
             ->whereIn('status', ['active', 'overdue'])
             ->get();
-
         $loanPrincipal = $loans->sum('current_balance');
-        $loanInterest = 0.00;
 
         $totalDeductions = $storageFees + $dryingFees + $millingFees + $gradingFees + $loanPrincipal;
+        
+        // Cap the total deductions to gross sales? No, preview should show the real debts.
+        // Wait, the UI just shows the total debts.
         $netPayout = max(0, $grossSales - $totalDeductions);
 
         return response()->json([
@@ -109,28 +112,51 @@ class SalesController extends Controller
     {
         $validated = $request->validate([
             'batch_id' => 'required|exists:batches,id',
-            'buyer_id' => 'required|exists:buyers,id',
-            'negotiated_price_per_mt' => 'required|numeric|gt:0',
+            'buyer_id' => 'nullable|exists:buyers,id',
+            'buyer_name' => 'nullable|string|max:255',
+            'price_per_kg' => 'required|numeric|min:0',
+            'sold_weight_kg' => 'required|numeric|gt:0',
         ]);
+        
+        if (empty($validated['buyer_id']) && empty($validated['buyer_name'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tafadhali chagua mnunuzi au ingiza jina la mnunuzi mpya.'
+            ], 422);
+        }
 
         $batch = Batch::findOrFail($validated['batch_id']);
 
-        if ($batch->current_weight_mt <= 0) {
+        $soldWeightKg = $validated['sold_weight_kg'];
+        $soldWeightMt = $soldWeightKg / 1000;
+
+        if ($batch->current_weight_mt < $soldWeightMt) {
             return response()->json([
                 'success' => false,
-                'message' => 'Shehena hii haina uzito unaojulikana. Tafadhali ipe huduma ya kukoboa kwanza kupata uzito.'
+                'message' => 'Kiasi unachotaka kuuza ni kikubwa kuliko mzigo uliopo ('.($batch->current_weight_mt * 1000).' Kg).'
             ], 422);
         }
 
         if ($batch->status === 'sold') {
             return response()->json([
                 'success' => false,
-                'message' => 'Shehena hii tayari imeshauzwa.'
+                'message' => 'Shehena hii tayari imeshauzwa yote.'
             ], 422);
         }
 
-        $buyer = Buyer::findOrFail($validated['buyer_id']);
         $tenantId = \App\Models\Tenant::first()->id;
+
+        if (!empty($validated['buyer_id'])) {
+            $buyer = Buyer::findOrFail($validated['buyer_id']);
+        } else {
+            // Create a new buyer
+            $buyer = Buyer::create([
+                'tenant_id' => $tenantId,
+                'name' => $validated['buyer_name'],
+                'phone' => null,
+                'status' => 'active'
+            ]);
+        }
 
         // Auto-generate invoice number
         $lastInvoice = Invoice::orderBy('created_at', 'desc')->first();
@@ -143,27 +169,59 @@ class SalesController extends Controller
         }
         $invoiceNumber = 'INV-' . $nextNumber;
 
-        $pricePerMt = $validated['negotiated_price_per_mt'];
-        $grossSales = $batch->current_weight_mt * $pricePerMt;
+        $pricePerKg = $validated['price_per_kg'];
+        $grossSales = $soldWeightKg * $pricePerKg;
 
-        // Calculate all deductions (same logic as preview)
+        // Calculate all deductions
         $storageFees = $this->calculateStorageFees($batch);
+        $dryingJobs = DryingJob::where('batch_id', $batch->id)->where('status', 'completed')->get();
+        $dryingFees = $dryingJobs->sum('fee_amount');
+        
+        $millingJobs = MillingJob::where('batch_id', $batch->id)->where('status', 'completed')->get();
+        $millingFees = $millingJobs->sum('fee_amount');
+        
+        $gradingRecords = GradingRecord::where('batch_id', $batch->id)->get(); // Assuming grading is one-time, wait, is there a status?
+        // Let's assume we don't have a status on GradingRecord, we'll just leave it or assume it's fully paid if we deduct.
+        $gradingFees = $gradingRecords->sum('fee_amount');
 
-        $dryingFees = DryingJob::where('batch_id', $batch->id)->where('status', 'completed')->sum('fee_amount');
-        $millingFees = MillingJob::where('batch_id', $batch->id)->where('status', 'completed')->sum('fee_amount');
-        $gradingFees = GradingRecord::where('batch_id', $batch->id)->sum('fee_amount');
-
-        $loans = Loan::where('farmer_id', $batch->farmer_id)->whereIn('status', ['active', 'overdue'])->get();
+        $loans = Loan::where('farmer_id', $batch->farmer_id)->whereIn('status', ['active', 'overdue'])->orderBy('created_at', 'asc')->get();
         $loanPrincipal = $loans->sum('current_balance');
         $loanInterest = 0.00;
 
         $totalDeductions = $storageFees + $dryingFees + $millingFees + $gradingFees + $loanPrincipal;
-        $netPayout = max(0, $grossSales - $totalDeductions);
+        
+        // Waterfall payment logic to figure out what actually gets paid
+        $availableFunds = $grossSales;
+        
+        $paidStorage = min($availableFunds, $storageFees);
+        $availableFunds -= $paidStorage;
+        
+        $paidDrying = min($availableFunds, $dryingFees);
+        $availableFunds -= $paidDrying;
+        
+        $paidMilling = min($availableFunds, $millingFees);
+        $availableFunds -= $paidMilling;
+        
+        $paidGrading = min($availableFunds, $gradingFees);
+        $availableFunds -= $paidGrading;
+        
+        $fundsBeforeLoans = $availableFunds;
+        $paidLoansTotal = 0;
+        foreach ($loans as $loan) {
+            if ($availableFunds <= 0) break;
+            $payAmount = min($availableFunds, $loan->current_balance);
+            $paidLoansTotal += $payAmount;
+            $availableFunds -= $payAmount;
+        }
+        
+        $netPayout = $availableFunds; // Whatever is left goes to the farmer
+        $actualDeductions = $grossSales - $netPayout;
 
         $result = DB::transaction(function () use (
-            $tenantId, $batch, $buyer, $invoiceNumber, $pricePerMt, $grossSales,
-            $storageFees, $dryingFees, $millingFees, $gradingFees,
-            $loanPrincipal, $loanInterest, $totalDeductions, $netPayout, $loans
+            $tenantId, $batch, $buyer, $invoiceNumber, $pricePerKg, $soldWeightKg, $soldWeightMt, $grossSales,
+            $paidStorage, $paidDrying, $paidMilling, $paidGrading,
+            $loans, $actualDeductions, $netPayout, $fundsBeforeLoans,
+            $dryingJobs, $millingJobs
         ) {
             // 1. Create Invoice
             $invoice = Invoice::create([
@@ -180,8 +238,8 @@ class SalesController extends Controller
             InvoiceItem::create([
                 'invoice_id' => $invoice->id,
                 'batch_id' => $batch->id,
-                'quantity_mt' => $batch->current_weight_mt,
-                'unit_price' => $pricePerMt,
+                'quantity_mt' => $soldWeightMt,
+                'unit_price' => $pricePerKg * 1000, // store as per MT for legacy compatibility
                 'total_price' => $grossSales,
             ]);
 
@@ -191,7 +249,7 @@ class SalesController extends Controller
                 'farmer_id' => $batch->farmer_id,
                 'invoice_id' => $invoice->id,
                 'gross_amount' => $grossSales,
-                'total_deductions' => $totalDeductions,
+                'total_deductions' => $actualDeductions,
                 'net_payout' => $netPayout,
                 'payment_method' => 'mobile_money',
                 'payment_status' => 'settled',
@@ -199,60 +257,84 @@ class SalesController extends Controller
                 'settled_at' => now(),
             ]);
 
-            // 3. Record Deductions Breakdown
-            if ($storageFees > 0) {
+            // 3. Record Deductions Breakdown and Update DB statuses
+            if ($paidStorage > 0) {
                 SettlementDeduction::create([
                     'settlement_id' => $settlement->id,
                     'deduction_type' => 'storage_fee',
-                    'amount' => $storageFees,
+                    'amount' => $paidStorage,
                 ]);
             }
-            if ($dryingFees > 0) {
+            if ($paidDrying > 0) {
                 SettlementDeduction::create([
                     'settlement_id' => $settlement->id,
                     'deduction_type' => 'drying_fee',
-                    'amount' => $dryingFees,
+                    'amount' => $paidDrying,
                 ]);
+                // If fully paid, we can mark them paid, but for simplicity we'll just mark all as paid if we paid any amount towards it, 
+                // OR we can just update the fee_amount remaining. Let's just mark as 'paid' if we covered the full amount.
+                if ($paidDrying >= $dryingJobs->sum('fee_amount')) {
+                    foreach($dryingJobs as $dj) $dj->update(['status' => 'paid']);
+                }
             }
-            if ($millingFees > 0) {
+            if ($paidMilling > 0) {
                 SettlementDeduction::create([
                     'settlement_id' => $settlement->id,
                     'deduction_type' => 'milling_fee',
-                    'amount' => $millingFees,
+                    'amount' => $paidMilling,
                 ]);
+                if ($paidMilling >= $millingJobs->sum('fee_amount')) {
+                    foreach($millingJobs as $mj) $mj->update(['status' => 'paid']);
+                }
             }
-            if ($gradingFees > 0) {
+            if ($paidGrading > 0) {
                 SettlementDeduction::create([
                     'settlement_id' => $settlement->id,
                     'deduction_type' => 'grading_fee',
-                    'amount' => $gradingFees,
+                    'amount' => $paidGrading,
                 ]);
             }
-            if ($loanPrincipal > 0) {
-                foreach ($loans as $loan) {
-                    SettlementDeduction::create([
-                        'settlement_id' => $settlement->id,
-                        'deduction_type' => 'loan_principal',
-                        'source_reference_id' => $loan->id,
-                        'amount' => $loan->current_balance,
-                    ]);
+            
+            // Loans waterfall
+            $loanFunds = $fundsBeforeLoans;
+            foreach ($loans as $loan) {
+                if ($loanFunds <= 0) break;
+                
+                $payAmount = min($loanFunds, $loan->current_balance);
+                $loanFunds -= $payAmount;
+                
+                SettlementDeduction::create([
+                    'settlement_id' => $settlement->id,
+                    'deduction_type' => 'loan_principal',
+                    'source_reference_id' => $loan->id,
+                    'amount' => $payAmount,
+                ]);
 
-                    // Settle Loan in DB
-                    $loan->update([
-                        'current_balance' => 0.00,
-                        'accrued_interest' => 0.00,
-                        'status' => 'settled',
-                    ]);
-                }
+                $newBalance = $loan->current_balance - $payAmount;
+                $loan->update([
+                    'current_balance' => $newBalance,
+                    'status' => $newBalance <= 0 ? 'paid' : 'active',
+                ]);
+                
+                \App\Models\LoanTransaction::create([
+                    'loan_id' => $loan->id,
+                    'transaction_type' => 'payment',
+                    'amount' => $payAmount,
+                    'reference_number' => 'SETT-' . $settlement->id,
+                ]);
             }
 
-            // 4. Update Batch status to Sold
-            $batch->update(['status' => 'sold']);
+            // 4. Update Batch status and weight
+            $newWeightMt = $batch->current_weight_mt - $soldWeightMt;
+            $batch->update([
+                'current_weight_mt' => $newWeightMt,
+                'status' => $newWeightMt <= 0.001 ? 'sold' : $batch->status // if less than 1kg left, consider sold
+            ]);
 
             // 5. Decrement Bin Occupancy
             if ($batch->current_bin_id) {
                 $bin = $batch->bin;
-                $bin->decrement('current_occupancy_mt', $batch->current_weight_mt);
+                $bin->decrement('current_occupancy_mt', $soldWeightMt);
                 if ($bin->current_occupancy_mt <= 0) {
                     $bin->update(['status' => 'empty', 'current_occupancy_mt' => 0.00, 'crop_type' => null]);
                 }

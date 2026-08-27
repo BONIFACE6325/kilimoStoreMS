@@ -284,11 +284,7 @@
         <div style="display:flex; border-bottom:1px solid var(--border); gap:6px; flex-wrap:wrap; padding-bottom:4px">
           <button class="tab-link active" onclick="switchProfileTab('batches')" id="tabBtnBatches" style="background:none; border:none; padding:10px 14px; font-weight:600; cursor:pointer; color:var(--text); border-bottom:2px solid var(--emerald-500); font-size:13.5px; display:flex; align-items:center; gap:6px; transition:all 0.2s">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-            <span data-lang-en="Current Stock" data-lang-sw="Mzigo">Mzigo</span>
-          </button>
-          <button class="tab-link" onclick="switchProfileTab('serviceHistory')" id="tabBtnServiceHistory" style="background:none; border:none; padding:10px 14px; font-weight:600; cursor:pointer; color:var(--text3); font-size:13.5px; display:flex; align-items:center; gap:6px; transition:all 0.2s">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-            <span data-lang-en="Services" data-lang-sw="Huduma">Huduma</span>
+            <span data-lang-en="Current Stock" data-lang-sw="Mzigo na Huduma">Mzigo na Huduma</span>
           </button>
           <button class="tab-link" onclick="switchProfileTab('newLoan')" id="tabBtnNewLoan" style="background:none; border:none; padding:10px 14px; font-weight:600; cursor:pointer; color:var(--text3); font-size:13.5px; display:flex; align-items:center; gap:6px; transition:all 0.2s">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/><line x1="1" y1="14" x2="23" y2="14"/><line x1="1" y1="18" x2="23" y2="18"/></svg>
@@ -299,41 +295,20 @@
             <span data-lang-en="Settlements" data-lang-sw="Mauzo">Mauzo</span>
           </button>
         </div>
-         <div id="tabContentServiceHistory" class="tab-content" style="display:none">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
-            <h4 style="margin:0; font-size:13.5px; font-weight:700; color:var(--text)" data-lang-en="Service History" data-lang-sw="Historia ya Huduma">Historia ya Huduma</h4>
-            <button class="btn btn-outline btn-sm" onclick="document.getElementById('applyServiceModal').classList.add('open')" style="padding: 6px 12px; font-size:12px; display:flex; align-items:center; gap:4px">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Huduma Mpya
-            </button>
-          </div>
-          <div class="table-responsive" style="max-height:400px; overflow-y:auto; border:1px solid var(--border); border-radius:10px">
-            <table class="data-table" style="font-size:12.5px; margin:0">
-              <thead style="position:sticky; top:0; z-index:1; background:var(--surface2)">
-                <tr>
-                  <th data-lang-en="Date" data-lang-sw="Tarehe">Tarehe</th>
-                  <th data-lang-en="Batch Code" data-lang-sw="Namba ya Shehena">Namba ya Shehena</th>
-                  <th data-lang-en="Service Type" data-lang-sw="Aina ya Huduma">Aina ya Huduma</th>
-                  <th data-lang-en="Description" data-lang-sw="Maelezo">Maelezo</th>
-                  <th data-lang-en="Fee" data-lang-sw="Gharama">Gharama</th>
-                  <th data-lang-en="Status" data-lang-sw="Hali">Hali</th>
-                  <th data-lang-en="Action" data-lang-sw="Kitendo">Kitendo</th>
-                </tr>
-              </thead>
-              <tbody id="profServicesBody">
-                <!-- Services will be listed here -->
-              </tbody>
-            </table>
-          </div>
-        </div>
 
         <div id="tabContentBatches" class="tab-content" style="display:block">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
             <h4 style="margin:0; font-size:13.5px; font-weight:700; color:var(--text)">Orodha ya Mzigo Uliopo</h4>
-            <button class="btn btn-primary btn-sm" onclick="document.getElementById('intakeModal').classList.add('open')" style="padding: 6px 12px; font-size:12px; background:var(--emerald-600); border-color:var(--emerald-600); display:flex; align-items:center; gap:4px">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              <span data-lang-en="New Stock" data-lang-sw="Pokea Mpya">Pokea Mpya</span>
-            </button>
+            <div style="display:flex; gap:8px">
+              <button class="btn btn-outline btn-sm" onclick="document.getElementById('applyServiceModal').classList.add('open')" style="padding: 6px 12px; font-size:12px; display:flex; align-items:center; gap:4px; border-color:var(--border); color:var(--text2)">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Huduma Mpya
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="document.getElementById('intakeModal').classList.add('open')" style="padding: 6px 12px; font-size:12px; background:var(--emerald-600); border-color:var(--emerald-600); display:flex; align-items:center; gap:4px">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span data-lang-en="New Stock" data-lang-sw="Pokea Mpya">Pokea Mpya</span>
+              </button>
+            </div>
           </div>
           <div style="overflow-x:auto; max-height:280px">
             <table class="data-table" style="font-size:12.5px">
@@ -532,6 +507,11 @@
               <input type="hidden" id="completeType" />
               <input type="hidden" id="completeJobId" />
               
+              <div id="completeServiceInfoBanner" style="background:var(--emerald-500); color:white; padding:10px 14px; border-radius:8px; font-size:12.5px; font-weight:600; display:flex; flex-direction:column; gap:4px; margin-bottom:12px;">
+                <span id="completeBannerService" style="font-size:14px">Huduma: ...</span>
+                <span id="completeBannerBatch" style="opacity:0.9; font-size:11.5px">Mzigo: ...</span>
+              </div>
+              
               <div style="margin-bottom:8px">
                 <label class="form-label" style="font-size:12.5px; font-weight:700; color:var(--text); margin-bottom:8px; display:block">Je, Zao limebadilika? (Mf. Mpunga kuwa Mchele)</label>
                 <div style="display:flex; gap:16px; margin-top:4px">
@@ -546,9 +526,23 @@
 
               <!-- IF NO (Zao ni Lilelile) -->
               <div id="completeSameCropDiv" style="margin-top: 6px;">
-                <label class="form-label" style="font-size:12px">Kiasi Kilichotumika / Kilichohudumiwa (Kg)</label>
-                <input type="number" step="0.01" id="completeSameInputUsed" class="form-input" style="padding:8px"/>
-                <small style="color:var(--text3); font-size:10px">Hakikisha hakizidi mzigo uliopo ghalani.</small>
+                <div style="margin-bottom:4px">
+                  <label class="form-label" style="font-size:12px; font-weight:600">Je, umehudumia mzigo WOTE?</label>
+                  <div style="display:flex; gap:16px; margin-top:4px">
+                    <label style="display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; color:var(--text2)">
+                      <input type="radio" name="completeSameUsedAll" value="yes" checked onchange="toggleSameUsedAllFields()" style="accent-color:var(--emerald-500); width:16px; height:16px" /> Kiasi Chote
+                    </label>
+                    <label style="display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; color:var(--text2)">
+                      <input type="radio" name="completeSameUsedAll" value="no" onchange="toggleSameUsedAllFields()" style="accent-color:var(--emerald-500); width:16px; height:16px" /> Kiasi Fulani
+                    </label>
+                  </div>
+                </div>
+
+                <div id="samePartialInputDiv" style="display:none; margin-top:8px">
+                  <label class="form-label" style="font-size:12px">Kiasi Kilichotumika / Kilichohudumiwa (Kg)</label>
+                  <input type="number" step="0.01" id="completeSameInputUsed" class="form-input" style="padding:8px"/>
+                  <small style="color:var(--text3); font-size:10px">Hakikisha hakizidi mzigo uliopo ghalani.</small>
+                </div>
               </div>
 
               <!-- IF YES (Zao Limebadilika) -->
@@ -626,6 +620,38 @@
           </div>
         </div>
         
+        <!-- Batch Details Modal -->
+        <div id="batchDetailsModal" class="modal-overlay">
+          <div class="modal" style="max-width:450px; width:95%">
+            <div class="modal-header">
+              <div class="modal-title">Taarifa za Mzigo (Batch)</div>
+              <button onclick="document.getElementById('batchDetailsModal').classList.remove('open')" style="background:none;border:none;cursor:pointer;color:var(--text3)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div class="modal-body" style="display:flex; flex-direction:column; gap:12px; font-size:13px">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+                <div><strong style="color:var(--text3); font-size:11.5px">Namba ya Mzigo</strong><div id="bdCode" style="font-weight:600; color:var(--text)"></div></div>
+                <div><strong style="color:var(--text3); font-size:11.5px">Zao / Kilichopatikana</strong><div id="bdCrop" style="font-weight:600; color:var(--emerald-600)"></div></div>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+                <div><strong style="color:var(--text3); font-size:11.5px">Kiasi Kilichoingia</strong><div id="bdIntake" style="font-weight:600"></div></div>
+                <div><strong style="color:var(--text3); font-size:11.5px">Kiasi Kilichobaki (Sasa)</strong><div id="bdCurrent" style="font-weight:600"></div></div>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+                <div><strong style="color:var(--text3); font-size:11.5px">Unyevu (Moisture)</strong><div id="bdMoisture"></div></div>
+                <div><strong style="color:var(--text3); font-size:11.5px">Hali ya Mzigo (Status)</strong><div id="bdStatus"></div></div>
+              </div>
+              <div id="bdParentSection" style="display:none; margin-top:8px; padding:10px; background:var(--surface2); border-radius:8px">
+                <strong style="color:var(--text); font-size:12px; display:block; margin-bottom:4px">Historia (Transformed From)</strong>
+                <div style="color:var(--text2); font-size:12px" id="bdParentInfo"></div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-secondary" onclick="document.getElementById('batchDetailsModal').classList.remove('open')">Funga</button>
+            </div>
+          </div>
+        </div>
         <!-- Tab 3: Loan History -->
         <div id="tabContentNewLoan" class="tab-content" style="display:none">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
@@ -1909,45 +1935,7 @@ async function loadFarmerBatches(farmerId) {
     const res = await fetch(`/api/v1/batches?farmer_id=${farmerId}`);
     farmerBatches = await res.json();
     
-    // 1. Populate Batches Table in Tab 1
-    const tbody = document.getElementById('profBatchesBody');
-    tbody.innerHTML = '';
-    
-    if (farmerBatches.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:14px 0">Hakuna shehena yoyote.</td></tr>';
-    } else {
-      farmerBatches.forEach(b => {
-        const tr = document.createElement('tr');
-        
-        let actionButtons = `
-          <button class="btn btn-secondary btn-sm" style="padding:2px 8px; font-size:11px; margin-right:4px; background:var(--surface3); color:var(--text)" onclick="openEditBatchModal('${b.id}')">✏️ Hariri</button>
-          <button class="btn btn-secondary btn-sm" style="padding:2px 8px; font-size:11px; background:var(--red-500); color:white; border-color:var(--red-500)" onclick="deleteBatch('${b.id}', '${b.batch_code}')">🗑️ Futa</button>
-        `;
-        
-        const currentWeightKg = parseFloat(b.current_weight) * 1000;
-        let weightDisplay = `${currentWeightKg.toLocaleString()} Kg`;
-        if (currentWeightKg === 0) {
-          if (b.intake_quantity && b.intake_unit) {
-            weightDisplay = `${parseFloat(b.intake_quantity)} ${b.intake_unit}`;
-          } else {
-            weightDisplay = (currentLang === 'sw' ? 'Uzito haujulikani' : 'Unknown weight');
-          }
-        }
-        tr.innerHTML = `
-          <td><code style="font-family:monospace;font-size:11.5px;color:var(--text2)">${b.batch_code}</code></td>
-          <td><span class="badge badge-green">${b.crop_type}</span></td>
-          <td><strong>${weightDisplay}</strong></td>
-          
-          <td>
-            <span class="badge badge-gray" style="font-size:10.5px">${b.status.toUpperCase()}</span>
-            <span style="display:block; font-size:10px; color:var(--text3); margin-top:2px">${b.days_stored} siku</span>
-          </td>
-          <td>${actionButtons}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-    
+
     // 2. Populate Collateral dropdown in Tab 3 (filtering stored batches)
     const colSelect = document.getElementById('loanCollateral');
     colSelect.innerHTML = '<option value="">Chagua batch ya dhamana...</option>';
@@ -1992,6 +1980,9 @@ async function loadFarmerBatches(farmerId) {
     const applySvcBatchSelect = document.getElementById('applyServiceBatchSelect');
     applySvcBatchSelect.innerHTML = '<option value="">Chagua shehena...</option>';
     farmerBatches.forEach(b => {
+      // Usiruhusu mzigo uliokwisha badilishwa (transformed) au wenye uzito 0 upewe huduma mpya
+      if (b.status === 'transformed' || parseFloat(b.current_weight) <= 0) return;
+
       const opt = document.createElement('option');
       opt.value = b.id;
       const currentWeightKg = parseFloat(b.current_weight) * 1000;
@@ -2018,39 +2009,94 @@ async function loadFarmerApiDetails(farmerId) {
     if (!res.ok) return;
     const data = await res.json();
     
-    // 1. Populate Services
+    // 1. Combine and Populate Batches and Services Table in Tab 1
     const services = data.services || [];
-    const svcBody = document.getElementById('profServicesBody');
+    const batches = data.batches || [];
     
-    if (svcBody) {
-      svcBody.innerHTML = '';
+    const tbody = document.getElementById('profBatchesBody');
+    if (tbody) {
+      tbody.innerHTML = '';
       
-      if (services.length === 0) {
-        svcBody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:14px 0">Hakuna huduma yoyote.</td></tr>';
-        
+      if (batches.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:14px 0">Hakuna mzigo wowote.</td></tr>';
       } else {
-        services.forEach(s => {
+        batches.forEach(b => {
           const tr = document.createElement('tr');
-          let stClass = 'badge-gray';
-          if (s.status === 'completed') stClass = 'badge-green';
-          else if (s.status === 'in_progress') stClass = 'badge-blue';
-          else if (s.status === 'queued') stClass = 'badge-orange';
           
-          const fee = parseFloat(s.fee_amount) || 0;
-          
-          const batch = farmerBatches.find(b => b.batch_code === s.batch_code) || {id: '', current_weight: 0};
-          tr.innerHTML = `
-            <td><div style="font-size:11.5px;color:var(--text3)">${new Date(s.created_at).toLocaleDateString()}</div></td>
-            <td><code style="font-family:monospace;font-size:11.5px;color:var(--text2)">${s.batch_code}</code></td>
-            <td><strong>${s.type}</strong></td>
-            <td>${s.service_name}</td>
-            <td><strong style="color:var(--text)">Tsh ${fee.toLocaleString()}</strong></td>
-            <td><span class="badge ${stClass}" style="font-size:10.5px">${(s.status || '').toUpperCase()}</span></td>
-            <td>
-              ${s.status !== 'completed' ? `<button class="btn btn-outline btn-sm" style="font-size:10px; padding:4px 8px" onclick="openCompleteServiceModal('${batch.id}', '${s.service_id}', '${s.type}', '${batch.current_weight}', '${s.job_id}')">Kamilisha</button>` : '<span style="font-size:10px; color:var(--text3)">-</span>'}
-            </td>
+          let actionButtons = `
+            <button class="btn btn-secondary btn-sm" style="padding:2px 8px; font-size:11px; margin-right:4px; background:var(--blue-500); color:white; border-color:var(--blue-500)" onclick="openBatchDetailsModal('${b.id}')">👁️ Tazama</button>
+            <button class="btn btn-secondary btn-sm" style="padding:2px 8px; font-size:11px; margin-right:4px; background:var(--surface3); color:var(--text)" onclick="openEditBatchModal('${b.id}')">✏️ Hariri</button>
+            <button class="btn btn-secondary btn-sm" style="padding:2px 8px; font-size:11px; background:var(--red-500); color:white; border-color:var(--red-500)" onclick="deleteBatch('${b.id}', '${b.batch_code}')">🗑️ Futa</button>
           `;
-          svcBody.appendChild(tr);
+          
+          const currentWeightKg = parseFloat(b.current_weight_mt) * 1000;
+          let weightDisplay = `${currentWeightKg.toLocaleString()} Kg`;
+          if (currentWeightKg === 0) {
+            if (b.intake_quantity && b.intake_unit) {
+              weightDisplay = `${parseFloat(b.intake_quantity)} ${b.intake_unit}`;
+            } else {
+              weightDisplay = (currentLang === 'sw' ? 'Uzito haujulikani' : 'Unknown weight');
+            }
+          }
+          tr.innerHTML = `
+            <td><code style="font-family:monospace;font-size:11.5px;color:var(--text2)">${b.batch_code}</code></td>
+            <td><span class="badge badge-green">${b.crop_type}</span></td>
+            <td><strong>${weightDisplay}</strong></td>
+            <td>
+              <span class="badge badge-gray" style="font-size:10.5px">${(b.status || '').toUpperCase()}</span>
+              <span style="display:block; font-size:10px; color:var(--text3); margin-top:2px">${b.days_stored || 0} siku</span>
+            </td>
+            <td>${actionButtons}</td>
+          `;
+          tbody.appendChild(tr);
+
+          // Render Nested Services for this Batch
+          const bServices = services.filter(s => s.batch_code === b.batch_code);
+          if (bServices.length > 0) {
+            const trSvc = document.createElement('tr');
+            trSvc.style.background = 'var(--surface2)';
+            
+            let svcHtml = `<td colspan="5" style="padding: 0; border-bottom: 2px solid var(--border);">
+              <div style="background: rgba(0,0,0,0.015); padding: 12px 16px 16px 42px; position:relative;">
+                <!-- Mstari ulionyooka wa mti (Vertical line) -->
+                <div style="position:absolute; left: 22px; top: 0; bottom: 24px; width: 2px; background: var(--border);"></div>
+                
+                <div style="font-size: 11px; font-weight: 600; color: var(--text3); margin-bottom: 12px; text-transform: uppercase;">
+                  Huduma Zilizofanywa:
+                </div>
+                
+                <div style="display:flex; flex-direction:column; gap:8px;">`;
+            
+            bServices.forEach(s => {
+              let stClass = 'badge-gray';
+              if (s.status === 'completed') stClass = 'badge-green';
+              else if (s.status === 'in_progress') stClass = 'badge-blue';
+              else if (s.status === 'queued') stClass = 'badge-orange';
+
+              let actionBtn = s.status !== 'completed' ? `<button class="btn btn-outline btn-sm" style="font-size:10px; padding:3px 8px; margin-left:auto; background:var(--emerald-50); color:var(--emerald-600); border-color:var(--emerald-200)" onclick="openCompleteServiceModal('${b.id}', '${s.service_id}', '${s.type}', '${b.current_weight_mt || 0}', '${s.job_id}', '${s.service_name}', '${s.batch_code}')">Kamilisha Huduma</button>` : '';
+
+              svcHtml += `
+                <div style="display:flex; align-items:center; position:relative;">
+                  <!-- Tawi (Horizontal branch) -->
+                  <div style="position:absolute; left:-20px; top:50%; width:20px; height:2px; background:var(--border);"></div>
+                  
+                  <div style="display:flex; flex:1; align-items:center; background: var(--bg); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); gap: 14px; box-shadow:0 1px 2px rgba(0,0,0,0.02)">
+                    <div style="font-size:11px; color:var(--text3); width:75px">${new Date(s.created_at).toLocaleDateString()}</div>
+                    <strong style="font-size:12.5px; color:var(--text); width:130px">${s.type}</strong>
+                    <span style="font-size:12px; color:var(--text2); flex:1">${s.service_name}</span>
+                    <span style="font-size:12px; color:var(--text2); font-weight:600; width:100px">Tsh ${parseFloat(s.fee_amount).toLocaleString()}</span>
+                    <span class="badge ${stClass}" style="font-size:10px; width:70px; justify-content:center">${(s.status || '').toUpperCase()}</span>
+                    <div style="width:120px; text-align:right">
+                      ${actionBtn}
+                    </div>
+                  </div>
+                </div>`;
+            });
+            
+            svcHtml += `</div></div></td>`;
+            trSvc.innerHTML = svcHtml;
+            tbody.appendChild(trSvc);
+          }
         });
       }
     }
@@ -2816,6 +2862,11 @@ function toggleCompleteCropFields() {
   document.getElementById('completeSameCropDiv').style.display = isChanged ? 'none' : 'block';
 }
 
+function toggleSameUsedAllFields() {
+  const isAll = document.querySelector('input[name="completeSameUsedAll"]:checked').value === 'yes';
+  document.getElementById('samePartialInputDiv').style.display = isAll ? 'none' : 'block';
+}
+
 function toggleUsedAllFields() {
   const isAll = document.querySelector('input[name="completeUsedAll"]:checked').value === 'yes';
   document.getElementById('partialInputDiv').style.display = isAll ? 'none' : 'block';
@@ -2828,11 +2879,50 @@ function toggleByProductFields() {
 
 let currentBatchWeightCache = 0; // store so we can validate
 
-function openCompleteServiceModal(batchId, serviceId, type, currentWeight, jobId) {
+function openBatchDetailsModal(id) {
+  const batch = farmerBatches.find(b => b.id === id);
+  if (!batch) return;
+  
+  document.getElementById('bdCode').textContent = batch.batch_code;
+  document.getElementById('bdCrop').textContent = batch.crop_type || 'N/A';
+  
+  let intakeQty = parseFloat(batch.intake_quantity);
+  if (isNaN(intakeQty) || intakeQty <= 0) {
+    intakeQty = parseFloat(batch.initial_weight) * 1000 || 0;
+  }
+  const intakeUnit = batch.intake_unit || 'Kg';
+  document.getElementById('bdIntake').textContent = `${intakeQty.toLocaleString()} ${intakeUnit}`;
+  
+  const currentKg = parseFloat(batch.current_weight) * 1000 || 0;
+  document.getElementById('bdCurrent').textContent = `${currentKg.toLocaleString()} Kg`;
+  
+  document.getElementById('bdMoisture').textContent = batch.current_moisture ? `${batch.current_moisture}%` : 'N/A';
+  
+  document.getElementById('bdStatus').innerHTML = `<span class="badge ${batch.status === 'transformed' ? 'badge-gray' : 'badge-green'}">${(batch.status || '').toUpperCase()}</span>`;
+  
+  if (batch.parent_batch_id) {
+    const parent = farmerBatches.find(p => p.id === batch.parent_batch_id);
+    if (parent) {
+      document.getElementById('bdParentInfo').innerHTML = `Mzigo huu ni matokeo (Transformed) kutoka kwenye mzigo wa <strong>${parent.crop_type}</strong> (Namba: <code style="color:var(--blue-600)">${parent.batch_code}</code>).`;
+    } else {
+      document.getElementById('bdParentInfo').innerHTML = `Mzigo huu ulitokana na mzigo mwingine uliokwisha badilishwa.`;
+    }
+    document.getElementById('bdParentSection').style.display = 'block';
+  } else {
+    document.getElementById('bdParentSection').style.display = 'none';
+  }
+  
+  document.getElementById('batchDetailsModal').classList.add('open');
+}
+
+function openCompleteServiceModal(batchId, serviceId, type, currentWeight, jobId, serviceName, batchCode) {
   document.getElementById('completeBatchId').value = batchId;
   document.getElementById('completeServiceId').value = serviceId;
   document.getElementById('completeType').value = type;
   document.getElementById('completeJobId').value = jobId || '';
+  
+  document.getElementById('completeBannerService').textContent = `Huduma: ${serviceName || type}`;
+  document.getElementById('completeBannerBatch').textContent = `Mzigo: ${batchCode || ''}`;
   
   const currentWeightKg = parseFloat(currentWeight) * 1000 || 0;
   currentBatchWeightCache = currentWeightKg;
@@ -2840,7 +2930,8 @@ function openCompleteServiceModal(batchId, serviceId, type, currentWeight, jobId
   // Resets
   document.querySelector('input[name="completeHasChanged"][value="no"]').checked = true;
   document.querySelector('input[name="completeUsedAll"][value="yes"]').checked = true;
-  document.getElementById('completeSameInputUsed').value = currentWeightKg;
+  document.querySelector('input[name="completeSameUsedAll"][value="yes"]').checked = true;
+  document.getElementById('completeSameInputUsed').value = '';
   document.getElementById('completePartialInputUsed').value = '';
   document.getElementById('completeOutputValue').value = '';
   document.getElementById('hasByProduct').checked = false;
@@ -2849,6 +2940,7 @@ function openCompleteServiceModal(batchId, serviceId, type, currentWeight, jobId
   
   toggleCompleteCropFields();
   toggleUsedAllFields();
+  toggleSameUsedAllFields();
   toggleByProductFields();
   
   // Populate crops
@@ -2881,12 +2973,17 @@ async function submitCompleteService() {
   };
   
   if (!hasChanged) {
-    const inputUsedRaw = parseFloat(document.getElementById('completeSameInputUsed').value);
-    if (isNaN(inputUsedRaw) || inputUsedRaw <= 0) {
-      showToast('Weka kiasi kilichotumika kwa usahihi!', 'error'); return;
-    }
-    if (inputUsedRaw > currentBatchWeightCache) {
-      showToast('Kiasi ulichoweka kinazidi mzigo uliopo ghalani!', 'error'); return;
+    const sameUsedAll = document.querySelector('input[name="completeSameUsedAll"]:checked').value === 'yes';
+    let inputUsedRaw = currentBatchWeightCache;
+    
+    if (!sameUsedAll) {
+      inputUsedRaw = parseFloat(document.getElementById('completeSameInputUsed').value);
+      if (isNaN(inputUsedRaw) || inputUsedRaw <= 0) {
+        showToast('Weka kiasi kilichotumika kwa usahihi!', 'error'); return;
+      }
+      if (inputUsedRaw > currentBatchWeightCache) {
+        showToast('Kiasi ulichoweka kinazidi mzigo uliopo ghalani!', 'error'); return;
+      }
     }
     // If no crop change, input == output, so the batch weight is just updated identically
     payload.input_used = inputUsedRaw / 1000;
@@ -2949,6 +3046,42 @@ async function submitCompleteService() {
     console.error(err);
     showToast('Mtandao unasumbua, tafadhali jaribu tena.', 'error');
   }
+}
+
+function openBatchDetailsModal(id) {
+  const batch = farmerBatches.find(b => b.id === id);
+  if (!batch) return;
+  
+  document.getElementById('bdCode').textContent = batch.batch_code;
+  document.getElementById('bdCrop').textContent = batch.crop_type || 'N/A';
+  
+  let intakeQty = parseFloat(batch.intake_quantity);
+  if (isNaN(intakeQty) || intakeQty <= 0) {
+    intakeQty = parseFloat(batch.initial_weight) * 1000 || 0;
+  }
+  const intakeUnit = batch.intake_unit || 'Kg';
+  document.getElementById('bdIntake').textContent = `${intakeQty.toLocaleString()} ${intakeUnit}`;
+  
+  const currentKg = parseFloat(batch.current_weight) * 1000 || 0;
+  document.getElementById('bdCurrent').textContent = `${currentKg.toLocaleString()} Kg`;
+  
+  document.getElementById('bdMoisture').textContent = batch.current_moisture ? `${batch.current_moisture}%` : 'N/A';
+  
+  document.getElementById('bdStatus').innerHTML = `<span class="badge ${batch.status === 'transformed' ? 'badge-gray' : 'badge-green'}">${(batch.status || '').toUpperCase()}</span>`;
+  
+  if (batch.parent_batch_id) {
+    const parent = farmerBatches.find(p => p.id === batch.parent_batch_id);
+    if (parent) {
+      document.getElementById('bdParentInfo').innerHTML = `Mzigo huu ni matokeo (Transformed) kutoka kwenye mzigo wa <strong>${parent.crop_type}</strong> (Namba: <code style="color:var(--blue-600)">${parent.batch_code}</code>) ambao uliingia ghalani mwanzo.`;
+    } else {
+      document.getElementById('bdParentInfo').innerHTML = `Mzigo huu ulitokana na mzigo mwingine uliokwisha badilishwa.`;
+    }
+    document.getElementById('bdParentSection').style.display = 'block';
+  } else {
+    document.getElementById('bdParentSection').style.display = 'none';
+  }
+  
+  document.getElementById('batchDetailsModal').classList.add('open');
 }
 
 // Load buyers list for settlement dropdown

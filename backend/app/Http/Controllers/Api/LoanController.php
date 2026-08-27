@@ -51,7 +51,7 @@ class LoanController extends Controller
             'farmer_id' => 'required|exists:farmers,id',
             'collateral_batch_id' => 'required|exists:batches,id',
             'principal_amount' => 'required|numeric|min:0',
-            'due_date' => 'required|date|after:today',
+            'due_date' => 'nullable|date',
         ]);
 
         $batch = Batch::findOrFail($validated['collateral_batch_id']);
@@ -80,7 +80,7 @@ class LoanController extends Controller
             'principal_amount' => $validated['principal_amount'],
             'interest_rate_annual' => 0.00, // default rate (no interest)
             'current_balance' => $validated['principal_amount'],
-            'due_date' => $validated['due_date'],
+            'due_date' => $validated['due_date'] ?? now()->format('Y-m-d'),
             'status' => 'pending_approval',
         ]);
 

@@ -200,12 +200,19 @@ class BatchController extends Controller
     {
         $batch = Batch::findOrFail($id);
         $type = $request->input('type'); // 'drying', 'milling', 'grading'
+        $tableName = 'milling_jobs';
+        if (strtolower($type) === 'drying') {
+            $tableName = 'drying_jobs';
+        } elseif (strtolower($type) === 'grading') {
+            $tableName = 'grading_records';
+        }
+
         $validated = $request->validate([
             'status' => 'required|string',
             'final_value' => 'nullable|numeric',
             'input_used' => 'nullable|numeric',
             'fee' => 'nullable|numeric',
-            'job_id' => 'nullable|exists:milling_jobs,id', // or drying_jobs depending on type
+            'job_id' => 'nullable|exists:' . $tableName . ',id',
         ]);
 
         $serviceId = $request->input('service_id');
@@ -214,7 +221,7 @@ class BatchController extends Controller
         
         $jobId = $request->input('job_id');
 
-        if ($type === 'drying') {
+        if (strtolower($type) === 'drying') {
             $job = $jobId ? DryingJob::find($jobId) : DryingJob::where('batch_id', $batch->id)->orderBy('created_at', 'desc')->first();
             if (!$job) {
                 $job = DryingJob::create([
@@ -236,15 +243,13 @@ class BatchController extends Controller
             if ($validated['status'] === 'completed') {
                 $inputUsed = $request->input('input_used') ?? $batch->current_weight_mt;
                 $finalValue = $validated['final_value'] ?? $inputUsed;
-                // For drying, we lose moisture weight.
-                // Subtract input used, add back final dried weight
                 $newWeight = max(0, $batch->current_weight_mt - $inputUsed + $finalValue);
                 $batch->update([
                     'current_weight_mt' => $newWeight,
-                    'status' => $newWeight <= 0 ? 'transformed' : 'stored'
+                    'status' => $batch->status === 'received' ? 'received' : 'stored'
                 ]);
             }
-        } elseif ($type === 'milling') {
+        } elseif (strtolower($type) === 'milling') {
             $job = $jobId ? MillingJob::find($jobId) : MillingJob::where('batch_id', $batch->id)->orderBy('created_at', 'desc')->first();
             if (!$job) {
                 $job = MillingJob::create([
@@ -268,11 +273,11 @@ class BatchController extends Controller
                 $outputUnit = $request->input('output_unit', 'Kilo'); 
                 $finalValue = $validated['final_value'] ?? 0;
                 
-                // Deduct the consumed input from the parent batch
-                $batch->decrement('current_weight_mt', $inputUsed);
-                
-                if (!empty($outputCrop) && $outputCrop !== $batch->crop_type) {
-                    // Create Primary Output Batch
+                $cropChanged = !empty($outputCrop) && strtolower(trim($outputCrop)) !== strtolower(trim($batch->crop_type));
+
+                if ($cropChanged) {
+                    $batch->decrement('current_weight_mt', $inputUsed);
+                    
                     Batch::create([
                         'tenant_id' => $batch->tenant_id,
                         'branch_id' => $batch->branch_id,
@@ -290,12 +295,14 @@ class BatchController extends Controller
                         'current_bin_id' => null,
                         'status' => 'stored'
                     ]);
+
+                    if ($batch->current_weight_mt <= 0.001) {
+                        $batch->update(['status' => 'transformed', 'current_weight_mt' => 0]);
+                    }
                 } else {
-                    // Same crop, just return the weight to the parent batch
-                    $batch->increment('current_weight_mt', $finalValue);
+                    $batch->update(['status' => $batch->status === 'received' ? 'received' : 'stored']);
                 }
                 
-                // Handle By-Product (e.g. Pumba)
                 $byProductCrop = $request->input('by_product_crop');
                 if (!empty($byProductCrop)) {
                     $byProductValue = $request->input('by_product_value', 0);
@@ -319,13 +326,8 @@ class BatchController extends Controller
                         'status' => 'stored'
                     ]);
                 }
-                
-                // If parent batch is completely used up, mark as transformed
-                if ($batch->current_weight_mt <= 0.001) {
-                    $batch->update(['status' => 'transformed', 'current_weight_mt' => 0]);
-                }
             }
-        } elseif ($type === 'grading') {
+        } elseif (strtolower($type) === 'grading') {
             $job = $jobId ? GradingRecord::find($jobId) : GradingRecord::where('batch_id', $batch->id)->orderBy('created_at', 'desc')->first();
             if (!$job) {
                 $job = GradingRecord::create([
@@ -352,9 +354,11 @@ class BatchController extends Controller
                 $outputUnit = $request->input('output_unit', 'Kilo'); 
                 $finalValue = $validated['final_value'] ?? 0;
                 
-                $batch->decrement('current_weight_mt', $inputUsed);
-                
-                if (!empty($outputCrop) && $outputCrop !== $batch->crop_type) {
+                $cropChanged = !empty($outputCrop) && strtolower(trim($outputCrop)) !== strtolower(trim($batch->crop_type));
+
+                if ($cropChanged) {
+                    $batch->decrement('current_weight_mt', $inputUsed);
+                    
                     Batch::create([
                         'tenant_id' => $batch->tenant_id,
                         'branch_id' => $batch->branch_id,
@@ -372,8 +376,12 @@ class BatchController extends Controller
                         'current_bin_id' => null,
                         'status' => 'stored'
                     ]);
+
+                    if ($batch->current_weight_mt <= 0.001) {
+                        $batch->update(['status' => 'transformed', 'current_weight_mt' => 0]);
+                    }
                 } else {
-                    $batch->increment('current_weight_mt', $finalValue);
+                    $batch->update(['status' => $batch->status === 'received' ? 'received' : 'stored']);
                 }
                 
                 $byProductCrop = $request->input('by_product_crop');
@@ -398,10 +406,6 @@ class BatchController extends Controller
                         'current_bin_id' => null,
                         'status' => 'stored'
                     ]);
-                }
-                
-                if ($batch->current_weight_mt <= 0.001) {
-                    $batch->update(['status' => 'transformed', 'current_weight_mt' => 0]);
                 }
             }
         }
