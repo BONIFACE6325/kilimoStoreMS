@@ -41,6 +41,8 @@ Route::prefix('v1')->group(function () {
     Route::get('/bins/map', [BatchController::class, 'binsMap']);
     Route::post('/batches/{id}/move', [BatchController::class, 'moveBatch']);
     Route::post('/batches/{id}/processing', [BatchController::class, 'updateProcessing']);
+    Route::delete('/processing/{jobType}/{jobId}', [BatchController::class, 'deleteProcessingJob']);
+    Route::delete('/processing-jobs/{id}', [BatchController::class, 'deleteProcessingJob']);
 
     // Loans
     Route::apiResource('loans', LoanController::class);
@@ -50,6 +52,7 @@ Route::prefix('v1')->group(function () {
     // Sales & Deductions
     Route::get('/sales/buyers', [SalesController::class, 'getBuyers']);
     Route::get('/sales/invoices', [SalesController::class, 'indexInvoices']);
+    Route::get('/sales/settlements', [SalesController::class, 'indexSettlements']);
     Route::post('/sales/preview-deductions', [SalesController::class, 'previewDeductions']);
     Route::post('/sales/confirm', [SalesController::class, 'confirmSale']);
 });

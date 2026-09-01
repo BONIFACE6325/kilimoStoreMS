@@ -324,102 +324,57 @@
     <div v-if="showUnitModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
       <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-slate-200 animate-fadeIn">
         <div class="px-6 py-4 border-b border-teal-800 flex items-center justify-between bg-gradient-to-r from-teal-900 to-emerald-900 text-white">
-          <div>
-            <h3 class="text-base font-extrabold flex items-center gap-2">
-              <span>⚖️ Usimamizi wa Milinganyo ya Vipimo (Unit Equivalence Control)</span>
-            </h3>
-            <p class="text-[11px] text-teal-200 font-medium">Weka mlinganyo wa kilo kwa kila kipimo (e.g. 1 Gunia = 100 Kg, 1 Roba = 50 Kg)</p>
-          </div>
-          <button @click="showUnitModal = false" class="text-teal-200 hover:text-white p-1">✕</button>
+          <h3 class="text-base font-black flex items-center gap-2">
+            <span>⚖️ Usimamizi wa Milinganyo ya Vipimo</span>
+          </h3>
+          <button @click="showUnitModal = false" class="text-teal-200 hover:text-white p-1 cursor-pointer">✕</button>
         </div>
 
         <div class="p-6 space-y-5 text-xs font-semibold text-slate-700 max-h-[85vh] overflow-y-auto">
 
-          <!-- GOOGLE-STYLE UNIVERSAL UNIT CONVERTER CARD -->
-          <div class="bg-gradient-to-br from-slate-900 via-teal-950 to-emerald-950 text-white p-5 rounded-3xl shadow-xl space-y-4 border border-teal-700/50">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <span class="text-xl">🔀</span>
-                <div>
-                  <div class="text-xs font-black uppercase tracking-wider text-teal-300">Google-Style Universal Unit Converter</div>
-                  <div class="text-[11px] text-slate-300">Badilisha kipimo chochote kwenda kipimo kingine chochote papo hapo (Matrix Converter)</div>
-                </div>
-              </div>
-              <span class="px-2.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-[10px] font-bold">Live Calculator</span>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
-              <!-- Amount & From Unit -->
-              <div class="sm:col-span-5 space-y-1">
-                <label class="text-[10.5px] font-bold text-slate-400">Kiasi & Kipimo cha Kwanza (From)</label>
-                <div class="flex gap-1.5">
-                  <input v-model.number="converter.amount" type="number" class="w-20 p-2.5 bg-white/10 border border-white/20 rounded-xl font-black text-white text-sm focus:bg-white/20 focus:outline-hidden" />
-                  <select v-model="converter.fromUnit" class="flex-1 p-2.5 bg-slate-800 border border-white/20 rounded-xl font-bold text-white text-xs">
-                    <option v-for="u in unitsList" :key="u.name" :value="u.name">{{ u.name }} ({{ u.kg }} Kg)</option>
-                  </select>
-                </div>
-              </div>
-
-              <!-- Swap Button -->
-              <div class="sm:col-span-2 flex justify-center">
-                <button @click="swapConverterUnits" title="Geuza Vipimo" class="w-10 h-10 rounded-2xl bg-teal-500/30 hover:bg-teal-500/50 text-teal-200 border border-teal-400/40 flex items-center justify-center font-bold text-lg transition shadow-md">
-                  ⇄
-                </button>
-              </div>
-
-              <!-- To Unit -->
-              <div class="sm:col-span-5 space-y-1">
-                <label class="text-[10.5px] font-bold text-slate-400">Kipimo cha Pili (To)</label>
-                <select v-model="converter.toUnit" class="flex-1 p-2.5 bg-slate-800 border border-white/20 rounded-xl font-bold text-white text-xs">
-                  <option v-for="u in unitsList" :key="u.name" :value="u.name">{{ u.name }} ({{ u.kg }} Kg)</option>
+          <!-- DUAL DROPDOWN & DUAL INPUT EQUIVALENCE CONTROL BUILDER -->
+          <div class="bg-gradient-to-br from-slate-900 via-slate-950 to-emerald-950 text-white p-5 rounded-3xl shadow-xl space-y-4 border border-teal-500/30">
+            <div class="grid grid-cols-1 sm:grid-cols-11 gap-3 items-center">
+              <!-- Left Side: Unit A Dropdown & Input -->
+              <div class="sm:col-span-5 space-y-2 bg-white/5 p-3 rounded-2xl border border-white/10">
+                <select v-model="eqForm.unitA" class="w-full p-2.5 bg-slate-900 border border-white/20 rounded-xl font-black text-white text-xs">
+                  <option v-for="u in unitsList" :key="u.name" :value="u.name">{{ u.name }}</option>
                 </select>
+                <input v-model.number="eqForm.amountA" type="number" placeholder="1" class="w-full p-2 bg-white/10 border border-white/15 rounded-xl font-black text-white text-sm text-center focus:bg-white/20 focus:outline-hidden" />
+              </div>
+
+              <!-- Equals Sign Badge -->
+              <div class="sm:col-span-1 flex items-center justify-center">
+                <span class="w-9 h-9 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-400 flex items-center justify-center font-black text-lg shadow-sm">=</span>
+              </div>
+
+              <!-- Right Side: Unit B Dropdown & Input -->
+              <div class="sm:col-span-5 space-y-2 bg-white/5 p-3 rounded-2xl border border-white/10">
+                <select v-model="eqForm.unitB" class="w-full p-2.5 bg-slate-900 border border-white/20 rounded-xl font-bold text-white text-xs">
+                  <option v-for="u in unitsList" :key="u.name" :value="u.name">{{ u.name }}</option>
+                </select>
+                <input v-model.number="eqForm.amountB" type="number" placeholder="50" class="w-full p-2 bg-white/10 border border-white/15 rounded-xl font-black text-white text-sm text-center focus:bg-white/20 focus:outline-hidden" />
               </div>
             </div>
 
-            <!-- Dynamic Google-style Result Badge -->
-            <div class="p-4 bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-2">
-              <div>
-                <div class="text-[11px] text-teal-200 font-bold uppercase tracking-wider">Matokeo ya Ulinganyo (Live Conversion):</div>
-                <div class="text-xl sm:text-2xl font-black text-emerald-400 tracking-tight">
-                  {{ converter.amount }} {{ converter.fromUnit }} = <span class="underline decoration-emerald-400 decoration-2 font-mono">{{ liveConvertedResult.toFixed(2) }}</span> {{ converter.toUnit }}
-                </div>
+            <!-- Dynamic Result & Save Button -->
+            <div class="p-3.5 bg-emerald-950/80 border border-emerald-500/30 rounded-2xl flex items-center justify-between gap-3">
+              <div class="text-sm font-extrabold text-white">
+                <span class="text-teal-300 font-mono">{{ eqForm.amountA || 1 }} {{ eqForm.unitA }}</span> = 
+                <span class="text-emerald-400 font-mono underline decoration-emerald-400 font-black ml-1">{{ calculatedEquivalenceSummary }}</span>
               </div>
-              <div class="text-right text-[10.5px] text-slate-300 font-mono space-y-0.5">
-                <div>1 {{ converter.fromUnit }} = {{ (getUnitKg(converter.fromUnit, 1) / (getUnitKg(converter.toUnit, 1) || 1)).toFixed(3) }} {{ converter.toUnit }}</div>
-                <div>1 {{ converter.toUnit }} = {{ (getUnitKg(converter.toUnit, 1) / (getUnitKg(converter.fromUnit, 1) || 1)).toFixed(3) }} {{ converter.fromUnit }}</div>
-              </div>
+              <button @click="saveEquivalenceRule" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold rounded-xl shadow-md transition cursor-pointer text-xs flex items-center gap-1">
+                <span>💾 Hifadhi</span>
+              </button>
             </div>
           </div>
 
-          <!-- Form to add new unit -->
-          <div class="p-3 bg-teal-50/60 border border-teal-200 rounded-2xl space-y-3">
-            <div class="font-extrabold text-teal-950 text-xs">+ Sajili Kipimo Kipya na Mlinganyo Wake</div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <div>
-                <label class="block mb-1 font-bold text-slate-700">Jina la Kipimo *</label>
-                <input 
-                  v-model="newUnitInput.name" 
-                  type="text" 
-                  placeholder="e.g. Gunia, Sado, Lumbesa" 
-                  class="w-full p-2 bg-white border border-slate-200 rounded-xl font-bold"
-                />
-              </div>
-              <div>
-                <label class="block mb-1 font-bold text-slate-700">1 Kipimo = Kg Ngapi? *</label>
-                <input 
-                  v-model.number="newUnitInput.kg" 
-                  type="number" 
-                  placeholder="e.g. 100" 
-                  class="w-full p-2 bg-white border border-slate-200 rounded-xl font-bold text-emerald-800"
-                />
-              </div>
-            </div>
-            <div class="flex items-center justify-between pt-1">
-              <span class="text-[11px] text-slate-500 font-medium">Mfano: 1 {{ newUnitInput.name || 'Gunia' }} = <strong>{{ newUnitInput.kg || 100 }} Kg</strong></span>
-              <button @click="handleSaveUnit" class="px-4 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-extrabold rounded-xl shadow-xs transition">
-                Hifadhi Kipimo
-              </button>
-            </div>
+          <!-- Quick Add New Unit -->
+          <div class="p-3 bg-teal-50/60 border border-teal-200 rounded-2xl flex items-center gap-2">
+            <input v-model="newUnitInput.name" type="text" placeholder="+ Sajili Kipimo Kipya (e.g. Lumbesa)" class="flex-1 p-2 bg-white border border-slate-200 rounded-xl font-bold text-xs"/>
+            <button @click="handleQuickAddUnit" class="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white font-extrabold text-xs rounded-xl shadow-xs transition cursor-pointer whitespace-nowrap">
+              + Sajili
+            </button>
           </div>
 
           <!-- Unit Equivalences Table -->
@@ -429,30 +384,67 @@
               <span class="text-[10.5px] text-slate-400 font-mono">{{ unitsList.length }} Registered Units</span>
             </div>
 
-            <div class="max-h-56 overflow-y-auto space-y-2 pr-1">
+            <div class="max-h-64 overflow-y-auto space-y-2 pr-1">
               <div 
                 v-for="u in unitsList" 
                 :key="u.name" 
-                class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200/80 rounded-2xl hover:border-teal-300 transition"
+                class="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl hover:border-teal-300 transition"
               >
-                <div>
-                  <div class="font-extrabold text-slate-900 text-xs">{{ u.name }}</div>
-                  <div class="text-[11px] text-teal-800 font-bold font-mono">1 {{ u.name }} = {{ u.kg }} Kg</div>
+                <!-- INLINE EDIT MODE -->
+                <div v-if="editingUnitName === u.name" class="space-y-2">
+                  <div class="font-extrabold text-teal-950 text-xs flex items-center justify-between">
+                    <span>✏️ Hariri Kipimo na Uzito:</span>
+                    <button @click="editingUnitName = null" class="text-slate-400 hover:text-slate-600 font-black text-xs cursor-pointer">✕ Ghairi</button>
+                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
+                    <div class="sm:col-span-7">
+                      <label class="block text-[9.5px] font-bold text-slate-500 mb-0.5">Jina la Kipimo (Name)</label>
+                      <input 
+                        v-model="editUnitForm.name" 
+                        type="text" 
+                        class="w-full p-1.5 bg-white border border-slate-300 rounded-xl font-extrabold text-xs text-slate-900"
+                      />
+                    </div>
+                    <div class="sm:col-span-5">
+                      <label class="block text-[9.5px] font-bold text-slate-500 mb-0.5">Mlinganyo wa Kg (Ratio)</label>
+                      <input 
+                        v-model.number="editUnitForm.kg" 
+                        type="number" 
+                        class="w-full p-1.5 bg-white border border-slate-300 rounded-xl font-extrabold text-xs text-emerald-800"
+                      />
+                    </div>
+                  </div>
+                  <div class="flex justify-end gap-1.5 pt-1">
+                    <button @click="editingUnitName = null" class="px-3 py-1 bg-slate-200 text-slate-700 font-bold rounded-lg text-xs cursor-pointer">Ghairi</button>
+                    <button @click="saveUnitEdit(u.name)" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-lg text-xs shadow-xs cursor-pointer">💾 Hifadhi</button>
+                  </div>
                 </div>
 
-                <div class="flex items-center gap-2">
-                  <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-xl border border-slate-200">
-                    <span class="text-[10.5px] text-slate-400 font-bold">Kg:</span>
-                    <input 
-                      type="number" 
-                      :value="u.kg" 
-                      @change="handleUpdateUnitKg(u.name, $event.target.value)" 
-                      class="w-16 p-0.5 text-xs font-black text-emerald-700 text-center bg-transparent border-b border-emerald-300 focus:outline-hidden"
-                    />
+                <!-- DISPLAY MODE -->
+                <div v-else class="flex items-center justify-between gap-2">
+                  <div class="space-y-0.5">
+                    <div class="font-extrabold text-slate-900 text-xs flex items-center gap-1.5 flex-wrap">
+                      <span>{{ u.name }}</span>
+                      <span v-if="u.formulaText" class="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300/80 rounded-lg text-[10px] font-black font-mono">
+                        🔄 {{ u.formulaText }}
+                      </span>
+                    </div>
+                    <div class="text-[11px] text-teal-800 font-bold font-mono">
+                      1 {{ u.name }} = <span class="text-emerald-700 font-black">{{ u.kg }} Kg</span>
+                    </div>
                   </div>
-                  <button @click="deleteUnit(u.name)" class="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl transition font-extrabold text-xs">
-                    Futa
-                  </button>
+
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <div class="px-2.5 py-1 bg-slate-100 border border-slate-200/80 rounded-xl text-xs font-mono font-extrabold text-slate-700 select-none">
+                      {{ u.kg }} Kg
+                    </div>
+                    <button @click="startEditUnit(u)" class="px-2.5 py-1 text-teal-700 hover:text-teal-900 hover:bg-teal-50 border border-teal-200 rounded-xl transition font-extrabold text-xs cursor-pointer flex items-center gap-1">
+                      <span>✏️ Badili</span>
+                    </button>
+                    <button @click="handleDeleteUnit(u.name)" class="px-2.5 py-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl transition font-extrabold text-xs cursor-pointer">
+                      Futa
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -465,14 +457,50 @@
       </div>
     </div>
 
-    <!-- TOAST NOTIFICATION -->
-    <div 
-      v-if="toast.show" 
-      :class="toast.type === 'error' ? 'bg-red-900 border-red-700' : 'bg-emerald-950 border-emerald-700'" 
-      class="fixed bottom-6 right-6 z-50 text-white px-5 py-3 rounded-2xl shadow-2xl border flex items-center gap-3 animate-bounce"
-    >
-      <span>{{ toast.type === 'error' ? '⚠️' : '✅' }}</span>
-      <span class="text-xs font-bold">{{ toast.message }}</span>
+    <!-- TOAST NOTIFICATION CARD -->
+    <div v-if="toast.show" 
+         class="fixed top-6 right-6 z-100 max-w-md w-full p-4 rounded-2xl shadow-2xl backdrop-blur-xl border flex items-start gap-3.5 text-white transition-all transform animate-fadeIn duration-200"
+         :class="toast.type === 'error' 
+           ? 'bg-gradient-to-r from-rose-950/95 via-red-950/95 to-slate-900/95 border-rose-500/80 shadow-rose-950/50' 
+           : 'bg-gradient-to-r from-emerald-950/95 via-teal-950/95 to-slate-900/95 border-emerald-500/80 shadow-emerald-950/50'">
+      
+      <div class="p-2 rounded-xl flex-shrink-0 flex items-center justify-center text-lg leading-none"
+           :class="toast.type === 'error' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'">
+        <span>{{ toast.type === 'error' ? '⚠️' : '✅' }}</span>
+      </div>
+
+      <div class="flex-1 min-w-0 pr-1 space-y-0.5">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] font-black uppercase tracking-wider" :class="toast.type === 'error' ? 'text-rose-400' : 'text-emerald-400'">
+            {{ toast.type === 'error' ? 'Onyo la Mfumo' : 'Taarifa ya Mfumo' }}
+          </span>
+          <button @click="toast.show = false" class="text-white/60 hover:text-white text-xs font-bold p-0.5 rounded-lg hover:bg-white/10 transition cursor-pointer">✕</button>
+        </div>
+        <div class="font-extrabold text-xs text-white/95 leading-relaxed break-words">
+          {{ toast.message }}
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOM BEAUTIFUL CONFIRMATION DIALOG MODAL -->
+    <div v-if="confirmModal.show" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden border border-slate-100 p-6 space-y-4 text-center animate-fadeIn">
+        <div class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-500 flex items-center justify-center text-2xl mx-auto shadow-inner">
+          ⚠️
+        </div>
+        <div class="space-y-1">
+          <h3 class="text-sm font-black text-slate-900">{{ confirmModal.title }}</h3>
+          <p class="text-xs font-semibold text-slate-600 leading-relaxed">{{ confirmModal.message }}</p>
+        </div>
+        <div class="flex items-center gap-2 pt-2">
+          <button @click="confirmModal.show = false" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs rounded-xl transition cursor-pointer">
+            Ghairi
+          </button>
+          <button @click="executeConfirmAction" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs rounded-xl shadow-md transition cursor-pointer">
+            Ndio, Futa
+          </button>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -482,7 +510,31 @@
 import { ref, computed, onMounted } from 'vue';
 import { useAgroMaster } from '../composables/useAgroMaster.js';
 
-const { cropsList, unitsList, addCrop, deleteCrop, addUnit, updateUnitRatio, deleteUnit, getUnitKg, convertUnits } = useAgroMaster();
+const { cropsList, unitsList, addCrop, deleteCrop, addUnit, updateUnitRatio, updateUnit, deleteUnit, getUnitKg, convertUnits } = useAgroMaster();
+
+const editingUnitName = ref(null);
+const editUnitForm = ref({ name: '', kg: 1 });
+
+const startEditUnit = (u) => {
+  editingUnitName.value = u.name;
+  editUnitForm.value = { name: u.name, kg: u.kg };
+};
+
+const saveUnitEdit = (oldName) => {
+  const newName = (editUnitForm.value.name || '').trim();
+  const newKg = Number(editUnitForm.value.kg);
+  if (!newName || isNaN(newKg) || newKg <= 0) {
+    triggerToast('Weka jina na kilo sahihi za kipimo!', 'error');
+    return;
+  }
+  const success = updateUnit(oldName, newName, newKg);
+  if (success) {
+    editingUnitName.value = null;
+    triggerToast(`Kipimo cha "${newName}" kimeboreshwa kikamilifu! (1 ${newName} = ${newKg} Kg) ✓`);
+  } else {
+    triggerToast('Jina la kipimo hiki tayari linatumiwa na kipimo kingine!', 'error');
+  }
+};
 
 const services = ref([]);
 const loading = ref(true);
@@ -496,21 +548,74 @@ const showUnitModal = ref(false);
 const newCropInput = ref('');
 const newUnitInput = ref({ name: '', kg: 100 });
 
-// Google Currency Converter Style State
-const converter = ref({
-  amount: 10,
-  fromUnit: 'Gunia (Bag)',
-  toUnit: 'Kiloba / Roba'
+const eqForm = ref({
+  unitA: 'Gunia (Bag)',
+  amountA: 1,
+  unitB: 'Kilo (Kg)',
+  amountB: 100
 });
 
-const liveConvertedResult = computed(() => {
-  return convertUnits(converter.value.amount, converter.value.fromUnit, converter.value.toUnit);
+const calculatedEquivalenceSummary = computed(() => {
+  const amtA = Number(eqForm.value.amountA) || 1;
+  const amtB = Number(eqForm.value.amountB) || 1;
+  const unitBName = eqForm.value.unitB || 'Kilo (Kg)';
+  const unitBKg = getUnitKg(unitBName, 1);
+  const totalKg = (amtB / amtA) * unitBKg;
+  if (unitBName.toLowerCase().includes('kg') || unitBName.toLowerCase().includes('kilo')) {
+    return `${amtB} ${unitBName}`;
+  }
+  return `${amtB} ${unitBName} (${totalKg.toLocaleString()} Kg)`;
 });
 
-const swapConverterUnits = () => {
-  const temp = converter.value.fromUnit;
-  converter.value.fromUnit = converter.value.toUnit;
-  converter.value.toUnit = temp;
+const saveEquivalenceRule = () => {
+  const nameA = (eqForm.value.unitA || '').trim();
+  const nameB = (eqForm.value.unitB || '').trim();
+  const amtA = Number(eqForm.value.amountA) || 0;
+  const amtB = Number(eqForm.value.amountB) || 0;
+
+  if (!nameA || !nameB || amtA <= 0 || amtB <= 0) {
+    triggerToast('Weka kiasi na chagua vipimo vyote viwili sahihi!', 'error');
+    return;
+  }
+
+  if (nameA.toLowerCase() === nameB.toLowerCase()) {
+    triggerToast('Huwezi kulinganisha kipimo na chenyewe! Chagua vipimo viwili tofauti.', 'error');
+    return;
+  }
+
+  const unitBKg = getUnitKg(nameB, 1);
+  const ratioInKg = (amtB / amtA) * unitBKg;
+  const formulaStr = `${amtA} ${nameA} = ${amtB} ${nameB}`;
+
+  const exists = unitsList.value.some(u => u.name.toLowerCase() === nameA.toLowerCase());
+  if (exists) {
+    updateUnitRatio(nameA, ratioInKg, formulaStr);
+    triggerToast(`Mlinganyo umehifadhiwa na kuonekana chini kwenye jedwali: ${formulaStr} ✓`);
+  } else {
+    addUnit(nameA, ratioInKg, formulaStr);
+    triggerToast(`Mlinganyo mpya umehifadhiwa na kuonekana chini kwenye jedwali: ${formulaStr} ✓`);
+  }
+};
+
+const handleQuickAddUnit = () => {
+  if (!newUnitInput.value.name) {
+    triggerToast('Weka jina la kipimo kipya!', 'error');
+    return;
+  }
+  const name = newUnitInput.value.name.trim();
+  const exists = unitsList.value.some(u => u.name.toLowerCase() === name.toLowerCase());
+  if (exists) {
+    triggerToast(`Kipimo cha "${name}" tayari kipo kwenye orodha! Badilisha mlinganyo wake hapo juu.`, 'error');
+    return;
+  }
+  const success = addUnit(name, 1);
+  if (success) {
+    eqForm.value.unitA = name;
+    triggerToast(`Kipimo cha "${name}" kimesajiliwa! Sasa weka mlinganyo wake hapo juu. ⚖️`);
+    newUnitInput.value.name = '';
+  } else {
+    triggerToast('Kipimo hiki hakikukubaliwa.', 'error');
+  }
 };
 
 const toast = ref({ show: false, message: '', type: 'success' });
@@ -525,6 +630,32 @@ const handleUpdateUnitKg = (unitName, val) => {
   if (isNaN(num) || num <= 0) return;
   updateUnitRatio(unitName, num);
   triggerToast(`Mlinganyo wa "${unitName}" umebadilishwa kuwa: 1 ${unitName} = ${num} Kg ✓`);
+};
+
+const confirmModal = ref({
+  show: false,
+  title: '',
+  message: '',
+  onConfirm: null
+});
+
+const executeConfirmAction = () => {
+  if (confirmModal.value.onConfirm) {
+    confirmModal.value.onConfirm();
+  }
+  confirmModal.value.show = false;
+};
+
+const handleDeleteUnit = (unitName) => {
+  confirmModal.value = {
+    show: true,
+    title: `Futa Kipimo: "${unitName}"`,
+    message: `Je, una uhakika unataka kufuta kipimo cha "${unitName}"? Mizigo na Huduma zote zilizosajiliwa awali kwa kutumia kipimo hiki ZITABAKI SALAMA na uzito wake hautapotea.`,
+    onConfirm: () => {
+      deleteUnit(unitName);
+      triggerToast(`Kipimo cha "${unitName}" kimefutwa kwenye orodha ✓`);
+    }
+  };
 };
 
 const handleSaveCrop = () => {

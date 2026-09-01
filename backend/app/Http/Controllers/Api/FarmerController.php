@@ -66,6 +66,13 @@ class FarmerController extends Controller
         $batches = $farmer->batches()->get();
         $loans = $farmer->loans()->get();
 
+        $activeStock = $batches->where('status', '!=', 'sold')->sum('current_weight_mt');
+        $expectedStatus = ($activeStock > 0.001) ? 'active' : 'inactive';
+
+        if ($farmer->status !== $expectedStatus) {
+            $farmer->update(['status' => $expectedStatus]);
+        }
+
         return [
             'id' => $farmer->id,
             'farmer_code' => $farmer->farmer_code,
@@ -77,9 +84,9 @@ class FarmerController extends Controller
             'ward' => $farmer->ward,
             'village' => $farmer->village,
             'street' => $farmer->street,
-            'status' => $farmer->status,
+            'status' => $expectedStatus,
             'total_deposited' => $batches->whereNull('parent_batch_id')->sum('initial_weight_mt'),
-            'active_stock' => $batches->whereIn('status', ['received', 'stored'])->sum('current_weight_mt'),
+            'active_stock' => $activeStock,
             'active_loans' => $loans->where('status', 'active')->count(),
             'loan_balance' => $loans->whereIn('status', ['active', 'overdue'])->sum('current_balance'),
             'created_at' => $farmer->created_at->format('Y-m-d H:i'),
@@ -115,7 +122,7 @@ class FarmerController extends Controller
         $farmer = Farmer::create(array_merge($validated, [
             'tenant_id' => $tenantId,
             'farmer_code' => $farmerCode,
-            'status' => 'active',
+            'status' => 'inactive',
         ]));
 
         return response()->json([
@@ -140,6 +147,12 @@ class FarmerController extends Controller
 
         // Append applied_services to each batch for frontend, and gather all services
         $batches->transform(function ($batch) use (&$services) {
+            if ($batch->current_weight_mt <= 0 && $batch->status !== 'transformed') {
+                $batch->status = 'sold';
+                $batch->current_weight_mt = 0;
+                $batch->save();
+            }
+
             $appliedServices = [];
 
             foreach ($batch->dryingJobs as $job) {

@@ -1,5 +1,8 @@
 <template>
-  <div class="min-h-screen flex bg-slate-50 text-slate-800 antialiased font-sans">
+  <div v-if="$route.path === '/login' || !isAuthenticated" class="min-h-screen w-full">
+    <router-view />
+  </div>
+  <div v-else class="min-h-screen flex bg-slate-50 text-slate-800 antialiased font-sans">
     <!-- Sidebar Navigation -->
     <Sidebar />
 
@@ -15,6 +18,11 @@
 </template>
 
 <script setup>
+import { useRoute } from 'vue-router';
+import { useAuth } from './composables/useAuth';
 import Sidebar from './components/Sidebar.vue';
 import Topbar from './components/Topbar.vue';
+
+const route = useRoute();
+const { isAuthenticated } = useAuth();
 </script>

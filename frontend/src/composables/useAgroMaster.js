@@ -61,20 +61,43 @@ export function useAgroMaster() {
     cropsList.value = cropsList.value.filter(c => c !== cropName);
   };
 
-  const addUnit = (unitName, kgRatio = 1) => {
+  const addUnit = (unitName, kgRatio = 1, formulaText = '') => {
     const name = unitName.trim();
     if (!name) return false;
     if (unitsList.value.some(u => u.name.toLowerCase() === name.toLowerCase())) {
       return false;
     }
-    unitsList.value.push({ name, kg: Number(kgRatio) || 1 });
+    unitsList.value.push({ name, kg: Number(kgRatio) || 1, formulaText: formulaText || '' });
     return true;
   };
 
-  const updateUnitRatio = (unitName, newKgRatio) => {
-    const found = unitsList.value.find(u => u.name === unitName);
+  const updateUnitRatio = (unitName, newKgRatio, formulaText = '') => {
+    const found = unitsList.value.find(u => u.name.toLowerCase() === unitName.toLowerCase());
     if (found) {
       found.kg = Number(newKgRatio) || 1;
+      if (formulaText) {
+        found.formulaText = formulaText;
+      }
+      return true;
+    }
+    return false;
+  };
+
+  const updateUnit = (oldName, newName, newKgRatio, formulaText = '') => {
+    const found = unitsList.value.find(u => u.name.toLowerCase() === oldName.toLowerCase());
+    if (found) {
+      const trimmedNew = (newName || '').trim();
+      if (trimmedNew && trimmedNew.toLowerCase() !== oldName.toLowerCase()) {
+        const exists = unitsList.value.some(u => u.name.toLowerCase() === trimmedNew.toLowerCase());
+        if (exists) return false;
+        found.name = trimmedNew;
+      }
+      if (newKgRatio !== undefined && newKgRatio !== null && !isNaN(Number(newKgRatio))) {
+        found.kg = Number(newKgRatio) || 1;
+      }
+      if (formulaText) {
+        found.formulaText = formulaText;
+      }
       return true;
     }
     return false;
@@ -118,6 +141,7 @@ export function useAgroMaster() {
     deleteCrop,
     addUnit,
     updateUnitRatio,
+    updateUnit,
     deleteUnit,
     getUnitKg,
     convertUnits

@@ -30,12 +30,12 @@ class LoanController extends Controller
             return [
                 'id' => $loan->id,
                 'loan_code' => $loan->loan_code,
-                'farmer_name' => $loan->farmer->name,
+                'farmer_name' => $loan->farmer ? $loan->farmer->name : 'N/A',
                 'collateral_batch' => $loan->collateralBatch ? $loan->collateralBatch->batch_code : 'N/A',
                 'principal_amount' => $loan->principal_amount,
                 'current_balance' => $loan->current_balance,
-                'interest_rate' => $loan->interest_rate_annual,
-                'accrued_interest' => $loan->accrued_interest,
+                'interest_rate' => 0.00, // Strictly 0.00% (No Interest)
+                'accrued_interest' => 0.00,
                 'due_date' => $loan->due_date,
                 'status' => $loan->status,
                 'created_at' => $loan->created_at->format('Y-m-d H:i'),
@@ -50,13 +50,34 @@ class LoanController extends Controller
         $validated = $request->validate([
             'farmer_id' => 'required|exists:farmers,id',
             'collateral_batch_id' => 'required|exists:batches,id',
-            'principal_amount' => 'required|numeric|min:0',
+            'principal_amount' => 'required|numeric|min:1',
             'due_date' => 'nullable|date',
         ]);
 
+        $farmer = Farmer::findOrFail($validated['farmer_id']);
         $batch = Batch::findOrFail($validated['collateral_batch_id']);
+
         if ($batch->farmer_id !== $validated['farmer_id']) {
-            return response()->json(['error' => 'Selected batch does not belong to the selected farmer'], 422);
+            return response()->json(['error' => 'Batch iliyochaguliwa haimhusu mkulima huyu!'], 422);
+        }
+
+        // 1. RULE: Farmer must have active stock ghalani (status != sold and weight > 0)
+        $batchWeightKg = floatval($batch->current_weight_mt ?? 0) * 1000;
+        if ($batch->status === 'sold' || $batchWeightKg <= 0) {
+            return response()->json([
+                'error' => 'Huwezi kumpa mkopo mkulima kwa batch iliyoezwa au isiyo na mzigo ghalani!'
+            ], 422);
+        }
+
+        // 2. RULE: Loan cannot exceed 50% of the collateral crop value (Nusu ya thamani ya mzigo ghalani)
+        // Baseline price per Kg = TZS 1,000 (Max Loan per Kg = TZS 500)
+        $estimatedCropValue = $batchWeightKg * 1000;
+        $maxLoanAllowed = $estimatedCropValue * 0.50; // 50% limit
+
+        if ($validated['principal_amount'] > $maxLoanAllowed) {
+            return response()->json([
+                'error' => 'Kiasi cha mkopo unachoomba (Tsh ' . number_format($validated['principal_amount']) . ') kinazidi kikomo cha 50% ya thamani ya mzigo ghalani! Kikomo cha juu kwa batch hii ni Tsh ' . number_format($maxLoanAllowed) . ' (kulingana na Kg ' . number_format($batchWeightKg) . ' zilizopo ghalani).'
+            ], 422);
         }
 
         $tenantId = \App\Models\Tenant::first()->id;
@@ -72,21 +93,33 @@ class LoanController extends Controller
         }
         $loanCode = 'LN-' . $nextNumber;
 
-        $loan = Loan::create([
-            'tenant_id' => $tenantId,
-            'farmer_id' => $validated['farmer_id'],
-            'collateral_batch_id' => $validated['collateral_batch_id'],
-            'loan_code' => $loanCode,
-            'principal_amount' => $validated['principal_amount'],
-            'interest_rate_annual' => 0.00, // default rate (no interest)
-            'current_balance' => $validated['principal_amount'],
-            'due_date' => $validated['due_date'] ?? now()->format('Y-m-d'),
-            'status' => 'pending_approval',
-        ]);
+        $loan = DB::transaction(function () use ($tenantId, $validated, $loanCode) {
+            $l = Loan::create([
+                'tenant_id' => $tenantId,
+                'farmer_id' => $validated['farmer_id'],
+                'collateral_batch_id' => $validated['collateral_batch_id'],
+                'loan_code' => $loanCode,
+                'principal_amount' => $validated['principal_amount'],
+                'interest_rate_annual' => 0.00, // Strictly 0.00%
+                'current_balance' => $validated['principal_amount'],
+                'due_date' => $validated['due_date'] ?? now()->format('Y-m-d'),
+                'status' => 'active',
+                'disbursed_at' => now(),
+            ]);
+
+            LoanTransaction::create([
+                'loan_id' => $l->id,
+                'transaction_type' => 'disbursement',
+                'amount' => $l->principal_amount,
+                'reference_number' => 'DISB-' . rand(1000, 9999),
+            ]);
+
+            return $l;
+        });
 
         return response()->json([
             'success' => true,
-            'message' => 'Loan application submitted successfully',
+            'message' => 'Mkopo umesajiliwa na kutolewa kikamilifu bila riba (0% Interest)',
             'loan' => $loan
         ], 201);
     }

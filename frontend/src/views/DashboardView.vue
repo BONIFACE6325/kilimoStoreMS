@@ -1,310 +1,521 @@
 <template>
-  <div class="space-y-6 pb-12">
+  <div class="space-y-5 pb-12">
     
-    <!-- Top Header Bar with Actions -->
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs">
+    <!-- Top Header Bar for Professional Financial Governance Center -->
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-2xs">
       <div>
-        <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-          Habari za asubuhi, James 👋
+        <h1 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+          Financial Control Center 📊
         </h1>
-        <p class="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
-          Hivi ndivyo vinavyoendelea kwenye ghala lako leo — {{ todayFormatted }}
+        <p class="text-xs text-slate-500 font-medium mt-0.5">
+          Financial Overview — <strong class="text-slate-800 font-mono">{{ todayFormatted }}</strong>
         </p>
       </div>
-      <div class="flex items-center gap-2.5 w-full sm:w-auto">
-        <button class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm rounded-xl border border-slate-200 transition flex items-center justify-center gap-2 w-1/2 sm:w-auto">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          <span>Pakua Data</span>
+
+      <!-- 📅 SUBTLE & ELEGANT QUICK DATE FILTERS -->
+      <div class="flex flex-wrap items-center gap-1.5 bg-slate-50 p-1.5 rounded-xl border border-slate-200/80 w-full md:w-auto">
+        <button 
+          v-for="opt in filterOptions" 
+          :key="opt.id"
+          @click="selectFilter(opt.id)"
+          :class="[
+            'px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all cursor-pointer',
+            activeFilter === opt.id 
+              ? 'bg-slate-900 text-white shadow-xs' 
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+          ]"
+        >
+          {{ opt.label }}
         </button>
-        <button class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-emerald-600/20 transition flex items-center justify-center gap-2 w-1/2 sm:w-auto">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          <span>Muamala Mpya</span>
-        </button>
+
+        <!-- Custom Date Range Pickers (Visible when 'custom' is selected) -->
+        <div v-if="activeFilter === 'custom'" class="flex items-center gap-1.5 pl-2 border-l border-slate-200">
+          <input 
+            type="date" 
+            v-model="customStartDate"
+            @change="applyCustomDateFilter"
+            class="px-2 py-1 text-[11px] bg-white border border-slate-300 rounded-md font-mono text-slate-800 focus:outline-emerald-600"
+          />
+          <span class="text-slate-400 text-xs">-</span>
+          <input 
+            type="date" 
+            v-model="customEndDate"
+            @change="applyCustomDateFilter"
+            class="px-2 py-1 text-[11px] bg-white border border-slate-300 rounded-md font-mono text-slate-800 focus:outline-emerald-600"
+          />
+        </div>
       </div>
     </div>
 
-    <!-- 1. Top KPI Cards Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- 🌟 THE 6 EXECUTIVE FINANCIAL CARDS (ALL IN A SINGLE ALIGNED ROW) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3">
       
-      <!-- Card 1: Wakulima -->
-      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs hover:border-emerald-500/30 transition">
+      <!-- CARD 1: GROSS OFFICE REVENUE -->
+      <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-2xs hover:border-emerald-500/50 transition-all space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Wakulima Waliosajiliwa</span>
-          <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-base">👨‍🌾</div>
+          <span class="text-[9.5px] font-black text-slate-400 uppercase tracking-wider">1. Gross Revenue</span>
+          <div class="w-6.5 h-6.5 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs shadow-2xs">💰</div>
         </div>
-        <div class="text-2xl font-black text-slate-900 mt-2.5">{{ (kpis.farmers || 2418).toLocaleString() }}</div>
-        <div class="text-[11px] text-emerald-600 font-bold mt-1">Akaunti hai ghalani</div>
+        <div class="text-lg font-black text-slate-900 font-mono">
+          Tsh {{ (finances.grossAllInflows || 0).toLocaleString() }}
+        </div>
+        <div class="text-[9px] text-slate-500 font-semibold pt-1 border-t border-slate-100 flex items-center justify-between">
+          <span>Fees + Logistics + Loans</span>
+          <span class="font-mono text-[8px] bg-slate-100 text-slate-600 px-1 rounded font-extrabold uppercase">GROSS</span>
+        </div>
       </div>
 
-      <!-- Card 2: Shehena Ghalani -->
-      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs hover:border-emerald-500/30 transition">
+      <!-- CARD 2: OPERATING EXPENSES / COSTS -->
+      <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-2xs hover:border-red-400 transition-all space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Shehena Ghalani</span>
-          <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-base">📦</div>
+          <span class="text-[9.5px] font-black text-slate-400 uppercase tracking-wider">2. Operating Costs</span>
+          <div class="w-6.5 h-6.5 rounded-xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs shadow-2xs">🧾</div>
         </div>
-        <div class="text-2xl font-black text-slate-900 mt-2.5">{{ ((kpis.stock || 184.5) * 1000).toLocaleString() }} Kg</div>
-        <div class="text-[11px] text-blue-600 font-bold mt-1">Nafaka iliyo ghalani</div>
+        <div class="text-lg font-black text-red-600 font-mono">
+          Tsh {{ (finances.totalExpenses || 0).toLocaleString() }}
+        </div>
+        <div class="text-[9px] text-red-600 font-bold pt-1 border-t border-slate-100 flex items-center justify-between">
+          <span>Office & Machine Costs</span>
+          <span class="text-[8px] bg-red-50 text-red-700 px-1 rounded font-extrabold uppercase border border-red-200">EXPENSES</span>
+        </div>
       </div>
 
-      <!-- Card 3: Mikopo Isiyolipwa -->
-      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs hover:border-amber-500/30 transition">
+      <!-- CARD 3: TOTAL LOANS DISBURSED -->
+      <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-2xs hover:border-amber-500/50 transition-all space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Mikopo Isiyolipwa</span>
-          <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-base">💳</div>
+          <span class="text-[9.5px] font-black text-slate-400 uppercase tracking-wider">3. Loans Disbursed</span>
+          <div class="w-6.5 h-6.5 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-xs shadow-2xs">📤</div>
         </div>
-        <div class="text-2xl font-black text-amber-600 mt-2.5">Tsh {{ (kpis.loans || 3700000).toLocaleString() }}</div>
-        <div class="text-[11px] text-amber-600 font-bold mt-1">Riba + Mtaji unaodaiwa</div>
+        <div class="text-lg font-black text-amber-700 font-mono">
+          Tsh {{ (finances.totalLoansDisbursed || 0).toLocaleString() }}
+        </div>
+        <div class="text-[9px] text-slate-500 font-semibold pt-1 border-t border-slate-100 flex items-center justify-between">
+          <span>Lifetime Principal</span>
+          <span class="text-[8px] bg-amber-50 text-amber-800 px-1 rounded font-extrabold uppercase border border-amber-200">DISBURSED</span>
+        </div>
       </div>
 
-      <!-- Card 4: Mapato ya Huduma -->
-      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs hover:border-emerald-500/30 transition">
+      <!-- CARD 4: LOAN PRINCIPAL RECOVERED -->
+      <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-2xs hover:border-emerald-500/50 transition-all space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Mapato ya Huduma</span>
-          <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-base">💰</div>
+          <span class="text-[9.5px] font-black text-slate-400 uppercase tracking-wider">4. Principal Recovered</span>
+          <div class="w-6.5 h-6.5 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs shadow-2xs">📥</div>
         </div>
-        <div class="text-2xl font-black text-emerald-600 mt-2.5">Tsh {{ (kpis.revenue || 12450000).toLocaleString() }}</div>
-        <div class="text-[11px] text-emerald-600 font-bold mt-1">Ada zote za usindikaji</div>
+        <div class="text-lg font-black text-emerald-700 font-mono">
+          Tsh {{ (finances.totalLoansRecovered || 0).toLocaleString() }}
+        </div>
+        <div class="text-[9px] text-emerald-700 font-bold pt-1 border-t border-slate-100 flex items-center justify-between">
+          <span>Recovered via Sales</span>
+          <span class="text-[8px] bg-emerald-50 text-emerald-800 px-1 rounded font-extrabold uppercase border border-emerald-200">RECOVERED</span>
+        </div>
+      </div>
+
+      <!-- CARD 5: OUTSTANDING LOAN DEBT -->
+      <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-2xs hover:border-orange-400 transition-all space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span class="text-[9.5px] font-black text-slate-400 uppercase tracking-wider">5. Outstanding Debt</span>
+          <div class="w-6.5 h-6.5 rounded-xl bg-orange-50 text-orange-700 flex items-center justify-center font-bold text-xs shadow-2xs">💳</div>
+        </div>
+        <div class="text-lg font-black text-orange-700 font-mono">
+          Tsh {{ (finances.loanPortfolio || 0).toLocaleString() }}
+        </div>
+        <div class="text-[9px] text-orange-800 font-bold pt-1 border-t border-slate-100 flex items-center justify-between">
+          <span>Uncollected Debt</span>
+          <span v-if="finances.overdueLoansCount > 0" class="text-[8px] bg-red-100 text-red-700 font-extrabold px-1 rounded">
+            {{ finances.overdueLoansCount }} Overdue
+          </span>
+          <span v-else class="text-[8px] bg-orange-50 text-orange-800 font-extrabold px-1 rounded border border-orange-200">
+            0% Interest
+          </span>
+        </div>
+      </div>
+
+      <!-- CARD 6: NET OPERATING PROFIT -->
+      <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-2xs hover:border-teal-500/50 transition-all space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span class="text-[9.5px] font-black text-slate-400 uppercase tracking-wider">6. Net Profit</span>
+          <div class="w-6.5 h-6.5 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center font-bold text-xs shadow-2xs">📈</div>
+        </div>
+        <div class="text-lg font-black text-teal-700 font-mono">
+          Tsh {{ (finances.netProfit || 0).toLocaleString() }}
+        </div>
+        <div class="text-[9px] text-slate-500 font-semibold pt-1 border-t border-slate-100 flex items-center justify-between">
+          <span>Revenues - Expenses</span>
+          <span class="text-[8px] bg-teal-50 text-teal-800 font-black px-1 rounded uppercase border border-teal-200">NET PROFIT</span>
+        </div>
       </div>
 
     </div>
 
-    <!-- 2. Charts Row 1: Directly Below KPI Cards (Revenue Line & Grain Donut) -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- 2. Financial Trends Chart & Service Revenue Breakdown -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
       
-      <!-- Revenue Trend Chart (2 cols) -->
-      <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs">
-        <div class="flex items-center justify-between mb-5">
+      <!-- Financial Cashflow & Revenue Line Chart (2 cols) -->
+      <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-3">
+        <div class="flex items-center justify-between">
           <div>
-            <h2 class="text-base font-extrabold text-slate-900">Mwenendo wa Mapato</h2>
-            <p class="text-xs text-slate-500 font-medium">TZS — Miezi 6 iliyopita (Mapato ya Huduma)</p>
+            <h2 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+              <span>📈 Financial Performance Trend (Revenues vs Operating Expenses)</span>
+            </h2>
+            <p class="text-[11px] text-slate-500 font-medium">Monthly performance comparison over the last 6 months.</p>
           </div>
+          <div class="flex items-center gap-3 text-xs font-extrabold">
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span><span class="text-slate-600">Revenue</span></div>
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span><span class="text-slate-600">Expenses</span></div>
+          </div>
+        </div>
+        <div class="h-60 relative w-full">
+          <Line :data="financialTrendData" :options="financialTrendOptions" />
+        </div>
+      </div>
+
+      <!-- Service Revenue Sources Donut Chart (1 col) -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between space-y-3">
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <h2 class="text-sm font-extrabold text-slate-900">🍩 Grain Service Revenues</h2>
+            <span class="text-[10px] font-bold text-slate-400">Total Collected</span>
+          </div>
+          <div class="h-44 flex items-center justify-center relative my-1">
+            <Doughnut :data="revenueSourcesData" :options="revenueSourcesOptions" />
+          </div>
+        </div>
+
+        <div class="space-y-1.5 pt-2.5 border-t border-slate-100 text-xs font-semibold">
+          <div v-if="Object.keys(finances.serviceBreakdown).length === 0" class="text-slate-400 italic text-[11px] py-2 text-center">
+            No service revenues recorded.
+          </div>
+          <div 
+            v-for="(amount, serviceName, idx) in finances.serviceBreakdown" 
+            :key="serviceName"
+            class="flex justify-between items-center text-xs font-bold"
+          >
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full shrink-0" :style="{ backgroundColor: getServiceColor(idx) }"></span>
+              <span class="text-slate-800 font-bold text-[11.5px]">{{ serviceName }}:</span>
+            </div>
+            <span class="font-mono font-black text-slate-900">Tsh {{ parseFloat(amount || 0).toLocaleString() }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 3. OTHER OPERATIONAL INCOMES & EXPENSES & LOANS RECONCILIATION -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      
+      <!-- OTHER OPERATIONAL INCOMES CARD -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+          <div>
+            <h2 class="text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+              <span>🚚 Other Operational Incomes</span>
+            </h2>
+            <p class="text-[11px] text-slate-500 font-medium">Logistics, Trucking, Rentals & Misc Revenue</p>
+          </div>
+          <span class="text-xs font-black text-emerald-700 font-mono">Tsh {{ (finances.totalOtherIncome || 0).toLocaleString() }}</span>
+        </div>
+
+        <div class="space-y-2">
+          <div v-if="Object.keys(finances.otherIncomeBreakdown).length === 0" class="text-slate-400 italic text-xs py-3 text-center">
+            No other operational incomes recorded.
+          </div>
+          <div 
+            v-for="(amount, srcName) in finances.otherIncomeBreakdown" 
+            :key="srcName"
+            class="p-2.5 bg-emerald-50/50 rounded-xl border border-emerald-200/60 flex items-center justify-between text-xs"
+          >
+            <div class="flex items-center gap-2">
+              <span class="text-emerald-600 font-black">•</span>
+              <span class="font-bold text-slate-800 uppercase text-[11px]">{{ srcName }}</span>
+            </div>
+            <span class="font-mono font-black text-emerald-800">Tsh {{ parseFloat(amount || 0).toLocaleString() }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expenses Breakdown Table -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+          <div>
+            <h2 class="text-sm font-extrabold text-slate-900">🧾 Operating Expenses</h2>
+            <p class="text-[11px] text-slate-500 font-medium">Categorized Operational Costs</p>
+          </div>
+          <span class="text-xs font-black text-red-600 font-mono">Tsh {{ (finances.totalExpenses || 0).toLocaleString() }}</span>
+        </div>
+
+        <div class="space-y-2">
+          <div v-if="Object.keys(finances.expensesBreakdown).length === 0" class="text-slate-400 italic text-xs py-3 text-center">
+            No operational expenses recorded.
+          </div>
+          <div 
+            v-for="(amount, catName) in finances.expensesBreakdown" 
+            :key="catName"
+            class="p-2.5 bg-slate-50/80 rounded-xl border border-slate-200/70 flex items-center justify-between text-xs"
+          >
+            <div class="flex items-center gap-2">
+              <span class="text-red-500 font-black">•</span>
+              <span class="font-bold text-slate-800">{{ catName }}</span>
+            </div>
+            <span class="font-mono font-black text-red-600">Tsh {{ parseFloat(amount || 0).toLocaleString() }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loan Portfolio & Reconciliation Audit -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-3 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2.5 mb-3">
+            <div>
+              <h2 class="text-sm font-extrabold text-slate-900">⚖️ Loan Portfolio Reconciliation</h2>
+              <p class="text-[11px] text-slate-500 font-medium">Disbursed - Recovered = Outstanding</p>
+            </div>
+            <span class="px-2 py-0.5 rounded-lg text-[9.5px] font-black bg-slate-100 text-slate-700 border border-slate-200">
+              AUDITED
+            </span>
+          </div>
+
+          <div class="space-y-2 text-xs font-semibold text-slate-700">
+            <div class="flex justify-between items-center p-2 bg-slate-50 rounded-xl border border-slate-200">
+              <span>(+) Total Principal Disbursed:</span>
+              <span class="font-mono font-bold text-amber-900">+ Tsh {{ (finances.totalLoansDisbursed || 0).toLocaleString() }}</span>
+            </div>
+            <div class="flex justify-between items-center p-2 bg-emerald-50/50 rounded-xl border border-emerald-200 text-emerald-900">
+              <span>(-) Principal Recovered:</span>
+              <span class="font-mono font-bold">- Tsh {{ (finances.totalLoansRecovered || 0).toLocaleString() }}</span>
+            </div>
+            <div class="flex justify-between items-center p-2 bg-orange-50/60 rounded-xl border border-orange-200 text-orange-950 font-black">
+              <span>(=) Outstanding Balance:</span>
+              <span class="font-mono font-black text-orange-900 text-xs">= Tsh {{ (finances.loanPortfolio || 0).toLocaleString() }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-[10.5px] text-slate-700 space-y-0.5">
+          <div class="font-black flex items-center gap-1.5 text-slate-900">
+            <span>🔒 Financial Governance Policy:</span>
+          </div>
+          <p class="text-slate-600">
+            All farmer loans are 0% Interest, capped at 50% of collateral crop value stored in warehouse.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Executive Business Analytics & Strategic Insights Panel (Matching White Card Theme) -->
+    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-4">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-3.5">
+        <div>
           <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-            <span class="text-xs font-extrabold text-slate-600">Ada za Usindikaji</span>
+            <span class="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+              Live Database Intelligence
+            </span>
+            <h2 class="text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+              🧠 Executive Analytics & Top Performance Drivers
+            </h2>
           </div>
+          <p class="text-[11px] text-slate-500 font-medium mt-0.5">Top 3 revenue generators, primary expense cost centers & strategic advisory</p>
         </div>
-        <div class="h-64">
-          <Line :data="revenueChartData" :options="revenueChartOptions" />
-        </div>
-      </div>
-
-      <!-- Grain Distribution Donut Chart (1 col) -->
-      <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between">
-        <div>
-          <div class="flex items-center justify-between mb-3">
-            <h2 class="text-base font-extrabold text-slate-900">Mchanganuo wa Mazao</h2>
-            <span class="text-xs font-bold text-slate-400">Kwa aina (Kg)</span>
-          </div>
-          <div class="h-48 flex items-center justify-center relative my-2">
-            <Doughnut :data="grainChartData" :options="grainChartOptions" />
-          </div>
-        </div>
-        <div class="grid grid-cols-3 gap-2 text-center pt-3 border-t border-slate-100 text-xs">
-          <div>
-            <div class="font-extrabold text-emerald-600">Mpunga</div>
-            <div class="font-black text-slate-900 mt-0.5">45%</div>
-          </div>
-          <div>
-            <div class="font-extrabold text-amber-500">Mahindi</div>
-            <div class="font-black text-slate-900 mt-0.5">35%</div>
-          </div>
-          <div>
-            <div class="font-extrabold text-indigo-500">Maharage</div>
-            <div class="font-black text-slate-900 mt-0.5">20%</div>
-          </div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono font-black bg-emerald-50 text-emerald-800 px-3 py-1.5 rounded-xl border border-emerald-200">
+            Net Profit: Tsh {{ (finances.netProfit || 0).toLocaleString() }}
+          </span>
         </div>
       </div>
 
-    </div>
+      <!-- Top 3 Performance Tables / Mini Grid (3 Columns) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-    <!-- 3. Charts Row 2: Stock Intake vs Dispatch Bar Chart & Storage Bins Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      
-      <!-- Intake vs Dispatch Bar Chart -->
-      <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs">
-        <div class="flex items-center justify-between mb-5">
-          <div>
-            <h2 class="text-base font-extrabold text-slate-900">Mwenendo wa Mzigo Ghalani</h2>
-            <p class="text-xs text-slate-500 font-medium">Intake vs Dispatch — miezi 6 iliyopita (Kg)</p>
+        <!-- Column 1: Top 3 Core Services (Kinara cha Mapato) -->
+        <div class="bg-slate-50/70 p-3.5 rounded-xl border border-slate-200/80 space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-200/60 pb-2">
+            <h3 class="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
+              <span>🌾 Top 3 Core Services</span>
+            </h3>
+            <span class="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-100/70 px-1.5 py-0.5 rounded">
+              Tsh {{ (finances.totalRevenue || 0).toLocaleString() }}
+            </span>
           </div>
-          <div class="flex items-center gap-4 text-xs font-bold">
-            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span><span class="text-slate-600">Intake</span></div>
-            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span><span class="text-slate-600">Dispatch</span></div>
-          </div>
-        </div>
-        <div class="h-60">
-          <Bar :data="stockChartData" :options="stockChartOptions" />
-        </div>
-      </div>
 
-      <!-- Storage Bins Utilization Grid -->
-      <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h2 class="text-base font-extrabold text-slate-900">Hali ya Bins za Ghala</h2>
-            <p class="text-xs text-slate-500 font-medium">Ujazaji wa kila bin — sasa hivi</p>
-          </div>
-          <span class="text-xs font-extrabold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">6 Bins Active</span>
-        </div>
-
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <div v-for="b in bins" :key="b.name" class="p-3.5 rounded-xl border border-slate-200/70 bg-slate-50/70">
-            <div class="flex items-center justify-between text-xs font-bold text-slate-700">
-              <span>{{ b.name }}</span>
-              <span class="font-mono text-[11px] text-slate-500">{{ b.crop }}</span>
-            </div>
-            <div class="text-base font-black text-slate-900 mt-2">{{ b.weight }} Kg</div>
-            <div class="mt-2.5">
-              <div class="flex justify-between text-[10px] font-extrabold text-slate-500 mb-1">
-                <span>Ujazo</span>
-                <span class="text-emerald-700 font-black">{{ b.pct }}%</span>
+          <div class="space-y-2">
+            <div v-for="(item, idx) in top3Services" :key="idx" class="p-2.5 bg-white rounded-lg border border-slate-200/70 shadow-2xs space-y-1">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold text-slate-800 flex items-center gap-1">
+                  <span>{{ item.rank }}</span>
+                  <span class="capitalize truncate max-w-[120px]">{{ item.name }}</span>
+                </span>
+                <span class="font-mono font-extrabold text-emerald-700">+ Tsh {{ item.amount.toLocaleString() }}</span>
               </div>
-              <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                <div class="h-full bg-emerald-500 rounded-full" :style="{ width: b.pct + '%' }"></div>
+              <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden flex">
+                <div class="bg-emerald-500 h-full rounded-full transition-all" :style="{ width: item.pct + '%' }"></div>
+              </div>
+              <div class="flex justify-between text-[9.5px] text-slate-400 font-medium">
+                <span>Rank #{{ idx + 1 }}</span>
+                <span>{{ item.pct }}% of revenue</span>
               </div>
             </div>
+            <div v-if="top3Services.length === 0" class="text-xs text-slate-400 py-3 text-center">No core services recorded</div>
           </div>
         </div>
+
+        <!-- Column 2: Top 3 Cost Centers -->
+        <div class="bg-slate-50/70 p-3.5 rounded-xl border border-slate-200/80 space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-200/60 pb-2">
+            <h3 class="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
+              <span>🔥 Top 3 Expense Costs</span>
+            </h3>
+            <span class="text-[10px] font-mono font-bold text-red-700 bg-red-100/70 px-1.5 py-0.5 rounded">
+              Tsh {{ (finances.totalExpenses || 0).toLocaleString() }}
+            </span>
+          </div>
+
+          <div class="space-y-2">
+            <div v-for="(item, idx) in top3Expenses" :key="idx" class="p-2.5 bg-white rounded-lg border border-slate-200/70 shadow-2xs space-y-1">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold text-slate-800 flex items-center gap-1">
+                  <span>{{ item.rank }}</span>
+                  <span class="capitalize truncate max-w-[120px]">{{ item.name }}</span>
+                </span>
+                <span class="font-mono font-extrabold text-red-700">- Tsh {{ item.amount.toLocaleString() }}</span>
+              </div>
+              <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden flex">
+                <div class="bg-red-500 h-full rounded-full transition-all" :style="{ width: item.pct + '%' }"></div>
+              </div>
+              <div class="flex justify-between text-[9.5px] text-slate-400 font-medium">
+                <span>Cost Center #{{ idx + 1 }}</span>
+                <span>{{ item.pct }}% of expenses</span>
+              </div>
+            </div>
+            <div v-if="top3Expenses.length === 0" class="text-xs text-slate-400 py-3 text-center">No expenses recorded</div>
+          </div>
+        </div>
+
+        <!-- Column 3: Top 3 Other Incomes -->
+        <div class="bg-slate-50/70 p-3.5 rounded-xl border border-slate-200/80 space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-200/60 pb-2">
+            <h3 class="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
+              <span>🚛 Top Other Incomes</span>
+            </h3>
+            <span class="text-[10px] font-mono font-bold text-blue-700 bg-blue-100/70 px-1.5 py-0.5 rounded">
+              Tsh {{ (finances.totalOtherIncome || 0).toLocaleString() }}
+            </span>
+          </div>
+
+          <div class="space-y-2">
+            <div v-for="(item, idx) in top3OtherIncomes" :key="idx" class="p-2.5 bg-white rounded-lg border border-slate-200/70 shadow-2xs space-y-1">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold text-slate-800 flex items-center gap-1">
+                  <span>{{ item.rank }}</span>
+                  <span class="capitalize truncate max-w-[120px]">{{ item.name }}</span>
+                </span>
+                <span class="font-mono font-extrabold text-blue-700">+ Tsh {{ item.amount.toLocaleString() }}</span>
+              </div>
+              <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden flex">
+                <div class="bg-blue-500 h-full rounded-full transition-all" :style="{ width: item.pct + '%' }"></div>
+              </div>
+              <div class="flex justify-between text-[9.5px] text-slate-400 font-medium">
+                <span>Inflow #{{ idx + 1 }}</span>
+                <span>{{ item.pct }}% of other income</span>
+              </div>
+            </div>
+            <div v-if="top3OtherIncomes.length === 0" class="text-xs text-slate-400 py-3 text-center">No other incomes recorded</div>
+          </div>
+        </div>
+
       </div>
 
+      <!-- Actionable Executive Advisory Bullet Points (Matching White Card Theme) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+        <div class="bg-amber-50/60 p-3 rounded-xl border border-amber-200/80 space-y-1 text-xs text-amber-900">
+          <div class="flex items-center gap-1.5 font-extrabold text-amber-950">
+            <span>⛽ Cost Control Advisory:</span>
+          </div>
+          <p class="leading-relaxed text-[11.5px] font-medium text-amber-900/90">
+            Operational costs are dominated by <strong class="font-black text-amber-950">{{ topExpense.name }}</strong> (Tsh {{ topExpense.amount.toLocaleString() }}). Enforce fuel logbook tracking for trucks & machines to optimize mileage.
+          </p>
+        </div>
+
+        <div class="bg-emerald-50/60 p-3 rounded-xl border border-emerald-200/80 space-y-1 text-xs text-emerald-900">
+          <div class="flex items-center gap-1.5 font-extrabold text-emerald-950">
+            <span>🌾 Service Revenue Strategy:</span>
+          </div>
+          <p class="leading-relaxed text-[11.5px] font-medium text-emerald-900/90">
+            <strong class="font-black text-emerald-950">{{ topService.name }}</strong> generates the highest core revenue (Tsh {{ topService.amount.toLocaleString() }}). Keep equipment well-serviced to eliminate downtime during intake.
+          </p>
+        </div>
+      </div>
     </div>
 
-    <!-- 4. GODOWN & MACHINERY PERFORMANCE ANALYTICS -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      
-      <!-- Godown Space Utilization Card -->
-      <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between">
+    <!-- 4. Live Recent Financial Transactions Ledger Table -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <div>
-          <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-            <div>
-              <h2 class="text-base font-extrabold text-slate-900">Uchambuzi wa Godown (Warehouse Space)</h2>
-              <p class="text-xs text-slate-500 font-medium">Kiwango cha Ujazaji na Hali ya Bins</p>
-            </div>
-            <span class="px-2.5 py-1 rounded-lg text-xs font-extrabold bg-slate-100 text-slate-700">Bay 01 - 06</span>
-          </div>
-
-          <div class="grid grid-cols-3 gap-3 p-4 bg-slate-50 rounded-xl mb-4 text-center">
-            <div>
-              <div class="text-[11px] font-bold text-slate-400 uppercase">Ujazo wa Jumla</div>
-              <div class="text-sm sm:text-base font-black text-slate-900 mt-1">500,000 Kg</div>
-            </div>
-            <div>
-              <div class="text-[11px] font-bold text-slate-400 uppercase">Mzigo Uliopo</div>
-              <div class="text-sm sm:text-base font-black text-emerald-600 mt-1">{{ ((kpis.stock || 184.5) * 1000).toLocaleString() }} Kg</div>
-            </div>
-            <div>
-              <div class="text-[11px] font-bold text-slate-400 uppercase">Nafasi Wazi</div>
-              <div class="text-sm sm:text-base font-black text-slate-600 mt-1">{{ (500000 - (kpis.stock || 184.5) * 1000).toLocaleString() }} Kg</div>
-            </div>
-          </div>
+          <h2 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+            📑 Financial Ledger & Audit Trail
+          </h2>
+          <p class="text-[11px] text-slate-500 font-medium mt-0.5">Real-time ledger of settlements, deductions, and operating expenses</p>
         </div>
-
-        <div>
-          <div class="flex justify-between items-center text-xs font-extrabold mb-2">
-            <span class="text-slate-600">Asilimia ya Ujazaji (Occupancy Rate)</span>
-            <span class="text-emerald-600 font-black text-sm">36.9%</span>
-          </div>
-          <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200">
-            <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500" style="width: 36.9%"></div>
-          </div>
-        </div>
+        <router-link to="/cashbook" class="inline-flex items-center gap-1 text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/80 px-3 py-1.5 rounded-xl transition border border-slate-200">
+          <span>Full Cashbook</span>
+          <span>→</span>
+        </router-link>
       </div>
 
-      <!-- Machinery & Services Activity Card -->
-      <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between">
-        <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-          <div>
-            <h2 class="text-base font-extrabold text-slate-900">Uchambuzi wa Mashine na Huduma</h2>
-            <p class="text-xs text-slate-500 font-medium">Kiasi cha Kazi na Volume iliyochakatwa</p>
-          </div>
-          <span class="px-2.5 py-1 rounded-lg text-xs font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">Moja kwa moja</span>
-        </div>
-
-        <div class="grid grid-cols-3 gap-3">
-          
-          <!-- Machine Drying -->
-          <div class="bg-amber-50/60 border border-amber-200/60 p-3.5 rounded-xl text-center flex flex-col justify-between">
-            <div>
-              <div class="text-xl mb-1">☀️</div>
-              <div class="text-[10px] font-black text-amber-800 uppercase tracking-wider">Kukausha</div>
-              <div class="text-sm font-black text-slate-900 mt-1">14 Kazi</div>
-            </div>
-            <div class="mt-2 pt-2 border-t border-amber-200/50">
-              <div class="text-xs font-black text-amber-700">42,500 Kg</div>
-              <div class="text-[9.5px] font-bold text-slate-500 mt-0.5">3 Active / 11 Done</div>
-            </div>
-          </div>
-
-          <!-- Machine Milling -->
-          <div class="bg-indigo-50/60 border border-indigo-200/60 p-3.5 rounded-xl text-center flex flex-col justify-between">
-            <div>
-              <div class="text-xl mb-1">⚙️</div>
-              <div class="text-[10px] font-black text-indigo-800 uppercase tracking-wider">Kukoboa</div>
-              <div class="text-sm font-black text-slate-900 mt-1">28 Kazi</div>
-            </div>
-            <div class="mt-2 pt-2 border-t border-indigo-200/50">
-              <div class="text-xs font-black text-indigo-700">89,200 Kg</div>
-              <div class="text-[9.5px] font-bold text-slate-500 mt-0.5">5 Active / 23 Done</div>
-            </div>
-          </div>
-
-          <!-- Machine Grading -->
-          <div class="bg-teal-50/60 border border-teal-200/60 p-3.5 rounded-xl text-center flex flex-col justify-between">
-            <div>
-              <div class="text-xl mb-1">📊</div>
-              <div class="text-[10px] font-black text-teal-800 uppercase tracking-wider">Kugredi</div>
-              <div class="text-sm font-black text-slate-900 mt-1">19 Kazi</div>
-            </div>
-            <div class="mt-2 pt-2 border-t border-teal-200/50">
-              <div class="text-xs font-black text-teal-700">54,000 Kg</div>
-              <div class="text-[9.5px] font-bold text-slate-500 mt-0.5">Grading Machine</div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-
-    <!-- 5. Recent Transactions Table -->
-    <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs">
-      <div class="flex items-center justify-between mb-4">
-        <div>
-          <h2 class="text-base font-extrabold text-slate-900">Miamala ya Hivi Karibuni</h2>
-          <p class="text-xs text-slate-500 font-medium">Moja kwa moja — shughuli za hivi karibuni ghalani</p>
-        </div>
-        <router-link to="/farmers" class="text-xs font-bold text-emerald-600 hover:text-emerald-700">Tazama Wakulima Wote →</router-link>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs sm:text-sm">
-          <thead class="bg-slate-50 text-slate-500 font-extrabold border-b uppercase text-[10px] tracking-wider">
-            <tr>
-              <th class="py-3 px-4">Tarehe</th>
-              <th class="py-3 px-4">Mkulima</th>
-              <th class="py-3 px-4">Aina ya Shughuli</th>
-              <th class="py-3 px-4">Zao / Batch</th>
-              <th class="py-3 px-4">Uzito (Kg)</th>
-              <th class="py-3 px-4">Kiasi (TZS)</th>
+      <div class="overflow-x-auto rounded-xl border border-slate-200/60">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="bg-slate-50/80 text-slate-600 font-bold border-b border-slate-200/70 uppercase text-[10px] tracking-wider">
+              <th class="py-3 px-4">Date</th>
+              <th class="py-3 px-4">Transaction Type</th>
+              <th class="py-3 px-4">Description</th>
+              <th class="py-3 px-4 text-right">Amount (TZS)</th>
+              <th class="py-3 px-4 text-center">Payment Method</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-100 font-medium">
-            <tr v-for="t in transactions" :key="t.id" class="hover:bg-slate-50 transition">
-              <td class="py-3 px-4 text-slate-500 font-mono">{{ t.date }}</td>
-              <td class="py-3 px-4 font-bold text-slate-900">{{ t.farmer }}</td>
-              <td class="py-3 px-4">
-                <span :class="t.typeClass" class="px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase border">
+          <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+            <tr v-if="recentTransactions.length === 0" class="text-center text-slate-400">
+              <td colspan="5" class="py-8 text-xs font-normal">No recent transactions recorded.</td>
+            </tr>
+            <tr v-for="t in recentTransactions" :key="t.id" class="hover:bg-slate-50/80 transition-colors">
+              <td class="py-3 px-4 text-slate-500 font-mono text-[11px] whitespace-nowrap">{{ t.date }}</td>
+              <td class="py-3 px-4 whitespace-nowrap">
+                <span :class="t.isExpense ? 'bg-slate-100 text-slate-700 border-slate-300' : 'bg-emerald-50 text-emerald-800 border-emerald-200'" class="px-2.5 py-0.5 rounded-md text-[9.5px] font-bold uppercase border">
                   {{ t.type }}
                 </span>
               </td>
-              <td class="py-3 px-4 text-slate-600">{{ t.crop }}</td>
-              <td class="py-3 px-4 font-bold text-slate-900">{{ t.weight }} Kg</td>
-              <td class="py-3 px-4 font-black text-emerald-600">Tsh {{ t.amount.toLocaleString() }}</td>
+              <td class="py-3 px-4 font-bold text-slate-900 max-w-[280px] truncate">{{ t.details }}</td>
+              <td class="py-3 px-4 text-right font-black font-mono whitespace-nowrap" :class="t.isExpense ? 'text-slate-800' : 'text-emerald-800'">
+                {{ t.isExpense ? '-' : '+' }} Tsh {{ t.amount.toLocaleString() }}
+              </td>
+              <td class="py-3 px-4 text-center font-mono text-slate-500 text-[10.5px] uppercase whitespace-nowrap">
+                <span class="px-2 py-0.5 bg-slate-100 rounded text-slate-600 font-semibold border border-slate-200/60">
+                  {{ t.method || 'CASH' }}
+                </span>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
+
+    <!-- 5. Executive Enterprise Footer (Clean, Sleek, Corporate Neutral) -->
+    <footer class="mt-8 pt-6 border-t border-slate-200/80 text-slate-500 text-xs flex flex-col md:flex-row items-center justify-between gap-4 pb-4">
+      <div class="flex items-center gap-2">
+        <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+        <span class="font-bold text-slate-700">GARANOKI ERP</span>
+        <span class="text-slate-300">|</span>
+        <span class="font-medium text-slate-500">Financial Governance & Analytics Dashboard</span>
+      </div>
+
+      <div class="flex items-center gap-4 text-[11px] font-medium text-slate-500">
+        <span class="font-mono">v2.4.0 (Enterprise Build)</span>
+        <span class="text-slate-300">•</span>
+        <span>Audit Trail Active</span>
+        <span class="text-slate-300">•</span>
+        <span>GARANOKI Management System</span>
+      </div>
+    </footer>
 
   </div>
 </template>
@@ -312,90 +523,377 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
-import { Line, Bar, Doughnut } from 'vue-chartjs';
+import { Line, Doughnut } from 'vue-chartjs';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend);
 
-const kpis = ref({
-  farmers: 2418,
-  stock: 184.5,
-  loans: 3700000,
-  revenue: 12450000
+const loading = ref(false);
+const activeFilter = ref('all_time');
+const customStartDate = ref('');
+const customEndDate = ref('');
+
+const filterOptions = [
+  { id: 'all_time', label: 'All Time' },
+  { id: 'today', label: 'Today' },
+  { id: 'this_week', label: 'This Week' },
+  { id: 'this_month', label: 'This Month' },
+  { id: 'last_3_months', label: '3 Months' },
+  { id: 'last_6_months', label: '6 Months' },
+  { id: 'this_year', label: 'This Year' },
+  { id: 'custom', label: 'Custom' }
+];
+
+const finances = ref({
+  grossAllInflows: 0,
+  totalLoansDisbursed: 0,
+  totalLoansRecovered: 0,
+  loanPortfolio: 0,
+  netProfit: 0,
+  totalExpenses: 0,
+  totalOtherIncome: 0,
+  activeLoansCount: 0,
+  overdueLoansCount: 0,
+  serviceBreakdown: {},
+  otherIncomeBreakdown: {},
+  expensesBreakdown: {}
 });
+
+const trendsData = ref({ months: [], revenue: [], expenses: [] });
+const recentTransactions = ref([]);
 
 const todayFormatted = computed(() => {
-  return new Date().toLocaleDateString('sw-TZ', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  return new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 });
 
-const revenueChartData = ref({
-  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-  datasets: [{
-    label: 'Mapato ya Huduma (TZS)',
-    data: [1800000, 2400000, 3100000, 2900000, 4200000, 5100000],
-    borderColor: '#10b981',
-    backgroundColor: 'rgba(16, 185, 129, 0.08)',
-    borderWidth: 3,
-    fill: true,
-    tension: 0.4
-  }]
-});
-
-const revenueChartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: { legend: { display: false } },
-  scales: {
-    y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
-    x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+const selectFilter = (filterId) => {
+  activeFilter.value = filterId;
+  if (filterId !== 'custom') {
+    fetchFinancialData();
   }
 };
 
-const grainChartData = ref({
-  labels: ['Mpunga', 'Mahindi', 'Maharage'],
-  datasets: [{
-    data: [45, 35, 20],
-    backgroundColor: ['#10b981', '#f59e0b', '#6366f1'],
-    borderWidth: 0
-  }]
+const applyCustomDateFilter = () => {
+  if (customStartDate.value && customEndDate.value) {
+    fetchFinancialData();
+  }
+};
+
+// Compute start_date and end_date strings based on activeFilter
+const getDateRangeParams = () => {
+  if (activeFilter.value === 'all_time') return '';
+
+  const now = new Date();
+  const formatIsoDate = (d) => d.toISOString().split('T')[0];
+  let start, end = formatIsoDate(now);
+
+  if (activeFilter.value === 'today') {
+    start = end;
+  } else if (activeFilter.value === 'this_week') {
+    const day = now.getDay();
+    const diff = now.getDate() - day + (day === 0 ? -6 : 1); // Monday
+    start = formatIsoDate(new Date(now.setDate(diff)));
+  } else if (activeFilter.value === 'this_month') {
+    start = formatIsoDate(new Date(now.getFullYear(), now.getMonth(), 1));
+  } else if (activeFilter.value === 'last_3_months') {
+    start = formatIsoDate(new Date(now.getFullYear(), now.getMonth() - 3, now.getDate()));
+  } else if (activeFilter.value === 'last_6_months') {
+    start = formatIsoDate(new Date(now.getFullYear(), now.getMonth() - 6, now.getDate()));
+  } else if (activeFilter.value === 'this_year') {
+    start = formatIsoDate(new Date(now.getFullYear(), 0, 1));
+  } else if (activeFilter.value === 'custom') {
+    if (customStartDate.value && customEndDate.value) {
+      return `?start_date=${customStartDate.value}&end_date=${customEndDate.value}`;
+    }
+    return '';
+  }
+
+  return start && end ? `?start_date=${start}&end_date=${end}` : '';
+};
+
+// Financial Trend Line Chart Config (Revenue vs Expenses)
+const financialTrendData = computed(() => ({
+  labels: trendsData.value.months.length > 0 ? trendsData.value.months : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+  datasets: [
+    {
+      label: 'Revenue (TZS)',
+      data: trendsData.value.revenue.length > 0 ? trendsData.value.revenue : [0, 0, 0, 0, 0, 0],
+      borderColor: '#059669',
+      backgroundColor: 'rgba(5, 150, 105, 0.06)',
+      borderWidth: 2.5,
+      fill: true,
+      tension: 0.4
+    },
+    {
+      label: 'Expenses (TZS)',
+      data: trendsData.value.expenses && trendsData.value.expenses.length > 0 ? trendsData.value.expenses : [0, 0, 0, 0, 0, 0],
+      borderColor: '#ef4444',
+      backgroundColor: 'rgba(239, 68, 68, 0.06)',
+      borderWidth: 2.5,
+      fill: true,
+      tension: 0.4
+    }
+  ]
+}));
+
+const financialTrendOptions = computed(() => {
+  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+  const textColor = isDark ? '#cbd5e1' : '#475569';
+  const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9';
+
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { 
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: isDark ? '#1e293b' : '#0f172a',
+        titleColor: '#ffffff',
+        bodyColor: '#cbd5e1'
+      }
+    },
+    scales: {
+      y: { 
+        grid: { color: gridColor }, 
+        ticks: { 
+          color: textColor,
+          font: { size: 10, weight: '600' },
+          callback: (value) => {
+            if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
+            if (value >= 1000) return (value / 1000).toFixed(0) + 'k';
+            return value;
+          }
+        } 
+      },
+      x: { 
+        grid: { display: false }, 
+        ticks: { 
+          color: textColor,
+          font: { size: 10, weight: '600' } 
+        } 
+      }
+    }
+  };
 });
 
-const grainChartOptions = {
+// Color palette helper for dynamic service donut chart
+const servicePalette = ['#4f46e5', '#d97706', '#059669', '#0d9488', '#8b5cf6', '#ec4899', '#3b82f6', '#f59e0b', '#10b981', '#6366f1'];
+const getServiceColor = (idx) => servicePalette[idx % servicePalette.length];
+
+// Revenue Sources Donut Chart Config (100% Dynamic from DB)
+const revenueSourcesData = computed(() => {
+  const breakdown = finances.value.serviceBreakdown || {};
+  const keys = Object.keys(breakdown);
+  const values = Object.values(breakdown).map(v => parseFloat(v || 0));
+
+  return {
+    labels: keys.length > 0 ? keys : ['Milling Services', 'Drying Services', 'Storage Services', 'Grading Services'],
+    datasets: [{
+      data: values.length > 0 ? values : [0, 0, 0, 0],
+      backgroundColor: keys.length > 0 ? keys.map((_, i) => getServiceColor(i)) : ['#4f46e5', '#d97706', '#059669', '#0d9488'],
+      borderWidth: 0
+    }]
+  };
+});
+
+const revenueSourcesOptions = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: { legend: { display: false } }
 };
 
-const stockChartData = ref({
-  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-  datasets: [
-    { label: 'Intake (Kg)', data: [45000, 52000, 61000, 48000, 75000, 89000], backgroundColor: '#6366f1', borderRadius: 6 },
-    { label: 'Dispatch (Kg)', data: [30000, 40000, 45000, 35000, 50000, 62000], backgroundColor: '#f59e0b', borderRadius: 6 }
-  ]
+// Executive Insights Computed Properties
+const topService = computed(() => {
+  const breakdown = finances.value.serviceBreakdown || {};
+  let topName = 'N/A';
+  let maxVal = 0;
+  let totalSrv = 0;
+  for (const [name, amt] of Object.entries(breakdown)) {
+    const val = parseFloat(amt || 0);
+    totalSrv += val;
+    if (val > maxVal) {
+      maxVal = val;
+      topName = name;
+    }
+  }
+  const pct = totalSrv > 0 ? ((maxVal / totalSrv) * 100).toFixed(1) : '0';
+  return { name: topName, amount: maxVal, pct };
 });
 
-const stockChartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: { legend: { display: false } },
-  scales: {
-    y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
-    x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+const topExpense = computed(() => {
+  const breakdown = finances.value.expensesBreakdown || {};
+  let topName = 'N/A';
+  let maxVal = 0;
+  let totalExp = 0;
+  for (const [name, amt] of Object.entries(breakdown)) {
+    const val = parseFloat(amt || 0);
+    totalExp += val;
+    if (val > maxVal) {
+      maxVal = val;
+      topName = name;
+    }
+  }
+  const pct = totalExp > 0 ? ((maxVal / totalExp) * 100).toFixed(1) : '0';
+  return { name: topName, amount: maxVal, pct };
+});
+
+const loanRecoveryRate = computed(() => {
+  const disbursed = finances.value.totalLoansDisbursed || 0;
+  const recovered = finances.value.totalLoansRecovered || 0;
+  if (disbursed === 0) return '0.0';
+  return ((recovered / disbursed) * 100).toFixed(1);
+});
+
+const profitMarginPct = computed(() => {
+  const rev = (finances.value.grossAllInflows || 0) - (finances.value.totalLoansRecovered || 0);
+  const exp = finances.value.totalExpenses || 0;
+  if (rev === 0) return '0.0';
+  const net = rev - exp;
+  return ((net / rev) * 100).toFixed(1);
+});
+
+// Top 3 Structured Mini Table Computed Properties
+const top3Services = computed(() => {
+  const breakdown = finances.value.serviceBreakdown || {};
+  const list = Object.entries(breakdown).map(([name, amt]) => ({
+    name,
+    amount: parseFloat(amt || 0)
+  })).sort((a, b) => b.amount - a.amount);
+
+  const total = list.reduce((acc, curr) => acc + curr.amount, 0);
+  const ranks = ['🥇', '🥈', '🥉', '🏅'];
+
+  return list.slice(0, 3).map((item, idx) => ({
+    rank: ranks[idx] || '•',
+    name: item.name,
+    amount: item.amount,
+    pct: total > 0 ? ((item.amount / total) * 100).toFixed(1) : '0'
+  }));
+});
+
+const top3Expenses = computed(() => {
+  const breakdown = finances.value.expensesBreakdown || {};
+  const list = Object.entries(breakdown).map(([name, amt]) => ({
+    name,
+    amount: parseFloat(amt || 0)
+  })).sort((a, b) => b.amount - a.amount);
+
+  const total = list.reduce((acc, curr) => acc + curr.amount, 0);
+  const ranks = ['🚨', '🔧', '🍲', '📌'];
+
+  return list.slice(0, 3).map((item, idx) => ({
+    rank: ranks[idx] || '•',
+    name: item.name,
+    amount: item.amount,
+    pct: total > 0 ? ((item.amount / total) * 100).toFixed(1) : '0'
+  }));
+});
+
+const top3OtherIncomes = computed(() => {
+  const breakdown = finances.value.otherIncomeBreakdown || {};
+  const list = Object.entries(breakdown).map(([name, amt]) => ({
+    name,
+    amount: parseFloat(amt || 0)
+  })).sort((a, b) => b.amount - a.amount);
+
+  const total = list.reduce((acc, curr) => acc + curr.amount, 0);
+  const ranks = ['🚛', '📦', '🏢', '🔹'];
+
+  return list.slice(0, 3).map((item, idx) => ({
+    rank: ranks[idx] || '•',
+    name: item.name,
+    amount: item.amount,
+    pct: total > 0 ? ((item.amount / total) * 100).toFixed(1) : '0'
+  }));
+});
+
+const fetchFinancialData = async () => {
+  loading.value = true;
+  const dateQueryParams = getDateRangeParams();
+
+  try {
+    const [dashRes, plRes, settRes, expRes] = await Promise.all([
+      fetch('/api/v1/dashboard/stats' + dateQueryParams),
+      fetch('/api/v1/reports/profit-loss' + dateQueryParams),
+      fetch('/api/v1/sales/settlements'),
+      fetch('/api/v1/expenses')
+    ]);
+
+    if (dashRes.ok) {
+      const dashData = await dashRes.json();
+      if (dashData.stats) {
+        finances.value.grossAllInflows = dashData.stats.gross_all_inflows_tzs || 0;
+        finances.value.totalLoansDisbursed = dashData.stats.total_loans_disbursed_tzs || 0;
+        finances.value.totalLoansRecovered = dashData.stats.total_loans_recovered_tzs || 0;
+        finances.value.loanPortfolio = dashData.stats.loan_portfolio_value || 0;
+        finances.value.totalOtherIncome = dashData.stats.total_other_income_tzs || 0;
+        finances.value.netProfit = dashData.stats.total_net_service_profit_tzs || 0;
+        finances.value.activeLoansCount = dashData.stats.active_loans_count || 0;
+        finances.value.overdueLoansCount = dashData.stats.overdue_loans_count || 0;
+      }
+      if (dashData.service_breakdown) {
+        finances.value.serviceBreakdown = dashData.service_breakdown;
+      }
+      if (dashData.other_income_breakdown) {
+        finances.value.otherIncomeBreakdown = dashData.other_income_breakdown;
+      }
+      if (dashData.trends) {
+        trendsData.value = dashData.trends;
+      }
+    }
+
+    if (plRes.ok) {
+      const plData = await plRes.json();
+      if (plData.expenses) {
+        finances.value.totalExpenses = plData.expenses.total || 0;
+        finances.value.expensesBreakdown = plData.expenses.breakdown || {};
+      }
+    }
+
+    // Build Recent Financial Ledger
+    let settlements = [];
+    let expensesList = [];
+    if (settRes.ok) settlements = await settRes.json();
+    if (expRes.ok) expensesList = await expRes.json();
+
+    const txList = [];
+    settlements.slice(0, 4).forEach(s => {
+      const dateStr = new Date(s.settled_at || s.created_at).toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
+      txList.push({
+        id: 'sett-' + s.id,
+        date: dateStr,
+        type: 'Settlement & Deductions',
+        typeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        details: 'Farmer Settlement: ' + (s.farmer?.name || 'Farmer'),
+        amount: parseFloat(s.gross_amount || 0),
+        isExpense: false,
+        method: s.payment_method || 'mobile_money'
+      });
+    });
+
+    expensesList.slice(0, 3).forEach(e => {
+      const dateStr = new Date(e.date_incurred || e.created_at).toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
+      txList.push({
+        id: 'exp-' + e.id,
+        date: dateStr,
+        type: 'Operating Expense',
+        typeClass: 'bg-red-50 text-red-700 border-red-200',
+        details: e.category_name + ' (' + (e.description || 'Office Expense') + ')',
+        amount: parseFloat(e.amount || 0),
+        isExpense: true,
+        method: 'CASH'
+      });
+    });
+
+    recentTransactions.value = txList;
+
+  } catch (err) {
+    console.error('Error fetching financial dashboard data:', err);
+  } finally {
+    loading.value = false;
   }
 };
 
-const bins = ref([
-  { name: 'Bin 01', crop: 'Mpunga', weight: '45,200', pct: 90.4 },
-  { name: 'Bin 02', crop: 'Mahindi', weight: '38,400', pct: 76.8 },
-  { name: 'Bin 03', crop: 'Maharage', weight: '22,100', pct: 44.2 },
-  { name: 'Bin 04', crop: 'Mpunga', weight: '41,000', pct: 82.0 },
-  { name: 'Bin 05', crop: 'Alizeti', weight: '18,500', pct: 37.0 },
-  { name: 'Bin 06', crop: 'Mahindi', weight: '19,300', pct: 38.6 }
-]);
-
-const transactions = ref([
-  { id: 1, date: '17 Jun 2026', farmer: 'Amina Mwangi', type: 'Upokeaji', typeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200', crop: 'Mpunga (BT-901)', weight: '1,200', amount: 45000 },
-  { id: 2, date: '17 Jun 2026', farmer: 'John Kiprop', type: 'Kukoboa', typeClass: 'bg-indigo-50 text-indigo-700 border-indigo-200', crop: 'Mahindi (BT-884)', weight: '850', amount: 85000 },
-  { id: 3, date: '16 Jun 2026', farmer: 'Grace Massawe', type: 'Mkopo', typeClass: 'bg-amber-50 text-amber-700 border-amber-200', crop: 'Dhamana Mpunga', weight: '2,500', amount: 1500000 },
-  { id: 4, date: '16 Jun 2026', farmer: 'Rashid Bakari', type: 'Kukausha', typeClass: 'bg-teal-50 text-teal-700 border-teal-200', crop: 'Maharage (BT-720)', weight: '950', amount: 38000 }
-]);
+onMounted(() => {
+  fetchFinancialData();
+});
 </script>

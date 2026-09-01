@@ -30,6 +30,26 @@ class SalesController extends Controller
         return response()->json($invoices);
     }
 
+    public function indexSettlements()
+    {
+        $settlements = Settlement::with(['farmer', 'invoice.buyer', 'deductions'])->orderBy('created_at', 'desc')->get();
+        return response()->json($settlements);
+    }
+
+    private function getRelatedBatchIds($batch)
+    {
+        $ids = [$batch->id];
+        if ($batch->parent_batch_id) {
+            $ids[] = $batch->parent_batch_id;
+            $siblingIds = Batch::where('parent_batch_id', $batch->parent_batch_id)->pluck('id')->toArray();
+            $ids = array_merge($ids, $siblingIds);
+        }
+        $childIds = Batch::where('parent_batch_id', $batch->id)->pluck('id')->toArray();
+        $ids = array_merge($ids, $childIds);
+
+        return array_unique($ids);
+    }
+
     public function previewDeductions(Request $request)
     {
         $validated = $request->validate([
@@ -58,24 +78,31 @@ class SalesController extends Controller
         }
 
         $grossSales = $soldWeightKg * $validated['price_per_kg'];
+        $batchIds = $this->getRelatedBatchIds($batch);
 
-        // 1. Calculate Storage Fees (only on the full batch, but wait, usually storage fee is charged per time, here we just charge what's accrued so far)
+        // 1. Calculate Storage Fees
         $daysInStorage = max(0, now()->diffInDays($batch->created_at));
         $storageFees = $this->calculateStorageFees($batch);
 
-        // 2. Fetch Unpaid Drying Fees
-        $dryingFees = DryingJob::where('batch_id', $batch->id)
-            ->where('status', 'completed')
-            ->sum('fee_amount');
+        // 2. Fetch Unpaid Drying Fees across processing tree
+        $dryingJobs = DryingJob::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
+        $dryingFees = $dryingJobs->sum(function($j) {
+            return $j->fee_amount > 0 ? $j->fee_amount : 0;
+        });
 
-        // 3. Fetch Unpaid Milling Fees
-        $millingFees = MillingJob::where('batch_id', $batch->id)
-            ->where('status', 'completed')
-            ->sum('fee_amount');
+        // 3. Fetch Unpaid Milling Fees across processing tree
+        $millingJobs = MillingJob::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
+        $millingFees = $millingJobs->sum(function($j) {
+            if ($j->fee_amount > 0 && $j->fee_amount < 500) {
+                $weightKg = ($j->output_weight_mt > 0 ? $j->output_weight_mt : $j->input_weight_mt) * 1000;
+                return $j->fee_amount * ($weightKg > 0 ? $weightKg : 1);
+            }
+            return $j->fee_amount ?: 0;
+        });
 
-        // 4. Fetch Unpaid Grading Fees
-        $gradingFees = GradingRecord::where('batch_id', $batch->id)
-            ->sum('fee_amount');
+        // 4. Fetch Unpaid Grading Fees across processing tree
+        $gradingRecords = GradingRecord::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
+        $gradingFees = $gradingRecords->sum('fee_amount');
 
         // 5. Fetch Active Loans
         $loans = Loan::where('farmer_id', $batch->farmer_id)
@@ -84,9 +111,6 @@ class SalesController extends Controller
         $loanPrincipal = $loans->sum('current_balance');
 
         $totalDeductions = $storageFees + $dryingFees + $millingFees + $gradingFees + $loanPrincipal;
-        
-        // Cap the total deductions to gross sales? No, preview should show the real debts.
-        // Wait, the UI just shows the total debts.
         $netPayout = max(0, $grossSales - $totalDeductions);
 
         return response()->json([
@@ -149,7 +173,6 @@ class SalesController extends Controller
         if (!empty($validated['buyer_id'])) {
             $buyer = Buyer::findOrFail($validated['buyer_id']);
         } else {
-            // Create a new buyer
             $buyer = Buyer::create([
                 'tenant_id' => $tenantId,
                 'name' => $validated['buyer_name'],
@@ -172,16 +195,25 @@ class SalesController extends Controller
         $pricePerKg = $validated['price_per_kg'];
         $grossSales = $soldWeightKg * $pricePerKg;
 
-        // Calculate all deductions
+        $batchIds = $this->getRelatedBatchIds($batch);
+
+        // Calculate all deductions across processing tree
         $storageFees = $this->calculateStorageFees($batch);
-        $dryingJobs = DryingJob::where('batch_id', $batch->id)->where('status', 'completed')->get();
-        $dryingFees = $dryingJobs->sum('fee_amount');
+        $dryingJobs = DryingJob::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
+        $dryingFees = $dryingJobs->sum(function($j) {
+            return $j->fee_amount > 0 ? $j->fee_amount : 0;
+        });
         
-        $millingJobs = MillingJob::where('batch_id', $batch->id)->where('status', 'completed')->get();
-        $millingFees = $millingJobs->sum('fee_amount');
+        $millingJobs = MillingJob::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
+        $millingFees = $millingJobs->sum(function($j) {
+            if ($j->fee_amount > 0 && $j->fee_amount < 500) {
+                $weightKg = ($j->output_weight_mt > 0 ? $j->output_weight_mt : $j->input_weight_mt) * 1000;
+                return $j->fee_amount * ($weightKg > 0 ? $weightKg : 1);
+            }
+            return $j->fee_amount ?: 0;
+        });
         
-        $gradingRecords = GradingRecord::where('batch_id', $batch->id)->get(); // Assuming grading is one-time, wait, is there a status?
-        // Let's assume we don't have a status on GradingRecord, we'll just leave it or assume it's fully paid if we deduct.
+        $gradingRecords = GradingRecord::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
         $gradingFees = $gradingRecords->sum('fee_amount');
 
         $loans = Loan::where('farmer_id', $batch->farmer_id)->whereIn('status', ['active', 'overdue'])->orderBy('created_at', 'asc')->get();
@@ -214,7 +246,7 @@ class SalesController extends Controller
             $availableFunds -= $payAmount;
         }
         
-        $netPayout = $availableFunds; // Whatever is left goes to the farmer
+        $netPayout = $availableFunds;
         $actualDeductions = $grossSales - $netPayout;
 
         $result = DB::transaction(function () use (
@@ -338,6 +370,17 @@ class SalesController extends Controller
                 if ($bin->current_occupancy_mt <= 0) {
                     $bin->update(['status' => 'empty', 'current_occupancy_mt' => 0.00, 'crop_type' => null]);
                 }
+            }
+
+            // 6. Sync Farmer Active Status (If all stock sold out, mark inactive)
+            $farmerId = $batch->farmer_id;
+            $hasActiveStock = \App\Models\Batch::where('farmer_id', $farmerId)
+                ->where('status', '!=', 'sold')
+                ->where('current_weight_mt', '>', 0.001)
+                ->exists();
+
+            if (!$hasActiveStock) {
+                \App\Models\Farmer::where('id', $farmerId)->update(['status' => 'inactive']);
             }
 
             return $settlement;

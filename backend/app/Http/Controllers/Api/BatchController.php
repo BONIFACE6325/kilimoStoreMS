@@ -131,7 +131,8 @@ class BatchController extends Controller
                 ]);
             }
 
-            // Moisture check and auto-drying removed as per user requirement
+            // Auto-activate farmer status upon receiving crop batch
+            Farmer::where('id', $validated['farmer_id'])->update(['status' => 'active']);
 
             return $batch;
         });
@@ -199,7 +200,15 @@ class BatchController extends Controller
     public function updateProcessing(Request $request, $id)
     {
         $batch = Batch::findOrFail($id);
-        $type = $request->input('type'); // 'drying', 'milling', 'grading'
+
+        if ($batch->status === 'sold' || floatval($batch->current_weight_mt) <= 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Mzigo huu tayari umeshauzwa wote! Huwezi kupanga au kukamilisha huduma kwenye mzigo uliouzwa.'
+            ], 422);
+        }
+
+        $type = $request->input('type') ?: 'milling'; // Default to milling if not specified
         $tableName = 'milling_jobs';
         if (strtolower($type) === 'drying') {
             $tableName = 'drying_jobs';
@@ -212,7 +221,7 @@ class BatchController extends Controller
             'final_value' => 'nullable|numeric',
             'input_used' => 'nullable|numeric',
             'fee' => 'nullable|numeric',
-            'job_id' => 'nullable|exists:' . $tableName . ',id',
+            'job_id' => 'nullable',
         ]);
 
         $serviceId = $request->input('service_id');
@@ -220,22 +229,25 @@ class BatchController extends Controller
         $serviceName = $service ? $service->name_sw : $request->input('service_name');
         
         $jobId = $request->input('job_id');
+        $incomingFee = $request->input('fee') ?? $request->input('fee_amount');
 
         if (strtolower($type) === 'drying') {
-            $job = $jobId ? DryingJob::find($jobId) : DryingJob::where('batch_id', $batch->id)->orderBy('created_at', 'desc')->first();
+            $job = $jobId ? DryingJob::find($jobId) : DryingJob::where('batch_id', $batch->id)->latest()->first();
             if (!$job) {
                 $job = DryingJob::create([
                     'batch_id' => $batch->id,
                     'initial_moisture' => $batch->current_moisture ?? 12.0,
-                    'weight_before_mt' => $batch->current_weight_mt,
+                    'weight_before_mt' => $batch->current_weight_mt ?: ($batch->initial_weight_mt ?: 0.5),
                     'status' => 'queued',
-                    'service_id' => $serviceId !== 'undefined' ? $serviceId : null,
+                    'service_id' => ($serviceId && $serviceId !== 'undefined') ? $serviceId : null,
+                    'fee_amount' => $incomingFee ?: 0,
                 ]);
             }
+            $finalFee = ($incomingFee && floatval($incomingFee) > 0) ? floatval($incomingFee) : ($job->fee_amount ?: 0);
             $job->update([
                 'status' => $validated['status'],
                 'final_moisture' => $validated['final_value'] ?? $job->final_moisture,
-                'fee_amount' => $validated['fee'] ?? $job->fee_amount,
+                'fee_amount' => $finalFee,
                 'machine_id' => $serviceName ?? $job->machine_id,
                 'service_id' => ($serviceId !== 'undefined' ? $serviceId : null) ?? $job->service_id,
                 'end_time' => now(),
@@ -245,23 +257,25 @@ class BatchController extends Controller
                 $finalValue = $validated['final_value'] ?? $inputUsed;
                 $newWeight = max(0, $batch->current_weight_mt - $inputUsed + $finalValue);
                 $batch->update([
-                    'current_weight_mt' => $newWeight,
+                    'current_weight_mt' => $newWeight > 0 ? $newWeight : ($batch->initial_weight_mt ?: 0.5),
                     'status' => $batch->status === 'received' ? 'received' : 'stored'
                 ]);
             }
         } elseif (strtolower($type) === 'milling') {
-            $job = $jobId ? MillingJob::find($jobId) : MillingJob::where('batch_id', $batch->id)->orderBy('created_at', 'desc')->first();
+            $job = $jobId ? MillingJob::find($jobId) : MillingJob::where('batch_id', $batch->id)->latest()->first();
             if (!$job) {
                 $job = MillingJob::create([
                     'batch_id' => $batch->id,
-                    'input_weight_mt' => $batch->current_weight_mt,
-                    'service_id' => $serviceId !== 'undefined' ? $serviceId : null,
+                    'input_weight_mt' => $batch->current_weight_mt ?: ($batch->initial_weight_mt ?: 0.5),
+                    'service_id' => ($serviceId && $serviceId !== 'undefined') ? $serviceId : null,
+                    'fee_amount' => $incomingFee ?: 0,
                 ]);
             }
+            $finalFee = ($incomingFee && floatval($incomingFee) > 0) ? floatval($incomingFee) : ($job->fee_amount ?: 0);
             $job->update([
                 'status' => $validated['status'],
                 'output_weight_mt' => $validated['final_value'] ?? $job->output_weight_mt,
-                'fee_amount' => $validated['fee'] ?? $job->fee_amount,
+                'fee_amount' => $finalFee,
                 'machine_id' => $serviceName ?? $job->machine_id,
                 'service_id' => ($serviceId !== 'undefined' ? $serviceId : null) ?? $job->service_id,
                 'end_time' => now(),
@@ -278,6 +292,9 @@ class BatchController extends Controller
                 if ($cropChanged) {
                     $batch->decrement('current_weight_mt', $inputUsed);
                     
+                    $rawOutputQty = $request->input('output_quantity');
+                    $intakeQtyVal = ($rawOutputQty && floatval($rawOutputQty) > 0) ? floatval($rawOutputQty) : ($finalValue * 1000);
+
                     Batch::create([
                         'tenant_id' => $batch->tenant_id,
                         'branch_id' => $batch->branch_id,
@@ -286,7 +303,7 @@ class BatchController extends Controller
                         'batch_code' => $batch->batch_code . '-PR1',
                         'crop_type' => $outputCrop,
                         'variety' => $batch->variety,
-                        'intake_quantity' => $finalValue,
+                        'intake_quantity' => $intakeQtyVal,
                         'intake_unit' => $outputUnit,
                         'initial_moisture' => $batch->current_moisture ?? 12.0,
                         'current_moisture' => $batch->current_moisture ?? 12.0,
@@ -300,7 +317,11 @@ class BatchController extends Controller
                         $batch->update(['status' => 'transformed', 'current_weight_mt' => 0]);
                     }
                 } else {
-                    $batch->update(['status' => $batch->status === 'received' ? 'received' : 'stored']);
+                    $restoredWeight = $batch->current_weight_mt > 0 ? $batch->current_weight_mt : ($batch->initial_weight_mt ?: 0.5);
+                    $batch->update([
+                        'status' => $batch->status === 'received' ? 'received' : 'stored',
+                        'current_weight_mt' => $restoredWeight
+                    ]);
                 }
                 
                 $byProductCrop = $request->input('by_product_crop');
@@ -454,6 +475,51 @@ class BatchController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Batch deleted successfully'
+        ]);
+    }
+
+    public function deleteProcessingJob(Request $request, $jobType, $jobId)
+    {
+        $type = strtolower($jobType);
+        $deleted = false;
+
+        if ($type === 'milling' || $type === 'millingjob') {
+            $job = MillingJob::find($jobId);
+            if ($job) {
+                $job->delete();
+                $deleted = true;
+            }
+        } elseif ($type === 'drying' || $type === 'dryingjob') {
+            $job = DryingJob::find($jobId);
+            if ($job) {
+                $job->delete();
+                $deleted = true;
+            }
+        } elseif ($type === 'grading' || $type === 'gradingrecord') {
+            $job = GradingRecord::find($jobId);
+            if ($job) {
+                $job->delete();
+                $deleted = true;
+            }
+        }
+
+        // Fallback search across all job tables if specific type lookup missed
+        if (!$deleted) {
+            $m = MillingJob::find($jobId);
+            if ($m) { $m->delete(); $deleted = true; }
+            else {
+                $d = DryingJob::find($jobId);
+                if ($d) { $d->delete(); $deleted = true; }
+                else {
+                    $g = GradingRecord::find($jobId);
+                    if ($g) { $g->delete(); $deleted = true; }
+                }
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Assigned processing service deleted successfully'
         ]);
     }
 }

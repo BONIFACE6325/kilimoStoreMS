@@ -21,38 +21,21 @@
       ]"
     >
       
-      <!-- Brand Logo Header with Stylish Collapse Toggle inside Sidebar -->
-      <div class="h-18 flex items-center justify-between border-b border-slate-800/80 bg-slate-950 shrink-0" :class="isSidebarCollapsed ? 'px-2.5 flex-col justify-center gap-1 py-2' : 'px-4.5'">
+      <!-- Brand Logo Header -->
+      <div class="h-18 flex items-center justify-between border-b border-slate-800/80 bg-slate-950 shrink-0" :class="isSidebarCollapsed ? 'px-2.5 justify-center' : 'px-4.5'">
         <div class="flex items-center gap-3">
           <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-emerald-400 flex items-center justify-center text-white font-black text-lg shadow-md shadow-emerald-500/20 ring-1 ring-white/20 shrink-0">
             ⭐
           </div>
           <div v-if="!isSidebarCollapsed">
             <div class="font-extrabold text-white text-base tracking-tight leading-none bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent whitespace-nowrap">
-              AgroVault
+              GARANOKI
             </div>
             <div class="text-[10.5px] text-emerald-400 font-extrabold uppercase tracking-widest mt-1 whitespace-nowrap">
-              ERP Platform
+              Store & Finance MS
             </div>
           </div>
         </div>
-
-        <!-- Stylish Desktop Collapse/Expand Button Inside Sidebar -->
-        <button 
-          @click="toggleSidebar" 
-          class="hidden md:flex p-1.5 text-slate-400 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-xs"
-          :title="isSidebarCollapsed ? 'Panua Sidebar' : 'Kunja Sidebar'"
-        >
-          <svg 
-            class="w-4 h-4 transition-transform duration-300" 
-            :class="isSidebarCollapsed ? 'rotate-180 text-emerald-400' : ''" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
-          </svg>
-        </button>
 
         <!-- Mobile Close Button -->
         <button v-if="!isSidebarCollapsed" @click="closeMobileSidebar" class="md:hidden text-slate-400 hover:text-white p-1 rounded-lg">
@@ -63,9 +46,9 @@
       <!-- Navigation Groups -->
       <nav class="flex-1 space-y-4 overflow-y-auto" :class="isSidebarCollapsed ? 'px-2 py-4' : 'px-3.5 py-4'">
         
-        <!-- Group 1: MAIN / KUU -->
+        <!-- Group 1: MAIN -->
         <div class="space-y-1">
-          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">Kuu / Main</div>
+          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">Main</div>
 
           <!-- Dashboard -->
           <router-link 
@@ -93,21 +76,21 @@
               $route.path.startsWith('/farmers') ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-900/40 ring-1 ring-emerald-400/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white',
               isSidebarCollapsed ? 'justify-center py-3 px-0' : 'justify-between px-3.5 py-2.5'
             ]"
-            :title="isSidebarCollapsed ? 'Farmers (2,418)' : ''"
+            :title="isSidebarCollapsed ? `Farmers (${farmerCount})` : ''"
           >
             <div class="flex items-center gap-3">
               <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
               <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">Farmers</span>
             </div>
-            <span v-if="!isSidebarCollapsed" class="px-2 py-0.5 rounded-lg text-xs font-black bg-emerald-950 text-emerald-400 border border-emerald-800/60">2,418</span>
+            <span v-if="!isSidebarCollapsed && farmerCount > 0" class="px-2 py-0.5 rounded-lg text-xs font-black bg-emerald-950 text-emerald-400 border border-emerald-800/60 font-mono">{{ farmerCount.toLocaleString() }}</span>
           </router-link>
         </div>
 
-        <!-- Group 2: OPERATIONS / UENDESHAJI -->
+        <!-- Group 2: OPERATIONS -->
         <div class="space-y-1">
-          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">Uendeshaji / Operations</div>
+          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">Operations</div>
 
-          <!-- Receiving -->
+          <!-- Cashbook -->
           <router-link 
             @click="closeMobileSidebar" 
             to="/receiving" 
@@ -116,13 +99,13 @@
               $route.path.startsWith('/receiving') ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-900/40 ring-1 ring-emerald-400/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white',
               isSidebarCollapsed ? 'justify-center py-3 px-0' : 'justify-between px-3.5 py-2.5'
             ]"
-            :title="isSidebarCollapsed ? 'Receiving (12)' : ''"
+            :title="isSidebarCollapsed ? `Cashbook (${receivingCount})` : ''"
           >
             <div class="flex items-center gap-3">
               <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
-              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">Receiving</span>
+              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">Cashbook</span>
             </div>
-            <span v-if="!isSidebarCollapsed" class="px-2 py-0.5 rounded-lg text-xs font-black bg-amber-950 text-amber-400 border border-amber-800/60">12</span>
+            <span v-if="!isSidebarCollapsed && receivingCount > 0" class="px-2 py-0.5 rounded-lg text-xs font-black bg-amber-950 text-amber-400 border border-amber-800/60 font-mono">{{ receivingCount }}</span>
           </router-link>
 
           <!-- Inventory -->
@@ -168,19 +151,19 @@
               $route.path.startsWith('/loans') ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-900/40 ring-1 ring-emerald-400/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white',
               isSidebarCollapsed ? 'justify-center py-3 px-0' : 'justify-between px-3.5 py-2.5'
             ]"
-            :title="isSidebarCollapsed ? 'Loans (7)' : ''"
+            :title="isSidebarCollapsed ? `Loans (${loanCount})` : ''"
           >
             <div class="flex items-center gap-3">
               <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
               <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">Loans</span>
             </div>
-            <span v-if="!isSidebarCollapsed" class="px-2 py-0.5 rounded-lg text-xs font-black bg-amber-950 text-amber-400 border border-amber-800/60">7</span>
+            <span v-if="!isSidebarCollapsed && loanCount > 0" class="px-2 py-0.5 rounded-lg text-xs font-black bg-amber-950 text-amber-400 border border-amber-800/60 font-mono">{{ loanCount }}</span>
           </router-link>
         </div>
 
-        <!-- Group 3: FINANCE / FEDHA -->
+        <!-- Group 3: FINANCE -->
         <div class="space-y-1">
-          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">Fedha / Finance</div>
+          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">Finance</div>
 
           <!-- Buyers -->
           <router-link 
@@ -251,9 +234,9 @@
           </router-link>
         </div>
 
-        <!-- Group 4: SYSTEM / MFUMO -->
+        <!-- Group 4: SYSTEM -->
         <div class="space-y-1">
-          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">Mfumo / System</div>
+          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">System</div>
 
           <!-- Settings -->
           <router-link 
@@ -280,28 +263,118 @@
         <div class="flex items-center gap-3">
           <div class="relative shrink-0">
             <div class="w-8.5 h-8.5 rounded-xl bg-gradient-to-tr from-slate-800 to-slate-700 text-emerald-400 font-extrabold flex items-center justify-center border border-slate-700 text-xs">
-              JM
+              BG
             </div>
             <span class="w-2 h-2 rounded-full bg-emerald-500 border-2 border-slate-950 absolute -bottom-0.5 -right-0.5"></span>
           </div>
           <div v-if="!isSidebarCollapsed">
-            <div class="font-bold text-white text-xs leading-tight whitespace-nowrap">James Makori</div>
-            <div class="text-[10px] text-emerald-400 font-semibold whitespace-nowrap">Warehouse Manager</div>
+            <div class="font-bold text-white text-xs leading-tight whitespace-nowrap">Boniface Gwakila</div>
+            <div class="text-[10px] text-emerald-400 font-semibold whitespace-nowrap">System Owner</div>
           </div>
         </div>
-        <button v-if="!isSidebarCollapsed" class="text-slate-400 hover:text-white p-1.5 hover:bg-slate-900 rounded-lg transition" title="Ondoka">
+        <button 
+          @click="openLogoutModal"
+          class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-red-950/60 hover:bg-red-900/80 text-red-300 hover:text-white border border-red-800/60 transition text-xs font-bold shadow-xs cursor-pointer" 
+          title="Logout of System"
+        >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          <span v-if="!isSidebarCollapsed">Logout</span>
         </button>
       </div>
 
     </aside>
+
+    <!-- Custom Styled Logout Confirmation Modal -->
+    <transition name="fade">
+      <div v-if="showLogoutModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl p-6 max-w-sm w-full space-y-4 text-center transform transition-all">
+          
+          <div class="w-14 h-14 rounded-2xl bg-red-50 text-red-600 border border-red-100 flex items-center justify-center text-2xl mx-auto shadow-inner">
+            🚪
+          </div>
+
+          <div class="space-y-1">
+            <h3 class="text-base font-extrabold text-slate-900">Logout of System?</h3>
+            <p class="text-xs text-slate-500 font-medium leading-relaxed">
+              Are you sure you want to log out of <strong>GARANOKI</strong>? Your active session will be securely closed.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5 pt-2">
+            <button 
+              @click="showLogoutModal = false"
+              class="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs rounded-xl border border-slate-200/80 transition cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button 
+              @click="executeLogout"
+              class="py-2.5 px-4 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-extrabold text-xs rounded-xl shadow-md shadow-red-900/30 border border-red-400/30 transition cursor-pointer"
+            >
+              Yes, Logout →
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useLayout } from '../composables/useLayout';
+import { useAuth } from '../composables/useAuth';
 
+const router = useRouter();
 const { isSidebarCollapsed, isMobileSidebarOpen, toggleSidebar, closeMobileSidebar } = useLayout();
+const { logout } = useAuth();
+
+const showLogoutModal = ref(false);
+
+const openLogoutModal = () => {
+  showLogoutModal.value = true;
+};
+
+const executeLogout = () => {
+  showLogoutModal.value = false;
+  logout();
+};
+
+const farmerCount = ref(0);
+const receivingCount = ref(0);
+const loanCount = ref(0);
+
+const fetchCounts = async () => {
+  try {
+    const fRes = await fetch('/api/v1/farmers');
+    if (fRes.ok) {
+      const data = await fRes.json();
+      farmerCount.value = Array.isArray(data) ? data.length : (data.data?.length || 0);
+    }
+    
+    const bRes = await fetch('/api/v1/batches');
+    if (bRes.ok) {
+      const bData = await bRes.json();
+      const rec = Array.isArray(bData) ? bData.filter(b => b.status === 'received') : [];
+      receivingCount.value = rec.length;
+    }
+
+    const lRes = await fetch('/api/v1/loans');
+    if (lRes.ok) {
+      const lData = await lRes.json();
+      const activeL = Array.isArray(lData) ? lData.filter(l => parseFloat(l.current_balance || l.remaining_balance || 0) > 0) : [];
+      loanCount.value = activeL.length;
+    }
+  } catch (e) {
+    console.error('Error fetching sidebar counts:', e);
+  }
+};
+
+onMounted(() => {
+  fetchCounts();
+});
 </script>
 
 <style scoped>
