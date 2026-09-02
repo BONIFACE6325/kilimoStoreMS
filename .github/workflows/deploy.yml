@@ -8,7 +8,7 @@ on:
 
 jobs:
   validate-backend:
-    name: 🧪 1. Validate & Test Backend (PHP 8.4)
+    name: 🧪 1. Validate Backend (PHP 8.4)
     runs-on: ubuntu-latest
 
     steps:
@@ -28,7 +28,7 @@ jobs:
           composer install --prefer-dist --no-progress --no-interaction
 
   build-frontend:
-    name: 🎨 2. Build & Validate Frontend (Vue 3 / Vite)
+    name: 🎨 2. Build Frontend on GitHub Actions (Vue 3 / Vite)
     needs: validate-backend
     runs-on: ubuntu-latest
 
@@ -47,27 +47,50 @@ jobs:
           npm ci
           npm run build
 
+      - name: Upload Frontend dist as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+          retention-days: 1
+
   deploy-to-ec2:
-    name: 🚀 3. Deploy Production Build to AWS EC2
+    name: 🚀 3. Deploy to AWS EC2
     needs: build-frontend
     runs-on: ubuntu-latest
 
     steps:
-      - name: SSH to AWS EC2 & Trigger Automated Deployment
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download Frontend dist Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+
+      - name: Copy Frontend dist to EC2 via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          source: "frontend/dist/"
+          target: "/var/www/kilimostore/frontend/dist-new"
+          strip_components: 2
+
+      - name: SSH to EC2 - Run Backend Setup & Swap dist
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
-          command_timeout: 30m
+          command_timeout: 20m
           script: |
-            echo "🚀 Starting Automated Deployment on AWS EC2..."
-            cd /var/www/kilimostore
-            
-            echo "🗄️ Provisioning MySQL Database Server & Extension..."
-            sudo apt-get update -y || true
-            sudo apt-get install -y mysql-server php-mysql || true
+            echo "🗄️ Provisioning MySQL..."
+            sudo apt-get install -y mysql-server php-mysql > /dev/null 2>&1 || true
             sudo systemctl enable mysql || true
             sudo systemctl start mysql || true
 
@@ -79,13 +102,13 @@ jobs:
             sudo mysql -e "GRANT ALL PRIVILEGES ON kilimostore_db.* TO 'kilimo_user'@'localhost';" || true
             sudo mysql -e "FLUSH PRIVILEGES;" || true
 
-            echo "📥 Pulling latest commits from GitHub..."
+            echo "📥 Pulling latest backend code from GitHub..."
             cd /var/www/kilimostore
             git reset --hard HEAD
             git clean -fd
             git pull origin main
-            
-            echo "⚙️ Configuring Backend to MySQL & Clearing Cached Config..."
+
+            echo "⚙️ Configuring Laravel Backend..."
             cd /var/www/kilimostore/backend
             rm -rf bootstrap/cache/*.php || true
 
@@ -113,15 +136,14 @@ jobs:
             php artisan db:seed --force
             php artisan config:clear || true
 
-            echo "🎨 Building Production Frontend Assets..."
-            cd /var/www/kilimostore/frontend
-            npm ci
-            npm run build
-            
-            echo "🔐 Securing Permissions & Reloading Nginx/PHP-FPM..."
+            echo "🔄 Replacing old dist with newly built frontend..."
+            rm -rf /var/www/kilimostore/frontend/dist
+            mv /var/www/kilimostore/frontend/dist-new /var/www/kilimostore/frontend/dist
+
+            echo "🔐 Securing Permissions & Reloading Services..."
             sudo chown -R www-data:www-data /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache
             sudo chmod -R 775 /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache
             sudo systemctl reload nginx || true
-            sudo systemctl reload php8.3-fpm || sudo systemctl reload php8.2-fpm || sudo systemctl reload php8.4-fpm || sudo systemctl reload php-fpm || true
-            
-            echo "✅ KilimoStoreMS Migrated to MySQL & Deployed Successfully to AWS EC2!"
+            sudo systemctl reload php8.4-fpm || sudo systemctl reload php8.3-fpm || sudo systemctl reload php8.2-fpm || sudo systemctl reload php-fpm || true
+
+            echo "✅ KilimoStoreMS Deployed Successfully to AWS EC2!"
