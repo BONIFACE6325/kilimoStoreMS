@@ -80,7 +80,8 @@ class LoanController extends Controller
             ], 422);
         }
 
-        $tenantId = \App\Models\Tenant::first()->id;
+        $tenant = \App\Models\Tenant::first() ?? \App\Models\Tenant::create(['name' => 'Garanoki Main Store', 'status' => 'active']);
+        $tenantId = $tenant->id;
 
         // Auto-generate code
         $lastLoan = Loan::orderBy('created_at', 'desc')->first();
