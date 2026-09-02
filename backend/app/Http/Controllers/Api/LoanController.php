@@ -80,7 +80,7 @@ class LoanController extends Controller
             ], 422);
         }
 
-        $tenant = \App\Models\Tenant::first() ?? \App\Models\Tenant::create(['name' => 'Garanoki Main Store', 'status' => 'active']);
+        $tenant = \App\Models\Tenant::first() ?? \App\Models\Tenant::create(['name' => 'Garanoki Main Store', 'subdomain' => 'garanoki-store', 'status' => 'active']);
         $tenantId = $tenant->id;
 
         // Auto-generate code

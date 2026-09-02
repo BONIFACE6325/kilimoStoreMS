@@ -83,7 +83,7 @@ class BatchController extends Controller
             'bin_id' => 'nullable|exists:bins,id',
         ]);
 
-        $tenant = \App\Models\Tenant::first() ?? \App\Models\Tenant::create(['name' => 'Garanoki Main Store', 'status' => 'active']);
+        $tenant = \App\Models\Tenant::first() ?? \App\Models\Tenant::create(['name' => 'Garanoki Main Store', 'subdomain' => 'garanoki-store', 'status' => 'active']);
         $branch = Branch::first() ?? Branch::create(['tenant_id' => $tenant->id, 'name' => 'Arusha Main Branch', 'code' => 'BR-001', 'status' => 'active']);
         $tenantId = $tenant->id;
         $branchId = $branch->id;

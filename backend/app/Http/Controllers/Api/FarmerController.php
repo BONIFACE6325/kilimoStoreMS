@@ -113,6 +113,7 @@ class FarmerController extends Controller
         if (!$tenant) {
             $tenant = \App\Models\Tenant::create([
                 'name' => 'Garanoki Main Store',
+                'subdomain' => 'garanoki-store',
                 'status' => 'active'
             ]);
         }

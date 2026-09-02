@@ -33,7 +33,7 @@ class ServiceController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $tenant = Tenant::first() ?? Tenant::create(['name' => 'Garanoki Main Store', 'status' => 'active']);
+        $tenant = Tenant::first() ?? Tenant::create(['name' => 'Garanoki Main Store', 'subdomain' => 'garanoki-store', 'status' => 'active']);
         $tenantId = $tenant->id;
 
         $service = Service::create(array_merge($validated, [
