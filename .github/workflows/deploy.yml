@@ -120,10 +120,29 @@ jobs:
             npm ci --prefer-offline || npm ci
             npm run build
 
-            echo "🔐 Securing Permissions & Reloading Services..."
+            echo "🔐 Securing Permissions..."
             sudo chown -R www-data:www-data /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache
             sudo chmod -R 775 /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache
-            sudo systemctl reload nginx || true
-            sudo systemctl reload php8.4-fpm || sudo systemctl reload php8.3-fpm || sudo systemctl reload php8.2-fpm || sudo systemctl reload php-fpm || true
+
+            echo "🌐 Detecting PHP-FPM socket & Updating Nginx Config..."
+            PHP_FPM_SOCK=""
+            for version in 8.4 8.3 8.2 8.1; do
+                if [ -S /var/run/php/php${version}-fpm.sock ]; then
+                    PHP_FPM_SOCK="/var/run/php/php${version}-fpm.sock"
+                    echo "✅ Found PHP-FPM socket: $PHP_FPM_SOCK"
+                    break
+                fi
+            done
+
+            if [ -z "$PHP_FPM_SOCK" ]; then
+                echo "⚠️ No PHP-FPM socket found! Trying php-fpm..."
+                PHP_FPM_SOCK="unix:/var/run/php-fpm.sock"
+            fi
+
+            sudo cp /var/www/kilimostore/deploy/nginx/kilimostore.conf /etc/nginx/sites-available/kilimostore
+            sudo sed -i "s|PHP_FPM_SOCKET|${PHP_FPM_SOCK}|g" /etc/nginx/sites-available/kilimostore
+            sudo ln -sf /etc/nginx/sites-available/kilimostore /etc/nginx/sites-enabled/kilimostore
+            sudo rm -f /etc/nginx/sites-enabled/default || true
+            sudo nginx -t && sudo systemctl reload nginx
 
             echo "✅ KilimoStoreMS Deployed Successfully!"
