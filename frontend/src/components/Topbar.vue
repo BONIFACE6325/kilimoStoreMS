@@ -62,7 +62,7 @@
 
         <!-- Notifications Animated Popover -->
         <transition name="pop">
-          <div v-if="showNotifs" class="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden z-50 p-4 space-y-3">
+          <div v-if="showNotifs" class="absolute right-0 mt-3 w-72 sm:w-80 max-w-[92vw] bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden z-50 p-4 space-y-3">
             <div class="flex items-center justify-between border-b border-slate-100 pb-2">
               <span class="text-xs font-black text-slate-900 uppercase tracking-wider">System Notifications (3)</span>
               <button @click="showNotifs = false" class="text-slate-400 hover:text-slate-600 text-xs font-bold">Close</button>

@@ -7,10 +7,10 @@
     <Sidebar />
 
     <!-- Main Content Panel -->
-    <div class="flex-1 flex flex-col min-w-0">
+    <div class="flex-1 flex flex-col min-w-0 w-full overflow-x-hidden">
       <Topbar />
       
-      <main class="flex-1 p-4 sm:p-5 lg:p-6 overflow-y-auto w-full">
+      <main class="flex-1 p-3 sm:p-5 lg:p-6 overflow-y-auto w-full min-w-0">
         <router-view />
       </main>
     </div>

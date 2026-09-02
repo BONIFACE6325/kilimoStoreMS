@@ -4,8 +4,24 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
-  body {
-    @apply bg-slate-50 text-slate-800 antialiased font-sans transition-colors duration-300;
+  html, body {
+    @apply bg-slate-50 text-slate-800 antialiased font-sans transition-colors duration-300 overflow-x-hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Touch-optimized horizontal scrolling for mobile tables */
+.responsive-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 0.75rem;
+}
+
+/* Ensure form controls do not zoom in on iOS Safari (min font 16px on mobile) */
+@media (max-width: 640px) {
+  input, select, textarea {
+    font-size: 14px !important;
   }
 }
 
@@ -22,21 +38,21 @@
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Custom scrollbar styling */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(156, 163, 175, 0.4);
+  background: rgba(156, 163, 175, 0.35);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(107, 114, 128, 0.7);
+  background: rgba(107, 114, 128, 0.6);
 }

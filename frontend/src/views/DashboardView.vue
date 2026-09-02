@@ -47,8 +47,8 @@
       </div>
     </div>
 
-    <!-- 🌟 THE 6 EXECUTIVE FINANCIAL CARDS (ALL IN A SINGLE ALIGNED ROW) -->
-    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3">
+    <!-- 🌟 THE 6 EXECUTIVE FINANCIAL CARDS (2 COLS ON MOBILE, 3 TABLET, 6 DESKTOP) -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
       
       <!-- CARD 1: GROSS OFFICE REVENUE -->
       <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-2xs hover:border-emerald-500/50 transition-all space-y-1.5">

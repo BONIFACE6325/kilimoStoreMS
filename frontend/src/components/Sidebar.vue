@@ -11,13 +11,13 @@
 
     <!-- Sidebar Container -->
     <aside 
-      class="bg-slate-950 text-slate-300 h-screen sticky top-0 flex flex-col border-r border-slate-800/80 shrink-0 select-none overflow-hidden z-50 transition-all duration-300 ease-in-out"
+      class="bg-slate-950 text-slate-300 h-screen h-[100dvh] sticky top-0 flex flex-col border-r border-slate-800/80 shrink-0 select-none overflow-hidden z-50 transition-all duration-300 ease-in-out"
       :class="[
         // Desktop collapse logic: Icon-Only Rail mode (w-18 = 72px) vs Expanded (w-64 = 256px)
         isSidebarCollapsed ? 'md:w-18' : 'md:w-64',
         // Mobile drawer logic
         'fixed md:sticky top-0 left-0',
-        isMobileSidebarOpen ? 'translate-x-0 w-64 shadow-2xl' : '-translate-x-full md:translate-x-0'
+        isMobileSidebarOpen ? 'translate-x-0 w-72 sm:w-64 shadow-2xl' : '-translate-x-full md:translate-x-0'
       ]"
     >
       
