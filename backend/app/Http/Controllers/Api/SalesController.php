@@ -168,7 +168,8 @@ class SalesController extends Controller
             ], 422);
         }
 
-        $tenantId = \App\Models\Tenant::first()->id;
+        $tenant = \App\Models\Tenant::first() ?? \App\Models\Tenant::create(['name' => 'Garanoki Main Store', 'status' => 'active']);
+        $tenantId = $tenant->id;
 
         if (!empty($validated['buyer_id'])) {
             $buyer = Buyer::findOrFail($validated['buyer_id']);
