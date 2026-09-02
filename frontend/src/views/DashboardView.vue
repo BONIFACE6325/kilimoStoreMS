@@ -644,7 +644,7 @@ const financialTrendData = computed(() => ({
 const financialTrendOptions = computed(() => {
   const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
   const textColor = isDark ? '#cbd5e1' : '#475569';
-  const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9';
+  const gridColor = isDark ? 'rgba(255, 255, 255, 0.03)' : '#f1f5f9';
 
   return {
     responsive: true,
