@@ -108,8 +108,15 @@ class FarmerController extends Controller
             'street' => 'nullable|string|max:100',
         ]);
 
-        // Auto-resolve tenant
-        $tenantId = \App\Models\Tenant::first()->id;
+        // Auto-resolve tenant safely
+        $tenant = \App\Models\Tenant::first();
+        if (!$tenant) {
+            $tenant = \App\Models\Tenant::create([
+                'name' => 'Garanoki Main Store',
+                'status' => 'active'
+            ]);
+        }
+        $tenantId = $tenant->id;
 
         // Auto-generate code uniquely without collisions
         $nextNumber = 1;

@@ -83,8 +83,10 @@ class BatchController extends Controller
             'bin_id' => 'nullable|exists:bins,id',
         ]);
 
-        $tenantId = \App\Models\Tenant::first()->id;
-        $branchId = Branch::first()->id;
+        $tenant = \App\Models\Tenant::first() ?? \App\Models\Tenant::create(['name' => 'Garanoki Main Store', 'status' => 'active']);
+        $branch = Branch::first() ?? Branch::create(['tenant_id' => $tenant->id, 'name' => 'Arusha Main Branch', 'code' => 'BR-001', 'status' => 'active']);
+        $tenantId = $tenant->id;
+        $branchId = $branch->id;
 
         // Calculate MT dynamically if not directly provided
         $unitLower = strtolower(trim($validated['intake_unit']));
