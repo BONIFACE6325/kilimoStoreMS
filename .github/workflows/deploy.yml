@@ -7,44 +7,53 @@ on:
       - master
 
 jobs:
-  build-and-test:
-    name: Build & Validate Project
+  validate-backend:
+    name: 🧪 1. Validate & Test Backend (PHP 8.4)
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Setup PHP
+      - name: Setup PHP 8.4
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
           extensions: mbstring, pdo, pdo_sqlite, bcmath, ctype, fileinfo, json, tokenizer, xml
           coverage: none
 
-      - name: Install Backend Dependencies
+      - name: Install & Validate Composer Dependencies
         run: |
           cd backend
           composer install --prefer-dist --no-progress --no-interaction
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+  build-frontend:
+    name: 🎨 2. Build & Validate Frontend (Vue 3 / Vite)
+    needs: validate-backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Build Frontend Assets
+      - name: Install NPM & Compile Production Assets
         run: |
           cd frontend
           npm ci
           npm run build
 
-  deploy:
-    name: Auto Deploy to AWS EC2
-    needs: build-and-test
+  deploy-to-ec2:
+    name: 🚀 3. Deploy Production Build to AWS EC2
+    needs: build-frontend
     runs-on: ubuntu-latest
 
     steps:
-      - name: SSH to AWS EC2 & Deploy
+      - name: SSH to AWS EC2 & Trigger Automated Deployment
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -53,17 +62,17 @@ jobs:
           port: 22
           script: |
             set -e
-            echo "🚀 Starting Deployment on AWS EC2..."
+            echo "🚀 Starting Automated Deployment on AWS EC2..."
             cd /var/www/kilimostore
             
-            echo "🛠️ Fixing Permissions for Deployment..."
+            echo "🛠️ Preparing Directory Permissions..."
             sudo chown -R ubuntu:www-data /var/www/kilimostore
             sudo chmod -R 777 /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache /var/www/kilimostore/backend/database
 
-            echo "📥 Pulling latest code..."
+            echo "📥 Pulling latest commits from GitHub..."
             git pull origin main || git pull origin master
             
-            echo "⚙️ Updating Backend..."
+            echo "⚙️ Running Backend Composer & Migrations..."
             cd /var/www/kilimostore/backend
             composer install --no-dev --optimize-autoloader --no-interaction
             php artisan migrate --force
@@ -71,15 +80,15 @@ jobs:
             php artisan route:cache
             php artisan view:cache
             
-            echo "🎨 Building Frontend..."
+            echo "🎨 Building Production Frontend Assets..."
             cd /var/www/kilimostore/frontend
             npm ci
             npm run build
             
-            echo "🔐 Finalizing Permissions & Reloading Services..."
+            echo "🔐 Securing Permissions & Reloading Nginx/PHP-FPM..."
             sudo chown -R www-data:www-data /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache /var/www/kilimostore/backend/database
             sudo chmod -R 777 /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache /var/www/kilimostore/backend/database
             sudo systemctl reload nginx
             sudo systemctl reload php8.4-fpm || sudo systemctl reload php-fpm
             
-            echo "✅ Deployment Completed Successfully!"
+            echo "✅ KilimoStoreMS Deployed Successfully to AWS EC2!"
