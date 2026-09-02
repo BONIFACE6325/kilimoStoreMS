@@ -17,7 +17,7 @@ return new class extends Migration
             $table->decimal('amount', 12, 2);
             $table->date('date_received');
             $table->text('description')->nullable();
-            $table->foreignId('recorded_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignUuid('recorded_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }
