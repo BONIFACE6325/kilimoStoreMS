@@ -80,7 +80,9 @@ jobs:
 
             echo "📥 Pulling latest commits from GitHub..."
             cd /var/www/kilimostore
-            git pull origin main || git pull origin master
+            git reset --hard HEAD
+            git clean -fd
+            git pull origin main
             
             echo "⚙️ Configuring Backend to MySQL & Clearing Cached Config..."
             cd /var/www/kilimostore/backend
