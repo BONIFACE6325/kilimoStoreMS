@@ -18,6 +18,7 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuth } from './composables/useAuth';
 import Sidebar from './components/Sidebar.vue';
@@ -25,4 +26,14 @@ import Topbar from './components/Topbar.vue';
 
 const route = useRoute();
 const { isAuthenticated } = useAuth();
+
+onMounted(() => {
+  const saved = localStorage.getItem('garanoki_theme');
+  if (saved === 'dark') {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+    localStorage.setItem('garanoki_theme', 'light');
+  }
+});
 </script>

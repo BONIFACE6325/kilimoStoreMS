@@ -215,7 +215,7 @@ const executeLogout = () => {
 
 onMounted(() => {
   const savedTheme = localStorage.getItem('garanoki_theme');
-  if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+  if (savedTheme === 'dark') {
     isDark.value = true;
     document.documentElement.classList.add('dark');
   } else {

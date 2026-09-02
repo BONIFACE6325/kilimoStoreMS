@@ -77,14 +77,28 @@ class BatchController extends Controller
             'crop_type' => 'required|string|max:100',
             'variety' => 'nullable|string|max:100',
             'initial_moisture' => 'nullable|numeric',
-            'initial_weight_mt' => 'required|numeric',
-            'intake_quantity' => 'nullable|numeric',
-            'intake_unit' => 'nullable|string|max:50',
+            'initial_weight_mt' => 'nullable|numeric',
+            'intake_quantity' => 'required|numeric',
+            'intake_unit' => 'required|string|max:50',
             'bin_id' => 'nullable|exists:bins,id',
         ]);
 
         $tenantId = \App\Models\Tenant::first()->id;
         $branchId = Branch::first()->id;
+
+        // Calculate MT dynamically if not directly provided
+        $unitLower = strtolower(trim($validated['intake_unit']));
+        $qty = floatval($validated['intake_quantity']);
+
+        if (!empty($validated['initial_weight_mt']) && floatval($validated['initial_weight_mt']) > 0) {
+            $computedMt = floatval($validated['initial_weight_mt']);
+        } elseif (in_array($unitLower, ['kilo', 'kg', 'kilogram', 'kilograms'])) {
+            $computedMt = $qty / 1000.0;
+        } elseif (in_array($unitLower, ['gunia', 'bags', 'bag', 'mifuko'])) {
+            $computedMt = $qty * 0.1; // 1 Bag = 100kg = 0.1 MT
+        } else {
+            $computedMt = $qty; // Default MT / Tons
+        }
 
         // Auto-generate batch code
         $lastBatch = Batch::orderBy('created_at', 'desc')->first();
@@ -97,7 +111,7 @@ class BatchController extends Controller
         }
         $batchCode = 'BCH-' . $nextNumber;
 
-        $batch = DB::transaction(function () use ($validated, $tenantId, $branchId, $batchCode) {
+        $batch = DB::transaction(function () use ($validated, $tenantId, $branchId, $batchCode, $computedMt) {
             $batch = Batch::create([
                 'tenant_id' => $tenantId,
                 'branch_id' => $branchId,
@@ -105,12 +119,12 @@ class BatchController extends Controller
                 'batch_code' => $batchCode,
                 'crop_type' => $validated['crop_type'],
                 'variety' => $validated['variety'] ?? null,
-                'intake_quantity' => $validated['intake_quantity'] ?? null,
-                'intake_unit' => $validated['intake_unit'] ?? null,
+                'intake_quantity' => $validated['intake_quantity'],
+                'intake_unit' => $validated['intake_unit'],
                 'initial_moisture' => $validated['initial_moisture'] ?? 12.0,
                 'current_moisture' => $validated['initial_moisture'] ?? 12.0,
-                'initial_weight_mt' => $validated['initial_weight_mt'],
-                'current_weight_mt' => $validated['initial_weight_mt'],
+                'initial_weight_mt' => $computedMt,
+                'current_weight_mt' => $computedMt,
                 'current_bin_id' => $validated['bin_id'] ?? null,
                 'status' => 'received',
             ]);
@@ -118,7 +132,7 @@ class BatchController extends Controller
             // If a bin is selected, update bin occupancy
             if (!empty($validated['bin_id'])) {
                 $bin = Bin::find($validated['bin_id']);
-                $bin->increment('current_occupancy_mt', $validated['initial_weight_mt']);
+                $bin->increment('current_occupancy_mt', $computedMt);
                 $bin->update(['status' => 'occupied', 'crop_type' => $validated['crop_type']]);
 
                 // Record movement
@@ -126,7 +140,7 @@ class BatchController extends Controller
                     'batch_id' => $batch->id,
                     'source_bin_id' => null,
                     'destination_bin_id' => $bin->id,
-                    'quantity_mt' => $validated['initial_weight_mt'],
+                    'quantity_mt' => $computedMt,
                     'reason' => 'Initial Intake Placement',
                 ]);
             }
@@ -521,5 +535,223 @@ class BatchController extends Controller
             'success' => true,
             'message' => 'Assigned processing service deleted successfully'
         ]);
+    }
+
+    private function getCanonicalCropName($raw)
+    {
+        $lower = strtolower(trim($raw));
+        if (in_array($lower, ['rice', 'mchele', 'mchele super', 'mchele 1', 'mchele 2'])) {
+            return 'Rice / Mchele';
+        }
+        if (in_array($lower, ['maize', 'mahindi', 'unga', 'flour'])) {
+            return 'Maize / Mahindi';
+        }
+        if (in_array($lower, ['paddy', 'mpunga', 'mpunga wet', 'mpunga dry'])) {
+            return 'Paddy / Mpunga';
+        }
+        if (in_array($lower, ['pumba', 'bran', 'husk'])) {
+            return 'Pumba / Bran';
+        }
+        if (in_array($lower, ['beans', 'maharage', 'legumes'])) {
+            return 'Beans / Maharage';
+        }
+        return ucfirst(trim($raw));
+    }
+
+    public function getInventorySummary()
+    {
+        $totalBatchesCount = Batch::count();
+        $totalIntakeWeightMt = floatval(Batch::sum('initial_weight_mt'));
+        $currentStoredWeightMt = floatval(Batch::whereNotIn('status', ['sold', 'transformed'])->sum('current_weight_mt'));
+        
+        $soldFromInvoiceItems = floatval(DB::table('invoice_items')->sum('quantity_mt'));
+        $soldFromBatches = floatval(Batch::where('status', 'sold')->sum('initial_weight_mt'));
+        $totalSoldWeightMt = max($soldFromInvoiceItems, $soldFromBatches);
+
+        $totalBagsReceived = intval(round($totalIntakeWeightMt * 10)); // 1 MT = 10 Bags of 100kg
+        $totalBagsStored = intval(round($currentStoredWeightMt * 10));
+        $totalBagsSold = intval(round($totalSoldWeightMt * 10));
+
+        $rawCrops = Batch::select(
+            'crop_type',
+            DB::raw('SUM(initial_weight_mt) as initial_mt'),
+            DB::raw("SUM(CASE WHEN status NOT IN ('transformed', 'sold') THEN current_weight_mt ELSE 0 END) as current_mt"),
+            DB::raw('COUNT(*) as batch_count')
+        )->groupBy('crop_type')->get();
+
+        $groupedMap = [];
+        $totalWeightForPct = $totalIntakeWeightMt > 0 ? $totalIntakeWeightMt : 1;
+
+        foreach ($rawCrops as $c) {
+            $canonical = $this->getCanonicalCropName($c->crop_type);
+            if (!isset($groupedMap[$canonical])) {
+                $groupedMap[$canonical] = [
+                    'crop_type' => $canonical,
+                    'received_mt' => 0.0,
+                    'stored_mt' => 0.0,
+                    'batch_count' => 0
+                ];
+            }
+            $groupedMap[$canonical]['received_mt'] += floatval($c->initial_mt);
+            $groupedMap[$canonical]['stored_mt'] += floatval($c->current_mt);
+            $groupedMap[$canonical]['batch_count'] += intval($c->batch_count);
+        }
+
+        $cropBreakdown = [];
+        foreach ($groupedMap as $canonical => $data) {
+            $receivedMt = $data['received_mt'];
+            $storedMt = $data['stored_mt'];
+            $pct = number_format(($receivedMt / $totalWeightForPct) * 100, 1);
+
+            $cropBreakdown[] = [
+                'crop_type' => $canonical,
+                'received_mt' => $receivedMt,
+                'received_kg' => $receivedMt * 1000,
+                'received_bags' => intval(round($receivedMt * 10)),
+                'stored_mt' => $storedMt,
+                'stored_kg' => $storedMt * 1000,
+                'stored_bags' => intval(round($storedMt * 10)),
+                'batch_count' => $data['batch_count'],
+                'percentage' => floatval($pct)
+            ];
+        }
+
+        // Sort by received_mt descending
+        usort($cropBreakdown, function ($a, $b) {
+            return $b['received_mt'] <=> $a['received_mt'];
+        });
+
+        $rawBins = Bin::orderBy('name')->get();
+        $totalCapacityMt = floatval($rawBins->sum('capacity_mt'));
+        $totalOccupancyMt = 0.0;
+
+        $bins = [];
+        foreach ($rawBins as $bin) {
+            $activeBatches = Batch::where('current_bin_id', $bin->id)
+                ->whereNotIn('status', ['transformed', 'sold'])
+                ->where('current_weight_mt', '>', 0)
+                ->get();
+
+            $liveOccupancyMt = floatval($activeBatches->sum('current_weight_mt'));
+            $totalOccupancyMt += $liveOccupancyMt;
+
+            $cropNames = $activeBatches->pluck('crop_type')
+                ->unique()
+                ->map(fn($c) => $this->getCanonicalCropName($c))
+                ->implode(', ');
+
+            $bins[] = [
+                'id' => $bin->id,
+                'name' => $bin->name,
+                'capacity_mt' => floatval($bin->capacity_mt),
+                'current_occupancy_mt' => $liveOccupancyMt,
+                'crop_type' => !empty($cropNames) ? $cropNames : 'Empty / Available',
+                'status' => $liveOccupancyMt >= ($bin->capacity_mt * 0.9) ? 'full' : ($liveOccupancyMt > 0 ? 'occupied' : 'empty')
+            ];
+        }
+
+        $utilizationPct = $totalCapacityMt > 0 ? number_format(($totalOccupancyMt / $totalCapacityMt) * 100, 1) : '0.0';
+
+        $periodAnalytics = [
+            'this_week' => $this->buildPeriodAnalytics(now()->startOfWeek()),
+            'this_month' => $this->buildPeriodAnalytics(now()->startOfMonth()),
+            'all_time' => $this->buildPeriodAnalytics(null),
+        ];
+
+        return response()->json([
+            'total_batches' => $totalBatchesCount,
+            'total_intake_mt' => $totalIntakeWeightMt,
+            'total_intake_kg' => $totalIntakeWeightMt * 1000,
+            'total_intake_bags' => $totalBagsReceived,
+            'stored_stock_mt' => $currentStoredWeightMt,
+            'stored_stock_kg' => $currentStoredWeightMt * 1000,
+            'stored_stock_bags' => $totalBagsStored,
+            'sold_stock_mt' => $totalSoldWeightMt,
+            'sold_stock_kg' => $totalSoldWeightMt * 1000,
+            'sold_stock_bags' => $totalBagsSold,
+            'warehouse_capacity_mt' => $totalCapacityMt,
+            'warehouse_occupancy_mt' => $totalOccupancyMt,
+            'utilization_pct' => floatval($utilizationPct),
+            'crop_breakdown' => $cropBreakdown,
+            'bins' => $bins,
+            'analytics' => $periodAnalytics
+        ]);
+    }
+
+    private function buildPeriodAnalytics($startDate = null)
+    {
+        // 1. Transformation Outputs (derived batches from milling/processing)
+        $derivedQuery = Batch::whereNotNull('parent_batch_id');
+        if ($startDate) {
+            $derivedQuery->where('created_at', '>=', $startDate);
+        }
+        $derivedBatches = $derivedQuery->get();
+
+        $transformMap = [];
+        $totalTransformedMt = 0.0;
+        foreach ($derivedBatches as $d) {
+            $canonical = $this->getCanonicalCropName($d->crop_type);
+            $mt = floatval($d->initial_weight_mt);
+            $totalTransformedMt += $mt;
+            if (!isset($transformMap[$canonical])) {
+                $transformMap[$canonical] = 0.0;
+            }
+            $transformMap[$canonical] += $mt;
+        }
+
+        $transformOutputs = [];
+        foreach ($transformMap as $crop => $mt) {
+            $transformOutputs[] = [
+                'crop_type' => $crop,
+                'mt' => $mt,
+                'kg' => $mt * 1000,
+                'bags' => intval(round($mt * 10))
+            ];
+        }
+        usort($transformOutputs, fn($a, $b) => $b['mt'] <=> $a['mt']);
+
+        // 2. Crop Sales Breakdown
+        $salesQuery = DB::table('invoice_items')
+            ->join('batches', 'invoice_items.batch_id', '=', 'batches.id')
+            ->select('batches.crop_type', DB::raw('SUM(invoice_items.quantity_mt) as sold_mt'));
+
+        if ($startDate) {
+            $salesQuery->where('invoice_items.created_at', '>=', $startDate);
+        }
+        $salesItems = $salesQuery->groupBy('batches.crop_type')->get();
+
+        $salesMap = [];
+        $totalSoldMt = 0.0;
+        foreach ($salesItems as $s) {
+            $canonical = $this->getCanonicalCropName($s->crop_type);
+            $mt = floatval($s->sold_mt);
+            $totalSoldMt += $mt;
+            if (!isset($salesMap[$canonical])) {
+                $salesMap[$canonical] = 0.0;
+            }
+            $salesMap[$canonical] += $mt;
+        }
+
+        $cropSales = [];
+        foreach ($salesMap as $crop => $mt) {
+            $cropSales[] = [
+                'crop_type' => $crop,
+                'mt' => $mt,
+                'kg' => $mt * 1000,
+                'bags' => intval(round($mt * 10))
+            ];
+        }
+        usort($cropSales, fn($a, $b) => $b['mt'] <=> $a['mt']);
+
+        return [
+            'total_transformed_mt' => $totalTransformedMt,
+            'total_transformed_kg' => $totalTransformedMt * 1000,
+            'total_transformed_bags' => intval(round($totalTransformedMt * 10)),
+            'transform_outputs' => $transformOutputs,
+            'total_sold_mt' => $totalSoldMt,
+            'total_sold_kg' => $totalSoldMt * 1000,
+            'total_sold_bags' => intval(round($totalSoldMt * 10)),
+            'crop_sales' => $cropSales
+        ];
     }
 }

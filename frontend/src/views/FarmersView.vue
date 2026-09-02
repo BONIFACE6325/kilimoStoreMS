@@ -287,22 +287,34 @@
               </div>
             </div>
 
-            <!-- KPI Highlight Cards (Vibrant Emerald Theme) -->
+            <!-- KPI Highlight Cards (Clean Enterprise Theme) -->
             <div class="space-y-3 pt-2">
-              <div class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-4 rounded-2xl flex items-center justify-between shadow-lg shadow-emerald-600/20">
+              <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
                 <div>
-                  <div class="text-[10.5px] font-black uppercase text-emerald-100 tracking-wider">Jumla ya Mzigo Ghalani</div>
-                  <div class="text-2xl font-black text-white mt-0.5">{{ totalFarmerStockKg.toLocaleString() }} Kg</div>
+                  <div class="text-[10px] font-black uppercase text-slate-500 tracking-wider">Jumla ya Mzigo Ghalani</div>
+                  <div class="text-xl font-black text-slate-900 mt-0.5 font-mono">{{ totalFarmerStockKg.toLocaleString() }} Kg</div>
+                  <div class="text-[9.5px] text-slate-400 font-semibold mt-0.5">Physical Stock in Storage</div>
                 </div>
-                <div class="w-10 h-10 rounded-xl bg-white/20 text-white font-black flex items-center justify-center text-base">📦</div>
+                <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 font-black flex items-center justify-center text-sm border border-slate-200">📦</div>
               </div>
 
-              <div class="bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 p-4 rounded-2xl flex items-center justify-between">
+              <!-- PATO SAFI LA MKULIMA LOTE (CLEAN ENTERPRISE CARD) -->
+              <div class="bg-white p-4 rounded-2xl border border-emerald-300 shadow-xs flex items-center justify-between">
                 <div>
-                  <div class="text-[10.5px] font-black uppercase text-red-700 tracking-wider">Mkopo Bado (Deni)</div>
-                  <div class="text-2xl font-black text-red-600 mt-0.5">Tsh {{ totalFarmerLoanBalance.toLocaleString() }}</div>
+                  <div class="text-[10px] font-black uppercase text-emerald-800 tracking-wider">Pato Safi Aliyolipwa (Net Payout)</div>
+                  <div class="text-xl font-black text-emerald-700 font-mono mt-0.5">Tsh {{ totalFarmerNetPayout.toLocaleString() }}</div>
+                  <div class="text-[9.5px] text-slate-500 font-semibold mt-0.5">Jumla ya malipo halisi baada ya makato</div>
                 </div>
-                <div class="w-10 h-10 rounded-xl bg-red-100 text-red-600 font-black flex items-center justify-center text-base">💳</div>
+                <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 font-black flex items-center justify-center text-sm border border-emerald-200">💵</div>
+              </div>
+
+              <div class="bg-white p-4 rounded-2xl border border-red-200 shadow-xs flex items-center justify-between">
+                <div>
+                  <div class="text-[10px] font-black uppercase text-red-600 tracking-wider">Mkopo Bado (Deni)</div>
+                  <div class="text-xl font-black text-red-600 font-mono mt-0.5">Tsh {{ totalFarmerLoanBalance.toLocaleString() }}</div>
+                  <div class="text-[9.5px] text-slate-500 font-semibold mt-0.5">Salio la deni la mikopo</div>
+                </div>
+                <div class="w-9 h-9 rounded-xl bg-red-50 text-red-600 font-black flex items-center justify-center text-sm border border-red-200">💳</div>
               </div>
             </div>
 
@@ -387,6 +399,11 @@
                           <span>Zao: <strong class="text-slate-900 font-bold">{{ b.crop_type }}</strong> {{ b.variety ? '(' + b.variety + ')' : '' }}</span>
                           <span class="text-slate-300">•</span>
                           <span>Intake: <strong class="text-slate-900 font-extrabold">{{ ((parseFloat(b.initial_weight_mt || b.current_weight_mt || 0)) * 1000).toLocaleString() }} Kg</strong></span>
+                          <span class="text-slate-300">•</span>
+                          <span class="px-2 py-0.5 rounded-md bg-amber-100/90 text-amber-950 text-[10.5px] font-black border border-amber-300/80 flex items-center gap-1 shadow-2xs">
+                            {{ formatStorageDaysBadge(b.created_at, b.status, b.updated_at) }}
+                            <span class="text-amber-800 font-bold">({{ formatDate(b.created_at) }})</span>
+                          </span>
                           <span v-if="(parseFloat(b.initial_weight_mt || 0)) > (parseFloat(b.current_weight_mt || 0))" class="px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 text-[10px] font-black">
                             Umeuzwa: {{ Math.max(0, ((parseFloat(b.initial_weight_mt || 0)) - (parseFloat(b.current_weight_mt || 0))) * 1000).toLocaleString() }} Kg
                           </span>
@@ -495,7 +512,13 @@
                                   <span class="px-1.5 py-0.5 bg-teal-100 text-teal-800 text-[9.5px] font-black rounded uppercase">Result Product</span>
                                   <span v-if="child.status === 'sold' || parseFloat(child.current_weight_mt || 0) <= 0" class="px-2 py-0.5 bg-rose-600 text-white text-[9.5px] font-black rounded-lg uppercase shadow-2xs">🏷️ IMEUZWA</span>
                                 </div>
-                                <div class="text-[10px] text-slate-500 font-mono">Code: {{ child.batch_code }}</div>
+                                <div class="text-[10px] text-slate-500 font-mono flex items-center gap-2 mt-0.5">
+                                  <span>Code: {{ child.batch_code }}</span>
+                                  <span>•</span>
+                                  <span class="font-extrabold text-teal-900 bg-teal-100/90 px-2 py-0.5 rounded-md border border-teal-200">
+                                    {{ formatStorageDaysBadge(child.created_at, child.status, child.updated_at) }}
+                                  </span>
+                                </div>
                               </div>
                             </div>
                             <div class="flex items-center gap-3">
@@ -616,6 +639,27 @@
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                   <span>+ Fanya Mauzo Mpya</span>
                 </button>
+              </div>
+
+              <!-- FINANCIAL SUMMARY CARDS BANNER FOR FARMER SALES -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-white border border-slate-200/80 p-3.5 rounded-2xl shadow-2xs">
+                  <div class="text-[10px] font-black text-slate-500 uppercase tracking-wider">1. Jumla Thamani ya Mauzo (Gross)</div>
+                  <div class="text-base font-black text-slate-900 font-mono mt-1">Tsh {{ totalFarmerGrossSales.toLocaleString() }}</div>
+                  <div class="text-[9.5px] text-slate-500 font-medium">Thamani yote kabla ya makato</div>
+                </div>
+
+                <div class="bg-white border border-slate-200/80 p-3.5 rounded-2xl shadow-2xs">
+                  <div class="text-[10px] font-black text-slate-500 uppercase tracking-wider">2. Makato Yote (Deductions)</div>
+                  <div class="text-base font-black text-red-600 font-mono mt-1">Tsh {{ totalFarmerDeductions.toLocaleString() }}</div>
+                  <div class="text-[9.5px] text-slate-500 font-medium">Kinu, Ukaushaji & Mikopo</div>
+                </div>
+
+                <div class="bg-white border border-emerald-300 p-3.5 rounded-2xl shadow-2xs">
+                  <div class="text-[10px] font-black text-emerald-800 uppercase tracking-wider">3. Pato Safi la Mkulima (Net Payout)</div>
+                  <div class="text-base font-black text-emerald-700 font-mono mt-1">Tsh {{ totalFarmerNetPayout.toLocaleString() }}</div>
+                  <div class="text-[9.5px] text-emerald-700 font-medium">Jumla ya malipo aliyochukua mkononi</div>
+                </div>
               </div>
 
               <!-- Sales History Table -->
@@ -1166,8 +1210,11 @@
                   placeholder="Uzito kwa Kg..." 
                   class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold text-slate-900 disabled:bg-slate-100 disabled:text-slate-500"
                 />
-                <div v-if="selectedSettlementBatch" class="text-[10.5px] text-slate-500 font-semibold mt-1">
-                  Uliopo: <strong class="text-slate-900 font-bold">{{ availableBatchKg.toLocaleString() }} Kg</strong> | Utakaobaki: <strong class="text-emerald-700 font-extrabold">{{ remainingBatchKgAfterSale.toLocaleString() }} Kg</strong>
+                <div v-if="selectedSettlementBatch" class="text-[10.5px] text-slate-500 font-semibold mt-1 space-y-0.5">
+                  <div>Uliopo: <strong class="text-slate-900 font-bold">{{ availableBatchKg.toLocaleString() }} Kg</strong> | Utakaobaki: <strong class="text-emerald-700 font-extrabold">{{ remainingBatchKgAfterSale.toLocaleString() }} Kg</strong></div>
+                  <div class="text-amber-900 font-bold flex items-center gap-1 bg-amber-50 p-1 rounded border border-amber-200">
+                    <span>⏱️ Muda wa Utunzaji: <strong class="text-amber-950 font-black">Siku {{ calculateStorageDays(selectedSettlementBatch.created_at, selectedSettlementBatch.status, selectedSettlementBatch.updated_at) }}</strong> (Mapokezi: {{ formatDate(selectedSettlementBatch.created_at) }})</span>
+                  </div>
                 </div>
               </div>
               <div>
@@ -2674,6 +2721,18 @@ const submitAddFarmer = async () => {
   }
 };
 
+const totalFarmerGrossSales = computed(() => {
+  return (farmerSettlements.value || []).reduce((sum, st) => sum + parseFloat(st.gross_amount || 0), 0);
+});
+
+const totalFarmerDeductions = computed(() => {
+  return (farmerSettlements.value || []).reduce((sum, st) => sum + parseFloat(st.total_deductions || 0), 0);
+});
+
+const totalFarmerNetPayout = computed(() => {
+  return (farmerSettlements.value || []).reduce((sum, st) => sum + parseFloat(st.net_payout || 0), 0);
+});
+
 const settleGrossSales = computed(() => {
   const b = activeNonTransformedBatches.value.find(item => item.id === settlementForm.value.batch_id);
   const defaultKg = b ? (parseFloat(b.current_weight_mt || b.current_weight || 0) * 1000) : totalFarmerStockKg.value;
@@ -2768,6 +2827,34 @@ const submitSettlement = async () => {
 const formatDate = (dateStr) => {
   if (!dateStr) return 'N/A';
   return new Date(dateStr).toLocaleDateString('sw-TZ', { day: '2-digit', month: 'short', year: 'numeric' });
+};
+
+const calculateStorageDays = (dateStr, status = 'active', updatedAtStr = null) => {
+  if (!dateStr) return 0;
+  const startDate = new Date(dateStr);
+  if (isNaN(startDate.getTime())) return 0;
+
+  let endDate = new Date();
+  if ((status === 'sold' || status === 'transformed') && updatedAtStr) {
+    const updatedDate = new Date(updatedAtStr);
+    if (!isNaN(updatedDate.getTime())) {
+      endDate = updatedDate;
+    }
+  }
+
+  const diffMs = endDate.getTime() - startDate.getTime();
+  if (diffMs < 0) return 1;
+
+  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  return days === 0 ? 1 : days;
+};
+
+const formatStorageDaysBadge = (dateStr, status = 'active', updatedAtStr = null) => {
+  const days = calculateStorageDays(dateStr, status, updatedAtStr);
+  if (days === 1) {
+    return '⏱️ Imepokelewa Leo (Siku 1)';
+  }
+  return `⏱️ Siku ${days} Ghalani`;
 };
 
 const resetFilters = () => {

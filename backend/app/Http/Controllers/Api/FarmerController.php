@@ -65,6 +65,7 @@ class FarmerController extends Controller
     private static function mapFarmerStats($farmer) {
         $batches = $farmer->batches()->get();
         $loans = $farmer->loans()->get();
+        $settlements = $farmer->settlements()->get();
 
         $activeStock = $batches->where('status', '!=', 'sold')->sum('current_weight_mt');
         $expectedStatus = ($activeStock > 0.001) ? 'active' : 'inactive';
@@ -89,6 +90,7 @@ class FarmerController extends Controller
             'active_stock' => $activeStock,
             'active_loans' => $loans->where('status', 'active')->count(),
             'loan_balance' => $loans->whereIn('status', ['active', 'overdue'])->sum('current_balance'),
+            'total_net_payout' => $settlements->sum('net_payout'),
             'created_at' => $farmer->created_at->format('Y-m-d H:i'),
         ];
     }

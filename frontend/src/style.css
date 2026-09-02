@@ -1,113 +1,12 @@
 @import "tailwindcss";
 
+/* Tailwind CSS v4 Class-Based Dark Mode Variant */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
   body {
     @apply bg-slate-50 text-slate-800 antialiased font-sans transition-colors duration-300;
   }
-}
-
-/* Premium High-Contrast Dark Mode Styles */
-html.dark {
-  color-scheme: dark;
-}
-
-html.dark body {
-  background-color: #090d16 !important;
-  color: #f8fafc !important;
-}
-
-/* Card, Header, Navbar & Sidebar Backgrounds */
-html.dark header,
-html.dark nav,
-html.dark aside,
-html.dark .bg-white,
-html.dark .bg-slate-50,
-html.dark .bg-slate-50\/70,
-html.dark .bg-slate-100,
-html.dark .bg-slate-100\/80,
-html.dark .bg-slate-200\/70 {
-  background-color: #111827 !important;
-  color: #f8fafc !important;
-  border-color: #1f2937 !important;
-}
-
-/* Text Visibility & High Contrast Overrides */
-html.dark h1,
-html.dark h2,
-html.dark h3,
-html.dark h4,
-html.dark h5,
-html.dark h6,
-html.dark .text-slate-900,
-html.dark .text-slate-800,
-html.dark .text-slate-700,
-html.dark .text-black,
-html.dark .text-gray-900,
-html.dark .text-gray-800 {
-  color: #f8fafc !important;
-}
-
-html.dark .text-slate-600,
-html.dark .text-slate-500,
-html.dark .text-gray-700,
-html.dark .text-gray-600 {
-  color: #cbd5e1 !important;
-}
-
-html.dark .text-slate-400,
-html.dark .text-gray-500 {
-  color: #94a3b8 !important;
-}
-
-/* SVG Icons Visibility in Dark Mode */
-html.dark svg:not(.text-emerald-500):not(.text-red-500):not(.text-blue-500):not(.text-amber-500):not(.text-yellow-400) {
-  color: #cbd5e1 !important;
-}
-
-html.dark svg.text-slate-400,
-html.dark svg.text-slate-500,
-html.dark svg.text-slate-600 {
-  color: #94a3b8 !important;
-}
-
-/* Form Controls & Inputs in Dark Mode */
-html.dark input,
-html.dark select,
-html.dark textarea {
-  background-color: #0f172a !important;
-  color: #f8fafc !important;
-  border-color: #334155 !important;
-}
-
-html.dark input::placeholder,
-html.dark textarea::placeholder {
-  color: #64748b !important;
-}
-
-/* Table Cells & Headers */
-html.dark table th {
-  background-color: #1e293b !important;
-  color: #f8fafc !important;
-  border-color: #334155 !important;
-}
-
-html.dark table td {
-  border-color: #1f2937 !important;
-  color: #e2e8f0 !important;
-}
-
-html.dark table tr:hover {
-  background-color: #1e293b !important;
-}
-
-/* Borders in Dark Mode */
-html.dark .border-slate-200,
-html.dark .border-slate-100,
-html.dark .border-slate-300,
-html.dark .border-slate-200\/60,
-html.dark .border-slate-200\/70,
-html.dark .border-slate-200\/80 {
-  border-color: #1f2937 !important;
 }
 
 /* Custom smooth entrance animations */
