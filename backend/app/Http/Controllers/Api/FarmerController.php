@@ -97,49 +97,64 @@ class FarmerController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:50',
-            'national_id' => 'nullable|string|max:100',
-            'region' => 'nullable|string|max:100',
-            'district' => 'nullable|string|max:100',
-            'ward' => 'nullable|string|max:100',
-            'village' => 'nullable|string|max:100',
-            'street' => 'nullable|string|max:100',
-        ]);
-
-        // Auto-resolve tenant safely
-        $tenant = \App\Models\Tenant::first();
-        if (!$tenant) {
-            $tenant = \App\Models\Tenant::create([
-                'name' => 'Garanoki Main Store',
-                'subdomain' => 'garanoki-store',
-                'status' => 'active'
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'phone' => 'required|string|max:50',
+                'national_id' => 'nullable|string|max:100',
+                'region' => 'nullable|string|max:100',
+                'district' => 'nullable|string|max:100',
+                'ward' => 'nullable|string|max:100',
+                'village' => 'nullable|string|max:100',
+                'street' => 'nullable|string|max:100',
             ]);
-        }
-        $tenantId = $tenant->id;
 
-        // Auto-generate code uniquely without collisions
-        $nextNumber = 1;
-        do {
-            $farmerCode = 'FRM-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
-            $exists = Farmer::where('tenant_id', $tenantId)->where('farmer_code', $farmerCode)->exists();
-            if ($exists) {
-                $nextNumber++;
+            // Auto-resolve tenant safely
+            $tenant = \App\Models\Tenant::first();
+            if (!$tenant) {
+                $tenant = \App\Models\Tenant::create([
+                    'name' => 'Garanoki Main Store',
+                    'subdomain' => 'garanoki-store',
+                    'status' => 'active'
+                ]);
             }
-        } while ($exists);
+            $tenantId = $tenant->id;
 
-        $farmer = Farmer::create(array_merge($validated, [
-            'tenant_id' => $tenantId,
-            'farmer_code' => $farmerCode,
-            'status' => 'inactive',
-        ]));
+            // Auto-generate code uniquely without collisions
+            $nextNumber = 1;
+            do {
+                $farmerCode = 'FRM-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+                $exists = Farmer::where('tenant_id', $tenantId)->where('farmer_code', $farmerCode)->exists();
+                if ($exists) {
+                    $nextNumber++;
+                }
+            } while ($exists);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Farmer registered successfully',
-            'farmer' => $farmer
-        ], 201);
+            $farmer = Farmer::create(array_merge($validated, [
+                'tenant_id' => $tenantId,
+                'farmer_code' => $farmerCode,
+                'status' => 'inactive',
+            ]));
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Mkulima amesajiliwa kikamilifu',
+                'farmer' => $farmer
+            ], 201);
+        } catch (\Illuminate\Validation\ValidationException $ve) {
+            $errs = implode(', ', \Illuminate\Support\Arr::flatten($ve->errors()));
+            return response()->json([
+                'success' => false,
+                'message' => 'Taarifa za fomu zina kasoro: ' . $errs,
+                'errors' => $ve->errors()
+            ], 422);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Farmer registration failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Kosa la Server: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function show($id)
