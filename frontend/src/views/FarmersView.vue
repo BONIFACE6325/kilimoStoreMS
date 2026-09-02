@@ -2708,16 +2708,29 @@ const submitAddFarmer = async () => {
   try {
     const res = await fetch('/api/v1/farmers', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
       body: JSON.stringify(newFarmerForm.value)
     });
+
+    const data = await res.json().catch(() => ({}));
+
     if (res.ok) {
       modals.value.addFarmer = false;
       await fetchFarmers();
       triggerToast('Mkulima Mpya Umesajiliwa kwenye Database! 🌾');
+      // Reset form inputs
+      newFarmerForm.value = { name: '', phone: '', region: '', location: '', national_id: '' };
+    } else {
+      console.error('Server Error on registering farmer:', data);
+      const errMsg = data.message || (data.errors ? Object.values(data.errors).flat().join(', ') : 'Imefeli kusajili mkulima.');
+      triggerToast(errMsg, 'error');
     }
   } catch (e) {
-    triggerToast('Imefeli kusajili mkulima.', 'error');
+    console.error('Network Error on registering farmer:', e);
+    triggerToast('Imefeli kusajili mkulima: ' + e.message, 'error');
   }
 };
 

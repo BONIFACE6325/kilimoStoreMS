@@ -2,12 +2,12 @@
   <div v-if="$route.path === '/login' || !isAuthenticated" class="min-h-screen w-full">
     <router-view />
   </div>
-  <div v-else class="min-h-screen flex bg-slate-50 text-slate-800 antialiased font-sans">
+  <div v-else class="h-screen w-full flex overflow-hidden bg-slate-50 text-slate-800 antialiased font-sans">
     <!-- Sidebar Navigation -->
     <Sidebar />
 
     <!-- Main Content Panel -->
-    <div class="flex-1 flex flex-col min-w-0 w-full overflow-x-hidden">
+    <div class="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
       <Topbar />
       
       <main class="flex-1 p-3 sm:p-5 lg:p-6 overflow-y-auto w-full min-w-0">

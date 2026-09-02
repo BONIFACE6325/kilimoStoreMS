@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :class="[isSidebarCollapsed ? 'md:w-18' : 'md:w-64', 'shrink-0 h-full transition-all duration-300']">
     <!-- Mobile Backdrop Overlay -->
     <transition name="fade">
       <div 
@@ -11,13 +11,9 @@
 
     <!-- Sidebar Container -->
     <aside 
-      class="bg-slate-950 text-slate-300 h-screen h-[100dvh] sticky top-0 flex flex-col border-r border-slate-800/80 shrink-0 select-none overflow-hidden z-50 transition-all duration-300 ease-in-out"
+      class="bg-slate-950 text-slate-300 h-full flex flex-col border-r border-slate-800/80 select-none overflow-hidden transition-all duration-300 ease-in-out fixed md:sticky top-0 left-0 z-50 w-72 md:w-full"
       :class="[
-        // Desktop collapse logic: Icon-Only Rail mode (w-18 = 72px) vs Expanded (w-64 = 256px)
-        isSidebarCollapsed ? 'md:w-18' : 'md:w-64',
-        // Mobile drawer logic
-        'fixed md:sticky top-0 left-0',
-        isMobileSidebarOpen ? 'translate-x-0 w-72 sm:w-64 shadow-2xl' : '-translate-x-full md:translate-x-0'
+        isMobileSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
       ]"
     >
       
@@ -38,7 +34,7 @@
         </div>
 
         <!-- Mobile Close Button -->
-        <button v-if="!isSidebarCollapsed" @click="closeMobileSidebar" class="md:hidden text-slate-400 hover:text-white p-1 rounded-lg">
+        <button @click="closeMobileSidebar" class="md:hidden text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition cursor-pointer" title="Close Menu">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>

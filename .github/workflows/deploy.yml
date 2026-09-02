@@ -75,10 +75,16 @@ jobs:
             echo "⚙️ Running Backend Composer & Migrations..."
             cd /var/www/kilimostore/backend
             composer install --no-dev --optimize-autoloader --no-interaction
+            touch database/database.sqlite || true
             php artisan migrate --force
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
+            php artisan config:clear || true
+            php artisan route:clear || true
+            php artisan view:clear || true
+
+            echo "🔒 Ensuring Nginx & www-data Write Access to SQLite & Storage..."
+            sudo chown -R www-data:www-data /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache /var/www/kilimostore/backend/database
+            sudo chmod -R 777 /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache /var/www/kilimostore/backend/database
+            sudo chmod 666 /var/www/kilimostore/backend/database/database.sqlite || true
             
             echo "🎨 Building Production Frontend Assets..."
             cd /var/www/kilimostore/frontend
