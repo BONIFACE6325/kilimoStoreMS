@@ -1,17 +1,17 @@
 <template>
   <div class="space-y-6 animate-fadeIn">
     <!-- Header -->
-    <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
         <div class="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1">
           <span>Mwanzo</span>
           <span>/</span>
-          <span class="text-emerald-700 font-bold">Orodha ya Huduma</span>
+          <span class="text-emerald-700 dark:text-emerald-400 font-bold">Orodha ya Huduma</span>
         </div>
-        <h1 class="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+        <h1 class="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tight flex items-center gap-2">
           <span>🛠️ Usimamizi wa Ada na Huduma za Kinu</span>
         </h1>
-        <p class="text-xs text-slate-500 font-medium mt-1">
+        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
           Sajili, hariri, na usimamie fomula za bei za huduma za Galanoki, aina za mazao na vipimo vya uzito.
         </p>
       </div>
@@ -19,13 +19,13 @@
       <div class="flex items-center gap-2 flex-wrap">
         <button 
           @click="showCropModal = true"
-          class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-2xl font-extrabold text-xs transition flex items-center gap-1.5"
+          class="px-3.5 py-2 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl font-extrabold text-xs transition flex items-center gap-1.5"
         >
           <span>🌱 + Sajili Zao</span>
         </button>
         <button 
           @click="showUnitModal = true"
-          class="px-3.5 py-2 bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 rounded-2xl font-extrabold text-xs transition flex items-center gap-1.5"
+          class="px-3.5 py-2 bg-teal-50 dark:bg-teal-900/40 hover:bg-teal-100 text-teal-800 dark:text-teal-400 border border-teal-200 dark:border-teal-700/50 rounded-2xl font-extrabold text-xs transition flex items-center gap-1.5"
         >
           <span>⚖️ + Sajili Kipimo</span>
         </button>
@@ -47,53 +47,53 @@
           <div class="text-3xl font-black text-white mt-1">{{ services.length }}</div>
           <div class="text-[11px] text-emerald-300 mt-0.5">Huduma zilizosajiliwa kinu</div>
         </div>
-        <div class="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-xs flex items-center justify-center text-xl">
+        <div class="w-12 h-12 rounded-2xl bg-white/15 dark:bg-slate-900/15 backdrop-blur-xs flex items-center justify-center text-xl">
           ⚙️
         </div>
       </div>
 
-      <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-2xs flex items-center justify-between">
+      <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-between">
         <div>
           <div class="text-xs font-bold uppercase text-slate-400 tracking-wider">Mazao Yaliyosajiliwa</div>
-          <div class="text-3xl font-black text-emerald-700 mt-1">{{ cropsList.length }}</div>
-          <div class="text-[11px] text-slate-500 mt-0.5">Crops Master List</div>
+          <div class="text-3xl font-black text-emerald-700 dark:text-emerald-400 mt-1">{{ cropsList.length }}</div>
+          <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Crops Master List</div>
         </div>
-        <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xl">
+        <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xl">
           🌱
         </div>
       </div>
 
-      <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-2xs flex items-center justify-between">
+      <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-between">
         <div>
           <div class="text-xs font-bold uppercase text-slate-400 tracking-wider">Vipimo Vya Bei</div>
-          <div class="text-3xl font-black text-teal-700 mt-1">{{ unitsList.length }}</div>
-          <div class="text-[11px] text-slate-500 mt-0.5">Units Master List</div>
+          <div class="text-3xl font-black text-teal-700 dark:text-teal-400 mt-1">{{ unitsList.length }}</div>
+          <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Units Master List</div>
         </div>
-        <div class="w-12 h-12 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center text-xl">
+        <div class="w-12 h-12 rounded-2xl bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-400 flex items-center justify-center text-xl">
           ⚖️
         </div>
       </div>
 
-      <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-2xs flex items-center justify-between">
+      <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-between">
         <div>
           <div class="text-xs font-bold uppercase text-slate-400 tracking-wider">Huduma za Kukoboa</div>
           <div class="text-3xl font-black text-amber-600 mt-1">{{ countByCategory('milling') }}</div>
-          <div class="text-[11px] text-slate-500 mt-0.5">Milling Services</div>
+          <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Milling Services</div>
         </div>
-        <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
+        <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 flex items-center justify-center text-xl">
           🌾
         </div>
       </div>
     </div>
 
     <!-- Filters & Search Bar -->
-    <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
+    <div class="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
       <div class="relative w-full sm:w-80">
         <input 
           v-model="searchQuery" 
           type="text" 
           placeholder="Tafuta huduma kwa jina au category..." 
-          class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-semibold focus:bg-white focus:border-emerald-500 transition"
+          class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-semibold focus:bg-white dark:bg-slate-900 focus:border-emerald-500 transition"
         />
         <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
       </div>
@@ -101,28 +101,28 @@
       <div class="flex items-center gap-2 w-full sm:w-auto">
         <button 
           @click="selectedCategoryFilter = ''" 
-          :class="!selectedCategoryFilter ? 'bg-emerald-800 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+          :class="!selectedCategoryFilter ? 'bg-emerald-800 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:bg-slate-700'"
           class="px-3.5 py-2 rounded-xl text-xs font-bold transition"
         >
           Zote
         </button>
         <button 
           @click="selectedCategoryFilter = 'milling'" 
-          :class="selectedCategoryFilter === 'milling' ? 'bg-emerald-800 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+          :class="selectedCategoryFilter === 'milling' ? 'bg-emerald-800 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:bg-slate-700'"
           class="px-3.5 py-2 rounded-xl text-xs font-bold transition"
         >
           Kukoboa
         </button>
         <button 
           @click="selectedCategoryFilter = 'drying'" 
-          :class="selectedCategoryFilter === 'drying' ? 'bg-emerald-800 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+          :class="selectedCategoryFilter === 'drying' ? 'bg-emerald-800 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:bg-slate-700'"
           class="px-3.5 py-2 rounded-xl text-xs font-bold transition"
         >
           Kukausha
         </button>
         <button 
           @click="selectedCategoryFilter = 'grading'" 
-          :class="selectedCategoryFilter === 'grading' ? 'bg-emerald-800 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+          :class="selectedCategoryFilter === 'grading' ? 'bg-emerald-800 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:bg-slate-700'"
           class="px-3.5 py-2 rounded-xl text-xs font-bold transition"
         >
           Grading
@@ -133,54 +133,54 @@
     <!-- Loading State -->
     <div v-if="loading" class="text-center py-16">
       <div class="inline-block animate-spin w-8 h-8 border-4 border-emerald-600 border-t-transparent rounded-full mb-2"></div>
-      <div class="text-xs text-slate-500 font-bold">Inapakia orodha ya huduma...</div>
+      <div class="text-xs text-slate-500 dark:text-slate-400 font-bold">Inapakia orodha ya huduma...</div>
     </div>
 
     <!-- Services Grid -->
-    <div v-else-if="filteredServices.length === 0" class="bg-white p-12 rounded-3xl border border-slate-200 text-center space-y-3">
+    <div v-else-if="filteredServices.length === 0" class="bg-white dark:bg-slate-900 p-12 rounded-3xl border border-slate-200 dark:border-slate-700 text-center space-y-3">
       <div class="text-4xl">🛠️</div>
-      <h3 class="text-base font-bold text-slate-800">Hakuna Huduma Zilizopatikana</h3>
-      <p class="text-xs text-slate-500 max-w-sm mx-auto font-medium">Jaribu kubadilisha neno la kutafuta au bofya kitufe cha "+ Sajili Huduma Mpya" kuongeza huduma mpya.</p>
+      <h3 class="text-base font-bold text-slate-800 dark:text-slate-100">Hakuna Huduma Zilizopatikana</h3>
+      <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto font-medium">Jaribu kubadilisha neno la kutafuta au bofya kitufe cha "+ Sajili Huduma Mpya" kuongeza huduma mpya.</p>
     </div>
 
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
       <div 
         v-for="s in filteredServices" 
         :key="s.id" 
-        class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-2xs hover:border-emerald-300 hover:shadow-md transition space-y-4 flex flex-col justify-between"
+        class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-emerald-300 dark:border-emerald-500/30 hover:shadow-md transition space-y-4 flex flex-col justify-between"
       >
         <div class="space-y-2.5">
           <div class="flex items-center justify-between flex-wrap gap-2">
-            <span class="px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-lg text-[10.5px] font-black uppercase tracking-wider">
+            <span class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-lg text-[10.5px] font-black uppercase tracking-wider">
               Kipimo: {{ s.unit || 'Kg' }}
             </span>
-            <span class="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg text-[10.5px] font-bold">
+            <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg text-[10.5px] font-bold">
               Zao: {{ s.crop_type || 'Zote (All)' }}
             </span>
           </div>
 
           <div>
-            <h3 class="text-base font-extrabold text-slate-900 leading-snug">{{ s.name_sw }}</h3>
-            <p v-if="s.description" class="text-xs text-slate-500 font-medium mt-1">{{ s.description }}</p>
+            <h3 class="text-base font-extrabold text-slate-900 dark:text-slate-50 leading-snug">{{ s.name_sw }}</h3>
+            <p v-if="s.description" class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">{{ s.description }}</p>
           </div>
         </div>
 
-        <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+        <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div>
             <div class="text-[10px] uppercase font-bold text-slate-400">Bei Kwa Kipimo</div>
-            <div class="text-lg font-black text-emerald-700">Tsh {{ parseFloat(s.rate || 0).toLocaleString() }}</div>
+            <div class="text-lg font-black text-emerald-700 dark:text-emerald-400">Tsh {{ parseFloat(s.rate || 0).toLocaleString() }}</div>
           </div>
 
           <div class="flex items-center gap-2">
             <button 
               @click="openEditModal(s)" 
-              class="px-3 py-1.5 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 text-slate-700 font-bold rounded-xl text-xs transition"
+              class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:bg-emerald-500/10 hover:text-emerald-800 dark:text-emerald-400 text-slate-700 dark:text-slate-200 font-bold rounded-xl text-xs transition"
             >
               Hariri
             </button>
             <button 
               @click="deleteService(s.id)" 
-              class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-xl text-xs transition"
+              class="px-3 py-1.5 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 font-bold rounded-xl text-xs transition"
             >
               Futa
             </button>
@@ -191,27 +191,27 @@
 
     <!-- MODAL 1: SAJILI / HARIRI HUDUMA -->
     <div v-if="showModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-slate-200 animate-fadeIn">
+      <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 animate-fadeIn">
         <div class="px-6 py-4 border-b border-emerald-800 flex items-center justify-between bg-gradient-to-r from-emerald-900 to-teal-900 text-white">
           <h3 class="text-base font-extrabold">{{ form.id ? 'Hariri Huduma' : 'Sajili Huduma Mpya' }}</h3>
           <button @click="closeModal" class="text-emerald-200 hover:text-white p-1">✕</button>
         </div>
 
-        <div class="p-6 space-y-4 text-xs font-semibold text-slate-700">
+        <div class="p-6 space-y-4 text-xs font-semibold text-slate-700 dark:text-slate-200">
           <div>
-            <label class="block mb-1 font-bold text-slate-800">Jina la Huduma (Swahili) *</label>
+            <label class="block mb-1 font-bold text-slate-800 dark:text-slate-100">Jina la Huduma (Swahili) *</label>
             <input 
               v-model="form.name_sw" 
               type="text" 
               placeholder="e.g. Kukoboa Mpunga" 
-              class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 focus:bg-white focus:border-emerald-500"
+              class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50 focus:bg-white dark:bg-slate-900 focus:border-emerald-500"
             />
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block mb-1 font-bold text-slate-800">Category *</label>
-              <select v-model="form.category" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold">
+              <label class="block mb-1 font-bold text-slate-800 dark:text-slate-100">Category *</label>
+              <select v-model="form.category" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold">
                 <option value="milling">Kukoboa (Milling)</option>
                 <option value="drying">Kukausha (Drying)</option>
                 <option value="grading">Grading / Sorting</option>
@@ -222,10 +222,10 @@
 
             <div>
               <div class="flex items-center justify-between mb-1">
-                <label class="font-bold text-slate-800">Aina ya Zao</label>
-                <button @click="showCropModal = true" class="text-[10.5px] font-extrabold text-emerald-700 hover:underline">+ Sajili Zao</button>
+                <label class="font-bold text-slate-800 dark:text-slate-100">Aina ya Zao</label>
+                <button @click="showCropModal = true" class="text-[10.5px] font-extrabold text-emerald-700 dark:text-emerald-400 hover:underline">+ Sajili Zao</button>
               </div>
-              <select v-model="form.crop_type" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold">
+              <select v-model="form.crop_type" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold">
                 <option value="">Zote (All)</option>
                 <option v-for="c in cropsList" :key="c" :value="c">{{ c }}</option>
               </select>
@@ -235,37 +235,37 @@
           <div class="grid grid-cols-2 gap-3">
             <div>
               <div class="flex items-center justify-between mb-1">
-                <label class="font-bold text-slate-800">Kipimo cha Bei *</label>
-                <button @click="showUnitModal = true" class="text-[10.5px] font-extrabold text-teal-700 hover:underline">+ Sajili Kipimo</button>
+                <label class="font-bold text-slate-800 dark:text-slate-100">Kipimo cha Bei *</label>
+                <button @click="showUnitModal = true" class="text-[10.5px] font-extrabold text-teal-700 dark:text-teal-400 hover:underline">+ Sajili Kipimo</button>
               </div>
-              <select v-model="form.unit" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold">
+              <select v-model="form.unit" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold">
                 <option v-for="u in unitsList" :key="u.name" :value="u.name">{{ u.name }}</option>
               </select>
             </div>
 
             <div>
-              <label class="block mb-1 font-bold text-slate-800">Bei kwa Kipimo (Tsh) *</label>
+              <label class="block mb-1 font-bold text-slate-800 dark:text-slate-100">Bei kwa Kipimo (Tsh) *</label>
               <input 
                 v-model.number="form.rate" 
                 type="number" 
                 placeholder="e.g. 70" 
-                class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 focus:bg-white focus:border-emerald-500"
+                class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50 focus:bg-white dark:bg-slate-900 focus:border-emerald-500"
               />
             </div>
           </div>
 
           <div>
-            <label class="block mb-1 font-bold text-slate-800">Maelezo ya Huduma (Optional)</label>
+            <label class="block mb-1 font-bold text-slate-800 dark:text-slate-100">Maelezo ya Huduma (Optional)</label>
             <textarea 
               v-model="form.description" 
               rows="2" 
               placeholder="e.g. Ada ya kukoboa mpunga kwa kilo moja" 
-              class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium"
+              class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-medium"
             ></textarea>
           </div>
 
-          <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
-            <button @click="closeModal" class="px-4 py-2 bg-slate-200 text-slate-700 font-bold rounded-xl">Ghairi</button>
+          <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+            <button @click="closeModal" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl">Ghairi</button>
             <button @click="saveService" class="px-5 py-2 bg-emerald-600 text-white font-bold rounded-xl shadow-xs hover:bg-emerald-700 transition">
               {{ form.id ? 'Hifadhi Mabadiliko' : 'Sajili Huduma' }}
             </button>
@@ -276,20 +276,20 @@
 
     <!-- MODAL 2: SAJILI ZAO JIPYA (Full Crops Control) -->
     <div v-if="showCropModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden border border-slate-200 animate-fadeIn">
+      <div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 animate-fadeIn">
         <div class="px-6 py-4 border-b border-emerald-800 flex items-center justify-between bg-gradient-to-r from-emerald-900 to-teal-900 text-white">
           <h3 class="text-base font-extrabold">🌱 Usimamizi wa Mazao</h3>
           <button @click="showCropModal = false" class="text-emerald-200 hover:text-white p-1">✕</button>
         </div>
-        <div class="p-6 space-y-4 text-xs font-semibold text-slate-700">
+        <div class="p-6 space-y-4 text-xs font-semibold text-slate-700 dark:text-slate-200">
           <div>
-            <label class="block mb-1 font-bold text-slate-800">Jina la Zao Jipya *</label>
+            <label class="block mb-1 font-bold text-slate-800 dark:text-slate-100">Jina la Zao Jipya *</label>
             <div class="flex gap-2">
               <input 
                 v-model="newCropInput" 
                 type="text" 
                 placeholder="e.g. Alizeti, Ngano, Pamba" 
-                class="flex-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold"
+                class="flex-1 p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold"
               />
               <button @click="handleSaveCrop" class="px-4 py-2.5 bg-emerald-600 text-white font-extrabold rounded-xl shadow-xs hover:bg-emerald-700 transition">
                 Sajili
@@ -297,24 +297,24 @@
             </div>
           </div>
 
-          <div class="space-y-2 pt-2 border-t border-slate-100">
-            <div class="text-xs font-extrabold text-slate-900">Orodha ya Mazao Yaliyopo (Full Control):</div>
+          <div class="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+            <div class="text-xs font-extrabold text-slate-900 dark:text-slate-50">Orodha ya Mazao Yaliyopo (Full Control):</div>
             <div class="max-h-48 overflow-y-auto space-y-1.5 pr-1">
               <div 
                 v-for="c in cropsList" 
                 :key="c" 
-                class="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-xl"
+                class="flex items-center justify-between p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl"
               >
-                <span class="font-bold text-slate-800">{{ c }}</span>
-                <button @click="deleteCrop(c)" class="text-red-500 hover:text-red-700 font-extrabold text-xs">
+                <span class="font-bold text-slate-800 dark:text-slate-100">{{ c }}</span>
+                <button @click="deleteCrop(c)" class="text-red-500 hover:text-red-700 dark:text-red-400 font-extrabold text-xs">
                   Futa
                 </button>
               </div>
             </div>
           </div>
 
-          <div class="flex justify-end pt-2 border-t border-slate-100">
-            <button @click="showCropModal = false" class="px-4 py-2 bg-slate-200 text-slate-700 font-bold rounded-xl">Funga</button>
+          <div class="flex justify-end pt-2 border-t border-slate-100 dark:border-slate-800">
+            <button @click="showCropModal = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl">Funga</button>
           </div>
         </div>
       </div>
@@ -322,7 +322,7 @@
 
     <!-- MODAL 3: SAJILI NA EDIT MILINGANYO YA VIPIMO (Full Unit Conversion Control) -->
     <div v-if="showUnitModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-slate-200 animate-fadeIn">
+      <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 animate-fadeIn">
         <div class="px-6 py-4 border-b border-teal-800 flex items-center justify-between bg-gradient-to-r from-teal-900 to-emerald-900 text-white">
           <h3 class="text-base font-black flex items-center gap-2">
             <span>⚖️ Usimamizi wa Milinganyo ya Vipimo</span>
@@ -330,17 +330,17 @@
           <button @click="showUnitModal = false" class="text-teal-200 hover:text-white p-1 cursor-pointer">✕</button>
         </div>
 
-        <div class="p-6 space-y-5 text-xs font-semibold text-slate-700 max-h-[85vh] overflow-y-auto">
+        <div class="p-6 space-y-5 text-xs font-semibold text-slate-700 dark:text-slate-200 max-h-[85vh] overflow-y-auto">
 
           <!-- DUAL DROPDOWN & DUAL INPUT EQUIVALENCE CONTROL BUILDER -->
           <div class="bg-gradient-to-br from-slate-900 via-slate-950 to-emerald-950 text-white p-5 rounded-3xl shadow-xl space-y-4 border border-teal-500/30">
             <div class="grid grid-cols-1 sm:grid-cols-11 gap-3 items-center">
               <!-- Left Side: Unit A Dropdown & Input -->
-              <div class="sm:col-span-5 space-y-2 bg-white/5 p-3 rounded-2xl border border-white/10">
+              <div class="sm:col-span-5 space-y-2 bg-white/5 dark:bg-slate-900/5 p-3 rounded-2xl border border-white/10">
                 <select v-model="eqForm.unitA" class="w-full p-2.5 bg-slate-900 border border-white/20 rounded-xl font-black text-white text-xs">
                   <option v-for="u in unitsList" :key="u.name" :value="u.name">{{ u.name }}</option>
                 </select>
-                <input v-model.number="eqForm.amountA" type="number" placeholder="1" class="w-full p-2 bg-white/10 border border-white/15 rounded-xl font-black text-white text-sm text-center focus:bg-white/20 focus:outline-hidden" />
+                <input v-model.number="eqForm.amountA" type="number" placeholder="1" class="w-full p-2 bg-white/10 dark:bg-slate-900/10 border border-white/15 rounded-xl font-black text-white text-sm text-center focus:bg-white/20 dark:bg-slate-900/20 focus:outline-hidden" />
               </div>
 
               <!-- Equals Sign Badge -->
@@ -349,11 +349,11 @@
               </div>
 
               <!-- Right Side: Unit B Dropdown & Input -->
-              <div class="sm:col-span-5 space-y-2 bg-white/5 p-3 rounded-2xl border border-white/10">
+              <div class="sm:col-span-5 space-y-2 bg-white/5 dark:bg-slate-900/5 p-3 rounded-2xl border border-white/10">
                 <select v-model="eqForm.unitB" class="w-full p-2.5 bg-slate-900 border border-white/20 rounded-xl font-bold text-white text-xs">
                   <option v-for="u in unitsList" :key="u.name" :value="u.name">{{ u.name }}</option>
                 </select>
-                <input v-model.number="eqForm.amountB" type="number" placeholder="50" class="w-full p-2 bg-white/10 border border-white/15 rounded-xl font-black text-white text-sm text-center focus:bg-white/20 focus:outline-hidden" />
+                <input v-model.number="eqForm.amountB" type="number" placeholder="50" class="w-full p-2 bg-white/10 dark:bg-slate-900/10 border border-white/15 rounded-xl font-black text-white text-sm text-center focus:bg-white/20 dark:bg-slate-900/20 focus:outline-hidden" />
               </div>
             </div>
 
@@ -370,17 +370,17 @@
           </div>
 
           <!-- Quick Add New Unit -->
-          <div class="p-3 bg-teal-50/60 border border-teal-200 rounded-2xl flex items-center gap-2">
-            <input v-model="newUnitInput.name" type="text" placeholder="+ Sajili Kipimo Kipya (e.g. Lumbesa)" class="flex-1 p-2 bg-white border border-slate-200 rounded-xl font-bold text-xs"/>
+          <div class="p-3 bg-teal-50/60 dark:bg-teal-900/40 border border-teal-200 dark:border-teal-700/50 rounded-2xl flex items-center gap-2">
+            <input v-model="newUnitInput.name" type="text" placeholder="+ Sajili Kipimo Kipya (e.g. Lumbesa)" class="flex-1 p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-xs"/>
             <button @click="handleQuickAddUnit" class="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white font-extrabold text-xs rounded-xl shadow-xs transition cursor-pointer whitespace-nowrap">
               + Sajili
             </button>
           </div>
 
           <!-- Unit Equivalences Table -->
-          <div class="space-y-2 pt-1 border-t border-slate-100">
+          <div class="space-y-2 pt-1 border-t border-slate-100 dark:border-slate-800">
             <div class="flex items-center justify-between">
-              <div class="text-xs font-extrabold text-slate-900">📊 Jedwali la Milinganyo ya Vipimo (Registered Equivalences):</div>
+              <div class="text-xs font-extrabold text-slate-900 dark:text-slate-50">📊 Jedwali la Milinganyo ya Vipimo (Registered Equivalences):</div>
               <span class="text-[10.5px] text-slate-400 font-mono">{{ unitsList.length }} Registered Units</span>
             </div>
 
@@ -388,34 +388,34 @@
               <div 
                 v-for="u in unitsList" 
                 :key="u.name" 
-                class="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl hover:border-teal-300 transition"
+                class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl hover:border-teal-300 transition"
               >
                 <!-- INLINE EDIT MODE -->
                 <div v-if="editingUnitName === u.name" class="space-y-2">
-                  <div class="font-extrabold text-teal-950 text-xs flex items-center justify-between">
+                  <div class="font-extrabold text-teal-950 dark:text-teal-400 text-xs flex items-center justify-between">
                     <span>✏️ Hariri Kipimo na Uzito:</span>
-                    <button @click="editingUnitName = null" class="text-slate-400 hover:text-slate-600 font-black text-xs cursor-pointer">✕ Ghairi</button>
+                    <button @click="editingUnitName = null" class="text-slate-400 hover:text-slate-600 dark:text-slate-300 font-black text-xs cursor-pointer">✕ Ghairi</button>
                   </div>
                   <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
                     <div class="sm:col-span-7">
-                      <label class="block text-[9.5px] font-bold text-slate-500 mb-0.5">Jina la Kipimo (Name)</label>
+                      <label class="block text-[9.5px] font-bold text-slate-500 dark:text-slate-400 mb-0.5">Jina la Kipimo (Name)</label>
                       <input 
                         v-model="editUnitForm.name" 
                         type="text" 
-                        class="w-full p-1.5 bg-white border border-slate-300 rounded-xl font-extrabold text-xs text-slate-900"
+                        class="w-full p-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl font-extrabold text-xs text-slate-900 dark:text-slate-50"
                       />
                     </div>
                     <div class="sm:col-span-5">
-                      <label class="block text-[9.5px] font-bold text-slate-500 mb-0.5">Mlinganyo wa Kg (Ratio)</label>
+                      <label class="block text-[9.5px] font-bold text-slate-500 dark:text-slate-400 mb-0.5">Mlinganyo wa Kg (Ratio)</label>
                       <input 
                         v-model.number="editUnitForm.kg" 
                         type="number" 
-                        class="w-full p-1.5 bg-white border border-slate-300 rounded-xl font-extrabold text-xs text-emerald-800"
+                        class="w-full p-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl font-extrabold text-xs text-emerald-800 dark:text-emerald-400"
                       />
                     </div>
                   </div>
                   <div class="flex justify-end gap-1.5 pt-1">
-                    <button @click="editingUnitName = null" class="px-3 py-1 bg-slate-200 text-slate-700 font-bold rounded-lg text-xs cursor-pointer">Ghairi</button>
+                    <button @click="editingUnitName = null" class="px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-lg text-xs cursor-pointer">Ghairi</button>
                     <button @click="saveUnitEdit(u.name)" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-lg text-xs shadow-xs cursor-pointer">💾 Hifadhi</button>
                   </div>
                 </div>
@@ -423,25 +423,25 @@
                 <!-- DISPLAY MODE -->
                 <div v-else class="flex items-center justify-between gap-2">
                   <div class="space-y-0.5">
-                    <div class="font-extrabold text-slate-900 text-xs flex items-center gap-1.5 flex-wrap">
+                    <div class="font-extrabold text-slate-900 dark:text-slate-50 text-xs flex items-center gap-1.5 flex-wrap">
                       <span>{{ u.name }}</span>
-                      <span v-if="u.formulaText" class="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300/80 rounded-lg text-[10px] font-black font-mono">
+                      <span v-if="u.formulaText" class="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-300/80 dark:border-emerald-700/60 rounded-lg text-[10px] font-black font-mono">
                         🔄 {{ u.formulaText }}
                       </span>
                     </div>
-                    <div class="text-[11px] text-teal-800 font-bold font-mono">
-                      1 {{ u.name }} = <span class="text-emerald-700 font-black">{{ u.kg }} Kg</span>
+                    <div class="text-[11px] text-teal-800 dark:text-teal-400 font-bold font-mono">
+                      1 {{ u.name }} = <span class="text-emerald-700 dark:text-emerald-400 font-black">{{ u.kg }} Kg</span>
                     </div>
                   </div>
 
                   <div class="flex items-center gap-1.5 shrink-0">
-                    <div class="px-2.5 py-1 bg-slate-100 border border-slate-200/80 rounded-xl text-xs font-mono font-extrabold text-slate-700 select-none">
+                    <div class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-mono font-extrabold text-slate-700 dark:text-slate-200 select-none">
                       {{ u.kg }} Kg
                     </div>
-                    <button @click="startEditUnit(u)" class="px-2.5 py-1 text-teal-700 hover:text-teal-900 hover:bg-teal-50 border border-teal-200 rounded-xl transition font-extrabold text-xs cursor-pointer flex items-center gap-1">
+                    <button @click="startEditUnit(u)" class="px-2.5 py-1 text-teal-700 dark:text-teal-400 hover:text-teal-900 dark:text-teal-400 hover:bg-teal-50 dark:bg-teal-900/40 border border-teal-200 dark:border-teal-700/50 rounded-xl transition font-extrabold text-xs cursor-pointer flex items-center gap-1">
                       <span>✏️ Badili</span>
                     </button>
-                    <button @click="handleDeleteUnit(u.name)" class="px-2.5 py-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl transition font-extrabold text-xs cursor-pointer">
+                    <button @click="handleDeleteUnit(u.name)" class="px-2.5 py-1 text-red-500 hover:text-red-700 dark:text-red-400 hover:bg-red-50 dark:bg-red-500/10 rounded-xl transition font-extrabold text-xs cursor-pointer">
                       Futa
                     </button>
                   </div>
@@ -450,8 +450,8 @@
             </div>
           </div>
 
-          <div class="flex justify-end pt-2 border-t border-slate-100">
-            <button @click="showUnitModal = false" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-extrabold rounded-xl transition">Funga</button>
+          <div class="flex justify-end pt-2 border-t border-slate-100 dark:border-slate-800">
+            <button @click="showUnitModal = false" class="px-5 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-800 dark:text-slate-100 font-extrabold rounded-xl transition">Funga</button>
           </div>
         </div>
       </div>
@@ -474,7 +474,7 @@
           <span class="text-[10px] font-black uppercase tracking-wider" :class="toast.type === 'error' ? 'text-rose-400' : 'text-emerald-400'">
             {{ toast.type === 'error' ? 'Onyo la Mfumo' : 'Taarifa ya Mfumo' }}
           </span>
-          <button @click="toast.show = false" class="text-white/60 hover:text-white text-xs font-bold p-0.5 rounded-lg hover:bg-white/10 transition cursor-pointer">✕</button>
+          <button @click="toast.show = false" class="text-white/60 hover:text-white text-xs font-bold p-0.5 rounded-lg hover:bg-white/10 dark:bg-slate-900/10 transition cursor-pointer">✕</button>
         </div>
         <div class="font-extrabold text-xs text-white/95 leading-relaxed break-words">
           {{ toast.message }}
@@ -484,16 +484,16 @@
 
     <!-- CUSTOM BEAUTIFUL CONFIRMATION DIALOG MODAL -->
     <div v-if="confirmModal.show" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden border border-slate-100 p-6 space-y-4 text-center animate-fadeIn">
+      <div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-800 p-6 space-y-4 text-center animate-fadeIn">
         <div class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-500 flex items-center justify-center text-2xl mx-auto shadow-inner">
           ⚠️
         </div>
         <div class="space-y-1">
-          <h3 class="text-sm font-black text-slate-900">{{ confirmModal.title }}</h3>
-          <p class="text-xs font-semibold text-slate-600 leading-relaxed">{{ confirmModal.message }}</p>
+          <h3 class="text-sm font-black text-slate-900 dark:text-slate-50">{{ confirmModal.title }}</h3>
+          <p class="text-xs font-semibold text-slate-600 dark:text-slate-300 leading-relaxed">{{ confirmModal.message }}</p>
         </div>
         <div class="flex items-center gap-2 pt-2">
-          <button @click="confirmModal.show = false" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs rounded-xl transition cursor-pointer">
+          <button @click="confirmModal.show = false" class="flex-1 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-extrabold text-xs rounded-xl transition cursor-pointer">
             Ghairi
           </button>
           <button @click="executeConfirmAction" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs rounded-xl shadow-md transition cursor-pointer">

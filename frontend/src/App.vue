@@ -2,7 +2,7 @@
   <div v-if="$route.path === '/login' || !isAuthenticated" class="min-h-screen w-full">
     <router-view />
   </div>
-  <div v-else class="h-screen w-full flex overflow-hidden bg-slate-50 text-slate-800 antialiased font-sans">
+  <div v-else class="h-screen w-full flex overflow-hidden bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 antialiased font-sans">
     <!-- Sidebar Navigation -->
     <Sidebar />
 

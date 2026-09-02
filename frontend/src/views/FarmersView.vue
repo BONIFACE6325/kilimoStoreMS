@@ -2,12 +2,12 @@
   <div class="space-y-6 pb-12">
     
     <!-- Page Header Bar (Clean Dashboard Style) -->
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs">
       <div>
-        <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tight flex items-center gap-2">
           Usimamizi wa Wakulima 👨‍🌾
         </h1>
-        <p class="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mt-0.5">
           Orodha ya wakulima, mizigo ghalani, huduma za kinu, mikopo na taarifa za mauzo
         </p>
       </div>
@@ -36,7 +36,7 @@
           <span class="text-[10px] font-black uppercase tracking-wider" :class="toast.type === 'error' ? 'text-rose-400' : 'text-emerald-400'">
             {{ toast.type === 'error' ? 'Onyo la Mfumo' : 'Taarifa ya Mfumo' }}
           </span>
-          <button @click="toast.show = false" class="text-white/60 hover:text-white text-xs font-bold p-0.5 rounded-lg hover:bg-white/10 transition cursor-pointer">✕</button>
+          <button @click="toast.show = false" class="text-white/60 hover:text-white text-xs font-bold p-0.5 rounded-lg hover:bg-white/10 dark:bg-slate-900/10 transition cursor-pointer">✕</button>
         </div>
         <div class="font-extrabold text-xs text-white/95 leading-relaxed break-words">
           {{ toast.message }}
@@ -45,28 +45,28 @@
     </div>
 
     <!-- Filters & Search Bar -->
-    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-emerald-100/80 shadow-2xs space-y-3">
+    <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-emerald-100/80 shadow-2xs space-y-3">
       <div class="flex flex-col sm:flex-row gap-3 items-center justify-between">
         <div class="relative flex-1 w-full">
-          <svg class="w-4 h-4 text-emerald-600 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-          <input v-model="searchQuery" type="text" placeholder="Tafuta mkulima kwa Jina, Code, au Namba ya Simu..." class="w-full pl-10 pr-4 py-2.5 bg-emerald-50/30 border border-emerald-200/70 rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"/>
+          <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-500 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input v-model="searchQuery" type="text" placeholder="Tafuta mkulima kwa Jina, Code, au Namba ya Simu..." class="w-full pl-10 pr-4 py-2.5 bg-emerald-50/30 dark:bg-emerald-900/40 border border-emerald-200/70 dark:border-emerald-700/50 rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"/>
         </div>
         <div class="flex items-center gap-2.5 w-full sm:w-auto">
-          <select v-model="regionFilter" class="bg-emerald-50/30 border border-emerald-200/70 rounded-xl text-xs sm:text-sm font-semibold py-2.5 px-3 focus:outline-none">
+          <select v-model="regionFilter" class="bg-emerald-50/30 dark:bg-emerald-900/40 border border-emerald-200/70 dark:border-emerald-700/50 rounded-xl text-xs sm:text-sm font-semibold py-2.5 px-3 focus:outline-none">
             <option value="">Mikoa Yote</option>
             <option v-for="r in availableRegions" :key="r" :value="r">{{ r }}</option>
           </select>
-          <button @click="resetFilters" class="px-3.5 py-2.5 text-xs font-bold text-emerald-800 hover:text-emerald-950 border border-emerald-200 rounded-xl bg-emerald-50 hover:bg-emerald-100 transition">
+          <button @click="resetFilters" class="px-3.5 py-2.5 text-xs font-bold text-emerald-800 dark:text-emerald-400 hover:text-emerald-950 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:bg-emerald-500/20 transition">
             Safisha
           </button>
         </div>
       </div>
 
       <!-- STATUS TABS (Active / Inactive / Wote) -->
-      <div class="flex items-center gap-2 pt-2 border-t border-slate-100 flex-wrap">
+      <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800 flex-wrap">
         <button 
           @click="statusFilter = ''"
-          :class="!statusFilter ? 'bg-slate-900 text-white shadow-xs font-black' : 'bg-slate-100 text-slate-700 font-bold hover:bg-slate-200/60'"
+          :class="!statusFilter ? 'bg-slate-900 text-white shadow-xs font-black' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-200/60 dark:bg-slate-700/60'"
           class="px-4 py-2 rounded-xl text-xs transition cursor-pointer flex items-center gap-1.5"
         >
           <span>👥 Wakulima Wote ({{ farmers.length }})</span>
@@ -74,7 +74,7 @@
 
         <button 
           @click="statusFilter = 'active'"
-          :class="statusFilter === 'active' ? 'bg-emerald-600 text-white shadow-xs font-black' : 'bg-emerald-50 text-emerald-800 font-bold hover:bg-emerald-100/80'"
+          :class="statusFilter === 'active' ? 'bg-emerald-600 text-white shadow-xs font-black' : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 font-bold hover:bg-emerald-100/80 dark:bg-emerald-900/50'"
           class="px-4 py-2 rounded-xl text-xs transition cursor-pointer flex items-center gap-1.5"
         >
           <span>🟢 Active Farmers (Wenye Mzigo Ghalani)</span>
@@ -82,7 +82,7 @@
 
         <button 
           @click="statusFilter = 'inactive'"
-          :class="statusFilter === 'inactive' ? 'bg-slate-600 text-white shadow-xs font-black' : 'bg-slate-100 text-slate-700 font-bold hover:bg-slate-200/60'"
+          :class="statusFilter === 'inactive' ? 'bg-slate-600 text-white shadow-xs font-black' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-200/60 dark:bg-slate-700/60'"
           class="px-4 py-2 rounded-xl text-xs transition cursor-pointer flex items-center gap-1.5"
         >
           <span>⚪ Inactive Farmers (Wasiokuwa na Mzigo)</span>
@@ -91,21 +91,21 @@
     </div>
 
     <!-- Data Table -->
-    <div class="bg-white rounded-2xl border border-emerald-100/80 shadow-2xs overflow-hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-emerald-100/80 dark:border-slate-700/80 shadow-2xs overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs">
-          <thead class="bg-emerald-50/70 text-emerald-950 font-extrabold border-b border-emerald-100 uppercase text-[10px] tracking-wider">
+          <thead class="bg-emerald-50/70 dark:bg-slate-950 text-emerald-950 dark:text-emerald-400 font-bold border-b border-emerald-100 dark:border-slate-800 capitalize text-[11px] tracking-wide">
             <tr>
-              <th class="py-2.5 px-4">Mkulima</th>
-              <th class="py-2.5 px-4">Simu</th>
-              <th class="py-2.5 px-4">Mkoa / Wilaya</th>
-              <th class="py-2.5 px-4">Mazao Ghalani</th>
-              <th class="py-2.5 px-4">Deni la Mkopo</th>
-              <th class="py-2.5 px-4">Hali (Status)</th>
-              <th class="py-2.5 px-4 text-right">Vitendo</th>
+              <th class="py-3 px-4">Mkulima</th>
+              <th class="py-3 px-4">Simu</th>
+              <th class="py-3 px-4">Mkoa / Wilaya</th>
+              <th class="py-3 px-4">Mazao Ghalani</th>
+              <th class="py-3 px-4">Deni la Mkopo</th>
+              <th class="py-3 px-4">Hali (Status)</th>
+              <th class="py-3 px-4 text-right">Vitendo</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-100 font-medium">
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50 font-medium">
             <tr v-if="loading" class="text-center text-slate-400">
               <td colspan="7" class="py-6">
                 <div class="flex items-center justify-center gap-2">
@@ -117,30 +117,30 @@
             <tr v-else-if="filteredFarmers.length === 0" class="text-center text-slate-400">
               <td colspan="7" class="py-6">Hakuna mkulima aliyepatikana kwenye database.</td>
             </tr>
-            <tr v-for="f in paginatedFarmers" :key="f.id" class="hover:bg-emerald-50/40 transition-colors">
-              <td class="py-2 px-4">
+            <tr v-for="f in paginatedFarmers" :key="f.id" class="hover:bg-emerald-50/40 dark:hover:bg-slate-800/50 transition-colors">
+              <td class="py-2.5 px-4">
                 <div class="flex items-center gap-2.5">
                   <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-black flex items-center justify-center text-xs shadow-2xs shrink-0">
                     {{ (f.name || 'M').charAt(0).toUpperCase() }}
                   </div>
                   <div>
-                    <div class="font-bold text-slate-900 text-xs leading-tight">{{ f.name }}</div>
-                    <div class="text-[10px] text-emerald-700 font-mono font-bold mt-0.5">{{ f.farmer_code }}</div>
+                    <div class="font-bold text-slate-900 dark:text-slate-50 text-xs leading-tight capitalize">{{ (f.name || '').toLowerCase() }}</div>
+                    <div class="text-[10px] text-emerald-700 dark:text-emerald-400 font-mono font-bold mt-0.5">{{ f.farmer_code }}</div>
                   </div>
                 </div>
               </td>
-              <td class="py-2 px-4 text-slate-600 font-mono font-semibold text-xs">{{ f.phone || 'N/A' }}</td>
-              <td class="py-2 px-4 text-slate-600 font-semibold text-xs">{{ f.region || 'N/A' }} {{ f.district ? '(' + f.district + ')' : '' }}</td>
-              <td class="py-2 px-4 font-black text-emerald-700 text-xs">
+              <td class="py-2 px-4 text-slate-600 dark:text-slate-300 font-mono font-semibold text-xs">{{ f.phone || 'N/A' }}</td>
+              <td class="py-2 px-4 text-slate-600 dark:text-slate-300 font-semibold text-xs">{{ f.region || 'N/A' }} {{ f.district ? '(' + f.district + ')' : '' }}</td>
+              <td class="py-2 px-4 font-black text-emerald-700 dark:text-emerald-400 text-xs">
                 {{ (parseFloat(f.active_stock || f.total_deposited || 0) * 1000).toLocaleString() }} Kg
               </td>
               <td class="py-2 px-4">
-                <span :class="parseFloat(f.loan_balance || 0) > 0 ? 'text-red-600 font-black text-xs' : 'text-slate-400 font-semibold text-xs'">
+                <span :class="parseFloat(f.loan_balance || 0) > 0 ? 'text-red-600 dark:text-red-400 font-black text-xs' : 'text-slate-400 font-semibold text-xs'">
                   Tsh {{ parseFloat(f.loan_balance || 0).toLocaleString() }}
                 </span>
               </td>
               <td class="py-2 px-4">
-                <span :class="f.status === 'active' ? 'bg-emerald-100 text-emerald-900 border-emerald-300' : 'bg-slate-100 text-slate-600 border-slate-200'" class="px-2.5 py-0.5 rounded-lg text-[10px] font-black border flex items-center gap-1 w-fit shadow-2xs">
+                <span :class="f.status === 'active' ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-900 dark:text-emerald-400 border-emerald-300 dark:border-emerald-500/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'" class="px-2.5 py-0.5 rounded-lg text-[10px] font-black border flex items-center gap-1 w-fit shadow-2xs">
                   <span>{{ f.status === 'active' ? '🟢 Active' : '⚪ Inactive' }}</span>
                 </span>
               </td>
@@ -148,7 +148,7 @@
                 <button 
                   @click="openFarmerProfile(f.id)" 
                   title="Fungua Profile ya Mkulima"
-                  class="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white border border-emerald-200/80 hover:border-emerald-600 rounded-lg text-xs font-bold transition-all duration-150 inline-flex items-center gap-1 cursor-pointer"
+                  class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white border border-emerald-200/80 dark:border-emerald-700/50 hover:border-emerald-600 rounded-lg text-xs font-bold transition-all duration-150 inline-flex items-center gap-1 cursor-pointer"
                 >
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                   <span>Profile</span>
@@ -160,18 +160,18 @@
       </div>
 
       <!-- Pagination Footer -->
-      <div class="px-6 py-4 bg-emerald-50/40 border-t border-emerald-100 flex items-center justify-between text-xs text-slate-600 font-semibold">
+      <div class="px-6 py-4 bg-emerald-50/40 dark:bg-emerald-900/40 border-t border-emerald-100 flex items-center justify-between text-xs text-slate-600 dark:text-slate-300 font-semibold">
         <div>Inaonyesha {{ (currentPage - 1) * pageSize + 1 }} hadi {{ Math.min(currentPage * pageSize, filteredFarmers.length) }} kati ya {{ filteredFarmers.length }}</div>
         <div class="flex gap-2">
-          <button @click="currentPage--" :disabled="currentPage === 1" class="px-3.5 py-1.5 bg-white border border-slate-200 rounded-xl text-slate-700 disabled:opacity-40 font-bold shadow-2xs">Iliyopita</button>
-          <button @click="currentPage++" :disabled="currentPage * pageSize >= filteredFarmers.length" class="px-3.5 py-1.5 bg-white border border-slate-200 rounded-xl text-slate-700 disabled:opacity-40 font-bold shadow-2xs">Ifuatayo</button>
+          <button @click="currentPage--" :disabled="currentPage === 1" class="px-3.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-200 disabled:opacity-40 font-bold shadow-2xs">Iliyopita</button>
+          <button @click="currentPage++" :disabled="currentPage * pageSize >= filteredFarmers.length" class="px-3.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-200 disabled:opacity-40 font-bold shadow-2xs">Ifuatayo</button>
         </div>
       </div>
     </div>
 
     <!-- MAIN FARMER PROFILE MODAL (With Strict Transformed Batch Locking & Product Tree Services) -->
     <div v-if="modals.profile" class="fixed inset-0 z-[80] bg-slate-900/75 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4">
-      <div class="bg-white w-full max-w-7xl h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-emerald-200">
+      <div class="bg-white dark:bg-slate-900 w-full max-w-7xl h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-emerald-200 dark:border-emerald-500/20">
         
         <!-- Profile Modal Header -->
         <div class="px-6 py-4 border-b border-emerald-800 flex items-center justify-between bg-gradient-to-r from-emerald-900 via-teal-900 to-emerald-950 text-white shrink-0">
@@ -198,30 +198,30 @@
         </div>
 
         <!-- Profile Loading State -->
-        <div v-if="loadingProfile" class="flex-1 flex flex-col items-center justify-center bg-slate-50 text-slate-500">
+        <div v-if="loadingProfile" class="flex-1 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400">
           <div class="w-8 h-8 rounded-full border-3 border-emerald-600 border-t-transparent animate-spin mb-3"></div>
-          <div class="font-extrabold text-sm text-slate-700">Inapakia taarifa za mkulima kutoka database...</div>
+          <div class="font-extrabold text-sm text-slate-700 dark:text-slate-200">Inapakia taarifa za mkulima kutoka database...</div>
         </div>
 
         <!-- Profile Modal Body (2 Columns) -->
-        <div v-else class="flex-1 overflow-y-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 bg-slate-50">
+        <div v-else class="flex-1 overflow-y-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 bg-slate-50 dark:bg-slate-950">
           
           <!-- LEFT COLUMN: Profile Info & Address (4 cols) -->
-          <div class="lg:col-span-4 bg-white p-5 rounded-2xl border border-emerald-100 shadow-2xs space-y-5">
+          <div class="lg:col-span-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-emerald-100 shadow-2xs space-y-5">
             
-            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
               <div class="flex items-center gap-3">
                 <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-black text-xl flex items-center justify-center shadow-md">
                   {{ (selectedFarmer.name || 'A').charAt(0).toUpperCase() }}
                 </div>
                 <div>
-                  <div class="text-base font-black text-slate-900 leading-tight">{{ selectedFarmer.name }}</div>
-                  <div class="text-xs font-mono font-bold text-emerald-700 mt-0.5">{{ selectedFarmer.farmer_code }}</div>
+                  <div class="text-base font-black text-slate-900 dark:text-slate-50 leading-tight">{{ selectedFarmer.name }}</div>
+                  <div class="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400 mt-0.5">{{ selectedFarmer.farmer_code }}</div>
                 </div>
               </div>
               <button 
                 @click="isEditingFarmer = !isEditingFarmer" 
-                class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition"
+                class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition"
               >
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                 <span>{{ isEditingFarmer ? 'Funga' : 'Hariri' }}</span>
@@ -229,35 +229,35 @@
             </div>
 
             <!-- Inline Edit Farmer Form -->
-            <div v-if="isEditingFarmer" class="p-4 bg-emerald-50/50 border border-emerald-200 rounded-2xl space-y-3">
-              <div class="text-xs font-extrabold text-emerald-950 pb-1 border-b border-emerald-200">✏️ Hariri Taarifa za Mkulima</div>
-              <div class="space-y-2.5 text-xs font-semibold text-slate-700">
+            <div v-if="isEditingFarmer" class="p-4 bg-emerald-50/50 dark:bg-emerald-900/40 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl space-y-3">
+              <div class="text-xs font-extrabold text-emerald-950 dark:text-emerald-400 pb-1 border-b border-emerald-200 dark:border-emerald-500/20">✏️ Hariri Taarifa za Mkulima</div>
+              <div class="space-y-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200">
                 <div>
-                  <label class="block text-[11px] font-bold text-slate-500 mb-1">Jina Kamili *</label>
-                  <input v-model="editFarmerForm.name" type="text" class="w-full p-2 bg-white border border-slate-200 rounded-xl font-medium"/>
+                  <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Jina Kamili *</label>
+                  <input v-model="editFarmerForm.name" type="text" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-medium"/>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                   <div>
-                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Simu *</label>
-                    <input v-model="editFarmerForm.phone" type="text" class="w-full p-2 bg-white border border-slate-200 rounded-xl font-medium"/>
+                    <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Simu *</label>
+                    <input v-model="editFarmerForm.phone" type="text" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-medium"/>
                   </div>
                   <div>
-                    <label class="block text-[11px] font-bold text-slate-500 mb-1">NIDA</label>
-                    <input v-model="editFarmerForm.national_id" type="text" class="w-full p-2 bg-white border border-slate-200 rounded-xl font-medium"/>
+                    <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">NIDA</label>
+                    <input v-model="editFarmerForm.national_id" type="text" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-medium"/>
                   </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                   <div>
-                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Mkoa</label>
-                    <input v-model="editFarmerForm.region" type="text" class="w-full p-2 bg-white border border-slate-200 rounded-xl font-medium"/>
+                    <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Mkoa</label>
+                    <input v-model="editFarmerForm.region" type="text" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-medium"/>
                   </div>
                   <div>
-                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Wilaya</label>
-                    <input v-model="editFarmerForm.district" type="text" class="w-full p-2 bg-white border border-slate-200 rounded-xl font-medium"/>
+                    <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Wilaya</label>
+                    <input v-model="editFarmerForm.district" type="text" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-medium"/>
                   </div>
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
-                  <button @click="isEditingFarmer = false" class="px-3 py-1.5 bg-slate-200 text-slate-700 font-bold rounded-xl">Ghairi</button>
+                  <button @click="isEditingFarmer = false" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl">Ghairi</button>
                   <button @click="saveEditFarmer" class="px-3.5 py-1.5 bg-emerald-600 text-white font-bold rounded-xl shadow-xs">Hifadhi</button>
                 </div>
               </div>
@@ -265,83 +265,83 @@
 
             <!-- Details List -->
             <div v-else class="space-y-3 text-xs sm:text-sm font-medium">
-              <div class="flex items-center justify-between py-1.5 border-b border-slate-100">
+              <div class="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
                 <span class="text-slate-400 font-semibold">Simu:</span>
-                <strong class="text-slate-900 font-bold font-mono">{{ selectedFarmer.phone || 'N/A' }}</strong>
+                <strong class="text-slate-900 dark:text-slate-50 font-bold font-mono">{{ selectedFarmer.phone || 'N/A' }}</strong>
               </div>
-              <div class="flex items-center justify-between py-1.5 border-b border-slate-100">
+              <div class="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
                 <span class="text-slate-400 font-semibold">Mkoa:</span>
-                <strong class="text-slate-900 font-bold">{{ selectedFarmer.region || 'Arusha' }}</strong>
+                <strong class="text-slate-900 dark:text-slate-50 font-bold">{{ selectedFarmer.region || 'Arusha' }}</strong>
               </div>
-              <div class="flex items-center justify-between py-1.5 border-b border-slate-100">
+              <div class="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
                 <span class="text-slate-400 font-semibold">Wilaya:</span>
-                <strong class="text-slate-900 font-bold">{{ selectedFarmer.district || 'Arumeru' }}</strong>
+                <strong class="text-slate-900 dark:text-slate-50 font-bold">{{ selectedFarmer.district || 'Arumeru' }}</strong>
               </div>
-              <div class="flex items-center justify-between py-1.5 border-b border-slate-100">
+              <div class="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
                 <span class="text-slate-400 font-semibold">Kata:</span>
-                <strong class="text-slate-900 font-bold">{{ selectedFarmer.ward || 'Usa River' }}</strong>
+                <strong class="text-slate-900 dark:text-slate-50 font-bold">{{ selectedFarmer.ward || 'Usa River' }}</strong>
               </div>
-              <div class="flex items-center justify-between py-1.5 border-b border-slate-100">
+              <div class="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
                 <span class="text-slate-400 font-semibold">National ID:</span>
-                <strong class="text-slate-900 font-bold font-mono">{{ selectedFarmer.national_id || 'N/A' }}</strong>
+                <strong class="text-slate-900 dark:text-slate-50 font-bold font-mono">{{ selectedFarmer.national_id || 'N/A' }}</strong>
               </div>
             </div>
 
             <!-- KPI Highlight Cards (Clean Enterprise Theme) -->
             <div class="space-y-3 pt-2">
-              <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+              <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs flex items-center justify-between">
                 <div>
-                  <div class="text-[10px] font-black uppercase text-slate-500 tracking-wider">Jumla ya Mzigo Ghalani</div>
-                  <div class="text-xl font-black text-slate-900 mt-0.5 font-mono">{{ totalFarmerStockKg.toLocaleString() }} Kg</div>
+                  <div class="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider">Jumla ya Mzigo Ghalani</div>
+                  <div class="text-xl font-black text-slate-900 dark:text-slate-50 mt-0.5 font-mono">{{ totalFarmerStockKg.toLocaleString() }} Kg</div>
                   <div class="text-[9.5px] text-slate-400 font-semibold mt-0.5">Physical Stock in Storage</div>
                 </div>
-                <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 font-black flex items-center justify-center text-sm border border-slate-200">📦</div>
+                <div class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-black flex items-center justify-center text-sm border border-slate-200 dark:border-slate-700">📦</div>
               </div>
 
               <!-- PATO SAFI LA MKULIMA LOTE (CLEAN ENTERPRISE CARD) -->
-              <div class="bg-white p-4 rounded-2xl border border-emerald-300 shadow-xs flex items-center justify-between">
+              <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-emerald-300 dark:border-emerald-500/30 shadow-xs flex items-center justify-between">
                 <div>
-                  <div class="text-[10px] font-black uppercase text-emerald-800 tracking-wider">Pato Safi Aliyolipwa (Net Payout)</div>
-                  <div class="text-xl font-black text-emerald-700 font-mono mt-0.5">Tsh {{ totalFarmerNetPayout.toLocaleString() }}</div>
-                  <div class="text-[9.5px] text-slate-500 font-semibold mt-0.5">Jumla ya malipo halisi baada ya makato</div>
+                  <div class="text-[10px] font-black uppercase text-emerald-800 dark:text-emerald-400 tracking-wider">Pato Safi Aliyolipwa (Net Payout)</div>
+                  <div class="text-xl font-black text-emerald-700 dark:text-emerald-400 font-mono mt-0.5">Tsh {{ totalFarmerNetPayout.toLocaleString() }}</div>
+                  <div class="text-[9.5px] text-slate-500 dark:text-slate-400 font-semibold mt-0.5">Jumla ya malipo halisi baada ya makato</div>
                 </div>
-                <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 font-black flex items-center justify-center text-sm border border-emerald-200">💵</div>
+                <div class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-black flex items-center justify-center text-sm border border-emerald-200 dark:border-emerald-500/20">💵</div>
               </div>
 
-              <div class="bg-white p-4 rounded-2xl border border-red-200 shadow-xs flex items-center justify-between">
+              <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-red-200 dark:border-red-500/20 shadow-xs flex items-center justify-between">
                 <div>
-                  <div class="text-[10px] font-black uppercase text-red-600 tracking-wider">Mkopo Bado (Deni)</div>
-                  <div class="text-xl font-black text-red-600 font-mono mt-0.5">Tsh {{ totalFarmerLoanBalance.toLocaleString() }}</div>
-                  <div class="text-[9.5px] text-slate-500 font-semibold mt-0.5">Salio la deni la mikopo</div>
+                  <div class="text-[10px] font-black uppercase text-red-600 dark:text-red-400 tracking-wider">Mkopo Bado (Deni)</div>
+                  <div class="text-xl font-black text-red-600 dark:text-red-400 font-mono mt-0.5">Tsh {{ totalFarmerLoanBalance.toLocaleString() }}</div>
+                  <div class="text-[9.5px] text-slate-500 dark:text-slate-400 font-semibold mt-0.5">Salio la deni la mikopo</div>
                 </div>
-                <div class="w-9 h-9 rounded-xl bg-red-50 text-red-600 font-black flex items-center justify-center text-sm border border-red-200">💳</div>
+                <div class="w-9 h-9 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 font-black flex items-center justify-center text-sm border border-red-200 dark:border-red-500/20">💳</div>
               </div>
             </div>
 
           </div>
 
           <!-- RIGHT COLUMN: Interactive Tabs & Processing Tree (8 cols) -->
-          <div class="lg:col-span-8 bg-white p-5 rounded-2xl border border-emerald-100 shadow-2xs flex flex-col space-y-5">
+          <div class="lg:col-span-8 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-emerald-100 shadow-2xs flex flex-col space-y-5">
             
             <!-- Tabs Navigation Bar -->
             <div class="flex items-center gap-2 border-b border-emerald-100 pb-3">
               <button 
                 @click="profileTab = 'batches'" 
-                :class="profileTab === 'batches' ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md' : 'bg-emerald-50 text-emerald-900 hover:bg-emerald-100'" 
+                :class="profileTab === 'batches' ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md' : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-900 dark:text-emerald-400 hover:bg-emerald-100 dark:bg-emerald-500/20'" 
                 class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center gap-2"
               >
                 <span>📦 Mzigo & Processing Tree</span>
               </button>
               <button 
                 @click="profileTab = 'loans'" 
-                :class="profileTab === 'loans' ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md' : 'bg-emerald-50 text-emerald-900 hover:bg-emerald-100'" 
+                :class="profileTab === 'loans' ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md' : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-900 dark:text-emerald-400 hover:bg-emerald-100 dark:bg-emerald-500/20'" 
                 class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center gap-2"
               >
                 <span>💰 Mikopo</span>
               </button>
               <button 
                 @click="profileTab = 'sales'" 
-                :class="profileTab === 'sales' ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md' : 'bg-emerald-50 text-emerald-900 hover:bg-emerald-100'" 
+                :class="profileTab === 'sales' ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md' : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-900 dark:text-emerald-400 hover:bg-emerald-100 dark:bg-emerald-500/20'" 
                 class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center gap-2"
               >
                 <span>🏷️ Mauzo & Settlement</span>
@@ -351,9 +351,9 @@
             <!-- TAB 1: BATCHES & SERVICE PROCESSING TREE -->
             <div v-if="profileTab === 'batches'" class="space-y-5">
               <div class="flex items-center justify-between">
-                <h3 class="text-sm font-extrabold text-slate-900">Orodha ya Mizigo na Huduma Za Kinu</h3>
+                <h3 class="text-sm font-extrabold text-slate-900 dark:text-slate-50">Orodha ya Mizigo na Huduma Za Kinu</h3>
                 <div class="flex gap-2">
-                  <button @click="openApplyServiceModal" class="px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold rounded-xl transition flex items-center gap-1">
+                  <button @click="openApplyServiceModal" class="px-3.5 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 text-xs font-bold rounded-xl transition flex items-center gap-1">
                     <span>+ Huduma Mpya</span>
                   </button>
                   <button @click="openIntakeModal" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1">
@@ -364,11 +364,11 @@
 
               <!-- Batches List with Transformed Locking and Active Output Product Buttons -->
               <div class="space-y-4">
-                <div v-if="topLevelFarmerBatches.length === 0" class="text-center text-slate-400 py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                <div v-if="topLevelFarmerBatches.length === 0" class="text-center text-slate-400 py-12 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
                   Hakuna shehena yoyote iliyopokelewa kwenye database.
                 </div>
 
-                <div v-for="b in topLevelFarmerBatches" :key="b.id" class="p-4 bg-emerald-50/40 border border-emerald-200/80 rounded-2xl space-y-3.5 shadow-2xs hover:border-emerald-300 transition">
+                <div v-for="b in topLevelFarmerBatches" :key="b.id" class="p-4 bg-emerald-50/40 dark:bg-emerald-900/40 border border-emerald-200/80 dark:border-emerald-700/50 rounded-2xl space-y-3.5 shadow-2xs hover:border-emerald-300 dark:border-emerald-500/30 transition">
                   <div class="flex items-center justify-between flex-wrap gap-3">
                     <div class="flex items-center gap-3">
                       <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-extrabold text-sm flex items-center justify-center shadow-xs flex-shrink-0">
@@ -376,7 +376,7 @@
                       </div>
                       <div>
                         <div class="flex items-center gap-2 flex-wrap">
-                          <span class="font-black text-slate-900 font-mono text-sm">{{ b.batch_code }}</span>
+                          <span class="font-black text-slate-900 dark:text-slate-50 font-mono text-sm">{{ b.batch_code }}</span>
                           
                           <!-- SINGLE SOLID STATUS BADGE ("Neno moja solid tu") -->
                           <span v-if="b.status === 'transformed'" class="px-2.5 py-0.5 rounded-lg text-[10px] font-black bg-purple-600 text-white uppercase shadow-2xs">
@@ -395,14 +395,14 @@
                         </div>
 
                         <!-- SOLID SINGLE-LINE SUMMARY -->
-                        <div class="text-xs text-slate-600 font-medium mt-1 flex flex-wrap items-center gap-2">
-                          <span>Zao: <strong class="text-slate-900 font-bold">{{ b.crop_type }}</strong> {{ b.variety ? '(' + b.variety + ')' : '' }}</span>
+                        <div class="text-xs text-slate-600 dark:text-slate-300 font-medium mt-1 flex flex-wrap items-center gap-2">
+                          <span>Zao: <strong class="text-slate-900 dark:text-slate-50 font-bold">{{ b.crop_type }}</strong> {{ b.variety ? '(' + b.variety + ')' : '' }}</span>
                           <span class="text-slate-300">•</span>
-                          <span>Intake: <strong class="text-slate-900 font-extrabold">{{ ((parseFloat(b.initial_weight_mt || b.current_weight_mt || 0)) * 1000).toLocaleString() }} Kg</strong></span>
+                          <span>Intake: <strong class="text-slate-900 dark:text-slate-50 font-extrabold">{{ ((parseFloat(b.initial_weight_mt || b.current_weight_mt || 0)) * 1000).toLocaleString() }} Kg</strong></span>
                           <span class="text-slate-300">•</span>
-                          <span class="px-2 py-0.5 rounded-md bg-amber-100/90 text-amber-950 text-[10.5px] font-black border border-amber-300/80 flex items-center gap-1 shadow-2xs">
+                          <span class="px-2 py-0.5 rounded-md bg-amber-100/90 dark:bg-amber-900/50 text-amber-950 dark:text-amber-400 text-[10.5px] font-black border border-amber-300/80 flex items-center gap-1 shadow-2xs">
                             {{ formatStorageDaysBadge(b.created_at, b.status, b.updated_at) }}
-                            <span class="text-amber-800 font-bold">({{ formatDate(b.created_at) }})</span>
+                            <span class="text-amber-800 dark:text-amber-400 font-bold">({{ formatDate(b.created_at) }})</span>
                           </span>
                           <span v-if="(parseFloat(b.initial_weight_mt || 0)) > (parseFloat(b.current_weight_mt || 0))" class="px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 text-[10px] font-black">
                             Umeuzwa: {{ Math.max(0, ((parseFloat(b.initial_weight_mt || 0)) - (parseFloat(b.current_weight_mt || 0))) * 1000).toLocaleString() }} Kg
@@ -413,7 +413,7 @@
                     
                     <div class="flex items-center gap-3">
                       <div class="text-right">
-                        <div class="text-sm font-black" :class="(parseFloat(b.current_weight_mt || b.current_weight || 0) <= 0) ? 'text-slate-400 line-through' : 'text-emerald-700'">
+                        <div class="text-sm font-black" :class="(parseFloat(b.current_weight_mt || b.current_weight || 0) <= 0) ? 'text-slate-400 line-through' : 'text-emerald-700 dark:text-emerald-400'">
                           {{ (parseFloat(b.current_weight_mt || b.current_weight || 0) * 1000).toLocaleString() }} Kg
                         </div>
                         <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Ghalani</div>
@@ -433,7 +433,7 @@
                       <button 
                         @click="toggleBatchAccordion(b.id)" 
                         :title="isBatchExpanded(b.id) ? 'Funga Maelezo' : 'Fungua Maelezo'"
-                        class="p-2 text-emerald-800 hover:text-emerald-950 bg-emerald-100/70 hover:bg-emerald-200/90 rounded-xl transition flex items-center justify-center w-8 h-8 shadow-2xs cursor-pointer"
+                        class="p-2 text-emerald-800 dark:text-emerald-400 hover:text-emerald-950 dark:text-emerald-400 bg-emerald-100/70 dark:bg-emerald-900/50 hover:bg-emerald-200/90 rounded-xl transition flex items-center justify-center w-8 h-8 shadow-2xs cursor-pointer"
                       >
                         <svg class="w-4 h-4 transform transition-transform duration-200" :class="isBatchExpanded(b.id) ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
@@ -450,7 +450,7 @@
 
                       <!-- 1. SERVICES PIPELINE SECTION -->
                       <div v-if="getBatchServices(b).length > 0" class="space-y-2.5">
-                        <div class="text-[10.5px] font-black text-emerald-900 uppercase tracking-wider flex items-center gap-1">
+                        <div class="text-[10.5px] font-black text-emerald-900 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1">
                           ⚙️ Huduma Zilizopangwa Ghalani (Services Pipeline):
                         </div>
 
@@ -458,12 +458,12 @@
                           <div class="absolute -left-3 top-4 w-3 h-0.5 bg-emerald-400"></div>
 
                           <!-- SERVICE ITEM CARD -->
-                          <div class="p-3 bg-white border border-emerald-200 rounded-xl text-xs shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                          <div class="p-3 bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-500/20 rounded-xl text-xs shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                             <div class="flex items-center gap-3">
-                              <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-[11px] flex items-center justify-center shadow-2xs flex-shrink-0">{{ sIdx + 1 }}</span>
+                              <span class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 font-extrabold text-[11px] flex items-center justify-center shadow-2xs flex-shrink-0">{{ sIdx + 1 }}</span>
                               <div>
-                                <span class="font-black text-slate-900 text-xs block">{{ s.service_name || s.type || 'Huduma ya Kinu' }}</span>
-                                <div class="text-[11px] font-semibold text-slate-500 flex items-center gap-2 mt-0.5">
+                                <span class="font-black text-slate-900 dark:text-slate-50 text-xs block">{{ s.service_name || s.type || 'Huduma ya Kinu' }}</span>
+                                <div class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-2 mt-0.5">
                                   <span v-if="s.rate || s.unit_price">Bei: Tsh {{ parseFloat(s.rate || s.unit_price || 0).toLocaleString() }} / {{ s.unit || 'Kg' }}</span>
                                   <span v-if="s.quantity">| Kiwango: {{ s.quantity }} {{ s.unit || 'Kg' }}</span>
                                 </div>
@@ -472,20 +472,20 @@
 
                             <div class="flex items-center gap-2 self-end sm:self-auto">
                               <div class="text-right mr-1">
-                                <div class="text-xs font-black text-emerald-700">Tsh {{ parseFloat(s.fee_amount || s.cost || 0).toLocaleString() }}</div>
+                                <div class="text-xs font-black text-emerald-700 dark:text-emerald-400">Tsh {{ parseFloat(s.fee_amount || s.cost || 0).toLocaleString() }}</div>
                                 <div class="text-[9.5px] text-slate-400 font-bold uppercase">Jumla ya Ada</div>
                               </div>
-                              <button v-if="s.status !== 'completed' && b.status !== 'transformed'" @click="openCompleteServiceModal(b, s)" class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 rounded-lg text-[10px] font-black uppercase tracking-wider cursor-pointer flex items-center gap-1 transition shadow-2xs" title="Bonyeza hapa kukamilisha huduma hii">
+                              <button v-if="s.status !== 'completed' && b.status !== 'transformed'" @click="openCompleteServiceModal(b, s)" class="px-2.5 py-1 bg-amber-100 dark:bg-amber-500/20 hover:bg-amber-200 text-amber-900 dark:text-amber-400 border border-amber-300 rounded-lg text-[10px] font-black uppercase tracking-wider cursor-pointer flex items-center gap-1 transition shadow-2xs" title="Bonyeza hapa kukamilisha huduma hii">
                                 <span>⚙️ INAENDELEA</span>
-                                <span class="text-[9px] font-bold text-amber-700">(Kamilisha)</span>
+                                <span class="text-[9px] font-bold text-amber-700 dark:text-amber-400">(Kamilisha)</span>
                               </button>
-                              <span v-else-if="s.status === 'completed'" class="px-2.5 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shadow-2xs">
+                              <span v-else-if="s.status === 'completed'" class="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30 rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shadow-2xs">
                                 <span>✅ IMEKAMILIKA</span>
                               </span>
-                              <span v-else class="px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-lg text-[10px] font-black uppercase tracking-wider">
+                              <span v-else class="px-2.5 py-1 bg-amber-100 dark:bg-amber-500/20 text-amber-900 dark:text-amber-400 border border-amber-300 rounded-lg text-[10px] font-black uppercase tracking-wider">
                                 ⚙️ INAENDELEA
                               </span>
-                              <button v-if="s.status !== 'completed'" @click="deleteAssignedService(b, s)" class="px-2 py-1 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-lg text-[10px] font-bold transition shadow-2xs cursor-pointer" title="Futa Huduma & Rejelea Mzigo">
+                              <button v-if="s.status !== 'completed'" @click="deleteAssignedService(b, s)" class="px-2 py-1 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-500/20 rounded-lg text-[10px] font-bold transition shadow-2xs cursor-pointer" title="Futa Huduma & Rejelea Mzigo">
                                 🗑️ Futa
                               </button>
                             </div>
@@ -494,8 +494,8 @@
                       </div>
 
                       <!-- 2. MATOKEO YA TRANSFORMATION (PRODUCTS ZILIZOZALISHWA — RENDERED ONCE) -->
-                      <div v-if="getBatchChildren(b).length > 0" class="pt-3 border-t border-dashed border-emerald-200 space-y-2.5">
-                        <div class="text-[10.5px] font-black text-teal-900 uppercase tracking-wider flex items-center gap-1.5">
+                      <div v-if="getBatchChildren(b).length > 0" class="pt-3 border-t border-dashed border-emerald-200 dark:border-emerald-500/20 space-y-2.5">
+                        <div class="text-[10.5px] font-black text-teal-900 dark:text-teal-400 uppercase tracking-wider flex items-center gap-1.5">
                           <span>🌿 Processing Tree Outcome (Product Zilizozalishwa Kutokana na Transformation):</span>
                         </div>
 
@@ -505,24 +505,24 @@
                           <!-- CHILD PRODUCT CARD -->
                           <div class="p-3 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-teal-300 rounded-xl flex items-center justify-between text-xs shadow-2xs">
                             <div class="flex items-center gap-2.5">
-                              <span class="text-teal-700 font-black text-base">🌾</span>
+                              <span class="text-teal-700 dark:text-teal-400 font-black text-base">🌾</span>
                               <div>
-                                <div class="font-black text-slate-900 text-xs flex items-center gap-1.5 flex-wrap">
+                                <div class="font-black text-slate-900 dark:text-slate-50 text-xs flex items-center gap-1.5 flex-wrap">
                                   <span>{{ child.crop_type }}</span>
-                                  <span class="px-1.5 py-0.5 bg-teal-100 text-teal-800 text-[9.5px] font-black rounded uppercase">Result Product</span>
+                                  <span class="px-1.5 py-0.5 bg-teal-100 text-teal-800 dark:text-teal-400 text-[9.5px] font-black rounded uppercase">Result Product</span>
                                   <span v-if="child.status === 'sold' || parseFloat(child.current_weight_mt || 0) <= 0" class="px-2 py-0.5 bg-rose-600 text-white text-[9.5px] font-black rounded-lg uppercase shadow-2xs">🏷️ IMEUZWA</span>
                                 </div>
-                                <div class="text-[10px] text-slate-500 font-mono flex items-center gap-2 mt-0.5">
+                                <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-2 mt-0.5">
                                   <span>Code: {{ child.batch_code }}</span>
                                   <span>•</span>
-                                  <span class="font-extrabold text-teal-900 bg-teal-100/90 px-2 py-0.5 rounded-md border border-teal-200">
+                                  <span class="font-extrabold text-teal-900 dark:text-teal-400 bg-teal-100/90 px-2 py-0.5 rounded-md border border-teal-200 dark:border-teal-700/50">
                                     {{ formatStorageDaysBadge(child.created_at, child.status, child.updated_at) }}
                                   </span>
                                 </div>
                               </div>
                             </div>
                             <div class="flex items-center gap-3">
-                              <div v-if="child.status !== 'sold' && parseFloat(child.current_weight_mt || 0) > 0" class="font-black text-emerald-800 text-sm">
+                              <div v-if="child.status !== 'sold' && parseFloat(child.current_weight_mt || 0) > 0" class="font-black text-emerald-800 dark:text-emerald-400 text-sm">
                                 {{ (parseFloat(child.current_weight_mt || 0) * 1000).toLocaleString() }} Kg
                               </div>
                               <div v-else class="font-black text-rose-600 text-sm font-mono">
@@ -539,12 +539,12 @@
 
                           <!-- SUB-SERVICES ASSIGNED SPECIFICALLY TO THIS CHILD PRODUCT -->
                           <div v-if="getBatchServices(child).length > 0" class="pl-4 space-y-2 border-l-2 border-dashed border-teal-400 ml-4">
-                            <div v-for="cs in getBatchServices(child)" :key="cs.id" class="p-2.5 bg-white border border-teal-200 rounded-xl text-xs shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div v-for="cs in getBatchServices(child)" :key="cs.id" class="p-2.5 bg-white dark:bg-slate-900 border border-teal-200 dark:border-teal-700/50 rounded-xl text-xs shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                               <div class="flex items-center gap-2.5">
-                                <span class="w-5 h-5 rounded-full bg-teal-100 text-teal-800 font-black text-[10px] flex items-center justify-center flex-shrink-0">⚙️</span>
+                                <span class="w-5 h-5 rounded-full bg-teal-100 text-teal-800 dark:text-teal-400 font-black text-[10px] flex items-center justify-center flex-shrink-0">⚙️</span>
                                 <div>
-                                  <span class="font-extrabold text-slate-900 text-xs block">{{ cs.service_name || cs.type || 'Huduma ya Product' }}</span>
-                                  <div class="text-[10.5px] font-semibold text-slate-500 flex items-center gap-2 mt-0.5">
+                                  <span class="font-extrabold text-slate-900 dark:text-slate-50 text-xs block">{{ cs.service_name || cs.type || 'Huduma ya Product' }}</span>
+                                  <div class="text-[10.5px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-2 mt-0.5">
                                     <span>Bei: Tsh {{ getServiceRate(cs).toLocaleString() }} / {{ cs.unit || 'Kg' }}</span>
                                     <span>| Kiwango: {{ getServiceQuantity(cs, child).toLocaleString() }} {{ cs.unit || 'Kg' }}</span>
                                   </div>
@@ -552,19 +552,19 @@
                               </div>
                               <div class="flex items-center gap-2 self-end sm:self-auto">
                                 <div class="text-right mr-1">
-                                  <div class="text-xs font-black text-teal-800">
+                                  <div class="text-xs font-black text-teal-800 dark:text-teal-400">
                                     Tsh {{ calculateServiceTotalFee(cs, child).toLocaleString() }}
                                   </div>
                                   <div class="text-[9px] text-slate-400 font-bold uppercase">Jumla ya Ada</div>
                                 </div>
-                                <button v-if="cs.status !== 'completed'" @click="openCompleteServiceModal(child, cs)" class="px-2 py-0.5 bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 rounded-md text-[9.5px] font-black uppercase cursor-pointer flex items-center gap-1 transition shadow-2xs" title="Bonyeza hapa kukamilisha huduma hii">
+                                <button v-if="cs.status !== 'completed'" @click="openCompleteServiceModal(child, cs)" class="px-2 py-0.5 bg-amber-100 dark:bg-amber-500/20 hover:bg-amber-200 text-amber-900 dark:text-amber-400 border border-amber-300 rounded-md text-[9.5px] font-black uppercase cursor-pointer flex items-center gap-1 transition shadow-2xs" title="Bonyeza hapa kukamilisha huduma hii">
                                   <span>⚙️ INAENDELEA</span>
-                                  <span class="text-[8.5px] font-bold text-amber-700">(Kamilisha)</span>
+                                  <span class="text-[8.5px] font-bold text-amber-700 dark:text-amber-400">(Kamilisha)</span>
                                 </button>
-                                <span v-else class="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-md text-[9.5px] font-black uppercase flex items-center gap-1 shadow-2xs">
+                                <span v-else class="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30 rounded-md text-[9.5px] font-black uppercase flex items-center gap-1 shadow-2xs">
                                   <span>✅ IMEKAMILIKA</span>
                                 </span>
-                                <button v-if="cs.status !== 'completed'" @click="deleteAssignedService(child, cs)" class="px-1.5 py-0.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-md text-[9.5px] font-bold transition shadow-2xs cursor-pointer">
+                                <button v-if="cs.status !== 'completed'" @click="deleteAssignedService(child, cs)" class="px-1.5 py-0.5 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-500/20 rounded-md text-[9.5px] font-bold transition shadow-2xs cursor-pointer">
                                   🗑️ Futa
                                 </button>
                               </div>
@@ -589,7 +589,7 @@
             <!-- TAB 2: LOANS WORKFLOW -->
             <div v-if="profileTab === 'loans'" class="space-y-4">
               <div class="flex items-center justify-between">
-                <h3 class="text-sm font-extrabold text-slate-900">Historia ya Mikopo na Dhamana</h3>
+                <h3 class="text-sm font-extrabold text-slate-900 dark:text-slate-50">Historia ya Mikopo na Dhamana</h3>
                 <button @click="modals.newLoan = true" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                   <span>Omba Mkopo Mpya</span>
@@ -599,7 +599,7 @@
               <!-- Loans Table -->
               <div class="border border-emerald-100 rounded-2xl overflow-hidden shadow-2xs">
                 <table class="w-full text-left text-xs">
-                  <thead class="bg-emerald-50/80 text-emerald-950 font-extrabold border-b border-emerald-100 uppercase text-[10px]">
+                  <thead class="bg-emerald-50/80 dark:bg-emerald-900/40 text-emerald-950 dark:text-emerald-400 font-extrabold border-b border-emerald-100 uppercase text-[10px]">
                     <tr>
                       <th class="py-2.5 px-3">Tarehe</th>
                       <th class="py-2.5 px-3">Dhamana (Collateral)</th>
@@ -612,15 +612,15 @@
                     <tr v-if="farmerLoans.length === 0" class="text-center text-slate-400">
                       <td colspan="5" class="py-6">Hakuna historia ya mikopo iliyotolewa.</td>
                     </tr>
-                    <tr v-for="l in farmerLoans" :key="l.id" class="hover:bg-slate-50 transition">
-                      <td class="py-2 px-3 text-slate-600 font-mono font-semibold">{{ formatDate(l.created_at) }}</td>
-                      <td class="py-2 px-3 font-bold text-emerald-800 font-mono">{{ l.collateral_batch?.batch_code || l.collateral_batch_id || 'Dhamana ya Mazao' }}</td>
-                      <td class="py-2 px-3 font-bold text-slate-900">Tsh {{ parseFloat(l.principal_amount || 0).toLocaleString() }}</td>
-                      <td class="py-2 px-3 font-black" :class="parseFloat(l.current_balance || l.remaining_balance || 0) > 0 ? 'text-red-600' : 'text-emerald-600'">
+                    <tr v-for="l in farmerLoans" :key="l.id" class="hover:bg-slate-50 dark:bg-slate-950 transition">
+                      <td class="py-2 px-3 text-slate-600 dark:text-slate-300 font-mono font-semibold">{{ formatDate(l.created_at) }}</td>
+                      <td class="py-2 px-3 font-bold text-emerald-800 dark:text-emerald-400 font-mono">{{ l.collateral_batch?.batch_code || l.collateral_batch_id || 'Dhamana ya Mazao' }}</td>
+                      <td class="py-2 px-3 font-bold text-slate-900 dark:text-slate-50">Tsh {{ parseFloat(l.principal_amount || 0).toLocaleString() }}</td>
+                      <td class="py-2 px-3 font-black" :class="parseFloat(l.current_balance || l.remaining_balance || 0) > 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-500'">
                         Tsh {{ parseFloat(l.current_balance || l.remaining_balance || 0).toLocaleString() }}
                       </td>
                       <td class="py-2 px-3 whitespace-nowrap">
-                        <span :class="parseFloat(l.current_balance || l.remaining_balance || 0) <= 0 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-blue-50 text-blue-700 border-blue-200'" class="px-2 py-0.5 rounded-md text-[10px] font-black border uppercase whitespace-nowrap inline-flex items-center gap-1">
+                        <span :class="parseFloat(l.current_balance || l.remaining_balance || 0) <= 0 ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20' : 'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-500/20'" class="px-2 py-0.5 rounded-md text-[10px] font-black border uppercase whitespace-nowrap inline-flex items-center gap-1">
                           {{ parseFloat(l.current_balance || l.remaining_balance || 0) <= 0 ? '✅ IMEKATWA' : '⚙️ IPO HAI' }}
                         </span>
                       </td>
@@ -634,7 +634,7 @@
             <div v-if="profileTab === 'sales'" class="space-y-4">
               <!-- Header & Action Button -->
               <div class="flex items-center justify-between">
-                <h3 class="text-sm font-extrabold text-slate-900">Historia ya Mauzo & Settlement za Mkulima</h3>
+                <h3 class="text-sm font-extrabold text-slate-900 dark:text-slate-50">Historia ya Mauzo & Settlement za Mkulima</h3>
                 <button @click="openNewSaleModal" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                   <span>+ Fanya Mauzo Mpya</span>
@@ -643,29 +643,29 @@
 
               <!-- FINANCIAL SUMMARY CARDS BANNER FOR FARMER SALES -->
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div class="bg-white border border-slate-200/80 p-3.5 rounded-2xl shadow-2xs">
-                  <div class="text-[10px] font-black text-slate-500 uppercase tracking-wider">1. Jumla Thamani ya Mauzo (Gross)</div>
-                  <div class="text-base font-black text-slate-900 font-mono mt-1">Tsh {{ totalFarmerGrossSales.toLocaleString() }}</div>
-                  <div class="text-[9.5px] text-slate-500 font-medium">Thamani yote kabla ya makato</div>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 p-3.5 rounded-2xl shadow-2xs">
+                  <div class="text-[10px] font-black text-slate-500 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider">1. Jumla Thamani ya Mauzo (Gross)</div>
+                  <div class="text-base font-black text-slate-900 dark:text-slate-50 font-mono mt-1">Tsh {{ totalFarmerGrossSales.toLocaleString() }}</div>
+                  <div class="text-[9.5px] text-slate-500 dark:text-slate-400 font-medium">Thamani yote kabla ya makato</div>
                 </div>
 
-                <div class="bg-white border border-slate-200/80 p-3.5 rounded-2xl shadow-2xs">
-                  <div class="text-[10px] font-black text-slate-500 uppercase tracking-wider">2. Makato Yote (Deductions)</div>
-                  <div class="text-base font-black text-red-600 font-mono mt-1">Tsh {{ totalFarmerDeductions.toLocaleString() }}</div>
-                  <div class="text-[9.5px] text-slate-500 font-medium">Kinu, Ukaushaji & Mikopo</div>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 p-3.5 rounded-2xl shadow-2xs">
+                  <div class="text-[10px] font-black text-slate-500 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider">2. Makato Yote (Deductions)</div>
+                  <div class="text-base font-black text-red-600 dark:text-red-400 font-mono mt-1">Tsh {{ totalFarmerDeductions.toLocaleString() }}</div>
+                  <div class="text-[9.5px] text-slate-500 dark:text-slate-400 font-medium">Kinu, Ukaushaji & Mikopo</div>
                 </div>
 
-                <div class="bg-white border border-emerald-300 p-3.5 rounded-2xl shadow-2xs">
-                  <div class="text-[10px] font-black text-emerald-800 uppercase tracking-wider">3. Pato Safi la Mkulima (Net Payout)</div>
-                  <div class="text-base font-black text-emerald-700 font-mono mt-1">Tsh {{ totalFarmerNetPayout.toLocaleString() }}</div>
-                  <div class="text-[9.5px] text-emerald-700 font-medium">Jumla ya malipo aliyochukua mkononi</div>
+                <div class="bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-500/30 p-3.5 rounded-2xl shadow-2xs">
+                  <div class="text-[10px] font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-wider">3. Pato Safi la Mkulima (Net Payout)</div>
+                  <div class="text-base font-black text-emerald-700 dark:text-emerald-400 font-mono mt-1">Tsh {{ totalFarmerNetPayout.toLocaleString() }}</div>
+                  <div class="text-[9.5px] text-emerald-700 dark:text-emerald-400 font-medium">Jumla ya malipo aliyochukua mkononi</div>
                 </div>
               </div>
 
               <!-- Sales History Table -->
               <div class="border border-emerald-100 rounded-2xl overflow-hidden shadow-2xs">
                 <table class="w-full text-left text-xs">
-                  <thead class="bg-emerald-50/80 text-emerald-950 font-extrabold border-b border-emerald-100 uppercase text-[10px]">
+                  <thead class="bg-emerald-50/80 dark:bg-emerald-900/40 text-emerald-950 dark:text-emerald-400 font-extrabold border-b border-emerald-100 uppercase text-[10px]">
                     <tr>
                       <th class="py-2.5 px-3">Tarehe</th>
                       <th class="py-2.5 px-3">Invoice / Risiti</th>
@@ -680,15 +680,15 @@
                     <tr v-if="farmerSettlements.length === 0" class="text-center text-slate-400">
                       <td colspan="7" class="py-6">Hakuna historia ya mauzo yaliyokamilishwa.</td>
                     </tr>
-                    <tr v-for="st in farmerSettlements" :key="st.id" class="hover:bg-slate-50 transition">
-                      <td class="py-2 px-3 text-slate-600 font-mono font-semibold">{{ formatDate(st.created_at || st.settled_at) }}</td>
-                      <td class="py-2 px-3 font-bold text-emerald-800 font-mono">{{ st.invoice?.invoice_number || ('SETT-' + st.id) }}</td>
-                      <td class="py-2 px-3 font-bold text-slate-800">{{ st.invoice?.buyer?.name || 'Mnunuzi wa Jumla' }}</td>
-                      <td class="py-2 px-3 font-bold text-slate-900">Tsh {{ parseFloat(st.gross_amount || 0).toLocaleString() }}</td>
-                      <td class="py-2 px-3 font-bold text-red-600">Tsh {{ parseFloat(st.total_deductions || 0).toLocaleString() }}</td>
-                      <td class="py-2 px-3 font-black text-emerald-700">Tsh {{ parseFloat(st.net_payout || 0).toLocaleString() }}</td>
+                    <tr v-for="st in farmerSettlements" :key="st.id" class="hover:bg-slate-50 dark:bg-slate-950 transition">
+                      <td class="py-2 px-3 text-slate-600 dark:text-slate-300 font-mono font-semibold">{{ formatDate(st.created_at || st.settled_at) }}</td>
+                      <td class="py-2 px-3 font-bold text-emerald-800 dark:text-emerald-400 font-mono">{{ st.invoice?.invoice_number || ('SETT-' + st.id) }}</td>
+                      <td class="py-2 px-3 font-bold text-slate-800 dark:text-slate-100">{{ st.invoice?.buyer?.name || 'Mnunuzi wa Jumla' }}</td>
+                      <td class="py-2 px-3 font-bold text-slate-900 dark:text-slate-50">Tsh {{ parseFloat(st.gross_amount || 0).toLocaleString() }}</td>
+                      <td class="py-2 px-3 font-bold text-red-600 dark:text-red-400">Tsh {{ parseFloat(st.total_deductions || 0).toLocaleString() }}</td>
+                      <td class="py-2 px-3 font-black text-emerald-700 dark:text-emerald-400">Tsh {{ parseFloat(st.net_payout || 0).toLocaleString() }}</td>
                       <td class="py-2 px-3 whitespace-nowrap">
-                        <span class="px-2 py-0.5 rounded-md text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300 uppercase whitespace-nowrap inline-flex items-center gap-1">
+                        <span class="px-2 py-0.5 rounded-md text-[10px] font-black bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30 uppercase whitespace-nowrap inline-flex items-center gap-1">
                           ✅ {{ st.payment_status || 'SETTLED' }}
                         </span>
                       </td>
@@ -707,45 +707,45 @@
 
     <!-- MODAL 1: SAJILI HUDUMA MPYA (Assign Service - ONLY Active Non-Transformed Batches Allowed!) -->
     <div v-if="modals.applyService" class="fixed inset-0 z-[90] bg-slate-900/75 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
+      <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700">
         <div class="px-6 py-4 border-b border-emerald-800 flex items-center justify-between bg-gradient-to-r from-emerald-900 to-teal-900 text-white">
           <h3 class="text-base font-extrabold">Sajili Huduma ya Kinu (Assign Service)</h3>
           <button @click="modals.applyService = false" class="text-emerald-200 hover:text-white p-1">✕</button>
         </div>
-        <div class="p-6 space-y-3.5 text-xs font-semibold text-slate-700">
+        <div class="p-6 space-y-3.5 text-xs font-semibold text-slate-700 dark:text-slate-200">
           <div>
             <label class="block mb-1 font-bold">Chagua Shehena (Batch/Product Active) *</label>
             <select v-model="serviceForm.batch_id" class="w-full p-2.5 border rounded-xl font-bold">
               <option value="">Chagua batch active...</option>
               <option v-for="b in activeNonTransformedBatches" :key="b.id" :value="b.id">{{ b.batch_code }} ({{ b.crop_type }} - {{ (parseFloat(b.current_weight_mt||b.current_weight||0)*1000) }} Kg)</option>
             </select>
-            <span class="text-[10.5px] text-amber-700 mt-1 block">⚠️ Batches zilizo-transformed (zilizotumika kikamilifu) haziruhusiwi kupangiwa huduma mpya.</span>
+            <span class="text-[10.5px] text-amber-700 dark:text-amber-400 mt-1 block">⚠️ Batches zilizo-transformed (zilizotumika kikamilifu) haziruhusiwi kupangiwa huduma mpya.</span>
           </div>
           <div>
             <label class="block mb-1 font-bold">Chagua Huduma Iliyosajiliwa (Huduma za Zao la {{ selectedBatchForService ? selectedBatchForService.crop_type : 'Mzigo Uliochaguliwa' }}) *</label>
-            <select v-model="serviceForm.service_id" @change="onServiceCatalogSelect" class="w-full p-2.5 bg-emerald-50/50 border border-emerald-300 rounded-xl font-extrabold text-emerald-950">
+            <select v-model="serviceForm.service_id" @change="onServiceCatalogSelect" class="w-full p-2.5 bg-emerald-50/50 dark:bg-emerald-900/40 border border-emerald-300 dark:border-emerald-500/30 rounded-xl font-extrabold text-emerald-950 dark:text-emerald-400">
               <option value="">Chagua huduma inayohusika na zao hili...</option>
               <option v-for="s in filteredCatalogServices" :key="s.id" :value="s.id">
                 {{ s.name_sw }} — Tsh {{ parseFloat(s.rate).toLocaleString() }} / {{ s.unit }} ({{ s.crop_type || 'Zote' }})
               </option>
             </select>
-            <span v-if="selectedBatchForService && filteredCatalogServices.length === 0" class="text-[10.5px] text-amber-700 mt-1 block font-bold">
+            <span v-if="selectedBatchForService && filteredCatalogServices.length === 0" class="text-[10.5px] text-amber-700 dark:text-amber-400 mt-1 block font-bold">
               ⚠️ Hakuna huduma iliyochujwa kwa zao hili. (Tafadhali sajili huduma ya {{ selectedBatchForService.crop_type }} kwenye Orodha ya Huduma).
             </span>
           </div>
 
-          <div v-if="serviceForm.service_id" class="p-3 bg-emerald-50/60 rounded-2xl border border-emerald-200 space-y-1">
-            <label class="block font-extrabold text-emerald-950 text-xs">Bei ya Kitengo / Rate (Tsh) *</label>
+          <div v-if="serviceForm.service_id" class="p-3 bg-emerald-50/60 dark:bg-emerald-900/40 rounded-2xl border border-emerald-200 dark:border-emerald-500/20 space-y-1">
+            <label class="block font-extrabold text-emerald-950 dark:text-emerald-400 text-xs">Bei ya Kitengo / Rate (Tsh) *</label>
             <div class="flex items-center gap-2">
-              <input v-model.number="serviceForm.rate" type="number" placeholder="Ingiza bei ya leo..." class="w-full p-2.5 bg-white border border-emerald-300 rounded-xl font-black text-emerald-950 text-sm"/>
-              <span class="text-xs font-black text-emerald-800 bg-emerald-100 px-3 py-2.5 rounded-xl border border-emerald-200 uppercase whitespace-nowrap">/ {{ serviceForm.unit || 'Kg' }}</span>
+              <input v-model.number="serviceForm.rate" type="number" placeholder="Ingiza bei ya leo..." class="w-full p-2.5 bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-500/30 rounded-xl font-black text-emerald-950 dark:text-emerald-400 text-sm"/>
+              <span class="text-xs font-black text-emerald-800 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-500/20 px-3 py-2.5 rounded-xl border border-emerald-200 dark:border-emerald-500/20 uppercase whitespace-nowrap">/ {{ serviceForm.unit || 'Kg' }}</span>
             </div>
-            <span class="text-[10.5px] text-slate-500 block font-semibold pt-0.5">
+            <span class="text-[10.5px] text-slate-500 dark:text-slate-400 block font-semibold pt-0.5">
               💡 Bei hii imetoka kwenye Catalog. Unaweza kuibadilisha hapa ikiwa bei imebadilika leo.
             </span>
           </div>
           <div class="flex justify-end gap-2 pt-2">
-            <button @click="modals.applyService = false" class="px-4 py-2 bg-slate-200 text-slate-700 font-bold rounded-xl">Ghairi</button>
+            <button @click="modals.applyService = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl">Ghairi</button>
             <button @click="submitApplyService" class="px-5 py-2 bg-emerald-600 text-white font-bold rounded-xl shadow-xs">Panga Huduma</button>
           </div>
         </div>
@@ -754,7 +754,7 @@
 
     <!-- MODAL 2: OMBA MKOPO MPYA (New Loan Request with Strict Collateral & 50% Value Limit) -->
     <div v-if="modals.newLoan" class="fixed inset-0 z-[90] bg-slate-900/75 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-slate-200 animate-fadeIn">
+      <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 animate-fadeIn">
         <div class="px-6 py-4 border-b border-emerald-800 flex items-center justify-between bg-gradient-to-r from-emerald-900 to-teal-900 text-white">
           <div>
             <h3 class="text-base font-extrabold">Omba Mkopo Mpya wa Mkulima</h3>
@@ -762,13 +762,13 @@
           </div>
           <button @click="modals.newLoan = false" class="text-emerald-200 hover:text-white p-1 cursor-pointer">✕</button>
         </div>
-        <div class="p-6 space-y-3.5 text-xs font-semibold text-slate-700">
+        <div class="p-6 space-y-3.5 text-xs font-semibold text-slate-700 dark:text-slate-200">
           
-          <div v-if="activeNonTransformedBatches.length === 0" class="p-4 bg-amber-50 border border-amber-300 text-amber-950 rounded-2xl space-y-1">
-            <div class="font-extrabold text-xs flex items-center gap-1.5 text-amber-900">
+          <div v-if="activeNonTransformedBatches.length === 0" class="p-4 bg-amber-50 dark:bg-amber-500/10 border border-amber-300 text-amber-950 dark:text-amber-400 rounded-2xl space-y-1">
+            <div class="font-extrabold text-xs flex items-center gap-1.5 text-amber-900 dark:text-amber-400">
               <span>⚠️ Hawezi Kukopeshwa!</span>
             </div>
-            <p class="text-[11px] leading-relaxed font-medium text-amber-800">
+            <p class="text-[11px] leading-relaxed font-medium text-amber-800 dark:text-amber-400">
               Mkulima huyu hana mzigo wowote ghalani (au mazao yake yote yameuzwa). Mfumo hauruhusu kutoa mkopo bila kuwa na akiba ya mzigo ghalani kama dhamana.
             </p>
           </div>
@@ -776,7 +776,7 @@
           <template v-else>
             <div>
               <label class="block mb-1 font-bold">Chagua Mazao ya Dhamana (Collateral Batch) *</label>
-              <select v-model="loanForm.collateral_batch_id" class="w-full p-2.5 bg-emerald-50/50 border border-emerald-300 rounded-xl font-extrabold text-emerald-950">
+              <select v-model="loanForm.collateral_batch_id" class="w-full p-2.5 bg-emerald-50/50 dark:bg-emerald-900/40 border border-emerald-300 dark:border-emerald-500/30 rounded-xl font-extrabold text-emerald-950 dark:text-emerald-400">
                 <option value="">Chagua batch ya dhamana ghalani...</option>
                 <option v-for="b in activeNonTransformedBatches" :key="b.id" :value="b.id">
                   {{ b.batch_code }} — {{ b.crop_type }} ({{ (parseFloat(b.current_weight_mt||b.current_weight||0)*1000).toLocaleString() }} Kg)
@@ -785,20 +785,20 @@
             </div>
 
             <!-- Calculated Max Limit Card -->
-            <div v-if="selectedCollateralBatch" class="p-3.5 bg-emerald-50/80 border border-emerald-200 rounded-2xl space-y-1.5">
+            <div v-if="selectedCollateralBatch" class="p-3.5 bg-emerald-50/80 dark:bg-emerald-900/40 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl space-y-1.5">
               <div class="flex justify-between items-center text-xs">
-                <span class="text-slate-600 font-bold">Akiba ya Mzigo Ghalani:</span>
-                <span class="font-mono font-black text-emerald-900">
+                <span class="text-slate-600 dark:text-slate-300 font-bold">Akiba ya Mzigo Ghalani:</span>
+                <span class="font-mono font-black text-emerald-900 dark:text-emerald-400">
                   {{ (parseFloat(selectedCollateralBatch.current_weight_mt||0)*1000).toLocaleString() }} Kg
                 </span>
               </div>
-              <div class="flex justify-between items-center text-xs border-t border-emerald-200/80 pt-1.5">
-                <span class="text-emerald-950 font-extrabold">Kikomo cha Juu cha Mkopo (Max 50% ya Thamani):</span>
-                <span class="font-mono font-black text-emerald-700 text-sm">
+              <div class="flex justify-between items-center text-xs border-t border-emerald-200/80 dark:border-emerald-700/50 pt-1.5">
+                <span class="text-emerald-950 dark:text-emerald-400 font-extrabold">Kikomo cha Juu cha Mkopo (Max 50% ya Thamani):</span>
+                <span class="font-mono font-black text-emerald-700 dark:text-emerald-400 text-sm">
                   Tsh {{ maxLoanLimit.toLocaleString() }}
                 </span>
               </div>
-              <span class="text-[10px] text-emerald-800 font-medium block pt-0.5">
+              <span class="text-[10px] text-emerald-800 dark:text-emerald-400 font-medium block pt-0.5">
                 ℹ️ Riba: <strong>0% (Bila Riba)</strong>. Kiasi kitakatwa kikamilifu kwenye mauzo yajayo.
               </span>
             </div>
@@ -810,22 +810,22 @@
                 type="number" 
                 :max="maxLoanLimit"
                 placeholder="Ingiza kiasi cha mkopo..." 
-                class="w-full p-2.5 bg-white border rounded-xl font-black text-slate-900 text-sm"
-                :class="loanForm.amount > maxLoanLimit ? 'border-red-500 text-red-600 focus:ring-red-500' : 'border-slate-300'"
+                class="w-full p-2.5 bg-white dark:bg-slate-900 border rounded-xl font-black text-slate-900 dark:text-slate-50 text-sm"
+                :class="loanForm.amount > maxLoanLimit ? 'border-red-500 text-red-600 dark:text-red-400 focus:ring-red-500' : 'border-slate-300 dark:border-slate-600'"
               />
-              <span v-if="loanForm.amount > maxLoanLimit" class="text-[10.5px] text-red-600 font-bold mt-1 block">
+              <span v-if="loanForm.amount > maxLoanLimit" class="text-[10.5px] text-red-600 dark:text-red-400 font-bold mt-1 block">
                 ⚠️ Kiasi hiki kinazidi kikomo cha 50% cha mzigo ghalani (Tsh {{ maxLoanLimit.toLocaleString() }}).
               </span>
             </div>
 
             <div>
               <label class="block mb-1 font-bold">Tarehe ya Kulipa (Due Date) *</label>
-              <input v-model="loanForm.due_date" type="date" class="w-full p-2.5 border border-slate-300 rounded-xl font-bold"/>
+              <input v-model="loanForm.due_date" type="date" class="w-full p-2.5 border border-slate-300 dark:border-slate-600 rounded-xl font-bold"/>
             </div>
           </template>
 
           <div class="flex justify-end gap-2 pt-2">
-            <button @click="modals.newLoan = false" class="px-4 py-2 bg-slate-200 text-slate-700 font-bold rounded-xl cursor-pointer">Ghairi</button>
+            <button @click="modals.newLoan = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl cursor-pointer">Ghairi</button>
             <button 
               v-if="activeNonTransformedBatches.length > 0"
               @click="submitNewLoan" 
@@ -841,12 +841,12 @@
 
     <!-- MODAL 3: KAMILISHA HUDUMA (Crop Transformation & Tree Building with Strict Validations) -->
     <div v-if="modals.completeService" class="fixed inset-0 z-[90] bg-slate-900/75 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
+      <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700">
         <div class="px-6 py-4 border-b border-emerald-800 flex items-center justify-between bg-gradient-to-r from-emerald-900 to-teal-900 text-white">
           <h3 class="text-base font-extrabold">Kamilisha Huduma & Batch Transformation</h3>
           <button @click="modals.completeService = false" class="text-emerald-200 hover:text-white p-1">✕</button>
         </div>
-        <div class="p-6 space-y-4 text-xs font-semibold text-slate-700">
+        <div class="p-6 space-y-4 text-xs font-semibold text-slate-700 dark:text-slate-200">
           <div class="p-3 bg-emerald-900 text-white rounded-xl border border-emerald-700">
             <div class="font-extrabold text-sm text-emerald-300">Mzigo Mama: {{ selectedBatchForComplete.batch_code }} ({{ selectedBatchForComplete.crop_type }})</div>
             <div class="text-xs text-emerald-100 mt-0.5">Uzito wa Sasa: {{ currentBatchWeightKg }} Kg</div>
@@ -860,53 +860,53 @@
             </select>
           </div>
 
-          <div v-if="completeForm.has_changed === 'yes'" class="space-y-4 p-4 bg-emerald-50/60 rounded-2xl border border-emerald-200">
+          <div v-if="completeForm.has_changed === 'yes'" class="space-y-4 p-4 bg-emerald-50/60 dark:bg-emerald-900/40 rounded-2xl border border-emerald-200 dark:border-emerald-500/20">
             <!-- Primary Output Product -->
             <div class="space-y-2">
-              <div class="font-extrabold text-emerald-950 text-xs flex items-center gap-1.5">
+              <div class="font-extrabold text-emerald-950 dark:text-emerald-400 text-xs flex items-center gap-1.5">
                 <span>🌾 1. Zao Kuu Lililopatikana (Primary Output Product)</span>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 <div>
                   <label class="block mb-1 font-bold">Zao Jipya *</label>
-                  <select v-model="completeForm.output_crop" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl font-bold">
+                  <select v-model="completeForm.output_crop" class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold">
                     <option v-for="c in cropsList" :key="c" :value="c">{{ c }}</option>
                   </select>
                 </div>
                 <div>
                   <label class="block mb-1 font-bold">Kiasi *</label>
-                  <input v-model.number="completeForm.output_quantity" type="number" placeholder="e.g. 30" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl font-bold"/>
+                  <input v-model.number="completeForm.output_quantity" type="number" placeholder="e.g. 30" class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold"/>
                 </div>
                 <div>
                   <label class="block mb-1 font-bold">Kipimo / Unit *</label>
-                  <select v-model="completeForm.output_unit" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl font-bold">
+                  <select v-model="completeForm.output_unit" class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold">
                     <option v-for="u in unitsList" :key="u.name" :value="u.name">{{ u.name }}</option>
                   </select>
                 </div>
               </div>
-              <div class="text-[11px] text-emerald-800 font-bold text-right">
+              <div class="text-[11px] text-emerald-800 dark:text-emerald-400 font-bold text-right">
                 Uzito wa Zao Kuu: {{ getUnitKg(completeForm.output_unit, completeForm.output_quantity || 0) }} Kg
               </div>
             </div>
 
             <!-- Mandatory By-Product Toggle -->
-            <div class="pt-3 border-t border-emerald-200 space-y-2">
-              <label class="block mb-1 font-extrabold text-slate-800 text-xs">
+            <div class="pt-3 border-t border-emerald-200 dark:border-emerald-500/20 space-y-2">
+              <label class="block mb-1 font-extrabold text-slate-800 dark:text-slate-100 text-xs">
                 🌱 2. Je, kuna zao la ziada (By-Product) litapatikana? *
               </label>
-              <select v-model="completeForm.has_byproduct" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl font-bold text-slate-900">
+              <select v-model="completeForm.has_byproduct" class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50">
                 <option value="no">Hapana, Hakuna Zao la Ziada</option>
                 <option value="yes">Ndiyo, Kuna Zao la Ziada (e.g. Pumba, Manamane, Taka)</option>
               </select>
             </div>
 
             <!-- Conditional By-Product Fields -->
-            <div v-if="completeForm.has_byproduct === 'yes'" class="p-3 bg-white border border-emerald-300 rounded-2xl space-y-2 animate-fadeIn">
-              <div class="font-extrabold text-teal-900 text-xs">Maelezo ya Zao la Ziada (By-Product Details)</div>
+            <div v-if="completeForm.has_byproduct === 'yes'" class="p-3 bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-500/30 rounded-2xl space-y-2 animate-fadeIn">
+              <div class="font-extrabold text-teal-900 dark:text-teal-400 text-xs">Maelezo ya Zao la Ziada (By-Product Details)</div>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 <div>
                   <label class="block mb-1 font-bold">Zao la Ziada *</label>
-                  <select v-model="completeForm.byproduct_crop" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl font-bold">
+                  <select v-model="completeForm.byproduct_crop" class="w-full p-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold">
                     <option value="Pumba">Pumba ya Mchele</option>
                     <option value="Pumba ya Mahindi">Pumba ya Mahindi</option>
                     <option value="Manamane">Manamane / Broken Rice</option>
@@ -915,16 +915,16 @@
                 </div>
                 <div>
                   <label class="block mb-1 font-bold">Kiasi cha Ziada *</label>
-                  <input v-model.number="completeForm.byproduct_quantity" type="number" placeholder="e.g. 15" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl font-bold"/>
+                  <input v-model.number="completeForm.byproduct_quantity" type="number" placeholder="e.g. 15" class="w-full p-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold"/>
                 </div>
                 <div>
                   <label class="block mb-1 font-bold">Kipimo / Unit *</label>
-                  <select v-model="completeForm.byproduct_unit" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl font-bold">
+                  <select v-model="completeForm.byproduct_unit" class="w-full p-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold">
                     <option v-for="u in unitsList" :key="u.name" :value="u.name">{{ u.name }}</option>
                   </select>
                 </div>
               </div>
-              <div class="text-[11px] text-teal-800 font-bold text-right">
+              <div class="text-[11px] text-teal-800 dark:text-teal-400 font-bold text-right">
                 Uzito wa Zao la Ziada: {{ getUnitKg(completeForm.byproduct_unit, completeForm.byproduct_quantity || 0) }} Kg
               </div>
             </div>
@@ -934,13 +934,13 @@
               <span class="text-white text-sm font-black">{{ totalOutputWeightKg }} Kg</span>
             </div>
 
-            <div v-if="totalOutputWeightKg > currentBatchWeightKg" class="p-2 bg-red-100 text-red-800 rounded-lg text-[11px] font-bold border border-red-200">
+            <div v-if="totalOutputWeightKg > currentBatchWeightKg" class="p-2 bg-red-100 dark:bg-red-500/20 text-red-800 dark:text-red-400 rounded-lg text-[11px] font-bold border border-red-200 dark:border-red-500/20">
               ⚠️ Tahadhari: Jumla ya uzito uliopatikana ({{ totalOutputWeightKg }} Kg) unazidi uzito wa mzigo mama ({{ currentBatchWeightKg }} Kg)!
             </div>
           </div>
 
           <div class="flex justify-end gap-2 pt-2">
-            <button @click="modals.completeService = false" class="px-4 py-2 bg-slate-200 text-slate-700 font-bold rounded-xl">Ghairi</button>
+            <button @click="modals.completeService = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl">Ghairi</button>
             <button @click="submitCompleteService" class="px-5 py-2 bg-emerald-600 text-white font-bold rounded-xl shadow-xs">Thibitisha (Complete)</button>
           </div>
         </div>
@@ -949,12 +949,12 @@
 
     <!-- MODAL 4: ADD FARMER MODAL -->
     <div v-if="modals.addFarmer" class="fixed inset-0 z-[80] bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
+      <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700">
         <div class="px-6 py-4 border-b border-emerald-800 flex items-center justify-between bg-gradient-to-r from-emerald-900 to-teal-900 text-white">
           <h3 class="text-base font-extrabold">Sajili Mkulima Mpya</h3>
           <button @click="modals.addFarmer = false" class="text-emerald-200 hover:text-white p-1">✕</button>
         </div>
-        <div class="p-6 space-y-3 text-xs font-semibold text-slate-700">
+        <div class="p-6 space-y-3 text-xs font-semibold text-slate-700 dark:text-slate-200">
           <div>
             <label class="block mb-1 font-bold">Jina Kamili *</label>
             <input v-model="newFarmerForm.name" type="text" placeholder="e.g. Bakari Juma" class="w-full p-2.5 border rounded-xl"/>
@@ -980,7 +980,7 @@
             </div>
           </div>
           <div class="flex justify-end gap-2 pt-3">
-            <button @click="modals.addFarmer = false" class="px-4 py-2 bg-slate-200 text-slate-700 font-bold rounded-xl">Ghairi</button>
+            <button @click="modals.addFarmer = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl">Ghairi</button>
             <button @click="submitAddFarmer" class="px-5 py-2 bg-emerald-600 text-white font-bold rounded-xl shadow-xs">Sajili Mkulima</button>
           </div>
         </div>
@@ -989,12 +989,12 @@
 
     <!-- MODAL 5: INTAKE MODAL (Pokea Mpya Database) -->
     <div v-if="modals.intake" class="fixed inset-0 z-[90] bg-slate-900/75 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
+      <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700">
         <div class="px-6 py-4 border-b border-emerald-800 flex items-center justify-between bg-gradient-to-r from-emerald-900 to-teal-900 text-white">
           <h3 class="text-base font-extrabold">Sajili Upokeaji Mpya (Intake)</h3>
           <button @click="modals.intake = false" class="text-emerald-200 hover:text-white p-1">✕</button>
         </div>
-        <div class="p-6 space-y-3 text-xs font-semibold text-slate-700">
+        <div class="p-6 space-y-3 text-xs font-semibold text-slate-700 dark:text-slate-200">
           <div>
             <label class="block mb-1 font-bold">Aina ya Zao *</label>
             <select v-model="intakeForm.crop_type" class="w-full p-2.5 border rounded-xl font-bold">
@@ -1013,14 +1013,14 @@
               </select>
             </div>
           </div>
-          <div class="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl font-extrabold text-center text-xs space-y-1">
-            <div>Uzito wa Jumla: <span class="text-sm font-black text-emerald-950">{{ calculatedIntakeWeight.toLocaleString() }} Kg</span> ({{ (calculatedIntakeWeight / 1000).toFixed(2) }} Tani)</div>
-            <div class="text-[10.5px] font-bold text-emerald-700 bg-white/80 py-0.5 px-2 rounded-lg border border-emerald-200 inline-block shadow-2xs">
+          <div class="p-3 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-400 rounded-xl font-extrabold text-center text-xs space-y-1">
+            <div>Uzito wa Jumla: <span class="text-sm font-black text-emerald-950 dark:text-emerald-400">{{ calculatedIntakeWeight.toLocaleString() }} Kg</span> ({{ (calculatedIntakeWeight / 1000).toFixed(2) }} Tani)</div>
+            <div class="text-[10.5px] font-bold text-emerald-700 dark:text-emerald-400 bg-white/80 dark:bg-slate-900/80 py-0.5 px-2 rounded-lg border border-emerald-200 dark:border-emerald-500/20 inline-block shadow-2xs">
               ({{ intakeForm.quantity || 0 }} {{ intakeForm.unit }} @ 1 {{ intakeForm.unit }} = {{ getUnitKg ? getUnitKg(intakeForm.unit, 1) : 100 }} Kg)
             </div>
           </div>
           <div class="flex justify-end gap-2 pt-3">
-            <button @click="modals.intake = false" class="px-4 py-2 bg-slate-200 text-slate-700 font-bold rounded-xl">Ghairi</button>
+            <button @click="modals.intake = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl">Ghairi</button>
             <button @click="submitIntake" class="px-5 py-2 bg-emerald-600 text-white font-bold rounded-xl shadow-xs">Sajili (Save)</button>
           </div>
         </div>
@@ -1029,8 +1029,8 @@
 
     <!-- MODAL 4: PRINTABLE FARMER PROFILE STATEMENT & RECEIPT PDF -->
     <div v-if="modals.farmerReceipt" class="fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-slate-200 animate-fadeIn">
-        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-emerald-950 text-white">
+      <div class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 animate-fadeIn">
+        <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-emerald-950 text-white">
           <div class="flex items-center gap-2">
             <span class="text-lg">🖨️</span>
             <h3 class="text-sm font-extrabold">Taarifa ya Mkulima (Farmer Statement & Storage Voucher)</h3>
@@ -1043,20 +1043,20 @@
           </div>
         </div>
 
-        <div id="printableFarmerReceiptArea" class="p-8 bg-white text-slate-900 font-sans space-y-6 max-h-[75vh] overflow-y-auto print:p-0 print:max-h-none">
+        <div id="printableFarmerReceiptArea" class="p-8 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 font-sans space-y-6 max-h-[75vh] overflow-y-auto print:p-0 print:max-h-none">
           <!-- Letterhead Header -->
           <div class="flex items-start justify-between border-b-2 border-emerald-700 pb-4">
             <div>
-              <div class="text-2xl font-black tracking-tight text-emerald-800">GALANOKI MILLING & WAREHOUSE</div>
-              <div class="text-xs text-slate-500 mt-1 font-semibold leading-relaxed">
+              <div class="text-2xl font-black tracking-tight text-emerald-800 dark:text-emerald-400">GALANOKI MILLING & WAREHOUSE</div>
+              <div class="text-xs text-slate-500 dark:text-slate-400 mt-1 font-semibold leading-relaxed">
                 Agro-Inventory Management System<br/>
                 Industrial Complex Block A & B, Tanzania<br/>
                 Helpline: +255 700 000 100 | info@galanoki.co.tz
               </div>
             </div>
             <div class="text-right">
-              <div class="text-xl font-black text-slate-900 tracking-tight">FARMER VOUCHER</div>
-              <div class="text-xs text-slate-500 font-mono mt-1">
+              <div class="text-xl font-black text-slate-900 dark:text-slate-50 tracking-tight">FARMER VOUCHER</div>
+              <div class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-1">
                 <strong>Voucher #:</strong> FVR-{{ selectedFarmer.farmer_code }}<br/>
                 <strong>Date:</strong> {{ new Date().toLocaleDateString() }}
               </div>
@@ -1065,40 +1065,40 @@
 
           <!-- Farmer Bio -->
           <div class="grid grid-cols-2 gap-4 text-xs">
-            <div class="p-3 bg-emerald-50/60 rounded-2xl border border-emerald-200 space-y-1">
-              <div class="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">Taarifa za Mkulima:</div>
-              <div class="text-sm font-black text-slate-900">{{ selectedFarmer.name }}</div>
-              <div class="text-slate-600">Simu: {{ selectedFarmer.phone || 'N/A' }} | Code: {{ selectedFarmer.farmer_code }}</div>
-              <div class="text-slate-500">Eneo: {{ selectedFarmer.ward || 'Usa River' }}, {{ selectedFarmer.district || 'Arumeru' }}, {{ selectedFarmer.region || 'Arusha' }}</div>
+            <div class="p-3 bg-emerald-50/60 dark:bg-emerald-900/40 rounded-2xl border border-emerald-200 dark:border-emerald-500/20 space-y-1">
+              <div class="text-[10px] font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider">Taarifa za Mkulima:</div>
+              <div class="text-sm font-black text-slate-900 dark:text-slate-50">{{ selectedFarmer.name }}</div>
+              <div class="text-slate-600 dark:text-slate-300">Simu: {{ selectedFarmer.phone || 'N/A' }} | Code: {{ selectedFarmer.farmer_code }}</div>
+              <div class="text-slate-500 dark:text-slate-400">Eneo: {{ selectedFarmer.ward || 'Usa River' }}, {{ selectedFarmer.district || 'Arumeru' }}, {{ selectedFarmer.region || 'Arusha' }}</div>
             </div>
 
-            <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-between">
+            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
               <div class="flex justify-between">
-                <span class="text-slate-500">Jumla ya Mzigo Ghalani:</span>
-                <span class="font-black text-emerald-800">{{ totalFarmerStockKg.toLocaleString() }} Kg</span>
+                <span class="text-slate-500 dark:text-slate-400">Jumla ya Mzigo Ghalani:</span>
+                <span class="font-black text-emerald-800 dark:text-emerald-400">{{ totalFarmerStockKg.toLocaleString() }} Kg</span>
               </div>
-              <div class="flex justify-between border-t border-slate-200 pt-1 mt-1">
-                <span class="text-slate-500">Jumla ya Deni la Mikopo:</span>
-                <span class="font-black text-red-600">Tsh {{ totalActiveLoansBalance.toLocaleString() }}</span>
+              <div class="flex justify-between border-t border-slate-200 dark:border-slate-700 pt-1 mt-1">
+                <span class="text-slate-500 dark:text-slate-400">Jumla ya Deni la Mikopo:</span>
+                <span class="font-black text-red-600 dark:text-red-400">Tsh {{ totalActiveLoansBalance.toLocaleString() }}</span>
               </div>
             </div>
           </div>
 
           <!-- Table of Batches -->
           <div>
-            <div class="text-xs font-black text-slate-900 uppercase tracking-wider mb-2">Orodha ya Shehena (Batches):</div>
+            <div class="text-xs font-black text-slate-900 dark:text-slate-50 uppercase tracking-wider mb-2">Orodha ya Shehena (Batches):</div>
             <table class="w-full text-left text-xs border-collapse">
               <thead>
-                <tr class="border-b-2 border-slate-900 font-extrabold text-slate-900">
+                <tr class="border-b-2 border-slate-900 font-extrabold text-slate-900 dark:text-slate-50">
                   <th class="py-2">Batch Code</th>
                   <th class="py-2">Zao</th>
                   <th class="py-2 text-right">Uzito wa Sasa</th>
                   <th class="py-2 text-center">Status</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-slate-200 font-semibold text-slate-700">
+              <tbody class="divide-y divide-slate-200 font-semibold text-slate-700 dark:text-slate-200">
                 <tr v-for="b in farmerBatches" :key="b.id">
-                  <td class="py-2.5 font-mono font-bold text-emerald-800">{{ b.batch_code }}</td>
+                  <td class="py-2.5 font-mono font-bold text-emerald-800 dark:text-emerald-400">{{ b.batch_code }}</td>
                   <td class="py-2.5">{{ b.crop_type }}</td>
                   <td class="py-2.5 text-right font-mono font-bold">{{ (parseFloat(b.current_weight_mt||b.current_weight||0)*1000).toLocaleString() }} Kg</td>
                   <td class="py-2.5 text-center font-extrabold text-[11px] uppercase">{{ b.status }}</td>
@@ -1108,23 +1108,23 @@
           </div>
 
           <!-- Official Signatures -->
-          <div class="pt-8 border-t border-slate-200 grid grid-cols-2 gap-8 text-[11px] text-slate-500">
+          <div class="pt-8 border-t border-slate-200 dark:border-slate-700 grid grid-cols-2 gap-8 text-[11px] text-slate-500 dark:text-slate-400">
             <div>
-              <div class="font-bold text-slate-800 mb-6">Sahihi ya Mkulima:</div>
-              <div class="border-b border-slate-300 w-3/4 mb-1"></div>
+              <div class="font-bold text-slate-800 dark:text-slate-100 mb-6">Sahihi ya Mkulima:</div>
+              <div class="border-b border-slate-300 dark:border-slate-600 w-3/4 mb-1"></div>
               <div>{{ selectedFarmer.name }}</div>
             </div>
 
             <div>
-              <div class="font-bold text-slate-800 mb-6">Sahihi & Muhuri wa Kinu:</div>
-              <div class="border-b border-slate-300 w-3/4 mb-1"></div>
+              <div class="font-bold text-slate-800 dark:text-slate-100 mb-6">Sahihi & Muhuri wa Kinu:</div>
+              <div class="border-b border-slate-300 dark:border-slate-600 w-3/4 mb-1"></div>
               <div>Galanoki Warehouse Manager</div>
             </div>
           </div>
         </div>
 
-        <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
-          <button @click="modals.farmerReceipt = false" class="px-4 py-2 bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Funga</button>
+        <div class="p-4 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
+          <button @click="modals.farmerReceipt = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl text-xs">Funga</button>
           <button @click="triggerFarmerPrint" class="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold rounded-xl text-xs shadow-xs transition flex items-center gap-1.5">
             <span>🖨️ Chapisha / Hifadhi PDF</span>
           </button>
@@ -1134,7 +1134,7 @@
 
     <!-- MODAL: FANYA MAUZO MPYA (RECORD NEW SALE & SETTLEMENT) -->
     <div v-if="modals.newSale" class="fixed inset-0 z-[90] bg-slate-900/75 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-slate-200 animate-fadeIn">
+      <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 animate-fadeIn">
         <div class="px-6 py-4 border-b border-emerald-800 flex items-center justify-between bg-gradient-to-r from-emerald-900 to-teal-900 text-white">
           <div class="flex items-center gap-2">
             <span class="text-xl">🏷️</span>
@@ -1143,26 +1143,26 @@
           <button @click="modals.newSale = false" class="text-emerald-200 hover:text-white p-1 cursor-pointer">✕</button>
         </div>
 
-        <div class="p-6 space-y-4 text-xs font-semibold text-slate-700">
+        <div class="p-6 space-y-4 text-xs font-semibold text-slate-700 dark:text-slate-200">
           
           <!-- Uchambuzi wa Makato Card -->
-          <div class="bg-emerald-50/70 p-3.5 rounded-2xl border border-emerald-200 space-y-2">
-            <div class="font-extrabold text-emerald-950 text-xs flex items-center justify-between border-b border-emerald-200 pb-1.5">
+          <div class="bg-emerald-50/70 dark:bg-emerald-900/40 p-3.5 rounded-2xl border border-emerald-200 dark:border-emerald-500/20 space-y-2">
+            <div class="font-extrabold text-emerald-950 dark:text-emerald-400 text-xs flex items-center justify-between border-b border-emerald-200 dark:border-emerald-500/20 pb-1.5">
               <span>Uchambuzi wa Makato ya Mkulima</span>
-              <span class="text-emerald-700 font-mono text-[11px]">{{ selectedFarmer.name }}</span>
+              <span class="text-emerald-700 dark:text-emerald-400 font-mono text-[11px]">{{ selectedFarmer.name }}</span>
             </div>
             <div class="grid grid-cols-3 gap-2 text-[11px] pt-1">
               <div>
-                <span class="text-slate-500 block">Ada Hifadhi:</span>
-                <strong class="text-slate-900 font-bold">Tsh {{ (settlementForm.storage_fee || 45000).toLocaleString() }}</strong>
+                <span class="text-slate-500 dark:text-slate-400 block">Ada Hifadhi:</span>
+                <strong class="text-slate-900 dark:text-slate-50 font-bold">Tsh {{ (settlementForm.storage_fee || 45000).toLocaleString() }}</strong>
               </div>
               <div>
-                <span class="text-slate-500 block">Ada Kinu:</span>
-                <strong class="text-slate-900 font-bold">Tsh {{ (settlementForm.milling_fee || 120000).toLocaleString() }}</strong>
+                <span class="text-slate-500 dark:text-slate-400 block">Ada Kinu:</span>
+                <strong class="text-slate-900 dark:text-slate-50 font-bold">Tsh {{ (settlementForm.milling_fee || 120000).toLocaleString() }}</strong>
               </div>
               <div>
-                <span class="text-slate-500 block">Den la Mkopo:</span>
-                <strong class="text-red-600 font-bold">Tsh {{ totalFarmerLoanBalance.toLocaleString() }}</strong>
+                <span class="text-slate-500 dark:text-slate-400 block">Den la Mkopo:</span>
+                <strong class="text-red-600 dark:text-red-400 font-bold">Tsh {{ totalFarmerLoanBalance.toLocaleString() }}</strong>
               </div>
             </div>
           </div>
@@ -1170,8 +1170,8 @@
           <!-- Input Fields -->
           <div class="space-y-3">
             <div>
-              <label class="block font-extrabold text-slate-900 mb-1">Chagua Batch ya Kuuza *</label>
-              <select v-model="settlementForm.batch_id" @change="onSettlementBatchChange" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold text-slate-900">
+              <label class="block font-extrabold text-slate-900 dark:text-slate-50 mb-1">Chagua Batch ya Kuuza *</label>
+              <select v-model="settlementForm.batch_id" @change="onSettlementBatchChange" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-600 rounded-xl font-bold text-slate-900 dark:text-slate-50">
                 <option value="">Chagua batch ya kuuza...</option>
                 <option v-for="b in activeNonTransformedBatches" :key="b.id" :value="b.id">{{ b.batch_code }} - {{ b.crop_type }} ({{ (parseFloat(b.current_weight_mt||b.current_weight||0)*1000).toLocaleString() }} Kg Ghalani)</option>
               </select>
@@ -1179,12 +1179,12 @@
 
             <!-- Aina ya Mauzo Toggle -->
             <div>
-              <label class="block font-extrabold text-slate-900 mb-1">Aina ya Mauzo *</label>
-              <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl border border-slate-200">
+              <label class="block font-extrabold text-slate-900 dark:text-slate-50 mb-1">Aina ya Mauzo *</label>
+              <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
                 <button 
                   type="button"
                   @click="settlementForm.sale_type = 'full'; onSaleTypeChange();"
-                  :class="settlementForm.sale_type === 'full' ? 'bg-emerald-600 text-white shadow-xs font-black' : 'text-slate-700 font-bold hover:bg-slate-200/60'"
+                  :class="settlementForm.sale_type === 'full' ? 'bg-emerald-600 text-white shadow-xs font-black' : 'text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-200/60 dark:bg-slate-700/60'"
                   class="py-2 px-3 rounded-lg text-xs transition cursor-pointer flex items-center justify-center gap-1"
                 >
                   <span>📦 Kuuza Mzigo Wote (100%)</span>
@@ -1192,7 +1192,7 @@
                 <button 
                   type="button"
                   @click="settlementForm.sale_type = 'partial'"
-                  :class="settlementForm.sale_type === 'partial' ? 'bg-emerald-600 text-white shadow-xs font-black' : 'text-slate-700 font-bold hover:bg-slate-200/60'"
+                  :class="settlementForm.sale_type === 'partial' ? 'bg-emerald-600 text-white shadow-xs font-black' : 'text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-200/60 dark:bg-slate-700/60'"
                   class="py-2 px-3 rounded-lg text-xs transition cursor-pointer flex items-center justify-center gap-1"
                 >
                   <span>⚖️ Kuuza Kidogo Kidogo</span>
@@ -1202,30 +1202,30 @@
 
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block font-extrabold text-slate-900 mb-1">Uzito wa Kuuza (Kg) *</label>
+                <label class="block font-extrabold text-slate-900 dark:text-slate-50 mb-1">Uzito wa Kuuza (Kg) *</label>
                 <input 
                   v-model.number="settlementForm.sold_weight_kg" 
                   :disabled="settlementForm.sale_type === 'full'"
                   type="number" 
                   placeholder="Uzito kwa Kg..." 
-                  class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold text-slate-900 disabled:bg-slate-100 disabled:text-slate-500"
+                  class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-600 rounded-xl font-bold text-slate-900 dark:text-slate-50 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 dark:text-slate-400"
                 />
-                <div v-if="selectedSettlementBatch" class="text-[10.5px] text-slate-500 font-semibold mt-1 space-y-0.5">
-                  <div>Uliopo: <strong class="text-slate-900 font-bold">{{ availableBatchKg.toLocaleString() }} Kg</strong> | Utakaobaki: <strong class="text-emerald-700 font-extrabold">{{ remainingBatchKgAfterSale.toLocaleString() }} Kg</strong></div>
-                  <div class="text-amber-900 font-bold flex items-center gap-1 bg-amber-50 p-1 rounded border border-amber-200">
-                    <span>⏱️ Muda wa Utunzaji: <strong class="text-amber-950 font-black">Siku {{ calculateStorageDays(selectedSettlementBatch.created_at, selectedSettlementBatch.status, selectedSettlementBatch.updated_at) }}</strong> (Mapokezi: {{ formatDate(selectedSettlementBatch.created_at) }})</span>
+                <div v-if="selectedSettlementBatch" class="text-[10.5px] text-slate-500 dark:text-slate-400 font-semibold mt-1 space-y-0.5">
+                  <div>Uliopo: <strong class="text-slate-900 dark:text-slate-50 font-bold">{{ availableBatchKg.toLocaleString() }} Kg</strong> | Utakaobaki: <strong class="text-emerald-700 dark:text-emerald-400 font-extrabold">{{ remainingBatchKgAfterSale.toLocaleString() }} Kg</strong></div>
+                  <div class="text-amber-900 dark:text-amber-400 font-bold flex items-center gap-1 bg-amber-50 dark:bg-amber-500/10 p-1 rounded border border-amber-200 dark:border-amber-500/20">
+                    <span>⏱️ Muda wa Utunzaji: <strong class="text-amber-950 dark:text-amber-400 font-black">Siku {{ calculateStorageDays(selectedSettlementBatch.created_at, selectedSettlementBatch.status, selectedSettlementBatch.updated_at) }}</strong> (Mapokezi: {{ formatDate(selectedSettlementBatch.created_at) }})</span>
                   </div>
                 </div>
               </div>
               <div>
-                <label class="block font-extrabold text-slate-900 mb-1">Bei ya Mauzo (Tsh/Kg) *</label>
-                <input v-model.number="settlementForm.price_per_kg" type="number" placeholder="e.g. 1800" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold text-slate-900"/>
+                <label class="block font-extrabold text-slate-900 dark:text-slate-50 mb-1">Bei ya Mauzo (Tsh/Kg) *</label>
+                <input v-model.number="settlementForm.price_per_kg" type="number" placeholder="e.g. 1800" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-600 rounded-xl font-bold text-slate-900 dark:text-slate-50"/>
               </div>
             </div>
 
             <div>
-              <label class="block font-extrabold text-slate-900 mb-1">Jina la Mnunuzi (Buyer) *</label>
-              <input v-model="settlementForm.buyer_name" type="text" placeholder="Ingiza jina la mnunuzi..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold text-slate-900"/>
+              <label class="block font-extrabold text-slate-900 dark:text-slate-50 mb-1">Jina la Mnunuzi (Buyer) *</label>
+              <input v-model="settlementForm.buyer_name" type="text" placeholder="Ingiza jina la mnunuzi..." class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-600 rounded-xl font-bold text-slate-900 dark:text-slate-50"/>
             </div>
           </div>
 
@@ -1239,7 +1239,7 @@
           </div>
 
           <div class="flex items-center gap-2 pt-2">
-            <button @click="modals.newSale = false" class="flex-1 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl transition cursor-pointer">
+            <button @click="modals.newSale = false" class="flex-1 py-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-800 dark:text-slate-100 font-bold rounded-xl transition cursor-pointer">
               Ghairi
             </button>
             <button @click="submitSettlement" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl shadow-md transition cursor-pointer">
@@ -1253,32 +1253,32 @@
 
     <!-- CUSTOM ENTERPRISE CONFIRMATION MODAL (No Native Browser Confirm) -->
     <div v-if="confirmModal.show" class="fixed inset-0 z-70 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-slate-100 space-y-0 transform transition-all scale-100">
+      <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-800 space-y-0 transform transition-all scale-100">
         <!-- Header -->
         <div class="px-6 py-4 flex items-center justify-between" :class="confirmModal.isDanger ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white' : 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white'">
           <div class="flex items-center gap-2 font-black text-sm sm:text-base">
             <span>{{ confirmModal.title }}</span>
           </div>
-          <button @click="confirmModal.show = false" class="text-white/80 hover:text-white p-1 rounded-full hover:bg-white/20 transition cursor-pointer">✕</button>
+          <button @click="confirmModal.show = false" class="text-white/80 hover:text-white p-1 rounded-full hover:bg-white/20 dark:bg-slate-900/20 transition cursor-pointer">✕</button>
         </div>
 
         <!-- Body Content -->
-        <div class="p-6 space-y-4 text-xs font-semibold text-slate-700">
-          <p class="text-sm font-bold text-slate-800 leading-relaxed">
+        <div class="p-6 space-y-4 text-xs font-semibold text-slate-700 dark:text-slate-200">
+          <p class="text-sm font-bold text-slate-800 dark:text-slate-100 leading-relaxed">
             {{ confirmModal.message }}
           </p>
 
-          <div v-if="confirmModal.warningNote" class="p-3.5 rounded-2xl text-xs font-bold leading-relaxed border flex items-start gap-2.5" :class="confirmModal.isDanger ? 'bg-red-50 text-red-900 border-red-200' : 'bg-emerald-50 text-emerald-900 border-emerald-200'">
+          <div v-if="confirmModal.warningNote" class="p-3.5 rounded-2xl text-xs font-bold leading-relaxed border flex items-start gap-2.5" :class="confirmModal.isDanger ? 'bg-red-50 dark:bg-red-500/10 text-red-900 border-red-200 dark:border-red-500/20' : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-900 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'">
             <span class="text-base leading-none">⚠️</span>
             <div>{{ confirmModal.warningNote }}</div>
           </div>
         </div>
 
         <!-- Footer Actions -->
-        <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
+        <div class="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3">
           <button 
             @click="confirmModal.show = false" 
-            class="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-extrabold rounded-xl text-xs transition cursor-pointer"
+            class="px-4 py-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-700 dark:text-slate-200 font-extrabold rounded-xl text-xs transition cursor-pointer"
           >
             {{ confirmModal.cancelText || 'Ghairi' }}
           </button>

@@ -2,7 +2,7 @@
   <div class="space-y-6 animate-fadeIn pb-12">
     
     <!-- Top Header Banner -->
-    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-colors">
+    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-700/80 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-colors">
       <div>
         <div class="flex items-center gap-2.5">
           <span class="p-2.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-xl shadow-inner">
@@ -24,7 +24,7 @@
         <button 
           @click="fetchInventoryData" 
           :disabled="loading"
-          class="p-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl transition border border-slate-200/70 dark:border-slate-700 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+          class="p-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl transition border border-slate-200 dark:border-slate-700/70 dark:border-slate-700 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
           title="Refresh Data"
         >
           <svg :class="{'animate-spin': loading}" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
@@ -55,9 +55,9 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
       
       <!-- KPI 1: Currently Stored Stock -->
-      <div class="bg-white dark:bg-slate-900 p-4.5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2 transition-colors">
+      <div class="bg-white dark:bg-slate-900 p-4.5 rounded-3xl border border-slate-200 dark:border-slate-700/80 dark:border-slate-800 shadow-sm space-y-2 transition-colors">
         <div class="flex items-center justify-between">
-          <span class="text-[11px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Current Stored Stock</span>
+          <span class="text-[11px] font-extrabold text-slate-500 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider">Current Stored Stock</span>
           <div class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm shadow-inner">
             📦
           </div>
@@ -77,9 +77,9 @@
       </div>
 
       <!-- KPI 2: Total Sold Stock -->
-      <div class="bg-white dark:bg-slate-900 p-4.5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2 transition-colors">
+      <div class="bg-white dark:bg-slate-900 p-4.5 rounded-3xl border border-slate-200 dark:border-slate-700/80 dark:border-slate-800 shadow-sm space-y-2 transition-colors">
         <div class="flex items-center justify-between">
-          <span class="text-[11px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Stock Sold</span>
+          <span class="text-[11px] font-extrabold text-slate-500 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Stock Sold</span>
           <div class="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center text-sm shadow-inner">
             🛍️
           </div>
@@ -99,9 +99,9 @@
       </div>
 
       <!-- KPI 3: Total Grain Intake Received -->
-      <div class="bg-white dark:bg-slate-900 p-4.5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2 transition-colors">
+      <div class="bg-white dark:bg-slate-900 p-4.5 rounded-3xl border border-slate-200 dark:border-slate-700/80 dark:border-slate-800 shadow-sm space-y-2 transition-colors">
         <div class="flex items-center justify-between">
-          <span class="text-[11px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Intake Received</span>
+          <span class="text-[11px] font-extrabold text-slate-500 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Intake Received</span>
           <div class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-sm shadow-inner">
             📥
           </div>
@@ -121,9 +121,9 @@
       </div>
 
       <!-- KPI 4: Silo Bin Utilization -->
-      <div class="bg-white dark:bg-slate-900 p-4.5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2 transition-colors">
+      <div class="bg-white dark:bg-slate-900 p-4.5 rounded-3xl border border-slate-200 dark:border-slate-700/80 dark:border-slate-800 shadow-sm space-y-2 transition-colors">
         <div class="flex items-center justify-between">
-          <span class="text-[11px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Silo Utilization</span>
+          <span class="text-[11px] font-extrabold text-slate-500 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider">Silo Utilization</span>
           <div class="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center text-sm shadow-inner">
             🏬
           </div>
@@ -147,9 +147,9 @@
       </div>
 
       <!-- KPI 5: Consignment Batches -->
-      <div class="bg-white dark:bg-slate-900 p-4.5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2 transition-colors">
+      <div class="bg-white dark:bg-slate-900 p-4.5 rounded-3xl border border-slate-200 dark:border-slate-700/80 dark:border-slate-800 shadow-sm space-y-2 transition-colors">
         <div class="flex items-center justify-between">
-          <span class="text-[11px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Active Batches</span>
+          <span class="text-[11px] font-extrabold text-slate-500 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider">Active Batches</span>
           <div class="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center text-sm shadow-inner">
             📜
           </div>
@@ -169,9 +169,9 @@
       </div>
 
       <!-- KPI 6: Moisture Quality Alert -->
-      <div class="bg-white dark:bg-slate-900 p-4.5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2 transition-colors">
+      <div class="bg-white dark:bg-slate-900 p-4.5 rounded-3xl border border-slate-200 dark:border-slate-700/80 dark:border-slate-800 shadow-sm space-y-2 transition-colors">
         <div class="flex items-center justify-between">
-          <span class="text-[11px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Quality Alert</span>
+          <span class="text-[11px] font-extrabold text-slate-500 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider">Quality Alert</span>
           <div class="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center text-sm shadow-inner">
             ⚠️
           </div>
@@ -195,7 +195,7 @@
     </div>
 
     <!-- Commodity Breakdown & Volume Distribution Card (Comprehensive Analysis) -->
-    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4 transition-colors">
+    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-700/80 dark:border-slate-800 shadow-sm space-y-4 transition-colors">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
         <div>
           <h3 class="text-base font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
@@ -219,7 +219,7 @@
         <div 
           v-for="item in summaryData.crop_breakdown" 
           :key="item.crop_type"
-          class="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-3"
+          class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/80 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 dark:border-slate-700/80 space-y-3"
         >
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -235,7 +235,7 @@
 
           <!-- Volume Breakdown Numbers -->
           <div class="grid grid-cols-2 gap-2 pt-1 text-xs">
-            <div class="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
+            <div class="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700/60 dark:border-slate-700/60">
               <span class="text-[10.5px] font-bold text-slate-400 block uppercase">Total Received:</span>
               <span class="font-black text-slate-900 dark:text-white text-sm">{{ formatNum(item.received_mt) }} MT</span>
               <span class="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">
@@ -243,7 +243,7 @@
               </span>
             </div>
 
-            <div class="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
+            <div class="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700/60 dark:border-slate-700/60">
               <span class="text-[10.5px] font-bold text-slate-400 block uppercase">In Active Store:</span>
               <span class="font-black text-emerald-600 dark:text-emerald-400 text-sm">{{ formatNum(item.stored_mt) }} MT</span>
               <span class="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">
@@ -264,7 +264,7 @@
     </div>
 
     <!-- Grain Processing (Transformation) & Sales Velocity Analytics -->
-    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-5 transition-colors">
+    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-700/80 dark:border-slate-800 shadow-sm space-y-5 transition-colors">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
         <div>
           <h3 class="text-base font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
@@ -279,24 +279,24 @@
         </div>
 
         <!-- Period Selector -->
-        <div class="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 self-start sm:self-auto">
+        <div class="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200 dark:border-slate-700/80 dark:border-slate-700/80 self-start sm:self-auto">
           <button 
             @click="analyticsTimeframe = 'this_week'"
-            :class="analyticsTimeframe === 'this_week' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm font-extrabold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 font-bold'"
+            :class="analyticsTimeframe === 'this_week' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm font-extrabold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 font-bold'"
             class="px-3 py-1 rounded-xl text-xs transition-all cursor-pointer"
           >
             This Week
           </button>
           <button 
             @click="analyticsTimeframe = 'this_month'"
-            :class="analyticsTimeframe === 'this_month' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm font-extrabold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 font-bold'"
+            :class="analyticsTimeframe === 'this_month' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm font-extrabold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 font-bold'"
             class="px-3 py-1 rounded-xl text-xs transition-all cursor-pointer"
           >
             This Month
           </button>
           <button 
             @click="analyticsTimeframe = 'all_time'"
-            :class="analyticsTimeframe === 'all_time' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm font-extrabold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 font-bold'"
+            :class="analyticsTimeframe === 'all_time' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm font-extrabold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-50 font-bold'"
             class="px-3 py-1 rounded-xl text-xs transition-all cursor-pointer"
           >
             All Time
@@ -308,7 +308,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
         
         <!-- Box 1: Grain Transformation & Milling Outputs -->
-        <div class="p-5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-4">
+        <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 dark:border-slate-700/80 space-y-4">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <div class="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 flex items-center justify-center text-xs font-black">
@@ -348,7 +348,7 @@
         </div>
 
         <!-- Box 2: Grain Sales & Dispatch Performance -->
-        <div class="p-5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-4">
+        <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 dark:border-slate-700/80 space-y-4">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <div class="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 flex items-center justify-center text-xs font-black">
@@ -391,7 +391,7 @@
     </div>
 
     <!-- Master Grain Batches Data Table Section -->
-    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden space-y-4 transition-colors">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700/80 dark:border-slate-800 shadow-sm overflow-hidden space-y-4 transition-colors">
       
       <!-- Table Header & Controls Bar -->
       <div class="p-6 pb-2 border-b border-slate-100 dark:border-slate-800 space-y-4">
@@ -412,7 +412,7 @@
           <div class="flex flex-wrap items-center gap-2">
             <button 
               @click="cropFilter = ''" 
-              :class="cropFilter === '' ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'"
+              :class="cropFilter === '' ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-700'"
               class="py-1.5 px-3 rounded-xl text-xs font-extrabold transition cursor-pointer"
             >
               All Crops
@@ -422,7 +422,7 @@
               v-for="crop in cropTypesList" 
               :key="crop"
               @click="cropFilter = crop"
-              :class="cropFilter === crop ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'"
+              :class="cropFilter === crop ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-700'"
               class="py-1.5 px-3 rounded-xl text-xs font-extrabold transition cursor-pointer"
             >
               {{ crop }}
@@ -467,7 +467,7 @@
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200/80 dark:border-slate-800 text-[11px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider">
+            <tr class="bg-slate-50 dark:bg-slate-950/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/80 dark:border-slate-800 text-[11px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider">
               <th class="py-3.5 px-4">Batch Code & Date</th>
               <th class="py-3.5 px-4">Farmer / Owner</th>
               <th class="py-3.5 px-4">Commodity & Variety</th>
@@ -506,7 +506,7 @@
             <tr 
               v-for="batch in filteredBatches" 
               :key="batch.id"
-              class="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors"
+              class="hover:bg-slate-50/80 dark:bg-slate-950/80 dark:hover:bg-slate-800/50 transition-colors"
             >
               <!-- Batch Code & Date -->
               <td class="py-3.5 px-4 font-bold text-slate-900 dark:text-white">
@@ -552,7 +552,7 @@
 
               <!-- Storage Bin -->
               <td class="py-3.5 px-4">
-                <span class="px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-extrabold text-[11px] border border-slate-200/80 dark:border-slate-700 inline-flex items-center gap-1">
+                <span class="px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-extrabold text-[11px] border border-slate-200 dark:border-slate-700/80 dark:border-slate-700 inline-flex items-center gap-1">
                   <span>🏢</span>
                   <span>{{ batch.bin_name || 'Unassigned' }}</span>
                 </span>
@@ -578,7 +578,7 @@
                 <div class="flex items-center justify-end gap-1.5">
                   <button 
                     @click="openMoveModal(batch)" 
-                    class="py-1 px-2.5 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-400 font-extrabold text-[11px] rounded-lg border border-blue-200 dark:border-blue-800 transition cursor-pointer"
+                    class="py-1 px-2.5 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:bg-blue-500/20 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-400 font-extrabold text-[11px] rounded-lg border border-blue-200 dark:border-blue-800 transition cursor-pointer"
                     title="Transfer Bin"
                   >
                     🚚 Move
@@ -610,7 +610,7 @@
               <span class="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-base">📥</span>
               <h3 class="text-base font-extrabold text-slate-900 dark:text-white">Intake New Grain Batch</h3>
             </div>
-            <button @click="showIntakeModal = false" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+            <button @click="showIntakeModal = false" class="text-slate-400 hover:text-slate-600 dark:text-slate-300 text-lg font-bold">✕</button>
           </div>
 
           <form @submit.prevent="submitIntakeBatch" class="space-y-4 text-left">
@@ -734,10 +734,10 @@
               <span class="p-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 text-base">🚚</span>
               <h3 class="text-base font-extrabold text-slate-900 dark:text-white">Transfer Batch Location</h3>
             </div>
-            <button @click="showMoveModal = false" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+            <button @click="showMoveModal = false" class="text-slate-400 hover:text-slate-600 dark:text-slate-300 text-lg font-bold">✕</button>
           </div>
 
-          <div v-if="activeMoveBatch" class="p-3 bg-slate-50 dark:bg-slate-800/70 rounded-2xl space-y-1 text-xs text-left border border-slate-200/60 dark:border-slate-700">
+          <div v-if="activeMoveBatch" class="p-3 bg-slate-50 dark:bg-slate-800/70 rounded-2xl space-y-1 text-xs text-left border border-slate-200 dark:border-slate-700/60 dark:border-slate-700">
             <div class="font-extrabold text-slate-900 dark:text-white">Batch: {{ activeMoveBatch.batch_code }} ({{ activeMoveBatch.crop_type }})</div>
             <div class="text-slate-500 dark:text-slate-400 font-medium">Owner: {{ activeMoveBatch.farmer_name }} | Weight: {{ activeMoveBatch.current_weight }} MT</div>
             <div class="text-slate-500 dark:text-slate-400 font-medium">Current Bin: <strong class="text-emerald-600 dark:text-emerald-400">{{ activeMoveBatch.bin_name || 'Unassigned' }}</strong></div>

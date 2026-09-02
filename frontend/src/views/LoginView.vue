@@ -1,159 +1,148 @@
 <template>
-  <div class="min-h-screen w-full flex bg-slate-950 text-slate-100 font-sans relative overflow-hidden select-none">
+  <div class="min-h-screen w-full flex items-center justify-center bg-[#050B14] relative overflow-hidden font-sans">
     
-    <!-- Dynamic Glowing Background Effects -->
-    <div class="absolute -top-40 -left-40 w-96 h-96 bg-emerald-600/20 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-teal-500/15 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute top-1/2 left-1/3 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <!-- Abstract Premium Background -->
+    <div class="absolute inset-0 z-0 opacity-40">
+      <div class="absolute -top-[30%] -left-[10%] w-[70%] h-[70%] rounded-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/40 via-[#050B14]/0 to-[#050B14]/0 blur-3xl pointer-events-none"></div>
+      <div class="absolute top-[60%] left-[60%] w-[60%] h-[60%] rounded-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-900/30 via-[#050B14]/0 to-[#050B14]/0 blur-3xl pointer-events-none"></div>
+    </div>
+    
+    <!-- Grid overlay -->
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjAuMDUiIGZpbGw9Im5vbmUiIG9wYWNpdHk9IjAuMTUiPjxwYXRoIGQ9Ik0wIDQwaDQwTTAgMGgwIiAvPjxwYXRoIGQ9Ik00MCAwaDB2NDAiIC8+PC9nPjwvc3ZnPg==')] opacity-30 z-0"></div>
 
-    <div class="w-full max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-center p-4 sm:p-6 lg:p-10 z-10 my-auto">
+    <div class="w-full max-w-5xl mx-auto flex flex-col lg:flex-row items-center justify-center p-6 z-10 relative">
       
       <!-- Left Hero & Branding Section -->
-      <div class="w-full lg:w-1/2 p-6 sm:p-10 space-y-8 text-left">
+      <div class="w-full lg:w-1/2 p-6 lg:p-12 space-y-10 text-left">
         <!-- Brand Header -->
-        <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-emerald-400 flex items-center justify-center text-white font-black text-2xl shadow-xl shadow-emerald-600/30 ring-2 ring-white/20">
-            ⭐
+        <div class="flex items-center gap-4 animate-fade-in-up">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center text-white font-black text-3xl shadow-[0_0_30px_rgba(16,185,129,0.3)] border border-white/10">
+            G
           </div>
           <div>
-            <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight leading-none bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">
+            <h1 class="text-3xl font-bold text-white tracking-tight">
               GARANOKI
             </h1>
-            <p class="text-xs text-emerald-400 font-extrabold uppercase tracking-widest mt-1">
-              Store & Financial Management System
+            <p class="text-[11px] text-emerald-400 font-bold uppercase tracking-[0.2em] mt-1">
+              Enterprise Systems
             </p>
           </div>
         </div>
 
         <!-- Headline -->
-        <div class="space-y-3">
-          <span class="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 inline-flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            Garanoki Enterprise Portal
-          </span>
-          <h2 class="text-2xl sm:text-4xl font-extrabold text-white leading-tight">
-            Executive Control & Financial Governance
+        <div class="space-y-4 animate-fade-in-up" style="animation-delay: 100ms;">
+          <h2 class="text-4xl lg:text-5xl font-semibold text-white leading-[1.15] tracking-tight">
+            Next-Generation <br/>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">Agribusiness Control</span>
           </h2>
-          <p class="text-sm text-slate-400 leading-relaxed font-medium">
-            Official Garanoki system for managing grain intake, milling & drying operations, farmer credit lines, and real-time financial ledgers.
+          <p class="text-base text-slate-400 leading-relaxed max-w-md font-light">
+            Secure, real-time management of grain inventory, farmer portfolios, and financial settlements across your entire operation.
           </p>
         </div>
 
-        <!-- System Value Propositions -->
-        <div class="space-y-3 pt-2">
-          <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-md">
-            <div class="p-2 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold text-sm shrink-0">🌾</div>
-            <div>
-              <h4 class="text-xs font-bold text-white">Inventory & Warehouse Control</h4>
-              <p class="text-[11.5px] text-slate-400">Comprehensive batch tracking for Paddy, Maize, and Legumes across all bins.</p>
-            </div>
+        <!-- Trust Badges -->
+        <div class="pt-8 border-t border-slate-800/60 flex items-center gap-6 animate-fade-in-up" style="animation-delay: 200ms;">
+          <div class="flex flex-col gap-1 text-xs">
+            <span class="text-white font-semibold flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> End-to-End Encryption</span>
           </div>
-
-          <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-md">
-            <div class="p-2 rounded-lg bg-teal-500/20 text-teal-400 font-bold text-sm shrink-0">💰</div>
-            <div>
-              <h4 class="text-xs font-bold text-white">Executive Financial Ledger</h4>
-              <p class="text-[11.5px] text-slate-400">Real-time service revenue streams, loan recovery tracking, and profit margins.</p>
-            </div>
+          <div class="flex flex-col gap-1 text-xs">
+            <span class="text-white font-semibold flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div> Live Synchronization</span>
           </div>
-        </div>
-
-        <!-- Footer status -->
-        <div class="flex items-center gap-2 text-xs text-slate-500 font-mono">
-          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-          <span>Security Protocol: Enforced (JWT Session)</span>
         </div>
       </div>
 
-      <!-- Right Login Card Form Section -->
-      <div class="w-full lg:w-1/2 max-w-md p-6 sm:p-8 bg-slate-900/80 backdrop-blur-xl border border-slate-800/90 rounded-3xl shadow-2xl space-y-6">
-        
-        <!-- Card Title Header -->
-        <div class="space-y-1 text-center sm:text-left border-b border-slate-800 pb-4">
-          <h3 class="text-xl font-black text-white tracking-tight">System Owner Sign In</h3>
-          <p class="text-xs text-slate-400 font-medium">Enter your credentials to unlock GARANOKI</p>
-        </div>
-
-        <!-- Error Alert (If any) -->
-        <div v-if="errorMessage" class="p-3 bg-red-950/90 border border-red-700/80 text-red-200 text-xs rounded-xl flex items-center gap-2.5 shadow-lg animate-shake">
-          <span class="text-base shrink-0">🚫</span>
-          <span class="font-medium leading-tight">{{ errorMessage }}</span>
-        </div>
-
-        <!-- Form Fields -->
-        <form @submit.prevent="handleLoginSubmit" class="space-y-4">
+      <!-- Right Login Card -->
+      <div class="w-full lg:w-[420px] shrink-0 mt-10 lg:mt-0 animate-fade-in-up" style="animation-delay: 300ms;">
+        <div class="bg-[#0A101C]/80 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] overflow-hidden">
           
-          <!-- Email Address Field -->
-          <div class="space-y-1.5 text-left">
-            <label class="text-xs font-bold text-slate-300 flex items-center justify-between">
-              <span>Owner Email Address</span>
-            </label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-              </div>
-              <input 
-                type="email" 
-                v-model="email"
-                required
-                placeholder="gwakilabonface@gmail.com"
-                class="w-full pl-10 pr-4 py-2.5 bg-slate-950/80 border border-slate-800 rounded-xl text-xs font-medium text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 transition shadow-inner"
-              />
+          <div class="p-8">
+            <div class="space-y-2 mb-8 text-center sm:text-left">
+              <h3 class="text-2xl font-semibold text-white tracking-tight">Welcome Back</h3>
+              <p class="text-sm text-slate-400">Sign in to your owner workspace</p>
             </div>
+
+            <!-- Error Alert -->
+            <div v-if="errorMessage" class="mb-6 p-3.5 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-xl flex items-start gap-3 transition-all">
+              <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              <span class="font-medium">{{ errorMessage }}</span>
+            </div>
+
+            <!-- Form -->
+            <form @submit.prevent="handleLoginSubmit" class="space-y-5" autocomplete="off">
+              <!-- Hack to disable browser autofill -->
+              <input style="display:none" type="text" name="fakeusernameremembered"/>
+              <input style="display:none" type="password" name="fakepasswordremembered"/>
+
+              <!-- Email Field -->
+              <div class="space-y-2">
+                <label class="text-[13px] font-medium text-slate-300 ml-1">Email Address</label>
+                <div class="relative group">
+                  <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-emerald-500 transition-colors">
+                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/></svg>
+                  </div>
+                  <input 
+                    type="email" 
+                    v-model="email"
+                    required
+                    autocomplete="new-password"
+                    class="w-full pl-11 pr-4 py-3.5 bg-[#0F1623] border border-slate-700/60 rounded-xl text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all shadow-inner"
+                    placeholder="Enter your email"
+                  />
+                </div>
+              </div>
+
+              <!-- Password Field -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between ml-1">
+                  <label class="text-[13px] font-medium text-slate-300">Password</label>
+                  <a href="#" @click.prevent="showForgotNotice" class="text-[12px] font-medium text-slate-500 hover:text-emerald-400 transition-colors">Forgot?</a>
+                </div>
+                <div class="relative group">
+                  <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-emerald-500 transition-colors">
+                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                  </div>
+                  <input 
+                    :type="showPassword ? 'text' : 'password'" 
+                    v-model="password"
+                    required
+                    autocomplete="new-password"
+                    class="w-full pl-11 pr-11 py-3.5 bg-[#0F1623] border border-slate-700/60 rounded-xl text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all shadow-inner"
+                    placeholder="Enter your password"
+                  />
+                  <button 
+                    type="button"
+                    @click="showPassword = !showPassword"
+                    class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-white transition-colors"
+                  >
+                    <svg v-if="!showPassword" class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    <svg v-else class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a10.03 10.03 0 013.682-.863c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m-6.33-6.33a3 3 0 104.243 4.243"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="pt-2">
+                <button 
+                  type="submit" 
+                  :disabled="loading"
+                  class="w-full py-3.5 px-4 bg-white hover:bg-slate-100 text-slate-900 font-semibold text-[14px] rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                >
+                  <svg v-if="loading" class="animate-spin h-4 w-4 text-slate-900" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>{{ loading ? 'Authenticating...' : 'Sign In' }}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+          
+          <div class="bg-[#050B14]/80 px-8 py-5 border-t border-slate-700/50 flex items-center justify-between">
+            <span class="text-[11px] text-slate-500 font-medium">© 2026 Garanoki Ltd.</span>
+            <span class="text-[11px] text-emerald-500/70 font-medium tracking-wide">SYSTEM V2.0</span>
           </div>
 
-          <!-- Password Field -->
-          <div class="space-y-1.5 text-left">
-            <div class="flex items-center justify-between">
-              <label class="text-xs font-bold text-slate-300">Password</label>
-              <a href="#" @click.prevent="showForgotNotice" class="text-[11px] font-semibold text-emerald-400 hover:underline">Forgot Password?</a>
-            </div>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-              </div>
-              <input 
-                :type="showPassword ? 'text' : 'password'" 
-                v-model="password"
-                required
-                placeholder="••••••••"
-                class="w-full pl-10 pr-10 py-2.5 bg-slate-950/80 border border-slate-800 rounded-xl text-xs font-medium text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 transition shadow-inner"
-              />
-              <button 
-                type="button"
-                @click="showPassword = !showPassword"
-                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300"
-              >
-                <svg v-if="!showPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a10.03 10.03 0 013.682-.863c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m-6.33-6.33a3 3 0 104.243 4.243"/></svg>
-              </button>
-            </div>
-          </div>
-
-          <!-- Submit Button -->
-          <button 
-            type="submit" 
-            :disabled="loading"
-            class="w-full py-3 px-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm rounded-xl shadow-lg shadow-emerald-900/50 border border-emerald-400/30 transition transform active:scale-98 flex items-center justify-center gap-2 cursor-pointer mt-4"
-          >
-            <svg v-if="loading" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <span>{{ loading ? 'Authenticating Credentials...' : 'Sign In as Owner →' }}</span>
-          </button>
-        </form>
-
-        <!-- Pre-fill Credentials Button -->
-        <div class="pt-3 border-t border-slate-800/90 text-center space-y-2">
-          <button 
-            @click="fillOwnerCredentials" 
-            class="w-full py-2.5 bg-slate-800/90 hover:bg-slate-800 text-emerald-400 hover:text-emerald-300 font-extrabold text-xs rounded-xl border border-slate-700/80 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
-          >
-            <span>👑 Pre-fill Owner Credentials</span>
-          </button>
         </div>
-
       </div>
 
     </div>
@@ -169,8 +158,8 @@ import { useAuth } from '../composables/useAuth';
 const router = useRouter();
 const { login } = useAuth();
 
-const email = ref('gwakilabonface@gmail.com');
-const password = ref('12345678');
+const email = ref('');
+const password = ref('');
 const showPassword = ref(false);
 const loading = ref(false);
 const errorMessage = ref('');
@@ -192,16 +181,27 @@ const handleLoginSubmit = () => {
 
     // Success -> redirect cleanly to Dashboard
     window.location.replace('/');
-  }, 400);
-};
-
-const fillOwnerCredentials = () => {
-  email.value = 'gwakilabonface@gmail.com';
-  password.value = '12345678';
-  errorMessage.value = '';
+  }, 600);
 };
 
 const showForgotNotice = () => {
-  alert('Default Owner password is: 12345678.');
+  alert('Please contact the System Administrator to reset your password.');
 };
 </script>
+
+<style scoped>
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>

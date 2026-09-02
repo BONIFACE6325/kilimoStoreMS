@@ -44,7 +44,7 @@
         
         <!-- Group 1: MAIN -->
         <div class="space-y-1">
-          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">Main</div>
+          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">Main</div>
 
           <!-- Dashboard -->
           <router-link 
@@ -84,7 +84,7 @@
 
         <!-- Group 2: OPERATIONS -->
         <div class="space-y-1">
-          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">Operations</div>
+          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">Operations</div>
 
           <!-- Cashbook -->
           <router-link 
@@ -159,7 +159,7 @@
 
         <!-- Group 3: FINANCE -->
         <div class="space-y-1">
-          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">Finance</div>
+          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">Finance</div>
 
           <!-- Buyers -->
           <router-link 
@@ -232,7 +232,7 @@
 
         <!-- Group 4: SYSTEM -->
         <div class="space-y-1">
-          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">System</div>
+          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">System</div>
 
           <!-- Settings -->
           <router-link 
@@ -283,15 +283,15 @@
     <!-- Custom Styled Logout Confirmation Modal -->
     <transition name="fade">
       <div v-if="showLogoutModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl p-6 max-w-sm w-full space-y-4 text-center transform transition-all">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-2xl p-6 max-w-sm w-full space-y-4 text-center transform transition-all">
           
-          <div class="w-14 h-14 rounded-2xl bg-red-50 text-red-600 border border-red-100 flex items-center justify-center text-2xl mx-auto shadow-inner">
+          <div class="w-14 h-14 rounded-2xl bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-100 flex items-center justify-center text-2xl mx-auto shadow-inner">
             🚪
           </div>
 
           <div class="space-y-1">
-            <h3 class="text-base font-extrabold text-slate-900">Logout of System?</h3>
-            <p class="text-xs text-slate-500 font-medium leading-relaxed">
+            <h3 class="text-base font-extrabold text-slate-900 dark:text-slate-50">Logout of System?</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
               Are you sure you want to log out of <strong>GARANOKI</strong>? Your active session will be securely closed.
             </p>
           </div>
@@ -299,7 +299,7 @@
           <div class="grid grid-cols-2 gap-2.5 pt-2">
             <button 
               @click="showLogoutModal = false"
-              class="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs rounded-xl border border-slate-200/80 transition cursor-pointer"
+              class="py-2.5 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-extrabold text-xs rounded-xl border border-slate-200/80 dark:border-slate-700/80 transition cursor-pointer"
             >
               Cancel
             </button>
