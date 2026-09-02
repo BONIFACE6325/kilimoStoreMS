@@ -65,9 +65,12 @@ jobs:
             echo "🚀 Starting Automated Deployment on AWS EC2..."
             cd /var/www/kilimostore
             
-            echo "🛠️ Preparing Directory Permissions..."
-            sudo chown -R ubuntu:www-data /var/www/kilimostore
-            sudo chmod -R 777 /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache /var/www/kilimostore/backend/database
+            echo "🛠️ Preparing Directory & SQLite Permissions..."
+            sudo chown -R www-data:www-data /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache /var/www/kilimostore/backend/database || true
+            sudo chmod -R 777 /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache /var/www/kilimostore/backend/database || true
+            sudo touch /var/www/kilimostore/backend/database/database.sqlite || true
+            sudo chown www-data:www-data /var/www/kilimostore/backend/database/database.sqlite || true
+            sudo chmod 666 /var/www/kilimostore/backend/database/database.sqlite || true
 
             echo "📥 Pulling latest commits from GitHub..."
             git pull origin main || git pull origin master
@@ -75,16 +78,15 @@ jobs:
             echo "⚙️ Running Backend Composer & Migrations..."
             cd /var/www/kilimostore/backend
             composer install --no-dev --optimize-autoloader --no-interaction
-            touch database/database.sqlite || true
-            php artisan migrate --force
+            php artisan migrate --force || true
             php artisan db:seed --force || true
             php artisan config:clear || true
             php artisan route:clear || true
             php artisan view:clear || true
 
             echo "🔒 Ensuring Nginx & www-data Write Access to SQLite & Storage..."
-            sudo chown -R www-data:www-data /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache /var/www/kilimostore/backend/database
-            sudo chmod -R 777 /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache /var/www/kilimostore/backend/database
+            sudo chown -R www-data:www-data /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache /var/www/kilimostore/backend/database || true
+            sudo chmod -R 777 /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache /var/www/kilimostore/backend/database || true
             sudo chmod 666 /var/www/kilimostore/backend/database/database.sqlite || true
             
             echo "🎨 Building Production Frontend Assets..."
