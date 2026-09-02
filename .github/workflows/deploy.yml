@@ -65,39 +65,53 @@ jobs:
             echo "🚀 Starting Automated Deployment on AWS EC2..."
             cd /var/www/kilimostore
             
-            echo "🛠️ Preparing Directory & SQLite Permissions..."
-            sudo chown -R www-data:www-data /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache /var/www/kilimostore/backend/database || true
-            sudo chmod -R 777 /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache /var/www/kilimostore/backend/database || true
-            sudo touch /var/www/kilimostore/backend/database/database.sqlite || true
-            sudo chown www-data:www-data /var/www/kilimostore/backend/database/database.sqlite || true
-            sudo chmod 666 /var/www/kilimostore/backend/database/database.sqlite || true
+            echo "🗄️ Provisioning MySQL Database Server & Extension..."
+            sudo apt-get update -y || true
+            sudo apt-get install -y mysql-server php-mysql || true
+            sudo systemctl enable mysql || true
+            sudo systemctl start mysql || true
+
+            echo "🔑 Creating MySQL Database & Database User..."
+            sudo mysql -e "CREATE DATABASE IF NOT EXISTS kilimostore_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" || true
+            sudo mysql -e "CREATE USER IF NOT EXISTS 'kilimo_user'@'localhost' IDENTIFIED BY 'KilimoPass2026!';" || true
+            sudo mysql -e "ALTER USER 'kilimo_user'@'localhost' IDENTIFIED BY 'KilimoPass2026!';" || true
+            sudo mysql -e "GRANT ALL PRIVILEGES ON kilimostore_db.* TO 'kilimo_user'@'localhost';" || true
+            sudo mysql -e "FLUSH PRIVILEGES;" || true
 
             echo "📥 Pulling latest commits from GitHub..."
+            cd /var/www/kilimostore
             git pull origin main || git pull origin master
             
-            echo "⚙️ Running Backend Composer & Migrations..."
+            echo "⚙️ Configuring Backend to MySQL & Running Migrations..."
             cd /var/www/kilimostore/backend
+            if [ ! -f .env ]; then
+                cp .env.example .env || true
+            fi
+
+            # Update .env to use MySQL
+            sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=mysql/' .env || echo "DB_CONNECTION=mysql" >> .env
+            sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env || echo "DB_HOST=127.0.0.1" >> .env
+            sed -i 's/^DB_PORT=.*/DB_PORT=3306/' .env || echo "DB_PORT=3306" >> .env
+            sed -i 's/^DB_DATABASE=.*/DB_DATABASE=kilimostore_db/' .env || echo "DB_DATABASE=kilimostore_db" >> .env
+            sed -i 's/^DB_USERNAME=.*/DB_USERNAME=kilimo_user/' .env || echo "DB_USERNAME=kilimo_user" >> .env
+            sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=KilimoPass2026!/' .env || echo "DB_PASSWORD=KilimoPass2026!" >> .env
+
             composer install --no-dev --optimize-autoloader --no-interaction
-            php artisan migrate --force || true
-            php artisan db:seed --force || true
             php artisan config:clear || true
             php artisan route:clear || true
-            php artisan view:clear || true
+            php artisan migrate --force
+            php artisan db:seed --force
+            php artisan config:clear || true
 
-            echo "🔒 Ensuring Nginx & www-data Write Access to SQLite & Storage..."
-            sudo chown -R www-data:www-data /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache /var/www/kilimostore/backend/database || true
-            sudo chmod -R 777 /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache /var/www/kilimostore/backend/database || true
-            sudo chmod 666 /var/www/kilimostore/backend/database/database.sqlite || true
-            
             echo "🎨 Building Production Frontend Assets..."
             cd /var/www/kilimostore/frontend
             npm ci
             npm run build
             
             echo "🔐 Securing Permissions & Reloading Nginx/PHP-FPM..."
-            sudo chown -R www-data:www-data /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache /var/www/kilimostore/backend/database
-            sudo chmod -R 777 /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache /var/www/kilimostore/backend/database
-            sudo systemctl reload nginx
-            sudo systemctl reload php8.4-fpm || sudo systemctl reload php-fpm
+            sudo chown -R www-data:www-data /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache
+            sudo chmod -R 775 /var/www/kilimostore/backend/storage /var/www/kilimostore/backend/bootstrap/cache
+            sudo systemctl reload nginx || true
+            sudo systemctl reload php8.3-fpm || sudo systemctl reload php8.2-fpm || sudo systemctl reload php8.4-fpm || sudo systemctl reload php-fpm || true
             
-            echo "✅ KilimoStoreMS Deployed Successfully to AWS EC2!"
+            echo "✅ KilimoStoreMS Migrated to MySQL & Deployed Successfully to AWS EC2!"
