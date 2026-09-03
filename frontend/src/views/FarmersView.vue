@@ -2308,8 +2308,12 @@ const closeAllSubModals = () => {
 };
 
 const getBatchServices = (b) => {
-  if (b.services && b.services.length > 0) return b.services;
-  return farmerServices.value.filter(s => s.batch_code === b.batch_code);
+  if (!b) return [];
+  if (b.services && Array.isArray(b.services) && b.services.length > 0) return b.services;
+  return (farmerServices.value || []).filter(s => 
+    (s.batch_code && b.batch_code && s.batch_code === b.batch_code) ||
+    (s.batch_id && b.id && String(s.batch_id) === String(b.id))
+  );
 };
 
 const getBatchChildren = (b) => {

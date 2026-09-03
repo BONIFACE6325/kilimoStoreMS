@@ -269,7 +269,7 @@ class BatchController extends Controller
             };
 
             if (strtolower($type) === 'drying') {
-                $job = $jobId ? DryingJob::find($jobId) : DryingJob::where('batch_id', $batch->id)->latest()->first();
+                $job = $jobId ? DryingJob::find($jobId) : null;
                 if (!$job) {
                     $job = DryingJob::create([
                         'batch_id' => $batch->id,
@@ -299,7 +299,7 @@ class BatchController extends Controller
                     ]);
                 }
             } elseif (strtolower($type) === 'milling') {
-                $job = $jobId ? MillingJob::find($jobId) : MillingJob::where('batch_id', $batch->id)->latest()->first();
+                $job = $jobId ? MillingJob::find($jobId) : null;
                 if (!$job) {
                     $job = MillingJob::create([
                         'batch_id' => $batch->id,
@@ -389,7 +389,7 @@ class BatchController extends Controller
                     }
                 }
             } elseif (strtolower($type) === 'grading') {
-                $job = $jobId ? GradingRecord::find($jobId) : GradingRecord::where('batch_id', $batch->id)->orderBy('created_at', 'desc')->first();
+                $job = $jobId ? GradingRecord::find($jobId) : null;
                 if (!$job) {
                     $job = GradingRecord::create([
                         'batch_id' => $batch->id,
