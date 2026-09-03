@@ -264,4 +264,56 @@ class FarmerController extends Controller
             'farmer' => $farmer
         ]);
     }
+
+    public function destroy($id)
+    {
+        $farmer = Farmer::findOrFail($id);
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($farmer) {
+            $batchIds = $farmer->batches()->pluck('id')->toArray();
+
+            if (!empty($batchIds)) {
+                // Delete processing jobs for these batches
+                \App\Models\DryingJob::whereIn('batch_id', $batchIds)->delete();
+                \App\Models\MillingJob::whereIn('batch_id', $batchIds)->delete();
+                \App\Models\GradingRecord::whereIn('batch_id', $batchIds)->delete();
+                \App\Models\BatchMovement::whereIn('batch_id', $batchIds)->delete();
+                
+                // Unlink invoice items
+                \App\Models\InvoiceItem::whereIn('batch_id', $batchIds)->delete();
+
+                // Delete batches
+                \App\Models\Batch::whereIn('id', $batchIds)->delete();
+            }
+
+            // Delete loans & transactions
+            $loanIds = $farmer->loans()->pluck('id')->toArray();
+            if (!empty($loanIds)) {
+                \App\Models\LoanTransaction::whereIn('loan_id', $loanIds)->delete();
+                \App\Models\Loan::whereIn('id', $loanIds)->delete();
+            }
+
+            // Delete settlements & deductions & invoices
+            $settlementIds = $farmer->settlements()->pluck('id')->toArray();
+            if (!empty($settlementIds)) {
+                $invoiceIds = \App\Models\Settlement::whereIn('id', $settlementIds)->whereNotNull('invoice_id')->pluck('invoice_id')->toArray();
+                
+                \App\Models\SettlementDeduction::whereIn('settlement_id', $settlementIds)->delete();
+                \App\Models\Settlement::whereIn('id', $settlementIds)->delete();
+
+                if (!empty($invoiceIds)) {
+                    \App\Models\InvoiceItem::whereIn('invoice_id', $invoiceIds)->delete();
+                    \App\Models\Invoice::whereIn('id', $invoiceIds)->delete();
+                }
+            }
+
+            // Finally delete the farmer
+            $farmer->delete();
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Mkulima na kumbukumbu zake zote zimefutwa kikamilifu.'
+        ]);
+    }
 }

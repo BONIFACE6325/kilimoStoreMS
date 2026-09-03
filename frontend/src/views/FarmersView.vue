@@ -145,14 +145,23 @@
                 </span>
               </td>
               <td class="py-2 px-4 text-right">
-                <button 
-                  @click="openFarmerProfile(f.id)" 
-                  title="Fungua Profile ya Mkulima"
-                  class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white border border-emerald-200/80 dark:border-emerald-700/50 hover:border-emerald-600 rounded-lg text-xs font-bold transition-all duration-150 inline-flex items-center gap-1 cursor-pointer"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                  <span>Profile</span>
-                </button>
+                <div class="flex items-center justify-end gap-1.5">
+                  <button 
+                    @click="openFarmerProfile(f.id)" 
+                    title="Fungua Profile ya Mkulima"
+                    class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white border border-emerald-200/80 dark:border-emerald-700/50 hover:border-emerald-600 rounded-lg text-xs font-bold transition-all duration-150 inline-flex items-center gap-1 cursor-pointer"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    <span>Profile</span>
+                  </button>
+                  <button 
+                    @click="deleteFarmer(f)" 
+                    title="Futa Mkulima huyu kabisa"
+                    class="px-2 py-1 bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-600 text-rose-700 dark:text-rose-400 hover:text-white border border-rose-200 dark:border-rose-500/20 hover:border-rose-600 rounded-lg text-xs font-bold transition-all duration-150 inline-flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>🗑️</span>
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -219,13 +228,22 @@
                   <div class="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400 mt-0.5">{{ selectedFarmer.farmer_code }}</div>
                 </div>
               </div>
-              <button 
-                @click="isEditingFarmer = !isEditingFarmer" 
-                class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition"
-              >
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                <span>{{ isEditingFarmer ? 'Funga' : 'Hariri' }}</span>
-              </button>
+              <div class="flex items-center gap-2">
+                <button 
+                  @click="isEditingFarmer = !isEditingFarmer" 
+                  class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  <span>{{ isEditingFarmer ? 'Funga' : 'Hariri' }}</span>
+                </button>
+                <button 
+                  @click="deleteFarmer(selectedFarmer)" 
+                  class="px-3 py-1.5 bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition cursor-pointer"
+                  title="Futa mkulima huyu kabisa na kumbukumbu zake zote"
+                >
+                  <span>🗑️ Futa</span>
+                </button>
+              </div>
             </div>
 
             <!-- Inline Edit Farmer Form -->
@@ -2031,6 +2049,39 @@ const editAssignedService = async (b, s) => {
     s.rate = newRate;
     triggerToast('Bei ya Huduma Imerekebishwa! ✏️');
   }
+};
+
+const deleteFarmer = (farmer) => {
+  if (!farmer || !farmer.id) return;
+
+  triggerConfirmModal({
+    title: '🗑️ Uthibitisho wa Kufuta Mkulima Kabisa',
+    message: `Je, una uhakika unataka kufuta kabisa Mkulima "${farmer.name}" (${farmer.farmer_code || ''})?`,
+    warningNote: `⚠️ TAHADHARI KUU: Kufuta mkulima huyu kutaondoa mizigo yake yote ghalani, huduma za kinu, mikopo, risiti na mahesabu yake yote kabisa kutoka kwenye mfumo. Kitendo hiki hakiwezi kurudishwa!`,
+    confirmText: 'Ndiyo, Futa Kabisa',
+    cancelText: 'Ghairi',
+    isDanger: true,
+    onConfirm: async () => {
+      try {
+        const res = await fetch(`/api/v1/farmers/${farmer.id}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          triggerToast('Mkulima na kumbukumbu zake zote zimefutwa kikamilifu ✓');
+          if (modals.value.farmerProfile && selectedFarmer.value && selectedFarmer.value.id === farmer.id) {
+            modals.value.farmerProfile = false;
+          }
+          await fetchFarmers();
+        } else {
+          triggerToast(data.message || 'Imeshindwa kufuta mkulima. Jaribu tena.', 'error');
+        }
+      } catch (e) {
+        triggerToast('Tatizo la mtandao wakati wa kufuta mkulima.', 'error');
+      }
+    }
+  });
 };
 
 const revertTransformationFromChild = (parentBatch, targetChild) => {
