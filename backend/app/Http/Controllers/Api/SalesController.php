@@ -7,6 +7,7 @@ use App\Models\Buyer;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Batch;
+use App\Models\Farmer;
 use App\Models\Loan;
 use App\Models\Settlement;
 use App\Models\SettlementDeduction;
