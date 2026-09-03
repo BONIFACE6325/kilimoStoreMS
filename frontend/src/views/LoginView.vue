@@ -41,12 +41,15 @@
         </div>
 
         <!-- Trust Badges -->
-        <div class="pt-8 border-t border-slate-800/60 flex items-center gap-6 animate-fade-in-up" style="animation-delay: 200ms;">
+        <div class="pt-8 border-t border-slate-800/60 flex flex-wrap items-center gap-6 animate-fade-in-up" style="animation-delay: 200ms;">
           <div class="flex flex-col gap-1 text-xs">
-            <span class="text-white font-semibold flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> End-to-End Encryption</span>
+            <span class="text-white font-semibold flex items-center gap-2" title="Mfumo unatumia encryption ya hali ya juu."><div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> End-to-End Encryption</span>
           </div>
           <div class="flex flex-col gap-1 text-xs">
-            <span class="text-white font-semibold flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div> Live Synchronization</span>
+            <span class="text-white font-semibold flex items-center gap-2" title="Hujifunga ukikaa dakika 15 bila kutumika."><div class="w-1.5 h-1.5 rounded-full bg-amber-500"></div> 15m Auto-Logout</span>
+          </div>
+          <div class="flex flex-col gap-1 text-xs">
+            <span class="text-white font-semibold flex items-center gap-2" title="Session inafutwa ukifunga browser."><div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div> Secure Sessions</span>
           </div>
         </div>
       </div>
@@ -59,6 +62,11 @@
             <div class="space-y-2 mb-8 text-center sm:text-left">
               <h3 class="text-2xl font-semibold text-white tracking-tight">Welcome Back</h3>
               <p class="text-sm text-slate-400">Sign in to your owner workspace</p>
+            </div>
+
+            <!-- Session Expiry Warning -->
+            <div v-if="sessionWarning" class="mb-6 p-3.5 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm rounded-xl flex items-start gap-3 transition-all">
+              <span class="font-medium leading-tight">{{ sessionWarning }}</span>
             </div>
 
             <!-- Error Alert -->
@@ -120,6 +128,19 @@
                 </div>
               </div>
 
+              <!-- Remember Me Checkbox -->
+              <div class="flex items-center gap-2 ml-1">
+                <input 
+                  type="checkbox" 
+                  id="rememberMe" 
+                  v-model="rememberMe"
+                  class="w-4 h-4 rounded border-slate-700 bg-[#0F1623] text-emerald-500 focus:ring-emerald-500/50 focus:ring-offset-[#0A101C]"
+                >
+                <label for="rememberMe" class="text-[13px] font-medium text-slate-300 cursor-pointer select-none">
+                  Kumbuka Session Hii (Remember Me)
+                </label>
+              </div>
+
               <!-- Submit Button -->
               <div class="pt-2">
                 <button 
@@ -151,7 +172,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuth } from '../composables/useAuth';
 
@@ -161,18 +182,28 @@ const { login } = useAuth();
 const email = ref('');
 const password = ref('');
 const showPassword = ref(false);
+const rememberMe = ref(false);
 const loading = ref(false);
 const errorMessage = ref('');
+const sessionWarning = ref('');
+
+onMounted(() => {
+  if (sessionStorage.getItem('garanoki_logout_reason') === 'inactivity') {
+    sessionWarning.value = '⚠️ Session yako ime-expire kutokana na kutokutumia mfumo kwa dakika 15. Tafadhali ingia tena.';
+    sessionStorage.removeItem('garanoki_logout_reason');
+  }
+});
 
 const handleLoginSubmit = () => {
   loading.value = true;
   errorMessage.value = '';
+  sessionWarning.value = '';
 
   setTimeout(() => {
     loading.value = false;
 
     // Strict credential check via useAuth composable
-    const res = login(email.value, password.value);
+    const res = login(email.value, password.value, rememberMe.value);
     
     if (!res.success) {
       errorMessage.value = res.message;
