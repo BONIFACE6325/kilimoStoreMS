@@ -35,9 +35,21 @@
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
           <span>+ Sajili Huduma Mpya</span>
+        
+        </button>
+      </div>
+
+      <!-- View Toggles -->
+      <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+        <button @click="viewMode = 'card'" :class="viewMode === 'card' ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-slate-400 hover:text-slate-600'" class="p-1.5 rounded-lg transition" title="Card View">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/></svg>
+        </button>
+        <button @click="viewMode = 'table'" :class="viewMode === 'table' ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-slate-400 hover:text-slate-600'" class="p-1.5 rounded-lg transition" title="Table View">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z"/></svg>
         </button>
       </div>
     </div>
+
 
     <!-- KPI Summary Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -77,7 +89,7 @@
       <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-between">
         <div>
           <div class="text-xs font-bold uppercase text-slate-400 tracking-wider">Huduma za Kukoboa</div>
-          <div class="text-3xl font-black text-amber-600 mt-1">{{ countByCategory('milling') }}</div>
+          <div class="text-3xl font-black text-amber-600 mt-1">{{ services.length }}</div>
           <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Milling Services</div>
         </div>
         <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 flex items-center justify-center text-xl">
@@ -92,41 +104,14 @@
         <input 
           v-model="searchQuery" 
           type="text" 
-          placeholder="Tafuta huduma kwa jina au category..." 
-          class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-semibold focus:bg-white dark:bg-slate-900 focus:border-emerald-500 transition"
+          placeholder="Tafuta huduma kwa jina..." 
+          class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-semibold focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 transition"
         />
         <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
       </div>
 
       <div class="flex items-center gap-2 w-full sm:w-auto">
-        <button 
-          @click="selectedCategoryFilter = ''" 
-          :class="!selectedCategoryFilter ? 'bg-emerald-800 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:bg-slate-700'"
-          class="px-3.5 py-2 rounded-xl text-xs font-bold transition"
-        >
-          Zote
-        </button>
-        <button 
-          @click="selectedCategoryFilter = 'milling'" 
-          :class="selectedCategoryFilter === 'milling' ? 'bg-emerald-800 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:bg-slate-700'"
-          class="px-3.5 py-2 rounded-xl text-xs font-bold transition"
-        >
-          Kukoboa
-        </button>
-        <button 
-          @click="selectedCategoryFilter = 'drying'" 
-          :class="selectedCategoryFilter === 'drying' ? 'bg-emerald-800 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:bg-slate-700'"
-          class="px-3.5 py-2 rounded-xl text-xs font-bold transition"
-        >
-          Kukausha
-        </button>
-        <button 
-          @click="selectedCategoryFilter = 'grading'" 
-          :class="selectedCategoryFilter === 'grading' ? 'bg-emerald-800 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:bg-slate-700'"
-          class="px-3.5 py-2 rounded-xl text-xs font-bold transition"
-        >
-          Grading
-        </button>
+        
       </div>
     </div>
 
@@ -143,48 +128,81 @@
       <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto font-medium">Jaribu kubadilisha neno la kutafuta au bofya kitufe cha "+ Sajili Huduma Mpya" kuongeza huduma mpya.</p>
     </div>
 
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-      <div 
-        v-for="s in filteredServices" 
-        :key="s.id" 
-        class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-emerald-300 dark:border-emerald-500/30 hover:shadow-md transition space-y-4 flex flex-col justify-between"
-      >
-        <div class="space-y-2.5">
-          <div class="flex items-center justify-between flex-wrap gap-2">
-            <span class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-lg text-[10.5px] font-black uppercase tracking-wider">
-              Kipimo: {{ s.unit || 'Kg' }}
-            </span>
-            <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg text-[10.5px] font-bold">
-              Zao: {{ s.crop_type || 'Zote (All)' }}
-            </span>
+    <div v-else>
+      <!-- CARD VIEW -->
+      <div v-if="viewMode === 'card'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div 
+          v-for="s in filteredServices" 
+          :key="s.id" 
+          class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs hover:border-emerald-300 dark:border-emerald-500/30 hover:shadow-md transition flex flex-col justify-between h-full"
+        >
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded text-[9px] font-black uppercase tracking-wide border border-slate-200 dark:border-slate-700">
+                {{ s.crop_type || 'Zote (All)' }}
+              </span>
+
+            </div>
+            <h3 class="text-sm font-extrabold text-slate-900 dark:text-slate-50 leading-tight mb-1">{{ s.name_sw }}</h3>
+            <p v-if="s.description" class="text-[10px] text-slate-500 dark:text-slate-400 font-medium line-clamp-2 mb-3">{{ s.description }}</p>
           </div>
 
-          <div>
-            <h3 class="text-base font-extrabold text-slate-900 dark:text-slate-50 leading-snug">{{ s.name_sw }}</h3>
-            <p v-if="s.description" class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">{{ s.description }}</p>
+          <div class="pt-3 border-t border-slate-100 dark:border-slate-800 mt-auto">
+            <div class="flex items-end justify-between mb-3">
+              <div>
+                <div class="text-[9px] uppercase font-bold text-slate-400">Bei Kwa {{ s.unit || 'Kg' }}</div>
+                <div class="text-base font-black text-emerald-700 dark:text-emerald-400">Tsh {{ parseFloat(s.rate || 0).toLocaleString() }}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button 
+                @click="openEditModal(s)" 
+                class="flex-1 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:text-emerald-800 dark:text-emerald-400 text-slate-700 dark:text-slate-200 font-bold rounded-lg text-xs transition"
+              >Hariri</button>
+              <button 
+                @click="deleteService(s.id)" 
+                class="flex-1 py-1.5 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 text-red-600 dark:text-red-400 font-bold rounded-lg text-xs transition"
+              >Futa</button>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <div>
-            <div class="text-[10px] uppercase font-bold text-slate-400">Bei Kwa Kipimo</div>
-            <div class="text-lg font-black text-emerald-700 dark:text-emerald-400">Tsh {{ parseFloat(s.rate || 0).toLocaleString() }}</div>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <button 
-              @click="openEditModal(s)" 
-              class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:bg-emerald-500/10 hover:text-emerald-800 dark:text-emerald-400 text-slate-700 dark:text-slate-200 font-bold rounded-xl text-xs transition"
-            >
-              Hariri
-            </button>
-            <button 
-              @click="deleteService(s.id)" 
-              class="px-3 py-1.5 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 font-bold rounded-xl text-xs transition"
-            >
-              Futa
-            </button>
-          </div>
+      <!-- TABLE VIEW -->
+      <div v-else class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50/70 dark:bg-slate-950 text-slate-600 dark:text-slate-400 font-bold border-b border-slate-200 dark:border-slate-800 uppercase text-[10px] tracking-wider">
+              <tr>
+                <th class="py-3 px-4">Huduma</th>
+                
+                <th class="py-3 px-4">Zao</th>
+                <th class="py-3 px-4">Kipimo</th>
+                <th class="py-3 px-4 text-right">Bei (Tsh)</th>
+                <th class="py-3 px-4 text-center">Vitendo</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50 font-medium">
+              <tr v-for="s in filteredServices" :key="s.id" class="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                <td class="py-2.5 px-4">
+                  <div class="font-extrabold text-slate-900 dark:text-slate-50 text-xs">{{ s.name_sw }}</div>
+                  <div v-if="s.description" class="text-[10px] text-slate-500 dark:text-slate-400 max-w-[200px] truncate">{{ s.description }}</div>
+                </td>
+                
+                <td class="py-2.5 px-4 font-bold text-slate-700 dark:text-slate-200">{{ s.crop_type || 'Zote (All)' }}</td>
+                <td class="py-2.5 px-4 font-mono font-bold text-emerald-800 dark:text-emerald-400 uppercase text-[10px]">{{ s.unit || 'Kg' }}</td>
+                <td class="py-2.5 px-4 text-right font-black text-emerald-700 dark:text-emerald-400 text-sm">
+                  {{ parseFloat(s.rate || 0).toLocaleString() }}
+                </td>
+                <td class="py-2.5 px-4 text-center">
+                  <div class="flex items-center justify-center gap-2">
+                    <button @click="openEditModal(s)" class="text-teal-600 dark:text-teal-400 hover:text-teal-800 font-bold p-1">✏️</button>
+                    <button @click="deleteService(s.id)" class="text-red-500 hover:text-red-700 font-bold p-1">🗑️</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -204,21 +222,11 @@
               v-model="form.name_sw" 
               type="text" 
               placeholder="e.g. Kukoboa Mpunga" 
-              class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50 focus:bg-white dark:bg-slate-900 focus:border-emerald-500"
+              class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50 focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500"
             />
           </div>
 
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block mb-1 font-bold text-slate-800 dark:text-slate-100">Category *</label>
-              <select v-model="form.category" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold">
-                <option value="milling">Kukoboa (Milling)</option>
-                <option value="drying">Kukausha (Drying)</option>
-                <option value="grading">Grading / Sorting</option>
-                <option value="storage">Hifadhi (Storage)</option>
-                <option value="packaging">Packaging</option>
-              </select>
-            </div>
+          <div class="grid grid-cols-1 gap-3">
 
             <div>
               <div class="flex items-center justify-between mb-1">
@@ -249,7 +257,7 @@
                 v-model.number="form.rate" 
                 type="number" 
                 placeholder="e.g. 70" 
-                class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50 focus:bg-white dark:bg-slate-900 focus:border-emerald-500"
+                class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50 focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500"
               />
             </div>
           </div>
@@ -325,53 +333,17 @@
       <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 animate-fadeIn">
         <div class="px-6 py-4 border-b border-teal-800 flex items-center justify-between bg-gradient-to-r from-teal-900 to-emerald-900 text-white">
           <h3 class="text-base font-black flex items-center gap-2">
-            <span>⚖️ Usimamizi wa Milinganyo ya Vipimo</span>
+            <span>⚖️ Usimamizi wa Vipimo (Units Registry)</span>
           </h3>
           <button @click="showUnitModal = false" class="text-teal-200 hover:text-white p-1 cursor-pointer">✕</button>
         </div>
 
         <div class="p-6 space-y-5 text-xs font-semibold text-slate-700 dark:text-slate-200 max-h-[85vh] overflow-y-auto">
 
-          <!-- DUAL DROPDOWN & DUAL INPUT EQUIVALENCE CONTROL BUILDER -->
-          <div class="bg-gradient-to-br from-slate-900 via-slate-950 to-emerald-950 text-white p-5 rounded-3xl shadow-xl space-y-4 border border-teal-500/30">
-            <div class="grid grid-cols-1 sm:grid-cols-11 gap-3 items-center">
-              <!-- Left Side: Unit A Dropdown & Input -->
-              <div class="sm:col-span-5 space-y-2 bg-white/5 dark:bg-slate-900/5 p-3 rounded-2xl border border-white/10">
-                <select v-model="eqForm.unitA" class="w-full p-2.5 bg-slate-900 border border-white/20 rounded-xl font-black text-white text-xs">
-                  <option v-for="u in unitsList" :key="u.name" :value="u.name">{{ u.name }}</option>
-                </select>
-                <input v-model.number="eqForm.amountA" type="number" placeholder="1" class="w-full p-2 bg-white/10 dark:bg-slate-900/10 border border-white/15 rounded-xl font-black text-white text-sm text-center focus:bg-white/20 dark:bg-slate-900/20 focus:outline-hidden" />
-              </div>
-
-              <!-- Equals Sign Badge -->
-              <div class="sm:col-span-1 flex items-center justify-center">
-                <span class="w-9 h-9 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-400 flex items-center justify-center font-black text-lg shadow-sm">=</span>
-              </div>
-
-              <!-- Right Side: Unit B Dropdown & Input -->
-              <div class="sm:col-span-5 space-y-2 bg-white/5 dark:bg-slate-900/5 p-3 rounded-2xl border border-white/10">
-                <select v-model="eqForm.unitB" class="w-full p-2.5 bg-slate-900 border border-white/20 rounded-xl font-bold text-white text-xs">
-                  <option v-for="u in unitsList" :key="u.name" :value="u.name">{{ u.name }}</option>
-                </select>
-                <input v-model.number="eqForm.amountB" type="number" placeholder="50" class="w-full p-2 bg-white/10 dark:bg-slate-900/10 border border-white/15 rounded-xl font-black text-white text-sm text-center focus:bg-white/20 dark:bg-slate-900/20 focus:outline-hidden" />
-              </div>
-            </div>
-
-            <!-- Dynamic Result & Save Button -->
-            <div class="p-3.5 bg-emerald-950/80 border border-emerald-500/30 rounded-2xl flex items-center justify-between gap-3">
-              <div class="text-sm font-extrabold text-white">
-                <span class="text-teal-300 font-mono">{{ eqForm.amountA || 1 }} {{ eqForm.unitA }}</span> = 
-                <span class="text-emerald-400 font-mono underline decoration-emerald-400 font-black ml-1">{{ calculatedEquivalenceSummary }}</span>
-              </div>
-              <button @click="saveEquivalenceRule" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold rounded-xl shadow-md transition cursor-pointer text-xs flex items-center gap-1">
-                <span>💾 Hifadhi</span>
-              </button>
-            </div>
-          </div>
 
           <!-- Quick Add New Unit -->
           <div class="p-3 bg-teal-50/60 dark:bg-teal-900/40 border border-teal-200 dark:border-teal-700/50 rounded-2xl flex items-center gap-2">
-            <input v-model="newUnitInput.name" type="text" placeholder="+ Sajili Kipimo Kipya (e.g. Lumbesa)" class="flex-1 p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-xs"/>
+            <input v-model="newUnitInput.name" type="text" placeholder="+ Jina la Kipimo Kipya (e.g. Gunia, Lumbesa)" class="flex-1 p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-xs"/>
             <button @click="handleQuickAddUnit" class="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white font-extrabold text-xs rounded-xl shadow-xs transition cursor-pointer whitespace-nowrap">
               + Sajili
             </button>
@@ -380,7 +352,7 @@
           <!-- Unit Equivalences Table -->
           <div class="space-y-2 pt-1 border-t border-slate-100 dark:border-slate-800">
             <div class="flex items-center justify-between">
-              <div class="text-xs font-extrabold text-slate-900 dark:text-slate-50">📊 Jedwali la Milinganyo ya Vipimo (Registered Equivalences):</div>
+              <h4 class="font-bold text-xs text-slate-500 dark:text-slate-400 mt-2 mb-2">📊 Orodha ya Vipimo Vilivyosajiliwa (Registered Units):</h4>
               <span class="text-[10.5px] text-slate-400 font-mono">{{ unitsList.length }} Registered Units</span>
             </div>
 
@@ -396,22 +368,15 @@
                     <span>✏️ Hariri Kipimo na Uzito:</span>
                     <button @click="editingUnitName = null" class="text-slate-400 hover:text-slate-600 dark:text-slate-300 font-black text-xs cursor-pointer">✕ Ghairi</button>
                   </div>
-                  <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
-                    <div class="sm:col-span-7">
+                  <div class="grid grid-cols-1 gap-2 items-center">
+                    <div>
                       <label class="block text-[9.5px] font-bold text-slate-500 dark:text-slate-400 mb-0.5">Jina la Kipimo (Name)</label>
                       <input 
                         v-model="editUnitForm.name" 
                         type="text" 
                         class="w-full p-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl font-extrabold text-xs text-slate-900 dark:text-slate-50"
                       />
-                    </div>
-                    <div class="sm:col-span-5">
-                      <label class="block text-[9.5px] font-bold text-slate-500 dark:text-slate-400 mb-0.5">Mlinganyo wa Kg (Ratio)</label>
-                      <input 
-                        v-model.number="editUnitForm.kg" 
-                        type="number" 
-                        class="w-full p-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl font-extrabold text-xs text-emerald-800 dark:text-emerald-400"
-                      />
+                      <p class="text-[9px] text-slate-400 dark:text-slate-500 mt-1">💡 Ili kubadili mlinganyo wa kipimo hiki, tumia fomu iliyopo juu (Usimamizi wa Milinganyo).</p>
                     </div>
                   </div>
                   <div class="flex justify-end gap-1.5 pt-1">
@@ -425,19 +390,10 @@
                   <div class="space-y-0.5">
                     <div class="font-extrabold text-slate-900 dark:text-slate-50 text-xs flex items-center gap-1.5 flex-wrap">
                       <span>{{ u.name }}</span>
-                      <span v-if="u.formulaText" class="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-300/80 dark:border-emerald-700/60 rounded-lg text-[10px] font-black font-mono">
-                        🔄 {{ u.formulaText }}
-                      </span>
-                    </div>
-                    <div class="text-[11px] text-teal-800 dark:text-teal-400 font-bold font-mono">
-                      1 {{ u.name }} = <span class="text-emerald-700 dark:text-emerald-400 font-black">{{ u.kg }} Kg</span>
                     </div>
                   </div>
 
                   <div class="flex items-center gap-1.5 shrink-0">
-                    <div class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-mono font-extrabold text-slate-700 dark:text-slate-200 select-none">
-                      {{ u.kg }} Kg
-                    </div>
                     <button @click="startEditUnit(u)" class="px-2.5 py-1 text-teal-700 dark:text-teal-400 hover:text-teal-900 dark:text-teal-400 hover:bg-teal-50 dark:bg-teal-900/40 border border-teal-200 dark:border-teal-700/50 rounded-xl transition font-extrabold text-xs cursor-pointer flex items-center gap-1">
                       <span>✏️ Badili</span>
                     </button>
@@ -522,12 +478,14 @@ const startEditUnit = (u) => {
 
 const saveUnitEdit = (oldName) => {
   const newName = (editUnitForm.value.name || '').trim();
-  const newKg = Number(editUnitForm.value.kg);
-  if (!newName || isNaN(newKg) || newKg <= 0) {
-    triggerToast('Weka jina na kilo sahihi za kipimo!', 'error');
+  const uObj = unitsList.value.find(u => u.name === oldName);
+  const existingKg = uObj ? uObj.kg : 0;
+  
+  if (!newName) {
+    triggerToast('Weka jina sahihi la kipimo!', 'error');
     return;
   }
-  const success = updateUnit(oldName, newName, newKg);
+  const success = updateUnit(oldName, newName, existingKg);
   if (success) {
     editingUnitName.value = null;
     triggerToast(`Kipimo cha "${newName}" kimeboreshwa kikamilifu! (1 ${newName} = ${newKg} Kg) ✓`);
@@ -539,7 +497,8 @@ const saveUnitEdit = (oldName) => {
 const services = ref([]);
 const loading = ref(true);
 const searchQuery = ref('');
-const selectedCategoryFilter = ref('');
+
+const viewMode = ref('card');
 
 const showModal = ref(false);
 const showCropModal = ref(false);
@@ -549,10 +508,10 @@ const newCropInput = ref('');
 const newUnitInput = ref({ name: '', kg: 100 });
 
 const eqForm = ref({
-  unitA: 'Gunia (Bag)',
+  unitA: '',
   amountA: 1,
-  unitB: 'Kilo (Kg)',
-  amountB: 100
+  unitB: '',
+  amountB: 1
 });
 
 const calculatedEquivalenceSummary = computed(() => {
@@ -608,10 +567,10 @@ const handleQuickAddUnit = () => {
     triggerToast(`Kipimo cha "${name}" tayari kipo kwenye orodha! Badilisha mlinganyo wake hapo juu.`, 'error');
     return;
   }
-  const success = addUnit(name, 1);
+  const success = addUnit(name, 0); // User registers without specifying kg ratio initially
   if (success) {
     eqForm.value.unitA = name;
-    triggerToast(`Kipimo cha "${name}" kimesajiliwa! Sasa weka mlinganyo wake hapo juu. ⚖️`);
+    triggerToast(`Kipimo cha "${name}" kimesajiliwa! Unaweza kuweka mlinganyo wake pale juu utakapohitaji. ⚖️`);
     newUnitInput.value.name = '';
   } else {
     triggerToast('Kipimo hiki hakikukubaliwa.', 'error');
@@ -687,21 +646,21 @@ const handleSaveUnit = () => {
 };
 
 const defaultServices = [
-  { id: 1, name_sw: 'Kukoboa (Sembe/Mpunga)', category: 'milling', rate: 70.00, unit: 'kg', crop_type: 'Mpunga/Mahindi', description: 'Ada ya kukoboa nafaka kwa kilo.' },
-  { id: 2, name_sw: 'Kusogeza kwenye kinu', category: 'milling', rate: 300.00, unit: 'gunia', crop_type: 'Zote', description: 'Ada ya kubeba na kusogeza gunia kwenye kinu.' },
-  { id: 3, name_sw: 'Kuanika mpunga (Drying)', category: 'drying', rate: 1000.00, unit: 'gunia', crop_type: 'Mpunga', description: 'Ada ya kuanika mpunga juani kwa gunia.' },
-  { id: 4, name_sw: 'Kugiredi (Grading)', category: 'grading', rate: 8.00, unit: 'kg', crop_type: 'Mchele', description: 'Ada ya kupambanua daraja la mchele.' },
-  { id: 5, name_sw: 'Kudoloti (Color sorting)', category: 'grading', rate: 22.00, unit: 'kg', crop_type: 'Mchele', description: 'Kutenganisha mchele mweusi/mwekundu kwa mashine ya rangi.' },
-  { id: 6, name_sw: 'Kuanika + Kuchanganya', category: 'drying', rate: 1500.00, unit: 'gunia', crop_type: 'Mpunga', description: 'Ada ya kuanika na kuchanganya mpunga.' },
-  { id: 7, name_sw: 'Kuchanganya Mchele na Mafuta', category: 'milling', rate: 2.50, unit: 'kg', crop_type: 'Mchele', description: 'Polishing na kurutubisha mchele.' },
-  { id: 8, name_sw: 'Kupanga stoko (Warehouse)', category: 'storage', rate: 700.00, unit: 'gunia', crop_type: 'Zote', description: 'Ada ya kupanga magunia ghalani.' },
-  { id: 9, name_sw: 'Wafanyakazi (Labor)', category: 'milling', rate: 1000.00, unit: 'gunia', crop_type: 'Zote', description: 'Gharama za vibarua vya kinu.' }
+  { id: 1, name_sw: 'Kukoboa (Sembe/Mpunga)',  rate: 70.00, unit: 'kg', crop_type: 'Mpunga/Mahindi', description: 'Ada ya kukoboa nafaka kwa kilo.' },
+  { id: 2, name_sw: 'Kusogeza kwenye kinu',  rate: 300.00, unit: 'gunia', crop_type: 'Zote', description: 'Ada ya kubeba na kusogeza gunia kwenye kinu.' },
+  { id: 3, name_sw: 'Kuanika mpunga (Drying)',  rate: 1000.00, unit: 'gunia', crop_type: 'Mpunga', description: 'Ada ya kuanika mpunga juani kwa gunia.' },
+  { id: 4, name_sw: 'Kugiredi (Grading)',  rate: 8.00, unit: 'kg', crop_type: 'Mchele', description: 'Ada ya kupambanua daraja la mchele.' },
+  { id: 5, name_sw: 'Kudoloti (Color sorting)',  rate: 22.00, unit: 'kg', crop_type: 'Mchele', description: 'Kutenganisha mchele mweusi/mwekundu kwa mashine ya rangi.' },
+  { id: 6, name_sw: 'Kuanika + Kuchanganya',  rate: 1500.00, unit: 'gunia', crop_type: 'Mpunga', description: 'Ada ya kuanika na kuchanganya mpunga.' },
+  { id: 7, name_sw: 'Kuchanganya Mchele na Mafuta',  rate: 2.50, unit: 'kg', crop_type: 'Mchele', description: 'Polishing na kurutubisha mchele.' },
+  { id: 8, name_sw: 'Kupanga stoko (Warehouse)',  rate: 700.00, unit: 'gunia', crop_type: 'Zote', description: 'Ada ya kupanga magunia ghalani.' },
+  { id: 9, name_sw: 'Wafanyakazi (Labor)',  rate: 1000.00, unit: 'gunia', crop_type: 'Zote', description: 'Gharama za vibarua vya kinu.' }
 ];
 
 const form = ref({
   id: null,
   name_sw: '',
-  category: 'milling',
+  
   crop_type: '',
   unit: 'kg',
   rate: 70,
@@ -730,15 +689,13 @@ const fetchServices = async () => {
   }
 };
 
-const countByCategory = (cat) => {
-  return services.value.filter(s => (s.category || '').toLowerCase() === cat.toLowerCase()).length;
-};
+
 
 const filteredServices = computed(() => {
   return services.value.filter(s => {
     const q = searchQuery.value.toLowerCase();
-    const matchQ = !q || (s.name_sw && s.name_sw.toLowerCase().includes(q)) || (s.category && s.category.toLowerCase().includes(q));
-    const matchCat = !selectedCategoryFilter.value || (s.category || '').toLowerCase() === selectedCategoryFilter.value.toLowerCase();
+    const matchQ = !q || (s.name_sw && s.name_sw.toLowerCase().includes(q));
+    const matchCat = true;
     return matchQ && matchCat;
   });
 });
@@ -747,7 +704,7 @@ const openAddModal = () => {
   form.value = {
     id: null,
     name_sw: '',
-    category: 'milling',
+    
     crop_type: '',
     unit: 'kg',
     rate: 70,
@@ -760,7 +717,7 @@ const openEditModal = (s) => {
   form.value = {
     id: s.id,
     name_sw: s.name_sw || '',
-    category: s.category || 'milling',
+    
     crop_type: s.crop_type || '',
     unit: s.unit || 'kg',
     rate: s.rate || 0,
@@ -782,7 +739,7 @@ const saveService = async () => {
   const payload = {
     name_sw: form.value.name_sw,
     name_en: form.value.name_sw,
-    category: form.value.category,
+    
     crop_type: form.value.crop_type || null,
     unit: form.value.unit,
     rate: form.value.rate,

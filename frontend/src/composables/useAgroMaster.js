@@ -3,14 +3,7 @@ import { ref, watch } from 'vue';
 const defaultCrops = ['Mpunga', 'Mahindi', 'Maharagwe', 'Ufuta', 'Alizeti', 'Kahawa', 'Ngano', 'Karanga'];
 
 const defaultUnits = [
-  { name: 'Kilo (Kg)', kg: 1 },
-  { name: 'Gunia (Bag)', kg: 100 },
-  { name: 'Kiloba / Roba', kg: 50 },
-  { name: 'Tani (Ton)', kg: 1000 },
-  { name: 'Sado', kg: 4 },
-  { name: 'Debbe', kg: 20 },
-  { name: 'Pishi', kg: 2 },
-  { name: 'Lumbesa', kg: 150 }
+  { name: 'Kilo (Kg)', kg: 1 }
 ];
 
 const loadSavedCrops = () => {
@@ -67,14 +60,14 @@ export function useAgroMaster() {
     if (unitsList.value.some(u => u.name.toLowerCase() === name.toLowerCase())) {
       return false;
     }
-    unitsList.value.push({ name, kg: Number(kgRatio) || 1, formulaText: formulaText || '' });
+    unitsList.value.push({ name, kg: kgRatio !== undefined && kgRatio !== null ? Number(kgRatio) : 1, formulaText: formulaText || '' });
     return true;
   };
 
   const updateUnitRatio = (unitName, newKgRatio, formulaText = '') => {
     const found = unitsList.value.find(u => u.name.toLowerCase() === unitName.toLowerCase());
     if (found) {
-      found.kg = Number(newKgRatio) || 1;
+      found.kg = newKgRatio !== undefined && newKgRatio !== null ? Number(newKgRatio) : 1;
       if (formulaText) {
         found.formulaText = formulaText;
       }
@@ -112,7 +105,7 @@ export function useAgroMaster() {
     const norm = String(unitName).toLowerCase().trim();
     const found = unitsList.value.find(u => u.name.toLowerCase().includes(norm) || norm.includes(u.name.toLowerCase()));
     if (found) {
-      return (Number(quantity) || 0) * (found.kg || 1);
+      return (Number(quantity) || 0) * (found.kg !== undefined && found.kg !== null ? found.kg : 1);
     }
     if (norm.includes('tani') || norm.includes('ton')) return (Number(quantity) || 0) * 1000;
     if (norm.includes('gunia') || norm.includes('bag')) return (Number(quantity) || 0) * 100;

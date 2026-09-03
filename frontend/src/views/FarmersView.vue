@@ -132,7 +132,7 @@
               <td class="py-2 px-4 text-slate-600 dark:text-slate-300 font-mono font-semibold text-xs">{{ f.phone || 'N/A' }}</td>
               <td class="py-2 px-4 text-slate-600 dark:text-slate-300 font-semibold text-xs">{{ f.region || 'N/A' }} {{ f.district ? '(' + f.district + ')' : '' }}</td>
               <td class="py-2 px-4 font-black text-emerald-700 dark:text-emerald-400 text-xs">
-                {{ (parseFloat(f.active_stock || f.total_deposited || 0) * 1000).toLocaleString() }} Kg
+                {{ (parseFloat(f.active_stock || f.total_deposited || 0)).toLocaleString() }} Kg
               </td>
               <td class="py-2 px-4">
                 <span :class="parseFloat(f.loan_balance || 0) > 0 ? 'text-red-600 dark:text-red-400 font-black text-xs' : 'text-slate-400 font-semibold text-xs'">
@@ -160,7 +160,7 @@
       </div>
 
       <!-- Pagination Footer -->
-      <div class="px-6 py-4 bg-emerald-50/40 dark:bg-emerald-900/40 border-t border-emerald-100 flex items-center justify-between text-xs text-slate-600 dark:text-slate-300 font-semibold">
+      <div class="px-6 py-4 bg-emerald-50/40 dark:bg-emerald-900/40 border-t border-emerald-100 dark:border-emerald-800/40 flex items-center justify-between text-xs text-slate-600 dark:text-slate-300 font-semibold">
         <div>Inaonyesha {{ (currentPage - 1) * pageSize + 1 }} hadi {{ Math.min(currentPage * pageSize, filteredFarmers.length) }} kati ya {{ filteredFarmers.length }}</div>
         <div class="flex gap-2">
           <button @click="currentPage--" :disabled="currentPage === 1" class="px-3.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-200 disabled:opacity-40 font-bold shadow-2xs">Iliyopita</button>
@@ -234,26 +234,26 @@
               <div class="space-y-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200">
                 <div>
                   <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Jina Kamili *</label>
-                  <input v-model="editFarmerForm.name" type="text" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-medium"/>
+                  <input v-model="editFarmerForm.name" type="text" class="w-full p-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-medium text-slate-900 dark:text-slate-50"/>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                   <div>
                     <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Simu *</label>
-                    <input v-model="editFarmerForm.phone" type="text" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-medium"/>
+                    <input v-model="editFarmerForm.phone" type="text" class="w-full p-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-medium text-slate-900 dark:text-slate-50"/>
                   </div>
                   <div>
                     <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">NIDA</label>
-                    <input v-model="editFarmerForm.national_id" type="text" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-medium"/>
+                    <input v-model="editFarmerForm.national_id" type="text" class="w-full p-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-medium text-slate-900 dark:text-slate-50"/>
                   </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                   <div>
                     <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Mkoa</label>
-                    <input v-model="editFarmerForm.region" type="text" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-medium"/>
+                    <input v-model="editFarmerForm.region" type="text" class="w-full p-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-medium text-slate-900 dark:text-slate-50"/>
                   </div>
                   <div>
                     <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Wilaya</label>
-                    <input v-model="editFarmerForm.district" type="text" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-medium"/>
+                    <input v-model="editFarmerForm.district" type="text" class="w-full p-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-medium text-slate-900 dark:text-slate-50"/>
                   </div>
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
@@ -287,34 +287,35 @@
               </div>
             </div>
 
-            <!-- KPI Highlight Cards (Clean Enterprise Theme) -->
-            <div class="space-y-3 pt-2">
-              <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs flex items-center justify-between">
+            <!-- KPI Highlight Cards (Clean Enterprise Theme & Compact Mobile) -->
+            <div class="space-y-2.5 pt-2">
+              <div class="bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs flex items-center justify-between">
                 <div>
-                  <div class="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider">Jumla ya Mzigo Ghalani</div>
-                  <div class="text-xl font-black text-slate-900 dark:text-slate-50 mt-0.5 font-mono">{{ totalFarmerStockKg.toLocaleString() }} Kg</div>
-                  <div class="text-[9.5px] text-slate-400 font-semibold mt-0.5">Physical Stock in Storage</div>
+                  <div class="text-[9.5px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider">Mzigo Ghalani</div>
+                  <div class="text-base font-black text-slate-900 dark:text-slate-50 mt-0.5">{{ farmerStockSummaryString }}</div>
                 </div>
-                <div class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-black flex items-center justify-center text-sm border border-slate-200 dark:border-slate-700">📦</div>
+                <div class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-black flex items-center justify-center text-xs border border-slate-200 dark:border-slate-700">📦</div>
               </div>
 
-              <!-- PATO SAFI LA MKULIMA LOTE (CLEAN ENTERPRISE CARD) -->
-              <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-emerald-300 dark:border-emerald-500/30 shadow-xs flex items-center justify-between">
-                <div>
-                  <div class="text-[10px] font-black uppercase text-emerald-800 dark:text-emerald-400 tracking-wider">Pato Safi Aliyolipwa (Net Payout)</div>
-                  <div class="text-xl font-black text-emerald-700 dark:text-emerald-400 font-mono mt-0.5">Tsh {{ totalFarmerNetPayout.toLocaleString() }}</div>
-                  <div class="text-[9.5px] text-slate-500 dark:text-slate-400 font-semibold mt-0.5">Jumla ya malipo halisi baada ya makato</div>
+              <!-- Compact Grid of 2 Financial Cards -->
+              <div class="grid grid-cols-2 gap-2">
+                <div class="bg-emerald-50/70 dark:bg-emerald-950/40 p-3 rounded-2xl border border-emerald-300 dark:border-emerald-500/30">
+                  <div class="text-[9.5px] font-black uppercase text-emerald-800 dark:text-emerald-400 tracking-tight">Pato Safi Mkulima</div>
+                  <div class="text-sm font-black text-emerald-700 dark:text-emerald-400 font-mono mt-1">Tsh {{ totalFarmerNetPayout.toLocaleString() }}</div>
                 </div>
-                <div class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-black flex items-center justify-center text-sm border border-emerald-200 dark:border-emerald-500/20">💵</div>
+
+                <div class="bg-teal-50/70 dark:bg-teal-950/40 p-3 rounded-2xl border border-teal-300 dark:border-teal-500/30">
+                  <div class="text-[9.5px] font-black uppercase text-teal-900 dark:text-teal-400 tracking-tight">Faida / Makato Kinu</div>
+                  <div class="text-sm font-black text-teal-800 dark:text-teal-400 font-mono mt-1">Tsh {{ totalFarmerDeductions.toLocaleString() }}</div>
+                </div>
               </div>
 
-              <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-red-200 dark:border-red-500/20 shadow-xs flex items-center justify-between">
+              <div class="bg-red-50/60 dark:bg-red-950/30 p-3 rounded-2xl border border-red-200 dark:border-red-500/20 flex items-center justify-between">
                 <div>
-                  <div class="text-[10px] font-black uppercase text-red-600 dark:text-red-400 tracking-wider">Mkopo Bado (Deni)</div>
-                  <div class="text-xl font-black text-red-600 dark:text-red-400 font-mono mt-0.5">Tsh {{ totalFarmerLoanBalance.toLocaleString() }}</div>
-                  <div class="text-[9.5px] text-slate-500 dark:text-slate-400 font-semibold mt-0.5">Salio la deni la mikopo</div>
+                  <div class="text-[9.5px] font-black uppercase text-red-600 dark:text-red-400 tracking-tight">Deni la Mkopo</div>
+                  <div class="text-sm font-black text-red-600 dark:text-red-400 font-mono mt-0.5">Tsh {{ totalFarmerLoanBalance.toLocaleString() }}</div>
                 </div>
-                <div class="w-9 h-9 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 font-black flex items-center justify-center text-sm border border-red-200 dark:border-red-500/20">💳</div>
+                <div class="w-7 h-7 rounded-lg bg-red-100 dark:bg-red-900/40 text-red-600 text-xs font-bold flex items-center justify-center">💳</div>
               </div>
             </div>
 
@@ -382,7 +383,7 @@
                           <span v-if="b.status === 'transformed'" class="px-2.5 py-0.5 rounded-lg text-[10px] font-black bg-purple-600 text-white uppercase shadow-2xs">
                             🔒 TRANSFORMED
                           </span>
-                          <span v-else-if="b.status === 'sold' || (parseFloat(b.current_weight_mt || b.current_weight || 0) <= 0)" class="px-2.5 py-0.5 rounded-lg text-[10px] font-black bg-rose-600 text-white uppercase shadow-2xs">
+                          <span v-else-if="b.status === 'sold'" class="px-2.5 py-0.5 rounded-lg text-[10px] font-black bg-rose-600 text-white uppercase shadow-2xs">
                             🏷️ IMEUZWA
                           </span>
                           <span v-else class="px-2.5 py-0.5 rounded-lg text-[10px] font-black bg-emerald-600 text-white uppercase shadow-2xs">
@@ -398,14 +399,17 @@
                         <div class="text-xs text-slate-600 dark:text-slate-300 font-medium mt-1 flex flex-wrap items-center gap-2">
                           <span>Zao: <strong class="text-slate-900 dark:text-slate-50 font-bold">{{ b.crop_type }}</strong> {{ b.variety ? '(' + b.variety + ')' : '' }}</span>
                           <span class="text-slate-300">•</span>
-                          <span>Intake: <strong class="text-slate-900 dark:text-slate-50 font-extrabold">{{ ((parseFloat(b.initial_weight_mt || b.current_weight_mt || 0)) * 1000).toLocaleString() }} Kg</strong></span>
+                          <span>Intake: <strong class="text-slate-900 dark:text-slate-50 font-extrabold">
+                            <template v-if="b.intake_quantity">{{ Number(b.intake_quantity).toLocaleString() }} {{ b.intake_unit }}</template>
+                            <template v-else>{{ ((parseFloat(b.initial_weight_mt || b.current_weight_mt || 0))).toLocaleString() }} Units</template>
+                          </strong></span>
                           <span class="text-slate-300">•</span>
                           <span class="px-2 py-0.5 rounded-md bg-amber-100/90 dark:bg-amber-900/50 text-amber-950 dark:text-amber-400 text-[10.5px] font-black border border-amber-300/80 flex items-center gap-1 shadow-2xs">
                             {{ formatStorageDaysBadge(b.created_at, b.status, b.updated_at) }}
                             <span class="text-amber-800 dark:text-amber-400 font-bold">({{ formatDate(b.created_at) }})</span>
                           </span>
-                          <span v-if="(parseFloat(b.initial_weight_mt || 0)) > (parseFloat(b.current_weight_mt || 0))" class="px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 text-[10px] font-black">
-                            Umeuzwa: {{ Math.max(0, ((parseFloat(b.initial_weight_mt || 0)) - (parseFloat(b.current_weight_mt || 0))) * 1000).toLocaleString() }} Kg
+                          <span v-if="(b.status === 'sold' || b.status === 'partially_sold')" class="px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 text-[10px] font-black">
+                            Umeuzwa: {{ Math.max(0, ((parseFloat(b.initial_weight_mt || 0)) - (parseFloat(b.current_weight_mt || 0)))).toLocaleString() }} {{ b.intake_unit || 'Units' }}
                           </span>
                         </div>
                       </div>
@@ -413,13 +417,20 @@
                     
                     <div class="flex items-center gap-3">
                       <div class="text-right">
-                        <div class="text-sm font-black" :class="(parseFloat(b.current_weight_mt || b.current_weight || 0) <= 0) ? 'text-slate-400 line-through' : 'text-emerald-700 dark:text-emerald-400'">
-                          {{ (parseFloat(b.current_weight_mt || b.current_weight || 0) * 1000).toLocaleString() }} Kg
+                        <div class="text-sm font-black" :class="b.status === 'sold' ? 'text-slate-400 line-through' : 'text-emerald-700 dark:text-emerald-400'">
+                          <template v-if="b.intake_quantity">
+                            {{ (parseFloat(b.initial_weight_mt || 0) > 0 ? (parseFloat(b.current_weight_mt || b.current_weight || 0) / parseFloat(b.initial_weight_mt)) * parseFloat(b.intake_quantity) : parseFloat(b.intake_quantity)).toLocaleString(undefined, {maximumFractionDigits: 2}) }} 
+                            <span class="text-[10px]">{{ b.intake_unit }}</span>
+                          </template>
+                          <template v-else>
+                            {{ (parseFloat(b.current_weight_mt || b.current_weight || 0)).toLocaleString() }} <span class="text-[10px]">Units</span>
+                          </template>
                         </div>
                         <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Ghalani</div>
                       </div>
 
                       <!-- ACTION BUTTONS -->
+                      
                       <button 
                         v-if="b.status !== 'transformed' && b.status !== 'sold' && (parseFloat(b.current_weight_mt || b.current_weight || 0) > 0)"
                         @click="openApplyServiceForBatch(b)" 
@@ -428,6 +439,25 @@
                       >
                         <span>+ Panga Huduma</span>
                       </button>
+
+                      <button 
+                        v-if="getBatchServices(b).length === 0 && b.status !== 'transformed' && b.status !== 'sold' && !b.parent_batch_id"
+                        @click="editBatch(b)" 
+                        class="px-2 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-bold text-xs shadow-xs transition cursor-pointer"
+                        title="Hariri Mzigo (Edit)"
+                      >
+                        ✏️ Hariri
+                      </button>
+
+                      <button 
+                        v-if="getBatchServices(b).length === 0 && b.status !== 'transformed' && b.status !== 'sold' && !b.parent_batch_id"
+                        @click="deleteRawBatch(b)" 
+                        class="px-2 py-1.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 rounded-xl font-bold text-xs shadow-xs transition cursor-pointer"
+                        title="Futa Mzigo (Delete)"
+                      >
+                        🗑️ Futa
+                      </button>
+
 
                       <!-- Icon-Only Toggle Accordion Button -->
                       <button 
@@ -443,10 +473,10 @@
                   </div>
 
                   <!-- COLLAPSIBLE TREE SECTION (KUFUNGUA/KUFUNGA WORKFLOW TREE) -->
-                  <div v-if="isBatchExpanded(b.id)" class="space-y-4 pt-3 border-t border-emerald-100 animate-fadeIn">
+                  <div v-if="isBatchExpanded(b.id)" class="space-y-4 pt-3 border-t border-emerald-100 dark:border-emerald-800/40 animate-fadeIn">
                     
                     <div class="pl-6 relative space-y-3">
-                      <div class="absolute left-3 top-2 bottom-3 w-0.5 bg-emerald-400"></div>
+                      <div class="absolute left-3 top-2 bottom-3 w-0.5 bg-emerald-400 dark:bg-emerald-600/50"></div>
 
                       <!-- 1. SERVICES PIPELINE SECTION -->
                       <div v-if="getBatchServices(b).length > 0" class="space-y-2.5">
@@ -455,7 +485,7 @@
                         </div>
 
                         <div v-for="(s, sIdx) in getBatchServices(b)" :key="s.id" class="relative pl-4">
-                          <div class="absolute -left-3 top-4 w-3 h-0.5 bg-emerald-400"></div>
+                          <div class="absolute -left-3 top-4 w-3 h-0.5 bg-emerald-400 dark:bg-emerald-600/50"></div>
 
                           <!-- SERVICE ITEM CARD -->
                           <div class="p-3 bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-500/20 rounded-xl text-xs shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -500,48 +530,49 @@
                         </div>
 
                         <div v-for="child in getBatchChildren(b)" :key="child.id" class="relative pl-4 space-y-2">
-                          <div class="absolute -left-3 top-4 w-3 h-0.5 bg-teal-400"></div>
+                          <div class="absolute -left-3 top-4 w-3 h-0.5 bg-teal-400 dark:bg-teal-600/50"></div>
 
                           <!-- CHILD PRODUCT CARD -->
-                          <div class="p-3 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-teal-300 rounded-xl flex items-center justify-between text-xs shadow-2xs">
+                          <div class="p-3 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 dark:from-emerald-900/20 dark:via-teal-900/20 dark:to-emerald-900/20 border border-teal-300 dark:border-teal-700/50 rounded-xl flex items-center justify-between text-xs shadow-2xs">
                             <div class="flex items-center gap-2.5">
                               <span class="text-teal-700 dark:text-teal-400 font-black text-base">🌾</span>
                               <div>
                                 <div class="font-black text-slate-900 dark:text-slate-50 text-xs flex items-center gap-1.5 flex-wrap">
                                   <span>{{ child.crop_type }}</span>
-                                  <span class="px-1.5 py-0.5 bg-teal-100 text-teal-800 dark:text-teal-400 text-[9.5px] font-black rounded uppercase">Result Product</span>
-                                  <span v-if="child.status === 'sold' || parseFloat(child.current_weight_mt || 0) <= 0" class="px-2 py-0.5 bg-rose-600 text-white text-[9.5px] font-black rounded-lg uppercase shadow-2xs">🏷️ IMEUZWA</span>
+                                  <span class="px-1.5 py-0.5 bg-teal-100 dark:bg-teal-900/40 text-teal-800 dark:text-teal-400 text-[9.5px] font-black rounded uppercase">Result Product</span>
+                                  <span v-if="child.status === 'sold'" class="px-2 py-0.5 bg-rose-600 text-white text-[9.5px] font-black rounded-lg uppercase shadow-2xs">🏷️ IMEUZWA</span>
+                                  <span v-else class="px-2 py-0.5 bg-emerald-600 text-white text-[9.5px] font-black rounded-lg uppercase shadow-2xs">🟢 GHALANI</span>
                                 </div>
                                 <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-2 mt-0.5">
                                   <span>Code: {{ child.batch_code }}</span>
                                   <span>•</span>
-                                  <span class="font-extrabold text-teal-900 dark:text-teal-400 bg-teal-100/90 px-2 py-0.5 rounded-md border border-teal-200 dark:border-teal-700/50">
+                                  <span class="font-extrabold text-teal-900 dark:text-teal-400 bg-teal-100/90 dark:bg-teal-900/40 px-2 py-0.5 rounded-md border border-teal-200 dark:border-teal-700/50">
                                     {{ formatStorageDaysBadge(child.created_at, child.status, child.updated_at) }}
                                   </span>
                                 </div>
                               </div>
                             </div>
                             <div class="flex items-center gap-3">
-                              <div v-if="child.status !== 'sold' && parseFloat(child.current_weight_mt || 0) > 0" class="font-black text-emerald-800 dark:text-emerald-400 text-sm">
-                                {{ (parseFloat(child.current_weight_mt || 0) * 1000).toLocaleString() }} Kg
+                              <div v-if="child.status !== 'sold'" class="font-black text-emerald-800 dark:text-emerald-400 text-sm">
+                                {{ child.intake_quantity ? Number(child.intake_quantity).toLocaleString() + ' ' + child.intake_unit : 'N/A' }}
                               </div>
                               <div v-else class="font-black text-rose-600 text-sm font-mono">
-                                0 Kg
+                                0 (Imeuzwa)
                               </div>
-                              <button v-if="child.status !== 'sold' && parseFloat(child.current_weight_mt || 0) > 0" @click="openApplyServiceForChild(child)" class="px-2.5 py-1 bg-teal-700 hover:bg-teal-800 text-white text-[11px] font-bold rounded-lg shadow-2xs flex items-center gap-1 cursor-pointer transition">
+                              <button v-if="child.status !== 'sold'" @click="openApplyServiceForChild(child)" class="px-2.5 py-1 bg-teal-700 hover:bg-teal-800 text-white text-[11px] font-bold rounded-lg shadow-2xs flex items-center gap-1 cursor-pointer transition">
                                 <span>+ Huduma ya {{ child.crop_type }}</span>
                               </button>
-                              <button v-if="child.status !== 'sold' && parseFloat(child.current_weight_mt || 0) > 0" @click="revertTransformationFromChild(b, child)" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-[11px] font-bold rounded-lg shadow-2xs flex items-center gap-1 cursor-pointer transition" title="Futa matokeo haya ya transformation na urudishe mpunga">
+                              <button v-if="child.status !== 'sold' && (!getBatchChildren(b) || !getBatchChildren(b).some(c => c.status === 'sold'))" @click="revertTransformationFromChild(b, child)" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-[11px] font-bold rounded-lg shadow-2xs flex items-center gap-1 cursor-pointer transition" title="Futa matokeo haya ya transformation na urudishe mpunga">
                                 <span>🗑️ Futa Zao / Revert</span>
                               </button>
                             </div>
                           </div>
 
                           <!-- SUB-SERVICES ASSIGNED SPECIFICALLY TO THIS CHILD PRODUCT -->
-                          <div v-if="getBatchServices(child).length > 0" class="pl-4 space-y-2 border-l-2 border-dashed border-teal-400 ml-4">
+                          <div v-if="getBatchServices(child).length > 0" class="pl-4 space-y-2 border-l-2 border-dashed border-teal-400 dark:border-teal-600/50 ml-4">
                             <div v-for="cs in getBatchServices(child)" :key="cs.id" class="p-2.5 bg-white dark:bg-slate-900 border border-teal-200 dark:border-teal-700/50 rounded-xl text-xs shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                               <div class="flex items-center gap-2.5">
-                                <span class="w-5 h-5 rounded-full bg-teal-100 text-teal-800 dark:text-teal-400 font-black text-[10px] flex items-center justify-center flex-shrink-0">⚙️</span>
+                                <span class="w-5 h-5 rounded-full bg-teal-100 dark:bg-teal-900/40 text-teal-800 dark:text-teal-400 font-black text-[10px] flex items-center justify-center flex-shrink-0">⚙️</span>
                                 <div>
                                   <span class="font-extrabold text-slate-900 dark:text-slate-50 text-xs block">{{ cs.service_name || cs.type || 'Huduma ya Product' }}</span>
                                   <div class="text-[10.5px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-2 mt-0.5">
@@ -642,23 +673,20 @@
               </div>
 
               <!-- FINANCIAL SUMMARY CARDS BANNER FOR FARMER SALES -->
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 p-3.5 rounded-2xl shadow-2xs">
-                  <div class="text-[10px] font-black text-slate-500 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider">1. Jumla Thamani ya Mauzo (Gross)</div>
-                  <div class="text-base font-black text-slate-900 dark:text-slate-50 font-mono mt-1">Tsh {{ totalFarmerGrossSales.toLocaleString() }}</div>
-                  <div class="text-[9.5px] text-slate-500 dark:text-slate-400 font-medium">Thamani yote kabla ya makato</div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 p-3 rounded-2xl shadow-2xs">
+                  <div class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-tight">1. Mauzo Ghafi (Gross)</div>
+                  <div class="text-sm font-black text-slate-900 dark:text-slate-50 font-mono mt-1">Tsh {{ totalFarmerGrossSales.toLocaleString() }}</div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 p-3.5 rounded-2xl shadow-2xs">
-                  <div class="text-[10px] font-black text-slate-500 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider">2. Makato Yote (Deductions)</div>
-                  <div class="text-base font-black text-red-600 dark:text-red-400 font-mono mt-1">Tsh {{ totalFarmerDeductions.toLocaleString() }}</div>
-                  <div class="text-[9.5px] text-slate-500 dark:text-slate-400 font-medium">Kinu, Ukaushaji & Mikopo</div>
+                <div class="bg-teal-50/70 dark:bg-teal-950/40 border border-teal-300 dark:border-teal-500/30 p-3 rounded-2xl shadow-2xs">
+                  <div class="text-[9.5px] font-black text-teal-900 dark:text-teal-400 uppercase tracking-tight">2. Faida / Makato Kinu</div>
+                  <div class="text-sm font-black text-teal-800 dark:text-teal-400 font-mono mt-1">Tsh {{ totalFarmerDeductions.toLocaleString() }}</div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-500/30 p-3.5 rounded-2xl shadow-2xs">
-                  <div class="text-[10px] font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-wider">3. Pato Safi la Mkulima (Net Payout)</div>
-                  <div class="text-base font-black text-emerald-700 dark:text-emerald-400 font-mono mt-1">Tsh {{ totalFarmerNetPayout.toLocaleString() }}</div>
-                  <div class="text-[9.5px] text-emerald-700 dark:text-emerald-400 font-medium">Jumla ya malipo aliyochukua mkononi</div>
+                <div class="bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-500/30 p-3 rounded-2xl shadow-2xs">
+                  <div class="text-[9.5px] font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-tight">3. Pato Safi Mkulima</div>
+                  <div class="text-sm font-black text-emerald-700 dark:text-emerald-400 font-mono mt-1">Tsh {{ totalFarmerNetPayout.toLocaleString() }}</div>
                 </div>
               </div>
 
@@ -715,17 +743,17 @@
         <div class="p-6 space-y-3.5 text-xs font-semibold text-slate-700 dark:text-slate-200">
           <div>
             <label class="block mb-1 font-bold">Chagua Shehena (Batch/Product Active) *</label>
-            <select v-model="serviceForm.batch_id" class="w-full p-2.5 border rounded-xl font-bold">
+            <select v-model="serviceForm.batch_id" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50">
               <option value="">Chagua batch active...</option>
-              <option v-for="b in activeNonTransformedBatches" :key="b.id" :value="b.id">{{ b.batch_code }} ({{ b.crop_type }} - {{ (parseFloat(b.current_weight_mt||b.current_weight||0)*1000) }} Kg)</option>
+              <option v-for="b in activeNonTransformedBatches" :key="b.id" :value="b.id">{{ b.batch_code }} ({{ b.crop_type }} - {{ b.intake_quantity || parseFloat(b.current_weight_mt||b.current_weight||0) }} {{ b.intake_unit || 'Units' }})</option>
             </select>
             <span class="text-[10.5px] text-amber-700 dark:text-amber-400 mt-1 block">⚠️ Batches zilizo-transformed (zilizotumika kikamilifu) haziruhusiwi kupangiwa huduma mpya.</span>
           </div>
           <div>
             <label class="block mb-1 font-bold">Chagua Huduma Iliyosajiliwa (Huduma za Zao la {{ selectedBatchForService ? selectedBatchForService.crop_type : 'Mzigo Uliochaguliwa' }}) *</label>
-            <select v-model="serviceForm.service_id" @change="onServiceCatalogSelect" class="w-full p-2.5 bg-emerald-50/50 dark:bg-emerald-900/40 border border-emerald-300 dark:border-emerald-500/30 rounded-xl font-extrabold text-emerald-950 dark:text-emerald-400">
-              <option value="">Chagua huduma inayohusika na zao hili...</option>
-              <option v-for="s in filteredCatalogServices" :key="s.id" :value="s.id">
+            <select v-model="serviceForm.service_id" @change="onServiceCatalogSelect" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-emerald-300 dark:border-emerald-500/50 rounded-xl font-extrabold text-emerald-950 dark:text-emerald-400 focus:ring-2 focus:ring-emerald-500/20">
+              <option value="" class="bg-white dark:bg-slate-900">Chagua huduma inayohusika na zao hili...</option>
+              <option v-for="s in filteredCatalogServices" :key="s.id" :value="s.id" class="bg-white dark:bg-slate-900">
                 {{ s.name_sw }} — Tsh {{ parseFloat(s.rate).toLocaleString() }} / {{ s.unit }} ({{ s.crop_type || 'Zote' }})
               </option>
             </select>
@@ -779,7 +807,7 @@
               <select v-model="loanForm.collateral_batch_id" class="w-full p-2.5 bg-emerald-50/50 dark:bg-emerald-900/40 border border-emerald-300 dark:border-emerald-500/30 rounded-xl font-extrabold text-emerald-950 dark:text-emerald-400">
                 <option value="">Chagua batch ya dhamana ghalani...</option>
                 <option v-for="b in activeNonTransformedBatches" :key="b.id" :value="b.id">
-                  {{ b.batch_code }} — {{ b.crop_type }} ({{ (parseFloat(b.current_weight_mt||b.current_weight||0)*1000).toLocaleString() }} Kg)
+                  {{ b.batch_code }} — {{ b.crop_type }} ({{ b.intake_quantity || parseFloat(b.current_weight_mt||b.current_weight||0) }} {{ b.intake_unit || 'Units' }})
                 </option>
               </select>
             </div>
@@ -789,7 +817,7 @@
               <div class="flex justify-between items-center text-xs">
                 <span class="text-slate-600 dark:text-slate-300 font-bold">Akiba ya Mzigo Ghalani:</span>
                 <span class="font-mono font-black text-emerald-900 dark:text-emerald-400">
-                  {{ (parseFloat(selectedCollateralBatch.current_weight_mt||0)*1000).toLocaleString() }} Kg
+                  {{ selectedCollateralBatch.intake_quantity || (parseFloat(selectedCollateralBatch.current_weight_mt||0)).toLocaleString() }} {{ selectedCollateralBatch.intake_unit || 'Units' }}
                 </span>
               </div>
               <div class="flex justify-between items-center text-xs border-t border-emerald-200/80 dark:border-emerald-700/50 pt-1.5">
@@ -820,7 +848,7 @@
 
             <div>
               <label class="block mb-1 font-bold">Tarehe ya Kulipa (Due Date) *</label>
-              <input v-model="loanForm.due_date" type="date" class="w-full p-2.5 border border-slate-300 dark:border-slate-600 rounded-xl font-bold"/>
+              <input v-model="loanForm.due_date" type="date" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50"/>
             </div>
           </template>
 
@@ -849,12 +877,20 @@
         <div class="p-6 space-y-4 text-xs font-semibold text-slate-700 dark:text-slate-200">
           <div class="p-3 bg-emerald-900 text-white rounded-xl border border-emerald-700">
             <div class="font-extrabold text-sm text-emerald-300">Mzigo Mama: {{ selectedBatchForComplete.batch_code }} ({{ selectedBatchForComplete.crop_type }})</div>
-            <div class="text-xs text-emerald-100 mt-0.5">Uzito wa Sasa: {{ currentBatchWeightKg }} Kg</div>
+            <div class="text-xs text-emerald-100 mt-0.5">
+              Kiasi cha Sasa: 
+              <template v-if="selectedBatchForComplete.intake_quantity">
+                {{ (parseFloat(selectedBatchForComplete.initial_weight_mt || 0) > 0 ? (parseFloat(selectedBatchForComplete.current_weight_mt || selectedBatchForComplete.current_weight || 0) / parseFloat(selectedBatchForComplete.initial_weight_mt)) * parseFloat(selectedBatchForComplete.intake_quantity) : parseFloat(selectedBatchForComplete.intake_quantity)).toLocaleString(undefined, {maximumFractionDigits: 2}) }} {{ selectedBatchForComplete.intake_unit }}
+              </template>
+              <template v-else>
+                {{ currentBatchWeightKg }} Units
+              </template>
+            </div>
           </div>
 
           <div>
             <label class="block mb-1 font-bold">Je, Zao limebadilika? (Mf. Mpunga kuwa Mchele)</label>
-            <select v-model="completeForm.has_changed" class="w-full p-2.5 border rounded-xl font-bold">
+            <select v-model="completeForm.has_changed" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50">
               <option value="yes">Ndiyo, Zao Limebadilika (Crop Transformation)</option>
               <option value="no">Hapana, Zao ni Lilelile</option>
             </select>
@@ -869,23 +905,20 @@
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 <div>
                   <label class="block mb-1 font-bold">Zao Jipya *</label>
-                  <select v-model="completeForm.output_crop" class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold">
+                  <select v-model="completeForm.output_crop" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50">
                     <option v-for="c in cropsList" :key="c" :value="c">{{ c }}</option>
                   </select>
                 </div>
                 <div>
                   <label class="block mb-1 font-bold">Kiasi *</label>
-                  <input v-model.number="completeForm.output_quantity" type="number" placeholder="e.g. 30" class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold"/>
+                  <input v-model.number="completeForm.output_quantity" type="number" placeholder="e.g. 30" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50"/>
                 </div>
                 <div>
                   <label class="block mb-1 font-bold">Kipimo / Unit *</label>
-                  <select v-model="completeForm.output_unit" class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold">
+                  <select v-model="completeForm.output_unit" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50">
                     <option v-for="u in unitsList" :key="u.name" :value="u.name">{{ u.name }}</option>
                   </select>
                 </div>
-              </div>
-              <div class="text-[11px] text-emerald-800 dark:text-emerald-400 font-bold text-right">
-                Uzito wa Zao Kuu: {{ getUnitKg(completeForm.output_unit, completeForm.output_quantity || 0) }} Kg
               </div>
             </div>
 
@@ -906,7 +939,7 @@
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 <div>
                   <label class="block mb-1 font-bold">Zao la Ziada *</label>
-                  <select v-model="completeForm.byproduct_crop" class="w-full p-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold">
+                  <select v-model="completeForm.byproduct_crop" class="w-full p-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50">
                     <option value="Pumba">Pumba ya Mchele</option>
                     <option value="Pumba ya Mahindi">Pumba ya Mahindi</option>
                     <option value="Manamane">Manamane / Broken Rice</option>
@@ -915,28 +948,17 @@
                 </div>
                 <div>
                   <label class="block mb-1 font-bold">Kiasi cha Ziada *</label>
-                  <input v-model.number="completeForm.byproduct_quantity" type="number" placeholder="e.g. 15" class="w-full p-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold"/>
+                  <input v-model.number="completeForm.byproduct_quantity" type="number" placeholder="e.g. 15" class="w-full p-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50"/>
                 </div>
                 <div>
                   <label class="block mb-1 font-bold">Kipimo / Unit *</label>
-                  <select v-model="completeForm.byproduct_unit" class="w-full p-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold">
+                  <select v-model="completeForm.byproduct_unit" class="w-full p-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50">
                     <option v-for="u in unitsList" :key="u.name" :value="u.name">{{ u.name }}</option>
                   </select>
                 </div>
               </div>
-              <div class="text-[11px] text-teal-800 dark:text-teal-400 font-bold text-right">
-                Uzito wa Zao la Ziada: {{ getUnitKg(completeForm.byproduct_unit, completeForm.byproduct_quantity || 0) }} Kg
-              </div>
             </div>
 
-            <div class="p-2.5 bg-emerald-950 text-emerald-200 rounded-xl text-xs font-mono font-bold flex items-center justify-between">
-              <span>Jumla ya Patokazi:</span>
-              <span class="text-white text-sm font-black">{{ totalOutputWeightKg }} Kg</span>
-            </div>
-
-            <div v-if="totalOutputWeightKg > currentBatchWeightKg" class="p-2 bg-red-100 dark:bg-red-500/20 text-red-800 dark:text-red-400 rounded-lg text-[11px] font-bold border border-red-200 dark:border-red-500/20">
-              ⚠️ Tahadhari: Jumla ya uzito uliopatikana ({{ totalOutputWeightKg }} Kg) unazidi uzito wa mzigo mama ({{ currentBatchWeightKg }} Kg)!
-            </div>
           </div>
 
           <div class="flex justify-end gap-2 pt-2">
@@ -957,26 +979,26 @@
         <div class="p-6 space-y-3 text-xs font-semibold text-slate-700 dark:text-slate-200">
           <div>
             <label class="block mb-1 font-bold">Jina Kamili *</label>
-            <input v-model="newFarmerForm.name" type="text" placeholder="e.g. Bakari Juma" class="w-full p-2.5 border rounded-xl"/>
+            <input v-model="newFarmerForm.name" type="text" placeholder="e.g. Bakari Juma" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50"/>
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block mb-1 font-bold">Namba ya Simu *</label>
-              <input v-model="newFarmerForm.phone" type="text" placeholder="0754123456" class="w-full p-2.5 border rounded-xl"/>
+              <input v-model="newFarmerForm.phone" type="text" placeholder="0754123456" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50"/>
             </div>
             <div>
               <label class="block mb-1 font-bold">NIDA Number</label>
-              <input v-model="newFarmerForm.national_id" type="text" class="w-full p-2.5 border rounded-xl"/>
+              <input v-model="newFarmerForm.national_id" type="text" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50"/>
             </div>
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block mb-1 font-bold">Mkoa *</label>
-              <input v-model="newFarmerForm.region" type="text" class="w-full p-2.5 border rounded-xl"/>
+              <input v-model="newFarmerForm.region" type="text" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50"/>
             </div>
             <div>
               <label class="block mb-1 font-bold">Wilaya</label>
-              <input v-model="newFarmerForm.district" type="text" class="w-full p-2.5 border rounded-xl"/>
+              <input v-model="newFarmerForm.district" type="text" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50"/>
             </div>
           </div>
           <div class="flex justify-end gap-2 pt-3">
@@ -996,28 +1018,25 @@
         </div>
         <div class="p-6 space-y-3 text-xs font-semibold text-slate-700 dark:text-slate-200">
           <div>
-            <label class="block mb-1 font-bold">Aina ya Zao *</label>
-            <select v-model="intakeForm.crop_type" class="w-full p-2.5 border rounded-xl font-bold">
+            <div class="flex items-center justify-between mb-1"><label class="font-bold">Aina ya Zao *</label><button type="button" @click="openQuickCropModal" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"><span>+ Sajili Zao</span><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></button></div>
+            <select v-model="intakeForm.crop_type" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50">
               <option v-for="c in cropsList" :key="c" :value="c">{{ c }}</option>
             </select>
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block mb-1 font-bold">Kiasi *</label>
-              <input v-model.number="intakeForm.quantity" type="number" class="w-full p-2.5 border rounded-xl font-bold"/>
+              <input v-model.number="intakeForm.quantity" type="number" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50"/>
             </div>
             <div>
-              <label class="block mb-1 font-bold">Vipimo / Units *</label>
-              <select v-model="intakeForm.unit" class="w-full p-2.5 border rounded-xl font-bold">
+              <div class="flex items-center justify-between mb-1"><label class="font-bold">Vipimo / Units *</label><button type="button" @click="openQuickUnitModal" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"><span>+ Sajili Kipimo</span><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></button></div>
+              <select v-model="intakeForm.unit" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50">
                 <option v-for="u in unitsList" :key="u.name" :value="u.name">{{ u.name }}</option>
               </select>
             </div>
           </div>
           <div class="p-3 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-400 rounded-xl font-extrabold text-center text-xs space-y-1">
-            <div>Uzito wa Jumla: <span class="text-sm font-black text-emerald-950 dark:text-emerald-400">{{ calculatedIntakeWeight.toLocaleString() }} Kg</span> ({{ (calculatedIntakeWeight / 1000).toFixed(2) }} Tani)</div>
-            <div class="text-[10.5px] font-bold text-emerald-700 dark:text-emerald-400 bg-white/80 dark:bg-slate-900/80 py-0.5 px-2 rounded-lg border border-emerald-200 dark:border-emerald-500/20 inline-block shadow-2xs">
-              ({{ intakeForm.quantity || 0 }} {{ intakeForm.unit }} @ 1 {{ intakeForm.unit }} = {{ getUnitKg ? getUnitKg(intakeForm.unit, 1) : 100 }} Kg)
-            </div>
+            <div>Jumla Utakayopokea: <span class="text-sm font-black text-emerald-950 dark:text-emerald-400">{{ intakeForm.quantity || 0 }} {{ intakeForm.unit }}</span></div>
           </div>
           <div class="flex justify-end gap-2 pt-3">
             <button @click="modals.intake = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl">Ghairi</button>
@@ -1075,7 +1094,7 @@
             <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
               <div class="flex justify-between">
                 <span class="text-slate-500 dark:text-slate-400">Jumla ya Mzigo Ghalani:</span>
-                <span class="font-black text-emerald-800 dark:text-emerald-400">{{ totalFarmerStockKg.toLocaleString() }} Kg</span>
+                <span class="font-black text-emerald-800 dark:text-emerald-400">{{ farmerStockSummaryString }}</span>
               </div>
               <div class="flex justify-between border-t border-slate-200 dark:border-slate-700 pt-1 mt-1">
                 <span class="text-slate-500 dark:text-slate-400">Jumla ya Deni la Mikopo:</span>
@@ -1100,7 +1119,7 @@
                 <tr v-for="b in farmerBatches" :key="b.id">
                   <td class="py-2.5 font-mono font-bold text-emerald-800 dark:text-emerald-400">{{ b.batch_code }}</td>
                   <td class="py-2.5">{{ b.crop_type }}</td>
-                  <td class="py-2.5 text-right font-mono font-bold">{{ (parseFloat(b.current_weight_mt||b.current_weight||0)*1000).toLocaleString() }} Kg</td>
+                  <td class="py-2.5 text-right font-mono font-bold">{{ b.intake_quantity || (parseFloat(b.current_weight_mt||b.current_weight||0)).toLocaleString() }} {{ b.intake_unit || 'Units' }}</td>
                   <td class="py-2.5 text-center font-extrabold text-[11px] uppercase">{{ b.status }}</td>
                 </tr>
               </tbody>
@@ -1173,7 +1192,7 @@
               <label class="block font-extrabold text-slate-900 dark:text-slate-50 mb-1">Chagua Batch ya Kuuza *</label>
               <select v-model="settlementForm.batch_id" @change="onSettlementBatchChange" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-600 rounded-xl font-bold text-slate-900 dark:text-slate-50">
                 <option value="">Chagua batch ya kuuza...</option>
-                <option v-for="b in activeNonTransformedBatches" :key="b.id" :value="b.id">{{ b.batch_code }} - {{ b.crop_type }} ({{ (parseFloat(b.current_weight_mt||b.current_weight||0)*1000).toLocaleString() }} Kg Ghalani)</option>
+                <option v-for="b in activeNonTransformedBatches" :key="b.id" :value="b.id">{{ b.batch_code }} - {{ b.crop_type }} ({{ b.intake_quantity || (parseFloat(b.current_weight_mt||b.current_weight||0)).toLocaleString() }} {{ b.intake_unit || 'Units' }} Ghalani)</option>
               </select>
             </div>
 
@@ -1252,7 +1271,7 @@
     </div>
 
     <!-- CUSTOM ENTERPRISE CONFIRMATION MODAL (No Native Browser Confirm) -->
-    <div v-if="confirmModal.show" class="fixed inset-0 z-70 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4">
+    <div v-if="confirmModal.show" class="fixed inset-0 z-[150] bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4">
       <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-800 space-y-0 transform transition-all scale-100">
         <!-- Header -->
         <div class="px-6 py-4 flex items-center justify-between" :class="confirmModal.isDanger ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white' : 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white'">
@@ -1293,14 +1312,55 @@
       </div>
     </div>
 
+
+    <!-- QUICK ADD CROP MODAL -->
+    <div v-if="modals.quickCrop" class="fixed inset-0 z-[100] bg-slate-900/75 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 w-full max-w-xs rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700">
+        <div class="px-5 py-3 border-b border-emerald-800 flex items-center justify-between bg-gradient-to-r from-emerald-900 to-teal-900 text-white">
+          <h3 class="text-sm font-extrabold">🌱 Sajili Zao Jipya</h3>
+          <button @click="modals.quickCrop = false" class="text-emerald-200 hover:text-white p-1">✕</button>
+        </div>
+        <div class="p-5 space-y-4">
+          <div>
+            <label class="block mb-1 text-xs font-bold text-slate-700 dark:text-slate-200">Jina la Zao *</label>
+            <input v-model="quickInput.crop" type="text" placeholder="Mf: Alizeti" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-xs text-slate-900 dark:text-slate-50" @keyup.enter="handleQuickCropAdd" />
+          </div>
+          <div class="flex justify-end gap-2">
+            <button @click="modals.quickCrop = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl text-xs">Ghairi</button>
+            <button @click="handleQuickCropAdd" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl shadow-xs transition text-xs">Sajili</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUICK ADD UNIT MODAL -->
+    <div v-if="modals.quickUnit" class="fixed inset-0 z-[100] bg-slate-900/75 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 w-full max-w-xs rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700">
+        <div class="px-5 py-3 border-b border-emerald-800 flex items-center justify-between bg-gradient-to-r from-emerald-900 to-teal-900 text-white">
+          <h3 class="text-sm font-extrabold">⚖️ Sajili Kipimo Jipya</h3>
+          <button @click="modals.quickUnit = false" class="text-emerald-200 hover:text-white p-1">✕</button>
+        </div>
+        <div class="p-5 space-y-4">
+          <div>
+            <label class="block mb-1 text-xs font-bold text-slate-700 dark:text-slate-200">Jina la Kipimo *</label>
+            <input v-model="quickInput.unit" type="text" placeholder="Mf: Lumbesa" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-xs text-slate-900 dark:text-slate-50" @keyup.enter="handleQuickUnitAdd" />
+          </div>
+          <div class="flex justify-end gap-2">
+            <button @click="modals.quickUnit = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl text-xs">Ghairi</button>
+            <button @click="handleQuickUnitAdd" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl shadow-xs transition text-xs">Sajili</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useAgroMaster } from '../composables/useAgroMaster.js';
 
-const { cropsList, unitsList } = useAgroMaster();
+const { cropsList, unitsList, addCrop, addUnit, getUnitKg } = useAgroMaster();
 
 const loading = ref(false);
 const loadingProfile = ref(false);
@@ -1338,7 +1398,9 @@ const modals = ref({
   newLoan: false,
   newSale: false,
   completeService: false,
-  farmerReceipt: false
+  farmerReceipt: false,
+  quickCrop: false,
+  quickUnit: false
 });
 
 const confirmModal = ref({
@@ -1400,7 +1462,7 @@ const openFarmerPDFReceipt = () => {
   // Totals calculations
   let totalIntakeKg = 0;
   batches.filter(b => !b.parent_batch_id).forEach(b => {
-    totalIntakeKg += parseFloat(b.initial_weight_mt || b.current_weight_mt || 0) * 1000;
+    totalIntakeKg += parseFloat(b.initial_weight_mt || b.current_weight_mt || 0);
   });
 
   const activeStockKg = totalFarmerStockKg.value || 0;
@@ -1409,7 +1471,7 @@ const openFarmerPDFReceipt = () => {
   services.forEach(s => {
     let fee = parseFloat(s.fee_amount || s.cost || 0);
     const rate = parseFloat(s.rate || 0);
-    const qty = (parseFloat(s.output_weight_mt || s.quantity || 0) * 1000);
+    const qty = (parseFloat(s.output_weight_mt || s.quantity || 0));
     if (fee > 0 && fee < 500 && rate > 0) {
       fee = rate * (qty > 0 ? qty : 1000);
     }
@@ -1436,16 +1498,17 @@ const openFarmerPDFReceipt = () => {
   let batchRows = '';
   batches.forEach((b, idx) => {
     const isChild = !!b.parent_batch_id;
-    const isSold = b.status === 'sold' || parseFloat(b.current_weight_mt || 0) <= 0;
+    const isSold = b.status === 'sold';
     const isTransformed = b.status === 'transformed';
-    const initKg = ((b.initial_weight_mt || b.current_weight_mt || 0) * 1000).toLocaleString();
-    const currKg = isSold ? '0' : ((b.current_weight_mt || 0) * 1000).toLocaleString();
+    const initKg = (b.intake_quantity || (b.initial_weight_mt || b.current_weight_mt || 0)).toLocaleString();
+    const currKg = isSold ? '0' : (b.intake_quantity || (b.current_weight_mt || 0)).toLocaleString();
+    const unitLabel = b.intake_unit || 'Units';
 
     let statusBadge = '<span style="color:#047857; font-weight:bold; padding:2px 6px; background:#d1fae5; border-radius:4px; font-size:10px;">🟢 GHALANI</span>';
-    if (isSold) {
-      statusBadge = '<span style="color:#b91c1c; font-weight:bold; padding:2px 6px; background:#fee2e2; border-radius:4px; font-size:10px;">🏷️ IMEUZWA</span>';
-    } else if (isTransformed) {
+    if (isTransformed) {
       statusBadge = '<span style="color:#6d28d9; font-weight:bold; padding:2px 6px; background:#f3e8ff; border-radius:4px; font-size:10px;">🔒 TRANSFORMED</span>';
+    } else if (isSold) {
+      statusBadge = '<span style="color:#b91c1c; font-weight:bold; padding:2px 6px; background:#fee2e2; border-radius:4px; font-size:10px;">🏷️ IMEUZWA</span>';
     }
 
     batchRows += `
@@ -1468,7 +1531,7 @@ const openFarmerPDFReceipt = () => {
   services.forEach((s, idx) => {
     let fee = parseFloat(s.fee_amount || s.cost || 0);
     const rate = parseFloat(s.rate || 0);
-    const qty = (parseFloat(s.output_weight_mt || s.quantity || 0) * 1000);
+    const qty = (parseFloat(s.output_weight_mt || s.quantity || 0));
     if (fee > 0 && fee < 500 && rate > 0) {
       fee = rate * (qty > 0 ? qty : 1000);
     }
@@ -1762,7 +1825,7 @@ const settlementForm = ref({
 const onSettlementBatchChange = () => {
   const b = activeNonTransformedBatches.value.find(item => item.id === settlementForm.value.batch_id);
   if (b) {
-    const availKg = parseFloat(b.current_weight_mt || b.current_weight || 0) * 1000;
+    const availKg = parseFloat(b.intake_quantity || b.current_weight_mt || b.current_weight || 0);
     settlementForm.value.sold_weight_kg = availKg;
     settlementForm.value.sale_type = 'full';
   }
@@ -1771,7 +1834,7 @@ const onSettlementBatchChange = () => {
 const onSaleTypeChange = () => {
   const b = activeNonTransformedBatches.value.find(item => item.id === settlementForm.value.batch_id);
   if (b && settlementForm.value.sale_type === 'full') {
-    settlementForm.value.sold_weight_kg = parseFloat(b.current_weight_mt || b.current_weight || 0) * 1000;
+    settlementForm.value.sold_weight_kg = parseFloat(b.intake_quantity || b.current_weight_mt || b.current_weight || 0);
   }
 };
 
@@ -1782,7 +1845,7 @@ const selectedSettlementBatch = computed(() => {
 
 const availableBatchKg = computed(() => {
   if (!selectedSettlementBatch.value) return 0;
-  return parseFloat(selectedSettlementBatch.value.current_weight_mt || selectedSettlementBatch.value.current_weight || 0) * 1000;
+  return parseFloat(selectedSettlementBatch.value.intake_quantity || selectedSettlementBatch.value.current_weight_mt || selectedSettlementBatch.value.current_weight || 0);
 });
 
 const remainingBatchKgAfterSale = computed(() => {
@@ -1799,14 +1862,14 @@ const activeNonTransformedBatches = computed(() => {
   const map = new Map();
   farmerBatches.value.forEach(b => {
     const bChildren = getBatchChildren(b);
-    const availKg = parseFloat(b.current_weight_mt || b.current_weight || 0) * 1000;
-    if (b.status !== 'transformed' && b.status !== 'sold' && availKg > 0.01 && bChildren.length === 0) {
+    const availQty = parseFloat(b.intake_quantity || b.current_weight_mt || b.current_weight || 0);
+    if (b.status !== 'transformed' && b.status !== 'sold' && availQty > 0 && bChildren.length === 0) {
       map.set(b.id || b.batch_code, b);
     }
     bChildren.forEach(c => {
       const cChildren = getBatchChildren(c);
-      const cAvailKg = parseFloat(c.current_weight_mt || c.current_weight || 0) * 1000;
-      if (c.status !== 'transformed' && c.status !== 'sold' && cAvailKg > 0.01 && cChildren.length === 0) {
+      const cAvailQty = parseFloat(c.intake_quantity || c.current_weight_mt || c.current_weight || 0);
+      if (c.status !== 'transformed' && c.status !== 'sold' && cAvailQty > 0 && cChildren.length === 0) {
         map.set(c.id || c.batch_code, c);
       }
     });
@@ -1889,47 +1952,27 @@ const getServiceRate = (cs) => {
 
 const getBatchWeightKg = (batch) => {
   if (!batch) return 0;
-  let wMt = parseFloat(batch.current_weight_mt || 0);
+  // Use intake_quantity as the source of truth (unit-agnostic system)
+  if (batch.intake_quantity && parseFloat(batch.intake_quantity) > 0) {
+    return parseFloat(batch.intake_quantity);
+  }
+  // Fallback to current_weight_mt (which now stores raw quantity, NOT metric tons)
+  let wMt = parseFloat(batch.current_weight_mt || batch.current_weight || 0);
   let initMt = parseFloat(batch.initial_weight_mt || 0);
-
-  if (wMt <= 0 || (wMt < 0.05 && initMt >= 0.05)) {
+  if (wMt <= 0 && initMt > 0) {
     wMt = initMt;
   }
-
-  if (wMt > 0) {
-    return wMt * 1000;
-  }
-
-  if (batch.current_weight) {
-    const cw = parseFloat(batch.current_weight);
-    return cw < 10 && initMt >= 0.05 ? initMt * 1000 : cw;
-  }
-
-  if (batch.intake_quantity) {
-    return getUnitKg(batch.intake_unit, batch.intake_quantity);
-  }
-  return 0;
+  return wMt;
 };
 
 const getServiceQuantity = (cs, batch) => {
-  const bKg = getBatchWeightKg(batch);
-  const unit = String(cs?.unit || 'kg').toLowerCase();
-
+  if (!batch || !cs) return 0;
+  // If the service has a stored quantity, use it directly
   let q = cs && cs.quantity !== undefined && cs.quantity !== null ? parseFloat(cs.quantity) : 0;
-  
-  if (q > 0) {
-    if (unit.includes('kg') || unit.includes('kilo')) {
-      if (q < 10 && bKg >= 100) {
-        return bKg;
-      }
-    }
-    return q;
-  }
-
-  if (unit.includes('gunia') || unit.includes('bag')) return bKg / 100;
-  if (unit.includes('tani') || unit.includes('ton')) return bKg / 1000;
-  if (unit.includes('roba') || unit.includes('kiloba')) return bKg / 25;
-  return bKg > 0 ? bKg : 1;
+  if (q > 0) return q;
+  // Otherwise use the batch's intake_quantity as the quantity
+  const batchQty = parseFloat(batch.intake_quantity || batch.current_weight_mt || batch.current_weight || 0);
+  return batchQty > 0 ? batchQty : 1;
 };
 
 const calculateServiceTotalFee = (cs, batch) => {
@@ -1993,34 +2036,24 @@ const revertTransformationFromChild = (parentBatch, targetChild) => {
 
   const children = getBatchChildren(parentBatch);
 
-  // MASHARTI: Check if ANY sub-service on Mchele or Pumba has ALREADY been completed!
-  let completedSubService = null;
-  for (const child of children) {
-    const services = getBatchServices(child);
-    const completed = services.find(s => s.status === 'completed');
-    if (completed) {
-      completedSubService = { service: completed, child };
-      break;
-    }
-  }
-
-  if (completedSubService) {
+  // MASHARTI: Check if ANY child product has ALREADY been sold!
+  const soldChild = children.find(c => c.status === 'sold');
+  if (soldChild) {
     triggerToast(
-      `Huwezi kurudisha nyuma: Huduma ya ${completedSubService.child.crop_type} tayari imekamilika! ⚠️`,
+      `Huwezi kurudisha nyuma: Zao la ${soldChild.crop_type} tayari limeshauzwa! ⚠️`,
       'error'
     );
     return;
   }
 
-  const origQty = parentBatch.intake_quantity || Math.round((parentBatch.initial_weight_mt || 0) * 10);
+  const origQty = parentBatch.intake_quantity || parentBatch.initial_weight_mt || 0;
   const origUnit = parentBatch.intake_unit || 'Gunia';
-  const origKg = ((parentBatch.initial_weight_mt || 0) * 1000).toLocaleString();
   const childrenNames = children.map(c => c.crop_type).join(' na ');
 
   triggerConfirmModal({
     title: '⚠️ Uthibitisho wa Revert ya Transformation',
     message: `Je, una uhakika unataka kufuta matokeo ya transformation na kurudisha mchakato mzima nyuma?`,
-    warningNote: `Tendo hili litarudisha zao mama (${parentBatch.crop_type}) kuwa kiasi cha asili cha ${origQty} ${origUnit} (${origKg} Kg) na kufuta mazao yote yaliyozalishwa (${childrenNames}).`,
+    warningNote: `Tendo hili litarudisha zao mama (${parentBatch.crop_type}) kuwa kiasi cha asili cha ${origQty} ${origUnit} na kufuta mazao yote yaliyozalishwa (${childrenNames}).`,
     confirmText: 'Ndiyo, Futa na Revert',
     cancelText: 'Ghairi',
     isDanger: true,
@@ -2056,17 +2089,19 @@ const revertTransformationFromChild = (parentBatch, targetChild) => {
         }
 
         // 4. Revert parent batch weight & status
-        const restoredWeight = parentBatch.initial_weight_mt || parentBatch.current_weight_mt || 0;
-        parentBatch.status = 'received';
+        const restoredWeight = parseFloat(parentBatch.intake_quantity || parentBatch.initial_weight_mt || 0);
+        parentBatch.status = 'stored';
+        parentBatch.initial_weight_mt = restoredWeight;
         parentBatch.current_weight_mt = restoredWeight;
 
         await fetch(`/api/v1/batches/${parentBatch.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            status: 'received',
+            status: 'stored',
+            initial_weight_mt: restoredWeight,
             current_weight_mt: restoredWeight,
-            current_weight: restoredWeight
+            intake_quantity: restoredWeight
           })
         });
 
@@ -2276,7 +2311,7 @@ const openNewSaleModal = () => {
   if (activeNonTransformedBatches.value.length > 0) {
     const firstB = activeNonTransformedBatches.value[0];
     settlementForm.value.batch_id = firstB.id;
-    settlementForm.value.sold_weight_kg = (parseFloat(firstB.current_weight_mt || firstB.current_weight || 0) * 1000);
+    settlementForm.value.sold_weight_kg = (parseFloat(firstB.current_weight_mt || firstB.current_weight || 0));
   } else {
     settlementForm.value.batch_id = '';
     settlementForm.value.sold_weight_kg = 0;
@@ -2292,6 +2327,38 @@ const totalFarmerStockKg = computed(() => {
     }
   });
   return totalKg;
+});
+
+const farmerStockSummaryString = computed(() => {
+  const stockMap = {};
+  farmerBatches.value.forEach(b => {
+    if (!b.parent_batch_id && (b.status === 'received' || b.status === 'stored' || (b.status !== 'sold' && b.status !== 'transformed'))) {
+      const unit = b.intake_unit || 'Kg';
+      let qty = 0;
+      if (b.intake_quantity) {
+        const initialMt = parseFloat(b.initial_weight_mt || 0);
+        const currMt = parseFloat(b.current_weight_mt || b.current_weight || 0);
+        if (initialMt > 0) {
+          qty = (currMt / initialMt) * parseFloat(b.intake_quantity);
+        } else {
+          qty = parseFloat(b.intake_quantity);
+        }
+      } else {
+        qty = parseFloat(b.current_weight_mt || b.current_weight || 0);
+      }
+
+      if (qty > 0) {
+        if (!stockMap[unit]) stockMap[unit] = 0;
+        stockMap[unit] += qty;
+      }
+    }
+  });
+
+  const parts = [];
+  for (const [unit, qty] of Object.entries(stockMap)) {
+    parts.push(`${Number(qty.toFixed(2)).toLocaleString()} ${unit}`);
+  }
+  return parts.length > 0 ? parts.join(' • ') : '0';
 });
 
 const totalFarmerLoanBalance = computed(() => {
@@ -2315,8 +2382,50 @@ const openApplyServiceModal = () => {
 
 const openIntakeModal = () => {
   closeAllSubModals();
-  intakeForm.value = { crop_type: 'Mpunga', quantity: 45, unit: 'Gunia' };
+  intakeForm.value = { id: null, crop_type: 'Mpunga', quantity: 45, unit: 'Gunia' };
   modals.value.intake = true;
+};
+
+const editBatch = (b) => {
+  closeAllSubModals();
+  let q = b.intake_quantity || 0;
+  if (!q) {
+     const w = parseFloat(b.initial_weight_mt || b.initial_weight || 0);
+     const unitName = b.intake_unit || 'Gunia';
+     const kgPerUnit = getUnitKg(unitName, 1);
+     q = Math.round(w / kgPerUnit);
+  }
+  intakeForm.value = {
+    id: b.id,
+    crop_type: b.crop_type,
+    quantity: q,
+    unit: b.intake_unit || 'Gunia'
+  };
+  modals.value.intake = true;
+};
+
+const deleteRawBatch = (b) => {
+  triggerConfirmModal({
+    title: '🗑️ Uthibitisho wa Kufuta Shehena',
+    message: `Je, una uhakika unataka kufuta shehena hii ya ${b.crop_type} (${((parseFloat(b.initial_weight_mt)||0)).toLocaleString()} Kg)?`,
+    warningNote: `Mzigo huu utafutwa kabisa kwa sababu haujafanyiwa huduma yoyote.`,
+    confirmText: 'Ndiyo, Futa Mzigo',
+    cancelText: 'Ghairi',
+    isDanger: true,
+    onConfirm: async () => {
+      try {
+        const res = await fetch(`/api/v1/batches/${b.id}`, { method: 'DELETE' });
+        if(res.ok) {
+           triggerToast('Mzigo umefutwa kikamilifu ✓');
+           await openFarmerProfile(selectedFarmer.value.id);
+        } else {
+           triggerToast('Imeshindwa kufuta mzigo. Jaribu tena.', 'error');
+        }
+      } catch(e) {
+        triggerToast('Tatizo la mtandao wakati wa kufuta mzigo.', 'error');
+      }
+    }
+  });
 };
 
 const openApplyServiceForBatch = (b) => {
@@ -2336,7 +2445,7 @@ const openApplyServiceForBatch = (b) => {
 
 const openApplyServiceForChild = (child) => {
   closeAllSubModals();
-  if (child.status === 'sold' || parseFloat(child.current_weight_mt || 0) <= 0) {
+  if (child.status === 'sold') {
     triggerToast('Mzigo huu tayari umeshauzwa wote! Huwezi kupanga huduma tena.', 'error');
     return;
   }
@@ -2353,24 +2462,10 @@ const openApplyServiceForChild = (child) => {
 const currentBatchWeightKg = computed(() => {
   const b = selectedBatchForComplete.value;
   if (!b) return 0;
-  return (parseFloat(b.current_weight_mt || b.current_weight || 0) * 1000);
+  return (parseFloat(b.current_weight_mt || b.current_weight || 0));
 });
 
-const getUnitKg = (unitName, qty = 1) => {
-  if (!unitName) return (qty || 0) * 1;
-  const nameLower = String(unitName).toLowerCase();
-  const list = unitsList.value || [];
-  const unitObj = list.find(u => 
-    u && u.name && (u.name.toLowerCase() === nameLower || nameLower.includes(u.name.toLowerCase()) || u.name.toLowerCase().includes(nameLower))
-  );
-  if (unitObj && unitObj.kg) {
-    return (qty || 0) * unitObj.kg;
-  }
-  if (nameLower.includes('tani') || nameLower.includes('ton')) return (qty || 0) * 1000;
-  if (nameLower.includes('gunia') || nameLower.includes('bag')) return (qty || 0) * 100;
-  if (nameLower.includes('roba') || nameLower.includes('kiloba') || nameLower.includes('sack')) return (qty || 0) * 25;
-  return (qty || 0) * 1;
-};
+
 
 const totalOutputWeightKg = computed(() => {
   const outKg = getUnitKg(completeForm.value.output_unit, completeForm.value.output_quantity || 0);
@@ -2412,27 +2507,67 @@ const saveEditFarmer = async () => {
 
 const calculatedIntakeWeight = computed(() => {
   const qty = intakeForm.value.quantity || 0;
-  const selectedUnit = (intakeForm.value.unit || '').toLowerCase();
-  const unitObj = unitsList.value.find(u => u.name.toLowerCase().includes(selectedUnit) || selectedUnit.includes(u.name.toLowerCase()));
-  const ratio = unitObj ? (unitObj.kg || 1) : (selectedUnit.includes('tani') ? 1000 : (selectedUnit.includes('gunia') ? 100 : 1));
+  const selectedUnit = intakeForm.value.unit || '';
+  const ratio = getUnitKg(selectedUnit, 1); // Get ratio accurately from composable
   return qty * ratio;
 });
+
+const quickInput = ref({ crop: '', unit: '' });
+
+const openQuickCropModal = () => {
+  quickInput.value.crop = '';
+  modals.value.quickCrop = true;
+};
+
+const openQuickUnitModal = () => {
+  quickInput.value.unit = '';
+  modals.value.quickUnit = true;
+};
+
+const handleQuickCropAdd = async () => {
+  if (!quickInput.value.crop.trim()) {
+    triggerToast('Tafadhali weka jina la zao!', 'error');
+    return;
+  }
+  const name = quickInput.value.crop.trim();
+  await addCrop(name);
+  intakeForm.value.crop_type = name;
+  modals.value.quickCrop = false;
+  triggerToast(`Zao la "${name}" limesajiliwa kikamilifu! 🌱`);
+};
+
+const handleQuickUnitAdd = async () => {
+  if (!quickInput.value.unit.trim()) {
+    triggerToast('Tafadhali weka jina la kipimo!', 'error');
+    return;
+  }
+  const name = quickInput.value.unit.trim();
+  await addUnit(name);
+  intakeForm.value.unit = name;
+  modals.value.quickUnit = false;
+  triggerToast(`Kipimo cha "${name}" kimesajiliwa kikamilifu! ⚖️`);
+};
 
 const submitIntake = async () => {
   if (!intakeForm.value.quantity || intakeForm.value.quantity <= 0) {
     triggerToast('Weka kiasi sahihi zaidi ya 0!', 'error');
     return;
   }
-  const weightMt = calculatedIntakeWeight.value / 1000;
+  const qty = parseFloat(intakeForm.value.quantity);
   try {
-    const res = await fetch('/api/v1/batches', {
-      method: 'POST',
+    const isEdit = !!intakeForm.value.id;
+    const url = isEdit ? `/api/v1/batches/${intakeForm.value.id}` : '/api/v1/batches';
+    const method = isEdit ? 'PUT' : 'POST';
+
+    const res = await fetch(url, {
+      method: method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         farmer_id: selectedFarmer.value.id,
         crop_type: intakeForm.value.crop_type,
-        initial_weight_mt: weightMt,
-        intake_quantity: intakeForm.value.quantity,
+        initial_weight_mt: qty,
+        current_weight_mt: qty,
+        intake_quantity: qty,
         intake_unit: intakeForm.value.unit
       })
     });
@@ -2440,7 +2575,10 @@ const submitIntake = async () => {
       modals.value.intake = false;
       await openFarmerProfile(selectedFarmer.value.id);
       await fetchFarmers();
-      triggerToast('Upokeaji Mpya Umesajiliwa kwenye Database! 📦');
+      triggerToast(isEdit ? 'Upokeaji Umerekebishwa! 📦' : 'Upokeaji Mpya Umesajiliwa kwenye Database! 📦');
+    } else {
+      const errData = await res.json();
+      triggerToast(errData.message || 'Imefeli kusajili upokeaji.', 'error');
     }
   } catch (e) {
     triggerToast('Imefeli kusajili upokeaji.', 'error');
@@ -2499,7 +2637,7 @@ const submitApplyService = async () => {
 
   let batchWeightKg = 0;
   if (targetB) {
-    batchWeightKg = (parseFloat(targetB.current_weight_mt || targetB.initial_weight_mt || targetB.current_weight || 0) * 1000);
+    batchWeightKg = (parseFloat(targetB.current_weight_mt || targetB.initial_weight_mt || targetB.current_weight || 0));
     if (batchWeightKg <= 0 && targetB.intake_quantity) {
       batchWeightKg = getUnitKg(targetB.intake_unit, targetB.intake_quantity);
     }
@@ -2550,7 +2688,7 @@ const selectedCollateralBatch = computed(() => {
 const maxLoanLimit = computed(() => {
   if (!selectedCollateralBatch.value) return 0;
   const b = selectedCollateralBatch.value;
-  const weightKg = (parseFloat(b.current_weight_mt || b.current_weight || 0) * 1000);
+  const weightKg = (parseFloat(b.current_weight_mt || b.current_weight || 0));
   // Estimated crop baseline price = TZS 1,000/Kg. Max loan cap = 50% of crop value (TZS 500 per Kg).
   return weightKg * 500;
 });
@@ -2598,7 +2736,7 @@ const openCompleteServiceModal = (b, s = null) => {
   closeAllSubModals();
   selectedBatchForComplete.value = b;
   selectedServiceForComplete.value = s;
-  const bWeightKg = (parseFloat(b.current_weight_mt || b.current_weight || 0) * 1000);
+  const bWeightKg = (parseFloat(b.current_weight_mt || b.current_weight || 0));
   const estGuniacount = Math.max(1, Math.round((bWeightKg * 0.7) / 100));
   const estPumbacount = Math.max(1, Math.round((bWeightKg * 0.25) / 25));
   
@@ -2645,11 +2783,7 @@ const submitCompleteService = async () => {
 
   const isChanging = completeForm.value.has_changed === 'yes';
 
-  // VALIDATION: Prevent output weight exceeding parent batch weight ONLY if crop is transforming
-  if (isChanging && totalOutputWeightKg.value > currentBatchWeightKg.value) {
-    triggerToast(`Kosa: Uzito wa pato (${totalOutputWeightKg.value} Kg) hauwezi kuzidi uzito wa mama (${currentBatchWeightKg.value} Kg)!`, 'error');
-    return;
-  }
+  // VALIDATION: Removed output weight > input weight check because units are now agnostic.
 
   const outKg = getUnitKg(completeForm.value.output_unit, completeForm.value.output_quantity || 0);
   const byKg = (isChanging && completeForm.value.has_byproduct === 'yes') ? getUnitKg(completeForm.value.byproduct_unit, completeForm.value.byproduct_quantity || 0) : 0;
@@ -2663,12 +2797,12 @@ const submitCompleteService = async () => {
       output_crop: isChanging ? completeForm.value.output_crop : parent.crop_type,
       output_unit: completeForm.value.output_unit,
       output_quantity: completeForm.value.output_quantity,
-      final_value: isChanging ? (outKg / 1000) : (parent.current_weight_mt || 0),
+      final_value: isChanging ? completeForm.value.output_quantity : (parent.current_weight_mt || parent.current_weight || 0),
       has_byproduct: isChanging ? completeForm.value.has_byproduct : 'no',
       by_product_crop: (isChanging && completeForm.value.has_byproduct === 'yes') ? completeForm.value.byproduct_crop : null,
       by_product_unit: (isChanging && completeForm.value.has_byproduct === 'yes') ? completeForm.value.byproduct_unit : null,
       by_product_quantity: (isChanging && completeForm.value.has_byproduct === 'yes') ? completeForm.value.byproduct_quantity : 0,
-      by_product_value: (isChanging && completeForm.value.has_byproduct === 'yes') ? (byKg / 1000) : 0,
+      by_product_value: (isChanging && completeForm.value.has_byproduct === 'yes') ? completeForm.value.byproduct_quantity : 0,
       fee: s ? (s.fee_amount || s.fee || s.cost || 0) : 0,
       fee_amount: s ? (s.fee_amount || s.fee || s.cost || 0) : 0
     };
@@ -2748,7 +2882,7 @@ const totalFarmerNetPayout = computed(() => {
 
 const settleGrossSales = computed(() => {
   const b = activeNonTransformedBatches.value.find(item => item.id === settlementForm.value.batch_id);
-  const defaultKg = b ? (parseFloat(b.current_weight_mt || b.current_weight || 0) * 1000) : totalFarmerStockKg.value;
+  const defaultKg = b ? (parseFloat(b.current_weight_mt || b.current_weight || 0)) : totalFarmerStockKg.value;
   const soldKg = Number(settlementForm.value.sold_weight_kg) || defaultKg || 0;
   return soldKg * (settlementForm.value.price_per_kg || 0);
 });
@@ -2759,7 +2893,7 @@ const settleTotalDeductions = computed(() => {
     if (s.status !== 'paid') {
       const fee = parseFloat(s.fee_amount || s.fee || s.cost || 0);
       const rate = parseFloat(s.rate || 0);
-      const qty = (parseFloat(s.output_weight_mt || s.quantity || 0) * 1000);
+      const qty = (parseFloat(s.output_weight_mt || s.quantity || 0));
       if (fee > 0 && fee < 500 && rate > 0) {
         totalFees += rate * (qty > 0 ? qty : 1000);
       } else {
@@ -2781,7 +2915,7 @@ const submitSettlement = async () => {
   }
 
   const b = activeNonTransformedBatches.value.find(item => item.id === settlementForm.value.batch_id);
-  const defaultKg = b ? (parseFloat(b.current_weight_mt || b.current_weight || 0) * 1000) : 0;
+  const defaultKg = b ? (parseFloat(b.current_weight_mt || b.current_weight || 0)) : 0;
   const soldKg = Number(settlementForm.value.sold_weight_kg) || defaultKg;
 
   if (soldKg <= 0) {

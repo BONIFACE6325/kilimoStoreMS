@@ -500,7 +500,7 @@
     </div>
 
     <!-- 5. Executive Enterprise Footer -->
-    <footer class="mt-10 px-6 py-4 bg-gradient-to-r from-slate-100/50 to-slate-50/50 dark:from-slate-800/20 dark:to-slate-900/40 rounded-2xl border border-slate-200/60 dark:border-slate-700/50 backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm mb-4">
+    <footer class="mt-10 px-6 py-4 -mx-3 sm:-mx-5 lg:-mx-6 -mb-3 sm:-mb-5 lg:-mb-6 bg-gradient-to-r from-slate-100/50 to-slate-50/50 dark:from-slate-800/20 dark:to-slate-900/40 border-t border-slate-200/80 dark:border-slate-700/80 backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
       <div class="flex items-center gap-3">
         <div class="relative flex h-2.5 w-2.5">
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>

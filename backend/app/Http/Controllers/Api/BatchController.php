@@ -102,16 +102,24 @@ class BatchController extends Controller
             $computedMt = $qty; // Default MT / Tons
         }
 
-        // Auto-generate batch code
-        $lastBatch = Batch::orderBy('created_at', 'desc')->first();
-        $nextNumber = 1143;
-        if ($lastBatch) {
-            preg_match('/BCH-(\d+)/', $lastBatch->batch_code, $matches);
-            if (!empty($matches[1])) {
-                $nextNumber = intval($matches[1]) + 1;
+        // Auto-generate unique batch code
+        $maxNum = 1143;
+        $allCodes = Batch::where('tenant_id', $tenantId)->pluck('batch_code');
+        foreach ($allCodes as $code) {
+            if (preg_match('/BCH-(\d+)/', $code, $matches)) {
+                $num = intval($matches[1]);
+                if ($num > $maxNum) {
+                    $maxNum = $num;
+                }
             }
         }
+        $nextNumber = $maxNum + 1;
         $batchCode = 'BCH-' . $nextNumber;
+
+        while (Batch::where('tenant_id', $tenantId)->where('batch_code', $batchCode)->exists()) {
+            $nextNumber++;
+            $batchCode = 'BCH-' . $nextNumber;
+        }
 
         $batch = DB::transaction(function () use ($validated, $tenantId, $branchId, $batchCode, $computedMt) {
             $batch = Batch::create([
@@ -323,8 +331,8 @@ class BatchController extends Controller
                         'intake_unit' => $outputUnit,
                         'initial_moisture' => $batch->current_moisture ?? 12.0,
                         'current_moisture' => $batch->current_moisture ?? 12.0,
-                        'initial_weight_mt' => $finalValue,
-                        'current_weight_mt' => $finalValue,
+                        'initial_weight_mt' => $intakeQtyVal,
+                        'current_weight_mt' => $intakeQtyVal,
                         'current_bin_id' => null,
                         'status' => 'stored'
                     ]);
@@ -342,7 +350,8 @@ class BatchController extends Controller
                 
                 $byProductCrop = $request->input('by_product_crop');
                 if (!empty($byProductCrop)) {
-                    $byProductValue = $request->input('by_product_value', 0);
+                    $byProductQty = $request->input('by_product_quantity', 0);
+                    $byProductValue = floatval($byProductQty) > 0 ? floatval($byProductQty) : floatval($request->input('by_product_value', 0));
                     $byProductUnit = $request->input('by_product_unit', 'Kilo');
                     
                     Batch::create([
@@ -396,6 +405,9 @@ class BatchController extends Controller
                 if ($cropChanged) {
                     $batch->decrement('current_weight_mt', $inputUsed);
                     
+                    $rawOutputQtyGrd = $request->input('output_quantity');
+                    $rawOutputQtyGrd = ($rawOutputQtyGrd && floatval($rawOutputQtyGrd) > 0) ? floatval($rawOutputQtyGrd) : $finalValue;
+                    
                     Batch::create([
                         'tenant_id' => $batch->tenant_id,
                         'branch_id' => $batch->branch_id,
@@ -404,12 +416,12 @@ class BatchController extends Controller
                         'batch_code' => $batch->batch_code . '-GRD1',
                         'crop_type' => $outputCrop,
                         'variety' => $batch->variety,
-                        'intake_quantity' => $finalValue,
+                        'intake_quantity' => $rawOutputQtyGrd,
                         'intake_unit' => $outputUnit,
                         'initial_moisture' => $batch->current_moisture ?? 12.0,
                         'current_moisture' => $batch->current_moisture ?? 12.0,
-                        'initial_weight_mt' => $finalValue,
-                        'current_weight_mt' => $finalValue,
+                        'initial_weight_mt' => $rawOutputQtyGrd,
+                        'current_weight_mt' => $rawOutputQtyGrd,
                         'current_bin_id' => null,
                         'status' => 'stored'
                     ]);
@@ -423,7 +435,8 @@ class BatchController extends Controller
                 
                 $byProductCrop = $request->input('by_product_crop');
                 if (!empty($byProductCrop)) {
-                    $byProductValue = $request->input('by_product_value', 0);
+                    $byProductQty = $request->input('by_product_quantity', 0);
+                    $byProductValue = floatval($byProductQty) > 0 ? floatval($byProductQty) : floatval($request->input('by_product_value', 0));
                     $byProductUnit = $request->input('by_product_unit', 'Kilo');
                     
                     Batch::create([
@@ -459,22 +472,28 @@ class BatchController extends Controller
         $batch = Batch::findOrFail($id);
 
         $validated = $request->validate([
-            'crop_type' => 'required|string|max:100',
-            'current_weight_mt' => 'required|numeric',
-            'current_moisture' => 'required|numeric',
-            'status' => 'required|string|max:50',
+            'crop_type' => 'nullable|string|max:100',
+            'current_weight_mt' => 'nullable|numeric',
+            'initial_weight_mt' => 'nullable|numeric',
+            'current_moisture' => 'nullable|numeric',
+            'status' => 'nullable|string|max:50',
             'intake_quantity' => 'nullable|numeric',
             'intake_unit' => 'nullable|string|max:50',
         ]);
 
-        $batch->update([
-            'crop_type' => $validated['crop_type'],
-            'current_weight_mt' => $validated['current_weight_mt'],
-            'current_moisture' => $validated['current_moisture'],
-            'status' => $validated['status'],
-            'intake_quantity' => $validated['intake_quantity'] ?? $batch->intake_quantity,
-            'intake_unit' => $validated['intake_unit'] ?? $batch->intake_unit,
-        ]);
+        $updateData = array_filter([
+            'crop_type' => $request->input('crop_type'),
+            'current_weight_mt' => $request->input('current_weight_mt'),
+            'initial_weight_mt' => $request->input('initial_weight_mt'),
+            'current_moisture' => $request->input('current_moisture'),
+            'status' => $request->input('status'),
+            'intake_quantity' => $request->input('intake_quantity'),
+            'intake_unit' => $request->input('intake_unit'),
+        ], function ($val) {
+            return !is_null($val);
+        });
+
+        $batch->update($updateData);
 
         return response()->json([
             'success' => true,

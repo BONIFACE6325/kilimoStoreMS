@@ -303,7 +303,7 @@
               <tr 
                 v-for="(item, idx) in filteredCombinedLedger" 
                 :key="idx"
-                class="hover:bg-slate-50 dark:bg-slate-950 transition-colors"
+                class="odd:bg-white even:bg-slate-50/60 dark:odd:bg-slate-900 dark:even:bg-slate-800/40 hover:bg-emerald-50/60 dark:hover:bg-slate-800/90 transition-colors"
               >
                 <td class="py-3 px-4 text-slate-500 dark:text-slate-400 font-mono text-[11px] whitespace-nowrap">
                   {{ formatDate(item.date) }}
@@ -371,7 +371,7 @@
               <tr v-if="filteredExpenses.length === 0" class="text-center text-slate-400">
                 <td colspan="5" class="py-8">Hakuna matumizi ya ofisi yaliyorekodiwa tarehe {{ selectedDate }}.</td>
               </tr>
-              <tr v-for="exp in filteredExpenses" :key="exp.id" class="hover:bg-slate-50 dark:bg-slate-950 transition">
+              <tr v-for="exp in filteredExpenses" :key="exp.id" class="odd:bg-white even:bg-slate-50/60 dark:odd:bg-slate-900 dark:even:bg-slate-800/40 hover:bg-red-50/40 dark:hover:bg-slate-800/90 transition-colors">
                 <td class="py-3 px-4 font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
                   <span class="text-base">{{ getCategoryEmoji(exp.category_name) }}</span>
                   <span>{{ exp.category_name }}</span>
@@ -408,7 +408,7 @@
             <tr v-if="filteredBatches.length === 0" class="text-center py-10">
               <td colspan="9" class="py-8 text-slate-400 font-bold">Hakuna mzigo uliopokelewa tarehe {{ selectedDate }}.</td>
             </tr>
-            <tr v-for="(b, idx) in filteredBatches" :key="b.id" class="hover:bg-slate-50 dark:bg-slate-950">
+            <tr v-for="(b, idx) in filteredBatches" :key="b.id" class="odd:bg-white even:bg-slate-50/60 dark:odd:bg-slate-900 dark:even:bg-slate-800/40 hover:bg-emerald-50/60 dark:hover:bg-slate-800/90 transition-colors">
               <td class="py-3 px-4 text-slate-400 font-mono text-[11px]">{{ idx + 1 }}</td>
               <td class="py-3 px-4 font-mono font-black text-emerald-800 dark:text-emerald-400">{{ b.batch_code }}</td>
               <td class="py-3 px-4 font-extrabold text-slate-900 dark:text-slate-50">{{ b.farmer_name }}</td>
@@ -694,7 +694,7 @@
                 <tr v-if="todayDynamicDeductions.length === 0">
                   <td colspan="3" class="py-3 px-3 text-slate-400 italic text-center">Hakuna ada za huduma zilizokusanywa tarehe hii.</td>
                 </tr>
-                <tr v-for="(item, idx) in todayDynamicDeductions" :key="idx" class="hover:bg-slate-50 dark:bg-slate-950">
+                <tr v-for="(item, idx) in todayDynamicDeductions" :key="idx" class="odd:bg-white even:bg-slate-50/60 dark:odd:bg-slate-900 dark:even:bg-slate-800/40 hover:bg-emerald-50/60 dark:hover:bg-slate-800/90 transition-colors">
                   <td class="py-2 px-3 border border-slate-200 dark:border-slate-700 font-mono text-[11px] text-slate-400">{{ idx + 1 }}</td>
                   <td class="py-2 px-3 border border-slate-200 dark:border-slate-700 font-bold text-slate-900 dark:text-slate-50">• {{ item.label }}</td>
                   <td class="py-2 px-3 border border-slate-200 dark:border-slate-700 text-right font-black text-emerald-800 dark:text-emerald-400 font-mono">Tsh {{ item.amount.toLocaleString() }}</td>
@@ -721,7 +721,7 @@
                 <tr v-if="filteredExpenses.length === 0">
                   <td colspan="3" class="py-3 px-3 text-slate-400 italic text-center">Hakuna matumizi ya ofisi yaliyorekodiwa tarehe hii.</td>
                 </tr>
-                <tr v-for="exp in filteredExpenses" :key="exp.id" class="hover:bg-slate-50 dark:bg-slate-950">
+                <tr v-for="exp in filteredExpenses" :key="exp.id" class="odd:bg-white even:bg-slate-50/60 dark:odd:bg-slate-900 dark:even:bg-slate-800/40 hover:bg-red-50/40 dark:hover:bg-slate-800/90 transition-colors">
                   <td class="py-2 px-3 border border-slate-200 dark:border-slate-700 font-bold text-slate-900 dark:text-slate-50">{{ exp.category_name }}</td>
                   <td class="py-2 px-3 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300">{{ exp.description || '-' }}</td>
                   <td class="py-2 px-3 border border-slate-200 dark:border-slate-700 text-right font-black text-red-600 dark:text-red-400 font-mono">Tsh {{ parseFloat(exp.amount || 0).toLocaleString() }}</td>
@@ -750,7 +750,7 @@
                 <tr v-if="combinedLedger.length === 0">
                   <td colspan="6" class="py-3 px-3 text-slate-400 italic text-center">Hakuna miamala yoyote iliyorekodiwa tarehe {{ selectedDate }}.</td>
                 </tr>
-                <tr v-for="(item, idx) in combinedLedger" :key="idx" class="hover:bg-slate-50 dark:bg-slate-950">
+                <tr v-for="(item, idx) in combinedLedger" :key="idx" class="odd:bg-white even:bg-slate-50/60 dark:odd:bg-slate-900 dark:even:bg-slate-800/40 hover:bg-emerald-50/60 dark:hover:bg-slate-800/90 transition-colors">
                   <td class="py-2 px-3 border border-slate-200 dark:border-slate-700 font-mono text-[10px] text-slate-500 dark:text-slate-400">{{ formatDate(item.date) }}</td>
                   <td class="py-2 px-3 border border-slate-200 dark:border-slate-700 font-bold">
                     <span v-if="item.type === 'INFLOW'" class="text-emerald-800 dark:text-emerald-400 font-black">Mauzo ya Zao</span>

@@ -79,24 +79,24 @@ class DatabaseSeeder extends Seeder
         // 9. Create Default Services for Galanoki Company Ltd
         $services = [
             // Mpunga na Sembe
-            ['name_sw' => 'Kukoboa (Sembe/Mpunga)', 'name_en' => 'Milling', 'category' => 'milling', 'rate' => 70.00, 'unit' => 'kg', 'description' => 'Milling and dehusking fee per Kg.'],
-            ['name_sw' => 'Kusogeza kwenye kinu', 'name_en' => 'Move to Mill', 'category' => 'milling', 'rate' => 300.00, 'unit' => 'gunia', 'description' => 'Fee for moving bags to mill.'],
-            ['name_sw' => 'Kupima Mamba', 'name_en' => 'Weigh Mamba Roba', 'category' => 'milling', 'rate' => 200.00, 'unit' => 'roba', 'description' => 'Mamba weighing fee per 100kg bale.'],
-            ['name_sw' => 'Kuanika mpunga', 'name_en' => 'Dry Paddy', 'category' => 'drying', 'rate' => 1000.00, 'unit' => 'gunia', 'description' => 'Sun-drying fee per bag.'],
-            ['name_sw' => 'Kuanika + Kuchanganya', 'name_en' => 'Dry & Mix', 'category' => 'drying', 'rate' => 1500.00, 'unit' => 'gunia', 'description' => 'Dry and mix fee per bag.'],
-            ['name_sw' => 'Kuanika + Kurundika', 'name_en' => 'Dry & Pile', 'category' => 'drying', 'rate' => 1200.00, 'unit' => 'gunia', 'description' => 'Dry and pile/stack fee per bag.'],
-            ['name_sw' => 'Kuchanganya Mpunga', 'name_en' => 'Mix Mpunga', 'category' => 'milling', 'rate' => 1000.00, 'unit' => 'gunia', 'description' => 'Paddy mixing fee per bag.'],
+            ['name_sw' => 'Kukoboa (Sembe/Mpunga)', 'name_en' => 'Milling', 'rate' => 70.00, 'unit' => 'kg', 'description' => 'Milling and dehusking fee per Kg.'],
+            ['name_sw' => 'Kusogeza kwenye kinu', 'name_en' => 'Move to Mill', 'rate' => 300.00, 'unit' => 'gunia', 'description' => 'Fee for moving bags to mill.'],
+            ['name_sw' => 'Kupima Mamba', 'name_en' => 'Weigh Mamba Roba', 'rate' => 200.00, 'unit' => 'roba', 'description' => 'Mamba weighing fee per 100kg bale.'],
+            ['name_sw' => 'Kuanika mpunga', 'name_en' => 'Dry Paddy', 'rate' => 1000.00, 'unit' => 'gunia', 'description' => 'Sun-drying fee per bag.'],
+            ['name_sw' => 'Kuanika + Kuchanganya', 'name_en' => 'Dry & Mix', 'rate' => 1500.00, 'unit' => 'gunia', 'description' => 'Dry and mix fee per bag.'],
+            ['name_sw' => 'Kuanika + Kurundika', 'name_en' => 'Dry & Pile', 'rate' => 1200.00, 'unit' => 'gunia', 'description' => 'Dry and pile/stack fee per bag.'],
+            ['name_sw' => 'Kuchanganya Mpunga', 'name_en' => 'Mix Mpunga', 'rate' => 1000.00, 'unit' => 'gunia', 'description' => 'Paddy mixing fee per bag.'],
             
             // Grading Machine
-            ['name_sw' => 'Kuchanganya Mchele na Mafuta', 'name_en' => 'Mix Rice & Oil', 'category' => 'milling', 'rate' => 2.50, 'unit' => 'kg', 'description' => 'Rice oil polishing fee per Kg.'],
-            ['name_sw' => 'Kugiredi', 'name_en' => 'Grading', 'category' => 'grading', 'rate' => 8.00, 'unit' => 'kg', 'description' => 'Grading machine fee per Kg.'],
-            ['name_sw' => 'Kudoloti (Color sorting)', 'name_en' => 'Color Sorting', 'category' => 'milling', 'rate' => 22.00, 'unit' => 'kg', 'description' => 'Color sorting/sorting machine fee per Kg.'],
+            ['name_sw' => 'Kuchanganya Mchele na Mafuta', 'name_en' => 'Mix Rice & Oil', 'rate' => 2.50, 'unit' => 'kg', 'description' => 'Rice oil polishing fee per Kg.'],
+            ['name_sw' => 'Kugiredi', 'name_en' => 'Grading', 'rate' => 8.00, 'unit' => 'kg', 'description' => 'Grading machine fee per Kg.'],
+            ['name_sw' => 'Kudoloti (Color sorting)', 'name_en' => 'Color Sorting', 'rate' => 22.00, 'unit' => 'kg', 'description' => 'Color sorting/sorting machine fee per Kg.'],
             
             // Stoko
-            ['name_sw' => 'Kupanga stoko', 'name_en' => 'Stack Stock', 'category' => 'milling', 'rate' => 700.00, 'unit' => 'gunia', 'description' => 'Warehouse stack arranging fee per bag.'],
-            ['name_sw' => 'Kukoboa (Stoko)', 'name_en' => 'Milling (Stock)', 'category' => 'milling', 'rate' => 100.00, 'unit' => 'kg', 'description' => 'Milling fee for stored grain per Kg.'],
-            ['name_sw' => 'Wafanyakazi (Labor)', 'name_en' => 'Labor (Wafanyakazi)', 'category' => 'milling', 'rate' => 1000.00, 'unit' => 'gunia', 'description' => 'Manual labor fee per bag.'],
-            ['name_sw' => 'Kuchanganya + Wafanyakazi', 'name_en' => 'Mix & Labor', 'category' => 'milling', 'rate' => 2000.00, 'unit' => 'gunia', 'description' => 'Mixing and labor fee per bag.'],
+            ['name_sw' => 'Kupanga stoko', 'name_en' => 'Stack Stock', 'rate' => 700.00, 'unit' => 'gunia', 'description' => 'Warehouse stack arranging fee per bag.'],
+            ['name_sw' => 'Kukoboa (Stoko)', 'name_en' => 'Milling (Stock)', 'rate' => 100.00, 'unit' => 'kg', 'description' => 'Milling fee for stored grain per Kg.'],
+            ['name_sw' => 'Wafanyakazi (Labor)', 'name_en' => 'Labor (Wafanyakazi)', 'rate' => 1000.00, 'unit' => 'gunia', 'description' => 'Manual labor fee per bag.'],
+            ['name_sw' => 'Kuchanganya + Wafanyakazi', 'name_en' => 'Mix & Labor', 'rate' => 2000.00, 'unit' => 'gunia', 'description' => 'Mixing and labor fee per bag.'],
         ];
 
         foreach ($services as $service) {

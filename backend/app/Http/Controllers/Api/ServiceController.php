@@ -13,9 +13,7 @@ class ServiceController extends Controller
     {
         $query = Service::query();
 
-        if ($request->has('category')) {
-            $query->where('category', $request->input('category'));
-        }
+
 
         $services = $query->orderBy('name_sw')->get();
         return response()->json($services);
@@ -26,7 +24,7 @@ class ServiceController extends Controller
         $validated = $request->validate([
             'name_sw' => 'required|string|max:255',
             'name_en' => 'required|string|max:255',
-            'category' => 'required|string|max:100',
+
             'crop_type' => 'nullable|string|max:100',
             'rate' => 'required|numeric|min:0',
             'unit' => 'required|string|max:50',
@@ -54,7 +52,7 @@ class ServiceController extends Controller
         $validated = $request->validate([
             'name_sw' => 'required|string|max:255',
             'name_en' => 'required|string|max:255',
-            'category' => 'required|string|max:100',
+
             'crop_type' => 'nullable|string|max:100',
             'rate' => 'required|numeric|min:0',
             'unit' => 'required|string|max:50',

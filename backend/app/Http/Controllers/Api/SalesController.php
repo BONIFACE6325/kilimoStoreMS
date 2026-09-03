@@ -61,12 +61,12 @@ class SalesController extends Controller
         $batch = Batch::with(['farmer'])->findOrFail($validated['batch_id']);
 
         $soldWeightKg = $validated['sold_weight_kg'];
-        $soldWeightMt = $soldWeightKg / 1000;
+        $availQty = floatval($batch->intake_quantity > 0 ? $batch->intake_quantity : $batch->current_weight_mt);
 
-        if ($batch->current_weight_mt < $soldWeightMt) {
+        if ($availQty < $soldWeightKg - 0.001) {
             return response()->json([
                 'success' => false,
-                'message' => 'Kiasi unachotaka kuuza ni kikubwa kuliko mzigo uliopo ('.($batch->current_weight_mt * 1000).' Kg).'
+                'message' => 'Kiasi unachotaka kuuza ni kikubwa kuliko mzigo uliopo ('.$availQty.' '.($batch->intake_unit ?? 'Units').').'
             ], 422);
         }
 
@@ -152,12 +152,12 @@ class SalesController extends Controller
         $batch = Batch::findOrFail($validated['batch_id']);
 
         $soldWeightKg = $validated['sold_weight_kg'];
-        $soldWeightMt = $soldWeightKg / 1000;
+        $availQty = floatval($batch->intake_quantity > 0 ? $batch->intake_quantity : $batch->current_weight_mt);
 
-        if ($batch->current_weight_mt < $soldWeightMt) {
+        if ($availQty < $soldWeightKg - 0.001) {
             return response()->json([
                 'success' => false,
-                'message' => 'Kiasi unachotaka kuuza ni kikubwa kuliko mzigo uliopo ('.($batch->current_weight_mt * 1000).' Kg).'
+                'message' => 'Kiasi unachotaka kuuza ni kikubwa kuliko mzigo uliopo ('.$availQty.' '.($batch->intake_unit ?? 'Units').').'
             ], 422);
         }
 
@@ -251,7 +251,7 @@ class SalesController extends Controller
         $actualDeductions = $grossSales - $netPayout;
 
         $result = DB::transaction(function () use (
-            $tenantId, $batch, $buyer, $invoiceNumber, $pricePerKg, $soldWeightKg, $soldWeightMt, $grossSales,
+            $tenantId, $batch, $buyer, $invoiceNumber, $pricePerKg, $soldWeightKg, $availQty, $grossSales,
             $paidStorage, $paidDrying, $paidMilling, $paidGrading,
             $loans, $actualDeductions, $netPayout, $fundsBeforeLoans,
             $dryingJobs, $millingJobs
@@ -271,8 +271,8 @@ class SalesController extends Controller
             InvoiceItem::create([
                 'invoice_id' => $invoice->id,
                 'batch_id' => $batch->id,
-                'quantity_mt' => $soldWeightMt,
-                'unit_price' => $pricePerKg * 1000, // store as per MT for legacy compatibility
+                'quantity_mt' => $soldWeightKg,
+                'unit_price' => $pricePerKg,
                 'total_price' => $grossSales,
             ]);
 
@@ -358,10 +358,13 @@ class SalesController extends Controller
             }
 
             // 4. Update Batch status and weight
-            $newWeightMt = $batch->current_weight_mt - $soldWeightMt;
+            $newQty = max(0, $availQty - $soldWeightKg);
+            $isFullySold = $newQty <= 0.001;
+
             $batch->update([
-                'current_weight_mt' => $newWeightMt,
-                'status' => $newWeightMt <= 0.001 ? 'sold' : $batch->status // if less than 1kg left, consider sold
+                'current_weight_mt' => $newQty,
+                'intake_quantity' => $newQty,
+                'status' => $isFullySold ? 'sold' : $batch->status
             ]);
 
             // 5. Decrement Bin Occupancy
