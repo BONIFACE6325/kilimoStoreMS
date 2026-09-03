@@ -19,23 +19,22 @@
       <div class="flex items-center gap-2 flex-wrap">
         <button 
           @click="showCropModal = true"
-          class="px-3.5 py-2 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl font-extrabold text-xs transition flex items-center gap-1.5"
+          class="px-3.5 py-2 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl font-extrabold text-xs transition flex items-center gap-1.5 cursor-pointer"
         >
           <span>🌱 + Sajili Zao</span>
         </button>
         <button 
           @click="showUnitModal = true"
-          class="px-3.5 py-2 bg-teal-50 dark:bg-teal-900/40 hover:bg-teal-100 text-teal-800 dark:text-teal-400 border border-teal-200 dark:border-teal-700/50 rounded-2xl font-extrabold text-xs transition flex items-center gap-1.5"
+          class="px-3.5 py-2 bg-teal-50 dark:bg-teal-900/40 hover:bg-teal-100 text-teal-800 dark:text-teal-400 border border-teal-200 dark:border-teal-700/50 rounded-2xl font-extrabold text-xs transition flex items-center gap-1.5 cursor-pointer"
         >
           <span>⚖️ + Sajili Kipimo</span>
         </button>
         <button 
           @click="openAddModal"
-          class="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-2xl font-extrabold text-xs shadow-lg shadow-emerald-600/20 transition flex items-center gap-1.5"
+          class="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-2xl font-extrabold text-xs shadow-lg shadow-emerald-600/20 transition flex items-center gap-1.5 cursor-pointer"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
           <span>+ Sajili Huduma Mpya</span>
-        
         </button>
       </div>
 

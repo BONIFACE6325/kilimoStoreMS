@@ -962,8 +962,8 @@
           </div>
 
           <div class="flex justify-end gap-2 pt-2">
-            <button @click="modals.completeService = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl">Ghairi</button>
-            <button @click="submitCompleteService" class="px-5 py-2 bg-emerald-600 text-white font-bold rounded-xl shadow-xs">Thibitisha (Complete)</button>
+            <button @click="modals.completeService = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl cursor-pointer">Ghairi</button>
+            <button @click="submitCompleteService" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-xs cursor-pointer">Thibitisha (Complete)</button>
           </div>
         </div>
       </div>
@@ -1002,8 +1002,8 @@
             </div>
           </div>
           <div class="flex justify-end gap-2 pt-3">
-            <button @click="modals.addFarmer = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl">Ghairi</button>
-            <button @click="submitAddFarmer" class="px-5 py-2 bg-emerald-600 text-white font-bold rounded-xl shadow-xs">Sajili Mkulima</button>
+            <button @click="modals.addFarmer = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl cursor-pointer">Ghairi</button>
+            <button @click="submitAddFarmer" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-xs cursor-pointer">Sajili Mkulima</button>
           </div>
         </div>
       </div>
@@ -1039,8 +1039,8 @@
             <div>Jumla Utakayopokea: <span class="text-sm font-black text-emerald-950 dark:text-emerald-400">{{ intakeForm.quantity || 0 }} {{ intakeForm.unit }}</span></div>
           </div>
           <div class="flex justify-end gap-2 pt-3">
-            <button @click="modals.intake = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl">Ghairi</button>
-            <button @click="submitIntake" class="px-5 py-2 bg-emerald-600 text-white font-bold rounded-xl shadow-xs">Sajili (Save)</button>
+            <button @click="modals.intake = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl cursor-pointer">Ghairi</button>
+            <button @click="submitIntake" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-xs cursor-pointer">Sajili (Save)</button>
           </div>
         </div>
       </div>
@@ -1326,8 +1326,8 @@
             <input v-model="quickInput.crop" type="text" placeholder="Mf: Alizeti" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-xs text-slate-900 dark:text-slate-50" @keyup.enter="handleQuickCropAdd" />
           </div>
           <div class="flex justify-end gap-2">
-            <button @click="modals.quickCrop = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl text-xs">Ghairi</button>
-            <button @click="handleQuickCropAdd" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl shadow-xs transition text-xs">Sajili</button>
+            <button @click="modals.quickCrop = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl text-xs cursor-pointer">Ghairi</button>
+            <button @click="handleQuickCropAdd" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl shadow-xs transition text-xs cursor-pointer">Sajili</button>
           </div>
         </div>
       </div>
@@ -1346,8 +1346,8 @@
             <input v-model="quickInput.unit" type="text" placeholder="Mf: Lumbesa" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-xs text-slate-900 dark:text-slate-50" @keyup.enter="handleQuickUnitAdd" />
           </div>
           <div class="flex justify-end gap-2">
-            <button @click="modals.quickUnit = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl text-xs">Ghairi</button>
-            <button @click="handleQuickUnitAdd" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl shadow-xs transition text-xs">Sajili</button>
+            <button @click="modals.quickUnit = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl text-xs cursor-pointer">Ghairi</button>
+            <button @click="handleQuickUnitAdd" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl shadow-xs transition text-xs cursor-pointer">Sajili</button>
           </div>
         </div>
       </div>
