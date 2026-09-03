@@ -502,7 +502,7 @@
 
                             <div class="flex items-center gap-2 self-end sm:self-auto">
                               <div class="text-right mr-1">
-                                <div class="text-xs font-black text-emerald-700 dark:text-emerald-400">Tsh {{ parseFloat(s.fee_amount || s.cost || 0).toLocaleString() }}</div>
+                                <div class="text-xs font-black text-emerald-700 dark:text-emerald-400">Tsh {{ calculateServiceTotalFee(s, b).toLocaleString() }}</div>
                                 <div class="text-[9.5px] text-slate-400 font-bold uppercase">Jumla ya Ada</div>
                               </div>
                               <button v-if="s.status !== 'completed' && b.status !== 'transformed'" @click="openCompleteServiceModal(b, s)" class="px-2.5 py-1 bg-amber-100 dark:bg-amber-500/20 hover:bg-amber-200 text-amber-900 dark:text-amber-400 border border-amber-300 rounded-lg text-[10px] font-black uppercase tracking-wider cursor-pointer flex items-center gap-1 transition shadow-2xs" title="Bonyeza hapa kukamilisha huduma hii">
@@ -1360,7 +1360,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useAgroMaster } from '../composables/useAgroMaster.js';
 
-const { cropsList, unitsList, addCrop, addUnit, getUnitKg } = useAgroMaster();
+const { cropsList, unitsList, addCrop, addUnit, getUnitKg, convertUnits } = useAgroMaster();
 
 const loading = ref(false);
 const loadingProfile = ref(false);
@@ -1469,13 +1469,8 @@ const openFarmerPDFReceipt = () => {
 
   let totalServiceFees = 0;
   services.forEach(s => {
-    let fee = parseFloat(s.fee_amount || s.cost || 0);
-    const rate = parseFloat(s.rate || 0);
-    const qty = (parseFloat(s.output_weight_mt || s.quantity || 0));
-    if (fee > 0 && fee < 500 && rate > 0) {
-      fee = rate * (qty > 0 ? qty : 1000);
-    }
-    totalServiceFees += fee;
+    const b = (farmerBatches.value || []).find(item => String(item.id) === String(s.batch_id));
+    totalServiceFees += calculateServiceTotalFee(s, b);
   });
 
   let totalLoansIssued = 0;
@@ -1529,12 +1524,8 @@ const openFarmerPDFReceipt = () => {
   // 2. Service Rows
   let serviceRows = '';
   services.forEach((s, idx) => {
-    let fee = parseFloat(s.fee_amount || s.cost || 0);
-    const rate = parseFloat(s.rate || 0);
-    const qty = (parseFloat(s.output_weight_mt || s.quantity || 0));
-    if (fee > 0 && fee < 500 && rate > 0) {
-      fee = rate * (qty > 0 ? qty : 1000);
-    }
+    const b = (farmerBatches.value || []).find(item => String(item.id) === String(s.batch_id));
+    const fee = calculateServiceTotalFee(s, b);
     const isDone = s.status === 'completed';
 
     serviceRows += `
@@ -1966,13 +1957,24 @@ const getBatchWeightKg = (batch) => {
 };
 
 const getServiceQuantity = (cs, batch) => {
-  if (!batch || !cs) return 0;
-  // If the service has a stored quantity, use it directly
+  if (!cs) return 0;
   let q = cs && cs.quantity !== undefined && cs.quantity !== null ? parseFloat(cs.quantity) : 0;
   if (q > 0) return q;
-  // Otherwise use the batch's intake_quantity as the quantity
-  const batchQty = parseFloat(batch.intake_quantity || batch.current_weight_mt || batch.current_weight || 0);
-  return batchQty > 0 ? batchQty : 1;
+  if (!batch) return 1;
+
+  const intakeQty = parseFloat(batch.intake_quantity || 0);
+  const intakeUnit = batch.intake_unit || 'Gunia';
+  const serviceUnit = cs.unit || 'Gunia';
+
+  if (intakeQty > 0) {
+    return convertUnits(intakeQty, intakeUnit, serviceUnit);
+  }
+
+  const batchWeightMt = parseFloat(batch.current_weight_mt || batch.initial_weight_mt || batch.current_weight || 0);
+  if (batchWeightMt > 0) {
+    return convertUnits(batchWeightMt, 'Tani', serviceUnit);
+  }
+  return 1;
 };
 
 const calculateServiceTotalFee = (cs, batch) => {
@@ -1981,14 +1983,14 @@ const calculateServiceTotalFee = (cs, batch) => {
   const qty = getServiceQuantity(cs, batch);
 
   if (rate > 0 && qty > 0) {
-    return rate * qty;
+    return Math.round(rate * qty);
   }
 
   const baseFee = parseFloat(cs.fee_amount || cs.fee || cs.cost || 0);
-  if (baseFee < 1000 && rate > 0 && qty > 0) {
-    return rate * qty;
+  if (baseFee > 0 && baseFee < 1000 && rate > 0 && qty > 0) {
+    return Math.round(rate * qty);
   }
-  return baseFee;
+  return baseFee > 0 ? baseFee : Math.round(rate * qty);
 };
 
 const editAssignedService = async (b, s) => {
@@ -2632,27 +2634,22 @@ const submitApplyService = async () => {
   const rate = serviceForm.value.rate !== undefined && serviceForm.value.rate !== null && serviceForm.value.rate >= 0
     ? parseFloat(serviceForm.value.rate)
     : (selectedCatalogService ? parseFloat(selectedCatalogService.rate || 0) : 0);
-  const unit = serviceForm.value.unit || (selectedCatalogService ? (selectedCatalogService.unit || 'kg').toLowerCase() : 'kg');
+  const unit = serviceForm.value.unit || (selectedCatalogService ? (selectedCatalogService.unit || 'Gunia') : 'Gunia');
   const sType = selectedCatalogService ? (selectedCatalogService.category || 'milling').toLowerCase() : 'milling';
 
-  let batchWeightKg = 0;
+  let qty = 1;
   if (targetB) {
-    batchWeightKg = (parseFloat(targetB.current_weight_mt || targetB.initial_weight_mt || targetB.current_weight || 0));
-    if (batchWeightKg <= 0 && targetB.intake_quantity) {
-      batchWeightKg = getUnitKg(targetB.intake_unit, targetB.intake_quantity);
+    const intakeQty = parseFloat(targetB.intake_quantity || 0);
+    const intakeUnit = targetB.intake_unit || 'Gunia';
+    if (intakeQty > 0) {
+      qty = convertUnits(intakeQty, intakeUnit, unit);
+    } else {
+      const batchWeightMt = parseFloat(targetB.current_weight_mt || targetB.initial_weight_mt || 0);
+      qty = convertUnits(batchWeightMt, 'Tani', unit);
     }
   }
 
-  let qty = batchWeightKg;
-  if (unit.includes('gunia') || unit.includes('bag')) {
-    qty = batchWeightKg / 100;
-  } else if (unit.includes('tani') || unit.includes('ton')) {
-    qty = batchWeightKg / 1000;
-  } else if (unit.includes('roba') || unit.includes('kiloba')) {
-    qty = batchWeightKg / 25;
-  }
-
-  const feeAmount = (rate > 0 && qty > 0) ? (rate * qty) : (selectedCatalogService ? parseFloat(selectedCatalogService.rate || 0) : 120000);
+  const feeAmount = (rate > 0 && qty > 0) ? Math.round(rate * qty) : (selectedCatalogService ? parseFloat(selectedCatalogService.rate || 0) : 120000);
 
   try {
     const res = await fetch(`/api/v1/batches/${serviceForm.value.batch_id}/processing`, {
@@ -2891,14 +2888,8 @@ const settleTotalDeductions = computed(() => {
   let totalFees = 0;
   farmerServices.value.forEach(s => {
     if (s.status !== 'paid') {
-      const fee = parseFloat(s.fee_amount || s.fee || s.cost || 0);
-      const rate = parseFloat(s.rate || 0);
-      const qty = (parseFloat(s.output_weight_mt || s.quantity || 0));
-      if (fee > 0 && fee < 500 && rate > 0) {
-        totalFees += rate * (qty > 0 ? qty : 1000);
-      } else {
-        totalFees += fee;
-      }
+      const b = (farmerBatches.value || []).find(item => String(item.id) === String(s.batch_id));
+      totalFees += calculateServiceTotalFee(s, b);
     }
   });
   return totalFees + totalFarmerLoanBalance.value;
