@@ -819,14 +819,8 @@ const fetchFinancialData = async () => {
   const dateQueryParams = getDateRangeParams();
 
   try {
-    const [dashRes, plRes, settRes, expRes] = await Promise.all([
-      fetch('/api/v1/dashboard/stats' + dateQueryParams),
-      fetch('/api/v1/reports/profit-loss' + dateQueryParams),
-      fetch('/api/v1/sales/settlements'),
-      fetch('/api/v1/expenses')
-    ]);
-
-    if (dashRes.ok) {
+    const dashRes = await fetch('/api/v1/dashboard/stats' + dateQueryParams).catch(() => null);
+    if (dashRes && dashRes.ok) {
       const dashData = await dashRes.json();
       if (dashData.stats) {
         finances.value.totalCropSales = dashData.stats.total_crop_sales_tzs || 0;
@@ -837,6 +831,7 @@ const fetchFinancialData = async () => {
         finances.value.loanPortfolio = dashData.stats.loan_portfolio_value || 0;
         finances.value.totalOtherIncome = dashData.stats.total_other_income_tzs || 0;
         finances.value.netProfit = dashData.stats.total_net_service_profit_tzs || 0;
+        finances.value.totalExpenses = dashData.stats.total_expenses_tzs || 0;
         finances.value.activeLoansCount = dashData.stats.active_loans_count || 0;
         finances.value.overdueLoansCount = dashData.stats.overdue_loans_count || 0;
       }
@@ -846,53 +841,57 @@ const fetchFinancialData = async () => {
       if (dashData.other_income_breakdown) {
         finances.value.otherIncomeBreakdown = dashData.other_income_breakdown;
       }
+      if (dashData.expenses_breakdown) {
+        finances.value.expensesBreakdown = dashData.expenses_breakdown;
+      }
       if (dashData.trends) {
         trendsData.value = dashData.trends;
       }
     }
 
-    if (plRes.ok) {
-      const plData = await plRes.json();
-      if (plData.expenses) {
-        finances.value.totalExpenses = plData.expenses.total || 0;
-        finances.value.expensesBreakdown = plData.expenses.breakdown || {};
-      }
-    }
+    const [settRes, expRes] = await Promise.all([
+      fetch('/api/v1/sales/settlements').catch(() => null),
+      fetch('/api/v1/expenses').catch(() => null)
+    ]);
 
     // Build Recent Financial Ledger
     let settlements = [];
     let expensesList = [];
-    if (settRes.ok) settlements = await settRes.json();
-    if (expRes.ok) expensesList = await expRes.json();
+    if (settRes && settRes.ok) settlements = await settRes.json();
+    if (expRes && expRes.ok) expensesList = await expRes.json();
 
     const txList = [];
-    settlements.slice(0, 4).forEach(s => {
-      const dateStr = new Date(s.settled_at || s.created_at).toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
-      txList.push({
-        id: 'sett-' + s.id,
-        date: dateStr,
-        type: 'Settlement & Deductions',
-        typeClass: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20',
-        details: 'Farmer Settlement: ' + (s.farmer?.name || 'Farmer'),
-        amount: parseFloat(s.gross_amount || 0),
-        isExpense: false,
-        method: s.payment_method || 'mobile_money'
+    if (Array.isArray(settlements)) {
+      settlements.slice(0, 4).forEach(s => {
+        const dateStr = new Date(s.settled_at || s.created_at).toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
+        txList.push({
+          id: 'sett-' + s.id,
+          date: dateStr,
+          type: 'Settlement & Deductions',
+          typeClass: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20',
+          details: 'Farmer Settlement: ' + (s.farmer?.name || 'Farmer'),
+          amount: parseFloat(s.gross_amount || 0),
+          isExpense: false,
+          method: s.payment_method || 'mobile_money'
+        });
       });
-    });
+    }
 
-    expensesList.slice(0, 3).forEach(e => {
-      const dateStr = new Date(e.date_incurred || e.created_at).toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
-      txList.push({
-        id: 'exp-' + e.id,
-        date: dateStr,
-        type: 'Operating Expense',
-        typeClass: 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 border-red-200 dark:border-red-500/20',
-        details: e.category_name + ' (' + (e.description || 'Office Expense') + ')',
-        amount: parseFloat(e.amount || 0),
-        isExpense: true,
-        method: 'CASH'
+    if (Array.isArray(expensesList)) {
+      expensesList.slice(0, 3).forEach(e => {
+        const dateStr = new Date(e.date_incurred || e.created_at).toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
+        txList.push({
+          id: 'exp-' + e.id,
+          date: dateStr,
+          type: 'Operating Expense',
+          typeClass: 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 border-red-200 dark:border-red-500/20',
+          details: e.category_name + ' (' + (e.description || 'Office Expense') + ')',
+          amount: parseFloat(e.amount || 0),
+          isExpense: true,
+          method: 'CASH'
+        });
       });
-    });
+    }
 
     recentTransactions.value = txList;
 

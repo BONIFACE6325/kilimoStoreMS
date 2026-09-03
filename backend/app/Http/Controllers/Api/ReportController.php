@@ -39,9 +39,17 @@ class ReportController extends Controller
         $grossStoreInflows = $totalServiceFeeRevenue + $totalLoansRecovered + $otherIncomeTotal;
         $totalNetServiceProfit = ($totalServiceFeeRevenue + $otherIncomeTotal) - $totalExpenses;
 
-        $totalCropSales = (float) Settlement::sum('gross_amount');
+        $settlementSalesQuery = Settlement::query();
+        if ($startDate && $endDate) {
+            $settlementSalesQuery->whereBetween('settled_at', [$startDate, $endDate]);
+        }
+        $totalCropSales = (float) $settlementSalesQuery->sum('gross_amount');
         if ($totalCropSales <= 0) {
-            $totalCropSales = (float) Invoice::sum('total_amount');
+            $invoiceSalesQuery = Invoice::query();
+            if ($startDate && $endDate) {
+                $invoiceSalesQuery->whereBetween('created_at', [$startDate, $endDate]);
+            }
+            $totalCropSales = (float) $invoiceSalesQuery->sum('total_amount');
         }
 
         $totalCapacity = \App\Models\Bin::sum('capacity_mt') ?: 1;
