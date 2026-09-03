@@ -267,12 +267,41 @@
                 <div class="grid grid-cols-2 gap-2">
                   <div>
                     <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Mkoa</label>
-                    <input v-model="editFarmerForm.region" type="text" class="w-full p-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-medium text-slate-900 dark:text-slate-50"/>
+                    <select v-model="editFarmerForm.region" class="w-full p-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-medium text-slate-900 dark:text-slate-50">
+                       <option value="" disabled>Chagua Mkoa...</option>
+                       <option v-for="r in tanzaniaRegions" :key="r" :value="r">{{ r }}</option>
+                    </select>
                   </div>
                   <div>
                     <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Wilaya</label>
-                    <input v-model="editFarmerForm.district" type="text" class="w-full p-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-medium text-slate-900 dark:text-slate-50"/>
+                    <select v-model="editFarmerForm.district" class="w-full p-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-medium text-slate-900 dark:text-slate-50" :disabled="!editFarmerForm.region">
+                       <option value="" disabled>Chagua Wilaya...</option>
+                       <option v-for="d in availableDistrictsForEdit" :key="d" :value="d">{{ d }}</option>
+                    </select>
                   </div>
+                </div>
+                <div class="grid grid-cols-3 gap-2 mt-2">
+                   <div>
+                    <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Kata (Ward)</label>
+                    <select v-model="editFarmerForm.ward" class="w-full p-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-medium text-slate-900 dark:text-slate-50" :disabled="!editFarmerForm.district">
+                       <option value="" disabled>Chagua Kata...</option>
+                       <option v-for="w in availableWardsForEdit" :key="w" :value="w">{{ w }}</option>
+                    </select>
+                   </div>
+                   <div>
+                    <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Kijiji/Mtaa</label>
+                    <select v-model="editFarmerForm.village" class="w-full p-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-medium text-slate-900 dark:text-slate-50" :disabled="!editFarmerForm.ward">
+                       <option value="" disabled>Chagua Kijiji...</option>
+                       <option v-for="v in availableVillagesForEdit" :key="v" :value="v">{{ v }}</option>
+                    </select>
+                   </div>
+                   <div>
+                    <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Kitongoji</label>
+                    <select v-model="editFarmerForm.street" class="w-full p-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-medium text-slate-900 dark:text-slate-50" :disabled="!editFarmerForm.village">
+                       <option value="" disabled>Kitongoji...</option>
+                       <option v-for="s in availableStreetsForEdit" :key="s" :value="s">{{ s }}</option>
+                    </select>
+                   </div>
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
                   <button @click="isEditingFarmer = false" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl">Ghairi</button>
@@ -297,7 +326,15 @@
               </div>
               <div class="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
                 <span class="text-slate-400 font-semibold">Kata:</span>
-                <strong class="text-slate-900 dark:text-slate-50 font-bold">{{ selectedFarmer.ward || 'Usa River' }}</strong>
+                <strong class="text-slate-900 dark:text-slate-50 font-bold">{{ selectedFarmer.ward || 'N/A' }}</strong>
+              </div>
+              <div class="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
+                <span class="text-slate-400 font-semibold">Kijiji / Mtaa:</span>
+                <strong class="text-slate-900 dark:text-slate-50 font-bold">{{ selectedFarmer.village || 'N/A' }}</strong>
+              </div>
+              <div class="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
+                <span class="text-slate-400 font-semibold">Kitongoji:</span>
+                <strong class="text-slate-900 dark:text-slate-50 font-bold">{{ selectedFarmer.street || 'N/A' }}</strong>
               </div>
               <div class="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
                 <span class="text-slate-400 font-semibold">National ID:</span>
@@ -1012,12 +1049,41 @@
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block mb-1 font-bold">Mkoa *</label>
-              <input v-model="newFarmerForm.region" type="text" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50"/>
+              <select v-model="newFarmerForm.region" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50">
+                 <option value="" disabled>Chagua Mkoa...</option>
+                 <option v-for="r in tanzaniaRegions" :key="r" :value="r">{{ r }}</option>
+              </select>
             </div>
             <div>
               <label class="block mb-1 font-bold">Wilaya</label>
-              <input v-model="newFarmerForm.district" type="text" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50"/>
+              <select v-model="newFarmerForm.district" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50" :disabled="!newFarmerForm.region">
+                 <option value="" disabled>Chagua Wilaya...</option>
+                 <option v-for="d in availableDistrictsForNew" :key="d" :value="d">{{ d }}</option>
+              </select>
             </div>
+          </div>
+          <div class="grid grid-cols-3 gap-3 mt-3">
+             <div>
+              <label class="block mb-1 font-bold">Kata (Ward)</label>
+              <select v-model="newFarmerForm.ward" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50" :disabled="!newFarmerForm.district">
+                 <option value="" disabled>Chagua Kata...</option>
+                 <option v-for="w in availableWardsForNew" :key="w" :value="w">{{ w }}</option>
+              </select>
+             </div>
+             <div>
+              <label class="block mb-1 font-bold">Kijiji/Mtaa</label>
+              <select v-model="newFarmerForm.village" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50" :disabled="!newFarmerForm.ward">
+                 <option value="" disabled>Chagua Kijiji...</option>
+                 <option v-for="v in availableVillagesForNew" :key="v" :value="v">{{ v }}</option>
+              </select>
+             </div>
+             <div>
+              <label class="block mb-1 font-bold">Kitongoji</label>
+              <select v-model="newFarmerForm.street" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50" :disabled="!newFarmerForm.village">
+                 <option value="" disabled>Kitongoji...</option>
+                 <option v-for="s in availableStreetsForNew" :key="s" :value="s">{{ s }}</option>
+              </select>
+             </div>
           </div>
           <div class="flex justify-end gap-2 pt-3">
             <button @click="modals.addFarmer = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl cursor-pointer">Ghairi</button>
@@ -1390,7 +1456,7 @@
 
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useAgroMaster } from '../composables/useAgroMaster.js';
 
 const { cropsList, unitsList, addCrop, addUnit, getUnitKg, convertUnits } = useAgroMaster();
@@ -1681,7 +1747,8 @@ const openFarmerPDFReceipt = () => {
         </div>
         <div class="profile-col">
           <div><strong>Mkoa / Wilaya:</strong> ${f.region || 'Arusha'} / ${f.district || 'Arumeru'}</div>
-          <div><strong>Kata / Kijiji:</strong> ${f.ward || 'USA River'} / ${f.village || 'Kijijini'}</div>
+          <div><strong>Kata / Kijiji:</strong> ${f.ward || '-'} / ${f.village || '-'}</div>
+          <div><strong>Kitongoji:</strong> ${f.street || '-'}</div>
           <div><strong>Hali ya Akaunti:</strong> ${f.status === 'active' ? '🟢 ACTIVE (Ana Mzigo Ghalani)' : '⚪ INACTIVE (Hana Mzigo Ghalani)'}</div>
           <div><strong>Tarehe ya Kutoa PDF:</strong> ${new Date().toLocaleString('sw-TZ')}</div>
         </div>
@@ -1821,7 +1888,112 @@ const openFarmerPDFReceipt = () => {
 };
 
 const editFarmerForm = ref({ name: '', phone: '', national_id: '', region: '', district: '', ward: '', village: '', street: '' });
-const newFarmerForm = ref({ name: '', phone: '', national_id: '', region: 'Arusha', district: 'Arumeru' });
+const newFarmerForm = ref({ name: '', phone: '', national_id: '', region: '', district: '', ward: '', village: '', street: '' });
+
+// GEO DATA LOGIC
+const geoData = ref(null);
+
+const fetchGeoData = async () => {
+  try {
+    const res = await fetch('/tanzania_geo.json');
+    if (res.ok) {
+      geoData.value = await res.json();
+    }
+  } catch (e) {
+    console.error('Failed to load geo data', e);
+  }
+};
+
+const tanzaniaRegions = computed(() => {
+  if (!geoData.value) return [];
+  return Object.keys(geoData.value).filter(k => !k.includes('post_code')).sort();
+});
+
+const getDistrictsForRegion = (regionName) => {
+  if (!geoData.value || !regionName || !geoData.value[regionName] || !geoData.value[regionName].districts) return [];
+  return Object.keys(geoData.value[regionName].districts).filter(k => !k.includes('post_code')).sort();
+};
+
+const getWardsForDistrict = (regionName, districtName) => {
+  if (!geoData.value || !regionName || !districtName) return [];
+  const region = geoData.value[regionName];
+  if (!region || !region.districts || !region.districts[districtName]) return [];
+  const district = region.districts[districtName];
+  if (!district.wards) return [];
+  return Object.keys(district.wards).filter(k => !k.includes('post_code')).sort();
+};
+
+const getVillagesForWard = (regionName, districtName, wardName) => {
+  if (!geoData.value || !regionName || !districtName || !wardName) return [];
+  const region = geoData.value[regionName];
+  if (!region || !region.districts || !region.districts[districtName]) return [];
+  const district = region.districts[districtName];
+  if (!district.wards || !district.wards[wardName]) return [];
+  const ward = district.wards[wardName];
+  if (!ward.streets) return [];
+  return Object.keys(ward.streets).filter(k => !k.includes('post_code')).sort();
+};
+
+const getStreetsForVillage = (regionName, districtName, wardName, villageName) => {
+  if (!geoData.value || !regionName || !districtName || !wardName || !villageName) return [];
+  const region = geoData.value[regionName];
+  if (!region || !region.districts || !region.districts[districtName]) return [];
+  const district = region.districts[districtName];
+  if (!district.wards || !district.wards[wardName]) return [];
+  const ward = district.wards[wardName];
+  if (!ward.streets || !ward.streets[villageName]) return [];
+  return Array.isArray(ward.streets[villageName]) ? ward.streets[villageName].sort() : [];
+};
+
+// Computed properties for newFarmerForm
+const availableDistrictsForNew = computed(() => getDistrictsForRegion(newFarmerForm.value.region));
+const availableWardsForNew = computed(() => getWardsForDistrict(newFarmerForm.value.region, newFarmerForm.value.district));
+const availableVillagesForNew = computed(() => getVillagesForWard(newFarmerForm.value.region, newFarmerForm.value.district, newFarmerForm.value.ward));
+const availableStreetsForNew = computed(() => getStreetsForVillage(newFarmerForm.value.region, newFarmerForm.value.district, newFarmerForm.value.ward, newFarmerForm.value.village));
+
+watch(() => newFarmerForm.value.region, () => {
+  newFarmerForm.value.district = '';
+  newFarmerForm.value.ward = '';
+  newFarmerForm.value.village = '';
+  newFarmerForm.value.street = '';
+});
+watch(() => newFarmerForm.value.district, () => {
+  newFarmerForm.value.ward = '';
+  newFarmerForm.value.village = '';
+  newFarmerForm.value.street = '';
+});
+watch(() => newFarmerForm.value.ward, () => {
+  newFarmerForm.value.village = '';
+  newFarmerForm.value.street = '';
+});
+watch(() => newFarmerForm.value.village, () => {
+  newFarmerForm.value.street = '';
+});
+
+// Computed properties for editFarmerForm
+const availableDistrictsForEdit = computed(() => getDistrictsForRegion(editFarmerForm.value.region));
+const availableWardsForEdit = computed(() => getWardsForDistrict(editFarmerForm.value.region, editFarmerForm.value.district));
+const availableVillagesForEdit = computed(() => getVillagesForWard(editFarmerForm.value.region, editFarmerForm.value.district, editFarmerForm.value.ward));
+const availableStreetsForEdit = computed(() => getStreetsForVillage(editFarmerForm.value.region, editFarmerForm.value.district, editFarmerForm.value.ward, editFarmerForm.value.village));
+
+watch(() => editFarmerForm.value.region, () => {
+  editFarmerForm.value.district = '';
+  editFarmerForm.value.ward = '';
+  editFarmerForm.value.village = '';
+  editFarmerForm.value.street = '';
+});
+watch(() => editFarmerForm.value.district, () => {
+  editFarmerForm.value.ward = '';
+  editFarmerForm.value.village = '';
+  editFarmerForm.value.street = '';
+});
+watch(() => editFarmerForm.value.ward, () => {
+  editFarmerForm.value.village = '';
+  editFarmerForm.value.street = '';
+});
+watch(() => editFarmerForm.value.village, () => {
+  editFarmerForm.value.street = '';
+});
 const intakeForm = ref({ crop_type: 'Mpunga', quantity: 45, unit: 'Gunia' });
 const serviceForm = ref({ batch_id: '', service_id: '' });
 const loanForm = ref({ amount: 1500000, due_date: '2026-12-31', collateral_batch_id: '' });
@@ -2885,7 +3057,7 @@ const submitCompleteService = async () => {
 };
 
 const openAddFarmerModal = () => {
-  newFarmerForm.value = { name: '', phone: '', national_id: '', region: 'Arusha', district: 'Arumeru' };
+  newFarmerForm.value = { name: '', phone: '', national_id: '', region: '', district: '', ward: '', village: '', street: '' };
   modals.value.addFarmer = true;
 };
 
@@ -2912,7 +3084,7 @@ const submitAddFarmer = async () => {
       await fetchFarmers();
       triggerToast('Mkulima Mpya Umesajiliwa kwenye Database! 🌾');
       // Reset form inputs
-      newFarmerForm.value = { name: '', phone: '', region: '', location: '', national_id: '' };
+      newFarmerForm.value = { name: '', phone: '', national_id: '', region: '', district: '', ward: '', village: '', street: '' };
     } else {
       console.error('Server Error on registering farmer:', data);
       const errMsg = data.message || (data.errors ? Object.values(data.errors).flat().join(', ') : 'Imefeli kusajili mkulima.');
@@ -3143,5 +3315,6 @@ const resetFilters = () => {
 onMounted(() => {
   fetchFarmers();
   fetchServicesCatalog();
+  fetchGeoData();
 });
 </script>
