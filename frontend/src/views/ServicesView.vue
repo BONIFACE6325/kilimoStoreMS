@@ -487,7 +487,7 @@ const saveUnitEdit = (oldName) => {
   const success = updateUnit(oldName, newName, existingKg);
   if (success) {
     editingUnitName.value = null;
-    triggerToast(`Kipimo cha "${newName}" kimeboreshwa kikamilifu! (1 ${newName} = ${newKg} Kg) ✓`);
+    triggerToast(`Kipimo cha "${newName}" kimeboreshwa kikamilifu! (1 ${newName} = ${existingKg} Kg) ✓`);
   } else {
     triggerToast('Jina la kipimo hiki tayari linatumiwa na kipimo kingine!', 'error');
   }
