@@ -12,6 +12,13 @@ use App\Models\DryingJob;
 use App\Models\MillingJob;
 use App\Models\GradingRecord;
 use App\Models\SettlementDeduction;
+use App\Models\InvoiceItem;
+use App\Models\Buyer;
+use App\Models\LoanTransaction;
+use App\Models\BatchMovement;
+use App\Models\OtherIncome;
+use App\Models\Expense;
+use App\Models\Bin;
 use Illuminate\Http\Request;
 
 class ReportController extends Controller
