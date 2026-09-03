@@ -19,6 +19,9 @@ use App\Models\BatchMovement;
 use App\Models\OtherIncome;
 use App\Models\Expense;
 use App\Models\Bin;
+use App\Models\Service;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
 class ReportController extends Controller
@@ -41,9 +44,9 @@ class ReportController extends Controller
         $dynamicServiceBreakdown = $serviceMetrics['breakdown'];
 
         $totalLoansRecovered = $this->getSumByDateRange(SettlementDeduction::query()->where('deduction_type', 'loan_principal'), 'created_at', $startDate, $endDate);
-        $otherIncomeTotal = $this->getSumByDateRange(\App\Models\OtherIncome::query(), 'date_received', $request->query('start_date'), $request->query('end_date'));
+        $otherIncomeTotal = $this->getSumByDateRange(OtherIncome::query(), 'date_received', $request->query('start_date'), $request->query('end_date'));
         $totalLoansDisbursed = $this->getSumByDateRange(Loan::query(), 'created_at', $startDate, $endDate, 'principal_amount');
-        $totalExpenses = $this->getSumByDateRange(\App\Models\Expense::query(), 'date_incurred', $request->query('start_date'), $request->query('end_date'));
+        $totalExpenses = $this->getSumByDateRange(Expense::query(), 'date_incurred', $request->query('start_date'), $request->query('end_date'));
 
         $grossStoreInflows = $totalServiceFeeRevenue + $totalLoansRecovered + $otherIncomeTotal;
         $totalNetServiceProfit = ($totalServiceFeeRevenue + $otherIncomeTotal) - $totalExpenses;
@@ -66,12 +69,12 @@ class ReportController extends Controller
             $totalCropSales = (float) $invoiceSalesQuery->sum('total_amount');
         }
 
-        $totalCapacity = \App\Models\Bin::sum('capacity_mt') ?: 1;
-        $totalOccupied = \App\Models\Bin::sum('current_occupancy_mt');
+        $totalCapacity = Bin::sum('capacity_mt') ?: 1;
+        $totalOccupied = Bin::sum('current_occupancy_mt');
         $occupancyPercentage = round(($totalOccupied / $totalCapacity) * 100, 1);
 
-        $otherIncomeMap = $this->getGroupedMap(\App\Models\OtherIncome::query(), 'source_name', 'date_received', $request->query('start_date'), $request->query('end_date'));
-        $expensesMap = $this->getGroupedMap(\App\Models\Expense::query(), 'category_name', 'date_incurred', $request->query('start_date'), $request->query('end_date'));
+        $otherIncomeMap = $this->getGroupedMap(OtherIncome::query(), 'source_name', 'date_received', $request->query('start_date'), $request->query('end_date'));
+        $expensesMap = $this->getGroupedMap(Expense::query(), 'category_name', 'date_incurred', $request->query('start_date'), $request->query('end_date'));
 
         $trends = $this->getMonthlyTrends();
 
@@ -121,7 +124,7 @@ class ReportController extends Controller
             ]
         ]);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('getDashboardStats failed: ' . $e->getMessage());
+            Log::error('getDashboardStats failed: ' . $e->getMessage());
             return response()->json([
                 'error' => $e->getMessage(),
                 'line' => $e->getLine(),
@@ -159,7 +162,7 @@ class ReportController extends Controller
     private function calculateServiceMetrics(?string $start, ?string $end): array
     {
         $dynamicServiceBreakdown = [];
-        $services = \App\Models\Service::all();
+        $services = Service::all();
 
         foreach ($services as $srv) {
             $serviceName = $srv->name_sw ?: $srv->name_en;
@@ -227,12 +230,12 @@ class ReportController extends Controller
             $revSum = Settlement::whereYear('settled_at', $date->year)
                 ->whereMonth('settled_at', $date->month)
                 ->sum('total_deductions')
-                + \App\Models\OtherIncome::whereYear('date_received', $date->year)
+                + OtherIncome::whereYear('date_received', $date->year)
                 ->whereMonth('date_received', $date->month)
                 ->sum('amount');
             $monthlyRevenue[$monthName] = (float)$revSum;
 
-            $expSum = \App\Models\Expense::whereYear('date_incurred', $date->year)
+            $expSum = Expense::whereYear('date_incurred', $date->year)
                 ->whereMonth('date_incurred', $date->month)
                 ->sum('amount');
             $monthlyExpenses[$monthName] = (float)$expSum;
@@ -264,8 +267,8 @@ class ReportController extends Controller
         $endDate = $request->query('end_date');
 
         $deductionsQuery = SettlementDeduction::query();
-        $otherIncomeQuery = \App\Models\OtherIncome::query();
-        $expensesQuery = \App\Models\Expense::query();
+        $otherIncomeQuery = OtherIncome::query();
+        $expensesQuery = Expense::query();
 
         if ($startDate && $endDate) {
             $endDateTime = $endDate . ' 23:59:59';
@@ -329,7 +332,7 @@ class ReportController extends Controller
     public function resetAllData(Request $request)
     {
         try {
-            \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
+            Schema::disableForeignKeyConstraints();
 
             SettlementDeduction::truncate();
             Settlement::truncate();
@@ -344,23 +347,23 @@ class ReportController extends Controller
             BatchMovement::truncate();
             Batch::truncate();
             Farmer::truncate();
-            \App\Models\OtherIncome::truncate();
-            \App\Models\Expense::truncate();
+            OtherIncome::truncate();
+            Expense::truncate();
 
-            \App\Models\Bin::query()->update([
+            Bin::query()->update([
                 'current_occupancy_mt' => 0,
                 'crop_type' => null,
                 'status' => 'empty'
             ]);
 
-            \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
+            Schema::enableForeignKeyConstraints();
 
             return response()->json([
                 'success' => true,
                 'message' => 'Operational data wiped successfully. Users, Tenants, Branches & Services preserved.'
             ]);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
+            Schema::enableForeignKeyConstraints();
             return response()->json([
                 'success' => false,
                 'error' => $e->getMessage()
