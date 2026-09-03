@@ -134,267 +134,275 @@ class SalesController extends Controller
 
     public function confirmSale(Request $request)
     {
-        $validated = $request->validate([
-            'batch_id' => 'required|exists:batches,id',
-            'buyer_id' => 'nullable|exists:buyers,id',
-            'buyer_name' => 'nullable|string|max:255',
-            'price_per_kg' => 'required|numeric|min:0',
-            'sold_weight_kg' => 'required|numeric|gt:0',
-        ]);
-        
-        if (empty($validated['buyer_id']) && empty($validated['buyer_name'])) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Tafadhali chagua mnunuzi au ingiza jina la mnunuzi mpya.'
-            ], 422);
-        }
-
-        $batch = Batch::findOrFail($validated['batch_id']);
-
-        $soldWeightKg = $validated['sold_weight_kg'];
-        $availQty = floatval($batch->intake_quantity > 0 ? $batch->intake_quantity : $batch->current_weight_mt);
-
-        if ($availQty < $soldWeightKg - 0.001) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Kiasi unachotaka kuuza ni kikubwa kuliko mzigo uliopo ('.$availQty.' '.($batch->intake_unit ?? 'Units').').'
-            ], 422);
-        }
-
-        if ($batch->status === 'sold') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Shehena hii tayari imeshauzwa yote.'
-            ], 422);
-        }
-
-        $tenant = \App\Models\Tenant::first() ?? \App\Models\Tenant::create(['name' => 'Garanoki Main Store', 'subdomain' => 'garanoki-store', 'status' => 'active']);
-        $tenantId = $tenant->id;
-
-        if (!empty($validated['buyer_id'])) {
-            $buyer = Buyer::findOrFail($validated['buyer_id']);
-        } else {
-            $buyer = Buyer::create([
-                'tenant_id' => $tenantId,
-                'name' => $validated['buyer_name'],
-                'phone' => null,
-                'status' => 'active'
+        try {
+            $validated = $request->validate([
+                'batch_id' => 'required|exists:batches,id',
+                'buyer_id' => 'nullable|exists:buyers,id',
+                'buyer_name' => 'nullable|string|max:255',
+                'price_per_kg' => 'required|numeric|min:0',
+                'sold_weight_kg' => 'required|numeric|gt:0',
             ]);
-        }
-
-        // Auto-generate invoice number
-        $lastInvoice = Invoice::orderBy('created_at', 'desc')->first();
-        $nextNumber = 1001;
-        if ($lastInvoice) {
-            preg_match('/INV-(\d+)/', $lastInvoice->invoice_number, $matches);
-            if (!empty($matches[1])) {
-                $nextNumber = intval($matches[1]) + 1;
+            
+            if (empty($validated['buyer_id']) && empty($validated['buyer_name'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tafadhali chagua mnunuzi au ingiza jina la mnunuzi mpya.'
+                ], 422);
             }
-        }
-        $invoiceNumber = 'INV-' . $nextNumber;
 
-        $pricePerKg = $validated['price_per_kg'];
-        $grossSales = $soldWeightKg * $pricePerKg;
+            $batch = Batch::findOrFail($validated['batch_id']);
 
-        $batchIds = $this->getRelatedBatchIds($batch);
+            $soldWeightKg = floatval($validated['sold_weight_kg']);
+            $availQty = floatval($batch->intake_quantity > 0 ? $batch->intake_quantity : $batch->current_weight_mt);
 
-        // Calculate all deductions across processing tree
-        $storageFees = $this->calculateStorageFees($batch);
-        $dryingJobs = DryingJob::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
-        $dryingFees = $dryingJobs->sum(function($j) {
-            return $j->fee_amount > 0 ? $j->fee_amount : 0;
-        });
-        
-        $millingJobs = MillingJob::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
-        $millingFees = $millingJobs->sum(function($j) {
-            if ($j->fee_amount > 0 && $j->fee_amount < 500) {
-                $weightKg = ($j->output_weight_mt > 0 ? $j->output_weight_mt : $j->input_weight_mt) * 1000;
-                return $j->fee_amount * ($weightKg > 0 ? $weightKg : 1);
+            if ($availQty < $soldWeightKg - 0.001) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kiasi unachotaka kuuza ni kikubwa kuliko mzigo uliopo ('.$availQty.' '.($batch->intake_unit ?? 'Units').').'
+                ], 422);
             }
-            return $j->fee_amount ?: 0;
-        });
-        
-        $gradingRecords = GradingRecord::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
-        $gradingFees = $gradingRecords->sum('fee_amount');
 
-        $loans = Loan::where('farmer_id', $batch->farmer_id)->whereIn('status', ['active', 'overdue'])->orderBy('created_at', 'asc')->get();
-        $loanPrincipal = $loans->sum('current_balance');
-        $loanInterest = 0.00;
+            if ($batch->status === 'sold') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Shehena hii tayari imeshauzwa yote.'
+                ], 422);
+            }
 
-        $totalDeductions = $storageFees + $dryingFees + $millingFees + $gradingFees + $loanPrincipal;
-        
-        // Waterfall payment logic to figure out what actually gets paid
-        $availableFunds = $grossSales;
-        
-        $paidStorage = min($availableFunds, $storageFees);
-        $availableFunds -= $paidStorage;
-        
-        $paidDrying = min($availableFunds, $dryingFees);
-        $availableFunds -= $paidDrying;
-        
-        $paidMilling = min($availableFunds, $millingFees);
-        $availableFunds -= $paidMilling;
-        
-        $paidGrading = min($availableFunds, $gradingFees);
-        $availableFunds -= $paidGrading;
-        
-        $fundsBeforeLoans = $availableFunds;
-        $paidLoansTotal = 0;
-        foreach ($loans as $loan) {
-            if ($availableFunds <= 0) break;
-            $payAmount = min($availableFunds, $loan->current_balance);
-            $paidLoansTotal += $payAmount;
-            $availableFunds -= $payAmount;
-        }
-        
-        $netPayout = $availableFunds;
-        $actualDeductions = $grossSales - $netPayout;
+            $tenant = \App\Models\Tenant::first() ?? \App\Models\Tenant::create(['name' => 'Garanoki Main Store', 'subdomain' => 'garanoki-store', 'status' => 'active']);
+            $tenantId = $tenant->id;
 
-        $result = DB::transaction(function () use (
-            $tenantId, $batch, $buyer, $invoiceNumber, $pricePerKg, $soldWeightKg, $availQty, $grossSales,
-            $paidStorage, $paidDrying, $paidMilling, $paidGrading,
-            $loans, $actualDeductions, $netPayout, $fundsBeforeLoans,
-            $dryingJobs, $millingJobs
-        ) {
-            // 1. Create Invoice
-            $invoice = Invoice::create([
-                'tenant_id' => $tenantId,
-                'buyer_id' => $buyer->id,
-                'invoice_number' => $invoiceNumber,
-                'subtotal' => $grossSales,
-                'vat_amount' => $grossSales * 0.18, // 18% VAT
-                'total_amount' => $grossSales * 1.18,
-                'status' => 'unpaid',
-                'due_date' => now()->addDays(30),
-            ]);
-
-            InvoiceItem::create([
-                'invoice_id' => $invoice->id,
-                'batch_id' => $batch->id,
-                'quantity_mt' => $soldWeightKg,
-                'unit_price' => $pricePerKg,
-                'total_price' => $grossSales,
-            ]);
-
-            // 2. Create Settlement
-            $settlement = Settlement::create([
-                'tenant_id' => $tenantId,
-                'farmer_id' => $batch->farmer_id,
-                'invoice_id' => $invoice->id,
-                'gross_amount' => $grossSales,
-                'total_deductions' => $actualDeductions,
-                'net_payout' => $netPayout,
-                'payment_method' => 'mobile_money',
-                'payment_status' => 'settled',
-                'payment_reference' => 'TXN-' . rand(100000000, 999999999),
-                'settled_at' => now(),
-            ]);
-
-            // 3. Record Deductions Breakdown and Update DB statuses
-            if ($paidStorage > 0) {
-                SettlementDeduction::create([
-                    'settlement_id' => $settlement->id,
-                    'deduction_type' => 'storage_fee',
-                    'amount' => $paidStorage,
+            if (!empty($validated['buyer_id'])) {
+                $buyer = Buyer::findOrFail($validated['buyer_id']);
+            } else {
+                $buyer = Buyer::create([
+                    'tenant_id' => $tenantId,
+                    'name' => $validated['buyer_name'],
+                    'phone' => null,
+                    'status' => 'active'
                 ]);
             }
-            if ($paidDrying > 0) {
-                SettlementDeduction::create([
-                    'settlement_id' => $settlement->id,
-                    'deduction_type' => 'drying_fee',
-                    'amount' => $paidDrying,
-                ]);
-                // If fully paid, we can mark them paid, but for simplicity we'll just mark all as paid if we paid any amount towards it, 
-                // OR we can just update the fee_amount remaining. Let's just mark as 'paid' if we covered the full amount.
-                if ($paidDrying >= $dryingJobs->sum('fee_amount')) {
-                    foreach($dryingJobs as $dj) $dj->update(['status' => 'paid']);
+
+            // Auto-generate invoice number
+            $lastInvoice = Invoice::orderBy('created_at', 'desc')->first();
+            $nextNumber = 1001;
+            if ($lastInvoice) {
+                preg_match('/INV-(\d+)/', $lastInvoice->invoice_number, $matches);
+                if (!empty($matches[1])) {
+                    $nextNumber = intval($matches[1]) + 1;
                 }
             }
-            if ($paidMilling > 0) {
-                SettlementDeduction::create([
-                    'settlement_id' => $settlement->id,
-                    'deduction_type' => 'milling_fee',
-                    'amount' => $paidMilling,
-                ]);
-                if ($paidMilling >= $millingJobs->sum('fee_amount')) {
-                    foreach($millingJobs as $mj) $mj->update(['status' => 'paid']);
+            $invoiceNumber = 'INV-' . $nextNumber;
+
+            $pricePerKg = floatval($validated['price_per_kg']);
+            $grossSales = $soldWeightKg * $pricePerKg;
+
+            $batchIds = $this->getRelatedBatchIds($batch);
+
+            // Calculate all deductions across processing tree
+            $storageFees = $this->calculateStorageFees($batch);
+            $dryingJobs = DryingJob::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
+            $dryingFees = $dryingJobs->sum(function($j) {
+                return $j->fee_amount > 0 ? $j->fee_amount : 0;
+            });
+            
+            $millingJobs = MillingJob::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
+            $millingFees = $millingJobs->sum(function($j) {
+                if ($j->fee_amount > 0 && $j->fee_amount < 500) {
+                    $weightKg = ($j->output_weight_mt > 0 ? $j->output_weight_mt : $j->input_weight_mt) * 1000;
+                    return $j->fee_amount * ($weightKg > 0 ? $weightKg : 1);
                 }
-            }
-            if ($paidGrading > 0) {
-                SettlementDeduction::create([
-                    'settlement_id' => $settlement->id,
-                    'deduction_type' => 'grading_fee',
-                    'amount' => $paidGrading,
-                ]);
+                return $j->fee_amount ?: 0;
+            });
+            
+            $gradingRecords = GradingRecord::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
+            $gradingFees = $gradingRecords->sum('fee_amount');
+
+            $loans = Loan::where('farmer_id', $batch->farmer_id)->whereIn('status', ['active', 'overdue'])->orderBy('created_at', 'asc')->get();
+            $loanPrincipal = $loans->sum('current_balance');
+
+            $totalDeductions = $storageFees + $dryingFees + $millingFees + $gradingFees + $loanPrincipal;
+            
+            // Waterfall payment logic to figure out what actually gets paid
+            $availableFunds = $grossSales;
+            
+            $paidStorage = min($availableFunds, $storageFees);
+            $availableFunds -= $paidStorage;
+            
+            $paidDrying = min($availableFunds, $dryingFees);
+            $availableFunds -= $paidDrying;
+            
+            $paidMilling = min($availableFunds, $millingFees);
+            $availableFunds -= $paidMilling;
+            
+            $paidGrading = min($availableFunds, $gradingFees);
+            $availableFunds -= $paidGrading;
+            
+            $fundsBeforeLoans = $availableFunds;
+            $paidLoansTotal = 0;
+            foreach ($loans as $loan) {
+                if ($availableFunds <= 0) break;
+                $payAmount = min($availableFunds, $loan->current_balance);
+                $paidLoansTotal += $payAmount;
+                $availableFunds -= $payAmount;
             }
             
-            // Loans waterfall
-            $loanFunds = $fundsBeforeLoans;
-            foreach ($loans as $loan) {
-                if ($loanFunds <= 0) break;
-                
-                $payAmount = min($loanFunds, $loan->current_balance);
-                $loanFunds -= $payAmount;
-                
-                SettlementDeduction::create([
-                    'settlement_id' => $settlement->id,
-                    'deduction_type' => 'loan_principal',
-                    'source_reference_id' => $loan->id,
-                    'amount' => $payAmount,
+            $netPayout = $availableFunds;
+            $actualDeductions = $grossSales - $netPayout;
+
+            $result = DB::transaction(function () use (
+                $tenantId, $batch, $buyer, $invoiceNumber, $pricePerKg, $soldWeightKg, $availQty, $grossSales,
+                $paidStorage, $paidDrying, $paidMilling, $paidGrading,
+                $loans, $actualDeductions, $netPayout, $fundsBeforeLoans,
+                $dryingJobs, $millingJobs
+            ) {
+                // 1. Create Invoice
+                $invoice = Invoice::create([
+                    'tenant_id' => $tenantId,
+                    'buyer_id' => $buyer->id,
+                    'invoice_number' => $invoiceNumber,
+                    'subtotal' => $grossSales,
+                    'vat_amount' => $grossSales * 0.18, // 18% VAT
+                    'total_amount' => $grossSales * 1.18,
+                    'status' => 'unpaid',
+                    'due_date' => now()->addDays(30),
                 ]);
 
-                $newBalance = $loan->current_balance - $payAmount;
-                $loan->update([
-                    'current_balance' => $newBalance,
-                    'status' => $newBalance <= 0 ? 'paid' : 'active',
+                InvoiceItem::create([
+                    'invoice_id' => $invoice->id,
+                    'batch_id' => $batch->id,
+                    'quantity_mt' => $soldWeightKg,
+                    'unit_price' => $pricePerKg,
+                    'total_price' => $grossSales,
                 ]);
-                
-                \App\Models\LoanTransaction::create([
-                    'loan_id' => $loan->id,
-                    'transaction_type' => 'payment',
-                    'amount' => $payAmount,
-                    'reference_number' => 'SETT-' . $settlement->id,
+
+                // 2. Create Settlement
+                $settlement = Settlement::create([
+                    'tenant_id' => $tenantId,
+                    'farmer_id' => $batch->farmer_id,
+                    'invoice_id' => $invoice->id,
+                    'gross_amount' => $grossSales,
+                    'total_deductions' => $actualDeductions,
+                    'net_payout' => $netPayout,
+                    'payment_method' => 'mobile_money',
+                    'payment_status' => 'settled',
+                    'payment_reference' => 'TXN-' . rand(100000000, 999999999),
+                    'settled_at' => now(),
                 ]);
-            }
 
-            // 4. Update Batch status and weight
-            $newQty = max(0, $availQty - $soldWeightKg);
-            $isFullySold = $newQty <= 0.001;
-
-            $batch->update([
-                'current_weight_mt' => $newQty,
-                'intake_quantity' => $newQty,
-                'status' => $isFullySold ? 'sold' : $batch->status
-            ]);
-
-            // 5. Decrement Bin Occupancy
-            if ($batch->current_bin_id) {
-                $bin = $batch->bin;
-                $bin->decrement('current_occupancy_mt', $soldWeightMt);
-                if ($bin->current_occupancy_mt <= 0) {
-                    $bin->update(['status' => 'empty', 'current_occupancy_mt' => 0.00, 'crop_type' => null]);
+                // 3. Record Deductions Breakdown and Update DB statuses
+                if ($paidStorage > 0) {
+                    SettlementDeduction::create([
+                        'settlement_id' => $settlement->id,
+                        'deduction_type' => 'storage_fee',
+                        'amount' => $paidStorage,
+                    ]);
                 }
-            }
+                if ($paidDrying > 0) {
+                    SettlementDeduction::create([
+                        'settlement_id' => $settlement->id,
+                        'deduction_type' => 'drying_fee',
+                        'amount' => $paidDrying,
+                    ]);
+                    if ($paidDrying >= $dryingJobs->sum('fee_amount')) {
+                        foreach($dryingJobs as $dj) $dj->update(['status' => 'paid']);
+                    }
+                }
+                if ($paidMilling > 0) {
+                    SettlementDeduction::create([
+                        'settlement_id' => $settlement->id,
+                        'deduction_type' => 'milling_fee',
+                        'amount' => $paidMilling,
+                    ]);
+                    if ($paidMilling >= $millingJobs->sum('fee_amount')) {
+                        foreach($millingJobs as $mj) $mj->update(['status' => 'paid']);
+                    }
+                }
+                if ($paidGrading > 0) {
+                    SettlementDeduction::create([
+                        'settlement_id' => $settlement->id,
+                        'deduction_type' => 'grading_fee',
+                        'amount' => $paidGrading,
+                    ]);
+                }
+                
+                // Loans waterfall
+                $loanFunds = $fundsBeforeLoans;
+                foreach ($loans as $loan) {
+                    if ($loanFunds <= 0) break;
+                    
+                    $payAmount = min($loanFunds, $loan->current_balance);
+                    $loanFunds -= $payAmount;
+                    
+                    SettlementDeduction::create([
+                        'settlement_id' => $settlement->id,
+                        'deduction_type' => 'loan_principal',
+                        'source_reference_id' => $loan->id,
+                        'amount' => $payAmount,
+                    ]);
 
-            // 6. Sync Farmer Active Status (If all stock sold out, mark inactive)
-            $farmerId = $batch->farmer_id;
-            $hasActiveStock = \App\Models\Batch::where('farmer_id', $farmerId)
-                ->where('status', '!=', 'sold')
-                ->where('current_weight_mt', '>', 0.001)
-                ->exists();
+                    $newBalance = $loan->current_balance - $payAmount;
+                    $loan->update([
+                        'current_balance' => $newBalance,
+                        'status' => $newBalance <= 0 ? 'paid' : 'active',
+                    ]);
+                    
+                    \App\Models\LoanTransaction::create([
+                        'loan_id' => $loan->id,
+                        'transaction_type' => 'payment',
+                        'amount' => $payAmount,
+                        'reference_number' => 'SETT-' . $settlement->id,
+                    ]);
+                }
 
-            if (!$hasActiveStock) {
-                \App\Models\Farmer::where('id', $farmerId)->update(['status' => 'inactive']);
-            }
+                // 4. Update Batch status and weight
+                $newQty = max(0, $availQty - $soldWeightKg);
+                $isFullySold = $newQty <= 0.001;
 
-            return $settlement;
-        });
+                $batch->update([
+                    'current_weight_mt' => $newQty,
+                    'intake_quantity' => $newQty,
+                    'status' => $isFullySold ? 'sold' : $batch->status
+                ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Sale finalized, invoice issued, and farmer payout processed successfully',
-            'settlement' => $result
-        ]);
+                // 5. Decrement Bin Occupancy
+                if ($batch->current_bin_id && $batch->bin) {
+                    $bin = $batch->bin;
+                    $soldWeightMt = $soldWeightKg / 1000;
+                    if ($bin->current_occupancy_mt > 0) {
+                        $bin->decrement('current_occupancy_mt', min($bin->current_occupancy_mt, $soldWeightMt));
+                    }
+                    if ($bin->current_occupancy_mt <= 0) {
+                        $bin->update(['status' => 'empty', 'current_occupancy_mt' => 0.00, 'crop_type' => null]);
+                    }
+                }
+
+                // 6. Sync Farmer Active Status (If all stock sold out, mark inactive)
+                $farmerId = $batch->farmer_id;
+                $hasActiveStock = \App\Models\Batch::where('farmer_id', $farmerId)
+                    ->where('status', '!=', 'sold')
+                    ->where('current_weight_mt', '>', 0.001)
+                    ->exists();
+
+                if (!$hasActiveStock) {
+                    \App\Models\Farmer::where('id', $farmerId)->update(['status' => 'inactive']);
+                }
+
+                return $settlement;
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Sale finalized, invoice issued, and farmer payout processed successfully',
+                'settlement' => $result
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Confirm sale error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Imeshindwa kukamilisha mauzo: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     private function calculateStorageFees($batch)
