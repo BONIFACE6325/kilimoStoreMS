@@ -151,6 +151,11 @@ class ReportController extends Controller
         ];
 
         // Financial Metrics requested by Owner:
+        $totalCropSales = (float) Settlement::sum('gross_amount');
+        if ($totalCropSales <= 0) {
+            $totalCropSales = (float) Invoice::sum('total_amount');
+        }
+
         // 1. Store Boss Retained Inflows ONLY (Service Fees + Loan Recoveries + Other Incomes - Excluding Farmer's Net Sales Share)
         $totalLoansRecovered = (float) (clone $deductionQuery)->where('deduction_type', 'loan_principal')->sum('amount');
         $otherIncomeTotal = (float) (clone $otherIncomeQuery)->sum('amount');
@@ -197,6 +202,7 @@ class ReportController extends Controller
             'stats' => [
                 'total_weight_stored_mt' => $activeWeight,
                 'registered_farmers' => $farmersCount,
+                'total_crop_sales_tzs' => $totalCropSales,
                 'gross_all_inflows_tzs' => $grossStoreInflows,
                 'total_loans_disbursed_tzs' => $totalLoansDisbursed,
                 'total_loans_recovered_tzs' => $totalLoansRecovered,

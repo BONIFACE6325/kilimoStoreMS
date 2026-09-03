@@ -50,77 +50,77 @@
     <!-- 🌟 THE 6 EXECUTIVE FINANCIAL CARDS (2 COLS ON MOBILE, 3 TABLET, 6 DESKTOP) -->
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
       
-      <!-- CARD 1: GROSS OFFICE REVENUE -->
+      <!-- CARD 1: GROSS CROP SALES -->
       <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-emerald-500/50 transition-all space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">1. Gross Revenue</span>
-          <div class="w-6.5 h-6.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold text-xs shadow-2xs">💰</div>
+          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">1. Mauzo ya Mazao</span>
+          <div class="w-6.5 h-6.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold text-xs shadow-2xs">🌾</div>
         </div>
         <div class="text-lg font-black text-slate-900 dark:text-slate-50 font-mono">
-          Tsh {{ (finances.grossAllInflows || 0).toLocaleString() }}
+          Tsh {{ (finances.totalCropSales || 0).toLocaleString() }}
         </div>
         <div class="text-[9px] text-slate-500 dark:text-slate-400 font-semibold pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <span>Fees + Logistics + Loans</span>
-          <span class="font-mono text-[8px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-1 rounded font-extrabold uppercase">GROSS</span>
+          <span>Invoices & Settlements</span>
+          <span class="font-mono text-[8px] bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 px-1 rounded font-extrabold uppercase">CROP SALES</span>
         </div>
       </div>
 
-      <!-- CARD 2: OPERATING EXPENSES / COSTS -->
+      <!-- CARD 2: SERVICE REVENUE -->
+      <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-indigo-500/50 transition-all space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">2. Ada za Huduma</span>
+          <div class="w-6.5 h-6.5 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 flex items-center justify-center font-bold text-xs shadow-2xs">💰</div>
+        </div>
+        <div class="text-lg font-black text-indigo-700 dark:text-indigo-400 font-mono">
+          Tsh {{ (finances.totalServiceRevenue || 0).toLocaleString() }}
+        </div>
+        <div class="text-[9px] text-slate-500 dark:text-slate-400 font-semibold pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <span>Kukoboa + Kuanika + Storage</span>
+          <span class="text-[8px] bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 px-1 rounded font-extrabold uppercase border border-indigo-200 dark:border-indigo-500/20">SERVICES</span>
+        </div>
+      </div>
+
+      <!-- CARD 3: OPERATING EXPENSES / COSTS -->
       <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-red-400 transition-all space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">2. Operating Costs</span>
+          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">3. Matumizi ya Ofisi</span>
           <div class="w-6.5 h-6.5 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center font-bold text-xs shadow-2xs">🧾</div>
         </div>
         <div class="text-lg font-black text-red-600 dark:text-red-400 font-mono">
           Tsh {{ (finances.totalExpenses || 0).toLocaleString() }}
         </div>
         <div class="text-[9px] text-red-600 dark:text-red-400 font-bold pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <span>Office & Machine Costs</span>
+          <span>Mafuta + Matengenezo</span>
           <span class="text-[8px] bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 px-1 rounded font-extrabold uppercase border border-red-200 dark:border-red-500/20">EXPENSES</span>
         </div>
       </div>
 
-      <!-- CARD 3: TOTAL LOANS DISBURSED -->
+      <!-- CARD 4: TOTAL LOANS DISBURSED -->
       <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-amber-500/50 transition-all space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">3. Loans Disbursed</span>
+          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">4. Mikopo Iliyotolewa</span>
           <div class="w-6.5 h-6.5 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 flex items-center justify-center font-bold text-xs shadow-2xs">📤</div>
         </div>
         <div class="text-lg font-black text-amber-700 dark:text-amber-400 font-mono">
           Tsh {{ (finances.totalLoansDisbursed || 0).toLocaleString() }}
         </div>
         <div class="text-[9px] text-slate-500 dark:text-slate-400 font-semibold pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <span>Lifetime Principal</span>
-          <span class="text-[8px] bg-amber-50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-400 px-1 rounded font-extrabold uppercase border border-amber-200 dark:border-amber-500/20">DISBURSED</span>
-        </div>
-      </div>
-
-      <!-- CARD 4: LOAN PRINCIPAL RECOVERED -->
-      <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-emerald-500/50 transition-all space-y-1.5">
-        <div class="flex items-center justify-between">
-          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">4. Principal Recovered</span>
-          <div class="w-6.5 h-6.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold text-xs shadow-2xs">📥</div>
-        </div>
-        <div class="text-lg font-black text-emerald-700 dark:text-emerald-400 font-mono">
-          Tsh {{ (finances.totalLoansRecovered || 0).toLocaleString() }}
-        </div>
-        <div class="text-[9px] text-emerald-700 dark:text-emerald-400 font-bold pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <span>Recovered via Sales</span>
-          <span class="text-[8px] bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 px-1 rounded font-extrabold uppercase border border-emerald-200 dark:border-emerald-500/20">RECOVERED</span>
+          <span>Iliyorejeshwa: Tsh {{ (finances.totalLoansRecovered || 0).toLocaleString() }}</span>
+          <span class="text-[8px] bg-amber-50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-400 px-1 rounded font-extrabold uppercase border border-amber-200 dark:border-amber-500/20">LOANS</span>
         </div>
       </div>
 
       <!-- CARD 5: OUTSTANDING LOAN DEBT -->
       <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-orange-400 transition-all space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">5. Outstanding Debt</span>
+          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">5. Deni la Mikopo</span>
           <div class="w-6.5 h-6.5 rounded-xl bg-orange-50 dark:bg-orange-900/40 text-orange-700 dark:text-orange-400 flex items-center justify-center font-bold text-xs shadow-2xs">💳</div>
         </div>
         <div class="text-lg font-black text-orange-700 dark:text-orange-400 font-mono">
           Tsh {{ (finances.loanPortfolio || 0).toLocaleString() }}
         </div>
         <div class="text-[9px] text-orange-800 dark:text-orange-400 font-bold pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <span>Uncollected Debt</span>
+          <span>Salio la Mikopo</span>
           <span v-if="finances.overdueLoansCount > 0" class="text-[8px] bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 font-extrabold px-1 rounded">
             {{ finances.overdueLoansCount }} Overdue
           </span>
@@ -133,14 +133,14 @@
       <!-- CARD 6: NET OPERATING PROFIT -->
       <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-teal-500/50 transition-all space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">6. Net Profit</span>
+          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">6. Faida Halisi</span>
           <div class="w-6.5 h-6.5 rounded-xl bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-400 flex items-center justify-center font-bold text-xs shadow-2xs">📈</div>
         </div>
         <div class="text-lg font-black text-teal-700 dark:text-teal-400 font-mono">
           Tsh {{ (finances.netProfit || 0).toLocaleString() }}
         </div>
         <div class="text-[9px] text-slate-500 dark:text-slate-400 font-semibold pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <span>Revenues - Expenses</span>
+          <span>(Ada + Mengine) - Matumizi</span>
           <span class="text-[8px] bg-teal-50 dark:bg-teal-900/40 text-teal-800 dark:text-teal-400 font-black px-1 rounded uppercase border border-teal-200 dark:border-teal-700/50">NET PROFIT</span>
         </div>
       </div>
@@ -550,10 +550,12 @@ const filterOptions = [
 ];
 
 const finances = ref({
+  totalCropSales: 0,
   grossAllInflows: 0,
   totalLoansDisbursed: 0,
   totalLoansRecovered: 0,
   loanPortfolio: 0,
+  totalServiceRevenue: 0,
   netProfit: 0,
   totalExpenses: 0,
   totalOtherIncome: 0,
@@ -827,7 +829,9 @@ const fetchFinancialData = async () => {
     if (dashRes.ok) {
       const dashData = await dashRes.json();
       if (dashData.stats) {
+        finances.value.totalCropSales = dashData.stats.total_crop_sales_tzs || 0;
         finances.value.grossAllInflows = dashData.stats.gross_all_inflows_tzs || 0;
+        finances.value.totalServiceRevenue = dashData.stats.total_revenue_tzs || 0;
         finances.value.totalLoansDisbursed = dashData.stats.total_loans_disbursed_tzs || 0;
         finances.value.totalLoansRecovered = dashData.stats.total_loans_recovered_tzs || 0;
         finances.value.loanPortfolio = dashData.stats.loan_portfolio_value || 0;
