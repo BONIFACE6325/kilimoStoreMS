@@ -47,43 +47,58 @@
       </div>
     </div>
 
-    <!-- 🌟 THE 6 EXECUTIVE FINANCIAL CARDS (2 COLS ON MOBILE, 3 TABLET, 6 DESKTOP) -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
+    <!-- 🌟 THE 7 EXECUTIVE FINANCIAL & OPERATIONAL CARDS -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2.5 sm:gap-3">
       
-      <!-- CARD 1: GROSS CROP SALES -->
+      <!-- CARD 1: MZIGO GHALANI & INTAKE -->
+      <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-blue-500/50 transition-all space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">1. Mzigo Ghalani</span>
+          <div class="w-6.5 h-6.5 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 flex items-center justify-center font-bold text-xs shadow-2xs">🏭</div>
+        </div>
+        <div class="text-lg font-black text-blue-700 dark:text-blue-400 font-mono">
+          {{ (finances.totalWeightStored || 0).toLocaleString() }} <span class="text-xs">MT</span>
+        </div>
+        <div class="text-[9px] text-slate-500 dark:text-slate-400 font-semibold pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <span>Jumla Intake: {{ (finances.totalIntakeMt || 0).toLocaleString() }} MT</span>
+          <span class="font-mono text-[8px] bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 px-1 rounded font-extrabold uppercase">CROP STOCK</span>
+        </div>
+      </div>
+
+      <!-- CARD 2: GROSS CROP SALES -->
       <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-emerald-500/50 transition-all space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">1. Mauzo ya Mazao</span>
+          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">2. Mauzo ya Mazao</span>
           <div class="w-6.5 h-6.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold text-xs shadow-2xs">🌾</div>
         </div>
         <div class="text-lg font-black text-slate-900 dark:text-slate-50 font-mono">
           Tsh {{ (finances.totalCropSales || 0).toLocaleString() }}
         </div>
         <div class="text-[9px] text-slate-500 dark:text-slate-400 font-semibold pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <span>Invoices & Settlements</span>
+          <span>Invoices & Cashbook</span>
           <span class="font-mono text-[8px] bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 px-1 rounded font-extrabold uppercase">CROP SALES</span>
         </div>
       </div>
 
-      <!-- CARD 2: SERVICE REVENUE -->
+      <!-- CARD 3: SERVICE REVENUE -->
       <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-indigo-500/50 transition-all space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">2. Ada za Huduma</span>
+          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">3. Ada za Huduma</span>
           <div class="w-6.5 h-6.5 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 flex items-center justify-center font-bold text-xs shadow-2xs">💰</div>
         </div>
         <div class="text-lg font-black text-indigo-700 dark:text-indigo-400 font-mono">
           Tsh {{ (finances.totalServiceRevenue || 0).toLocaleString() }}
         </div>
         <div class="text-[9px] text-slate-500 dark:text-slate-400 font-semibold pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <span>Kukoboa + Kuanika + Storage</span>
+          <span>Kukoboa + Kuanika</span>
           <span class="text-[8px] bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 px-1 rounded font-extrabold uppercase border border-indigo-200 dark:border-indigo-500/20">SERVICES</span>
         </div>
       </div>
 
-      <!-- CARD 3: OPERATING EXPENSES / COSTS -->
+      <!-- CARD 4: OPERATING EXPENSES / COSTS -->
       <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-red-400 transition-all space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">3. Matumizi ya Ofisi</span>
+          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">4. Matumizi</span>
           <div class="w-6.5 h-6.5 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center font-bold text-xs shadow-2xs">🧾</div>
         </div>
         <div class="text-lg font-black text-red-600 dark:text-red-400 font-mono">
@@ -95,10 +110,10 @@
         </div>
       </div>
 
-      <!-- CARD 4: TOTAL LOANS DISBURSED -->
+      <!-- CARD 5: TOTAL LOANS DISBURSED -->
       <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-amber-500/50 transition-all space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">4. Mikopo Iliyotolewa</span>
+          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">5. Mikopo</span>
           <div class="w-6.5 h-6.5 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 flex items-center justify-center font-bold text-xs shadow-2xs">📤</div>
         </div>
         <div class="text-lg font-black text-amber-700 dark:text-amber-400 font-mono">
@@ -110,10 +125,10 @@
         </div>
       </div>
 
-      <!-- CARD 5: OUTSTANDING LOAN DEBT -->
+      <!-- CARD 6: OUTSTANDING LOAN DEBT -->
       <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-orange-400 transition-all space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">5. Deni la Mikopo</span>
+          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">6. Deni la Mikopo</span>
           <div class="w-6.5 h-6.5 rounded-xl bg-orange-50 dark:bg-orange-900/40 text-orange-700 dark:text-orange-400 flex items-center justify-center font-bold text-xs shadow-2xs">💳</div>
         </div>
         <div class="text-lg font-black text-orange-700 dark:text-orange-400 font-mono">
@@ -130,51 +145,64 @@
         </div>
       </div>
 
-      <!-- CARD 6: NET OPERATING PROFIT -->
+      <!-- CARD 7: NET OPERATING PROFIT -->
       <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-teal-500/50 transition-all space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">6. Faida Halisi</span>
+          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">7. Faida Halisi</span>
           <div class="w-6.5 h-6.5 rounded-xl bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-400 flex items-center justify-center font-bold text-xs shadow-2xs">📈</div>
         </div>
         <div class="text-lg font-black text-teal-700 dark:text-teal-400 font-mono">
           Tsh {{ (finances.netProfit || 0).toLocaleString() }}
         </div>
         <div class="text-[9px] text-slate-500 dark:text-slate-400 font-semibold pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <span>(Ada + Mengine) - Matumizi</span>
+          <span>(Ada + Mengine) - Expenses</span>
           <span class="text-[8px] bg-teal-50 dark:bg-teal-900/40 text-teal-800 dark:text-teal-400 font-black px-1 rounded uppercase border border-teal-200 dark:border-teal-700/50">NET PROFIT</span>
         </div>
       </div>
 
     </div>
 
-    <!-- 2. Financial Trends Chart & Service Revenue Breakdown -->
+    <!-- 2. Financial & Grain Volume Performance Trends & Service Revenue Breakdown -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
       
-      <!-- Financial Cashflow & Revenue Line Chart (2 cols) -->
+      <!-- Financial & Volume Trend Chart (2 cols) -->
       <div class="lg:col-span-2 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs space-y-3">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
           <div>
             <h2 class="text-sm font-extrabold text-slate-900 dark:text-slate-50 flex items-center gap-2">
-              <span>📈 Financial Performance Trend (Revenues vs Operating Expenses)</span>
+              <span>📈 {{ trendMode === 'finance' ? 'Financial Performance Trend (Revenues vs Expenses)' : '🌾 Grain Volume Analysis (Intake vs Dispatch in MT)' }}</span>
             </h2>
             <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Monthly performance comparison over the last 6 months.</p>
           </div>
-          <div class="flex items-center gap-3 text-xs font-extrabold">
-            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span><span class="text-slate-600 dark:text-slate-300">Revenue</span></div>
-            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span><span class="text-slate-600 dark:text-slate-300">Expenses</span></div>
+
+          <!-- Mode Toggle Switch -->
+          <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
+            <button 
+              @click="trendMode = 'finance'" 
+              :class="['px-2.5 py-1 text-[11px] font-extrabold rounded-lg transition-all cursor-pointer', trendMode === 'finance' ? 'bg-slate-900 text-white dark:bg-emerald-600 shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900']"
+            >
+              💰 TZS Trend
+            </button>
+            <button 
+              @click="trendMode = 'volume'" 
+              :class="['px-2.5 py-1 text-[11px] font-extrabold rounded-lg transition-all cursor-pointer', trendMode === 'volume' ? 'bg-slate-900 text-white dark:bg-blue-600 shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900']"
+            >
+              🌾 Volume (MT)
+            </button>
           </div>
         </div>
+
         <div class="h-60 relative w-full">
           <Line :data="financialTrendData" :options="financialTrendOptions" />
         </div>
       </div>
 
-      <!-- Service Revenue Sources Donut Chart (1 col) -->
+      <!-- Service Revenue & Crop Breakdown (1 col) -->
       <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex flex-col justify-between space-y-3">
         <div>
           <div class="flex items-center justify-between mb-1">
-            <h2 class="text-sm font-extrabold text-slate-900 dark:text-slate-50">🍩 Grain Service Revenues</h2>
-            <span class="text-[10px] font-bold text-slate-400">Total Collected</span>
+            <h2 class="text-sm font-extrabold text-slate-900 dark:text-slate-50">🍩 Grain Services & Stock Distribution</h2>
+            <span class="text-[10px] font-bold text-slate-400">Live DB Metrics</span>
           </div>
           <div class="h-44 flex items-center justify-center relative my-1">
             <Doughnut :data="revenueSourcesData" :options="revenueSourcesOptions" />
@@ -195,6 +223,20 @@
               <span class="text-slate-800 dark:text-slate-100 font-bold text-[11.5px]">{{ serviceName }}:</span>
             </div>
             <span class="font-mono font-black text-slate-900 dark:text-slate-50">Tsh {{ parseFloat(amount || 0).toLocaleString() }}</span>
+          </div>
+
+          <!-- Crop Stock Distribution Pills -->
+          <div v-if="Object.keys(finances.cropDistribution).length > 0" class="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1">
+            <div class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Mzigo Uliopo Ghalani (Crop MT)</div>
+            <div class="flex flex-wrap gap-1.5">
+              <div 
+                v-for="(mt, cName) in finances.cropDistribution" 
+                :key="cName" 
+                class="px-2 py-0.5 bg-blue-50 dark:bg-blue-950/60 rounded border border-blue-200 dark:border-blue-800 text-[10.5px] font-mono font-bold text-blue-900 dark:text-blue-300"
+              >
+                {{ cName }}: <strong class="text-blue-700 dark:text-blue-400 font-black">{{ mt }} MT</strong>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -537,6 +579,7 @@ const loading = ref(false);
 const activeFilter = ref('all_time');
 const customStartDate = ref('');
 const customEndDate = ref('');
+const trendMode = ref('finance'); // 'finance' or 'volume'
 
 const filterOptions = [
   { id: 'all_time', label: 'All Time' },
@@ -550,6 +593,8 @@ const filterOptions = [
 ];
 
 const finances = ref({
+  totalWeightStored: 0,
+  totalIntakeMt: 0,
   totalCropSales: 0,
   grossAllInflows: 0,
   totalLoansDisbursed: 0,
@@ -563,10 +608,12 @@ const finances = ref({
   overdueLoansCount: 0,
   serviceBreakdown: {},
   otherIncomeBreakdown: {},
-  expensesBreakdown: {}
+  expensesBreakdown: {},
+  cropDistribution: {},
+  warehouseInfo: { capacity_mt: 5000, occupied_mt: 0, occupancy_pct: 0 }
 });
 
-const trendsData = ref({ months: [], revenue: [], expenses: [] });
+const trendsData = ref({ months: [], revenue: [], expenses: [], intake: [], dispatch: [] });
 const recentTransactions = ref([]);
 
 const todayFormatted = computed(() => {
@@ -618,30 +665,60 @@ const getDateRangeParams = () => {
   return start && end ? `?start_date=${start}&end_date=${end}` : '';
 };
 
-// Financial Trend Line Chart Config (Revenue vs Expenses)
-const financialTrendData = computed(() => ({
-  labels: trendsData.value.months.length > 0 ? trendsData.value.months : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-  datasets: [
-    {
-      label: 'Revenue (TZS)',
-      data: trendsData.value.revenue.length > 0 ? trendsData.value.revenue : [0, 0, 0, 0, 0, 0],
-      borderColor: '#059669',
-      backgroundColor: 'rgba(5, 150, 105, 0.06)',
-      borderWidth: 2.5,
-      fill: true,
-      tension: 0.4
-    },
-    {
-      label: 'Expenses (TZS)',
-      data: trendsData.value.expenses && trendsData.value.expenses.length > 0 ? trendsData.value.expenses : [0, 0, 0, 0, 0, 0],
-      borderColor: '#ef4444',
-      backgroundColor: 'rgba(239, 68, 68, 0.06)',
-      borderWidth: 2.5,
-      fill: true,
-      tension: 0.4
-    }
-  ]
-}));
+// Financial & Volume Trend Line Chart Config (Revenue vs Expenses OR Intake vs Dispatch MT)
+const financialTrendData = computed(() => {
+  const months = trendsData.value.months.length > 0 ? trendsData.value.months : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+
+  if (trendMode.value === 'volume') {
+    return {
+      labels: months,
+      datasets: [
+        {
+          label: 'Mzigo Uliopokelewa (Intake MT)',
+          data: trendsData.value.intake && trendsData.value.intake.length > 0 ? trendsData.value.intake : [0, 0, 0, 0, 0, 0],
+          borderColor: '#0284c7',
+          backgroundColor: 'rgba(2, 132, 199, 0.08)',
+          borderWidth: 2.5,
+          fill: true,
+          tension: 0.4
+        },
+        {
+          label: 'Mzigo Uliotoka/Uliouzwa (Dispatch MT)',
+          data: trendsData.value.dispatch && trendsData.value.dispatch.length > 0 ? trendsData.value.dispatch : [0, 0, 0, 0, 0, 0],
+          borderColor: '#f59e0b',
+          backgroundColor: 'rgba(245, 158, 11, 0.08)',
+          borderWidth: 2.5,
+          fill: true,
+          tension: 0.4
+        }
+      ]
+    };
+  }
+
+  return {
+    labels: months,
+    datasets: [
+      {
+        label: 'Revenue (TZS)',
+        data: trendsData.value.revenue.length > 0 ? trendsData.value.revenue : [0, 0, 0, 0, 0, 0],
+        borderColor: '#059669',
+        backgroundColor: 'rgba(5, 150, 105, 0.06)',
+        borderWidth: 2.5,
+        fill: true,
+        tension: 0.4
+      },
+      {
+        label: 'Expenses (TZS)',
+        data: trendsData.value.expenses && trendsData.value.expenses.length > 0 ? trendsData.value.expenses : [0, 0, 0, 0, 0, 0],
+        borderColor: '#ef4444',
+        backgroundColor: 'rgba(239, 68, 68, 0.06)',
+        borderWidth: 2.5,
+        fill: true,
+        tension: 0.4
+      }
+    ]
+  };
+});
 
 const financialTrendOptions = computed(() => {
   const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
@@ -666,6 +743,7 @@ const financialTrendOptions = computed(() => {
           color: textColor,
           font: { size: 10, weight: '600' },
           callback: (value) => {
+            if (trendMode.value === 'volume') return value + ' MT';
             if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
             if (value >= 1000) return (value / 1000).toFixed(0) + 'k';
             return value;
@@ -823,6 +901,8 @@ const fetchFinancialData = async () => {
     if (dashRes && dashRes.ok) {
       const dashData = await dashRes.json();
       if (dashData.stats) {
+        finances.value.totalWeightStored = dashData.stats.total_weight_stored_mt || 0;
+        finances.value.totalIntakeMt = dashData.stats.total_intake_mt || 0;
         finances.value.totalCropSales = dashData.stats.total_crop_sales_tzs || 0;
         finances.value.grossAllInflows = dashData.stats.gross_all_inflows_tzs || 0;
         finances.value.totalServiceRevenue = dashData.stats.total_revenue_tzs || 0;
@@ -834,6 +914,12 @@ const fetchFinancialData = async () => {
         finances.value.totalExpenses = dashData.stats.total_expenses_tzs || 0;
         finances.value.activeLoansCount = dashData.stats.active_loans_count || 0;
         finances.value.overdueLoansCount = dashData.stats.overdue_loans_count || 0;
+      }
+      if (dashData.warehouse) {
+        finances.value.warehouseInfo = dashData.warehouse;
+      }
+      if (dashData.crop_distribution) {
+        finances.value.cropDistribution = dashData.crop_distribution;
       }
       if (dashData.service_breakdown) {
         finances.value.serviceBreakdown = dashData.service_breakdown;

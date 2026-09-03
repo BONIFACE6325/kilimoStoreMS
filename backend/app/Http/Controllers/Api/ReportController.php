@@ -21,7 +21,8 @@ class ReportController extends Controller
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date') ? $request->query('end_date') . ' 23:59:59' : null;
 
-        $activeWeight = Batch::where('status', 'stored')->sum('current_weight_mt');
+        $activeWeight = (float) Batch::whereIn('status', ['stored', 'received', 'processing'])->sum('current_weight_mt');
+        $totalIntakeWeight = (float) Batch::sum('initial_weight_mt');
         $farmersCount = Farmer::where('status', 'active')->count();
         $outstandingLoans = (float) Loan::whereIn('status', ['active', 'overdue'])->sum('current_balance');
         $activeLoansCount = Loan::where('status', 'active')->count();
@@ -41,7 +42,12 @@ class ReportController extends Controller
 
         $settlementSalesQuery = Settlement::query();
         if ($startDate && $endDate) {
-            $settlementSalesQuery->whereBetween('settled_at', [$startDate, $endDate]);
+            $settlementSalesQuery->where(function($q) use ($startDate, $endDate) {
+                $q->whereBetween('settled_at', [$startDate, $endDate])
+                  ->orWhere(function($q2) use ($startDate, $endDate) {
+                      $q2->whereNull('settled_at')->whereBetween('created_at', [$startDate, $endDate]);
+                  });
+            });
         }
         $totalCropSales = (float) $settlementSalesQuery->sum('gross_amount');
         if ($totalCropSales <= 0) {
@@ -64,6 +70,7 @@ class ReportController extends Controller
         return response()->json([
             'stats' => [
                 'total_weight_stored_mt' => $activeWeight,
+                'total_intake_mt' => $totalIntakeWeight,
                 'registered_farmers' => $farmersCount,
                 'total_crop_sales_tzs' => $totalCropSales,
                 'gross_all_inflows_tzs' => $grossStoreInflows,
@@ -100,9 +107,9 @@ class ReportController extends Controller
             ],
             'trends' => $trends,
             'crop_distribution' => [
-                'Maize' => Batch::where('crop_type', 'Maize')->where('status', 'stored')->sum('current_weight_mt'),
-                'Rice' => Batch::where('crop_type', 'Rice')->where('status', 'stored')->sum('current_weight_mt'),
-                'Beans' => Batch::where('crop_type', 'Beans')->where('status', 'stored')->sum('current_weight_mt'),
+                'Mpunga / Rice' => (float) Batch::whereIn('crop_type', ['Rice', 'Mpunga', 'Paddy', 'mchele', 'Mchele'])->whereIn('status', ['stored', 'received', 'processing'])->sum('current_weight_mt'),
+                'Mahindi / Maize' => (float) Batch::whereIn('crop_type', ['Maize', 'Mahindi', 'Sembe'])->whereIn('status', ['stored', 'received', 'processing'])->sum('current_weight_mt'),
+                'Maharage / Beans' => (float) Batch::whereIn('crop_type', ['Beans', 'Maharage'])->whereIn('status', ['stored', 'received', 'processing'])->sum('current_weight_mt'),
             ]
         ]);
     }
