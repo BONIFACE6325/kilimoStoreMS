@@ -51,6 +51,33 @@ class SalesController extends Controller
         return array_unique($ids);
     }
 
+    private function getBatchRawQuantity($batch)
+    {
+        if (!$batch) return 0.0;
+        $qty = floatval($batch->intake_quantity ?? 0);
+        if ($qty > 0) return $qty;
+        return floatval($batch->current_weight_mt ?? $batch->initial_weight_mt ?? 0);
+    }
+
+    private function calculateJobFee($job, $batch)
+    {
+        if (!$job) return 0.0;
+        
+        $rawQty = $this->getBatchRawQuantity($batch);
+        if ($rawQty <= 0) $rawQty = 1.0;
+
+        $rate = floatval($job->rate ?? $job->unit_price ?? 0);
+        if ($rate <= 0) {
+            $rate = floatval($job->fee_amount ?? $job->fee ?? $job->cost ?? 0);
+        }
+
+        if ($rate > 0) {
+            return $rate * $rawQty;
+        }
+
+        return floatval($job->fee_amount ?? 0);
+    }
+
     public function previewDeductions(Request $request)
     {
         $validated = $request->validate([
@@ -61,13 +88,13 @@ class SalesController extends Controller
 
         $batch = Batch::with(['farmer'])->findOrFail($validated['batch_id']);
 
-        $soldWeightKg = $validated['sold_weight_kg'];
-        $availQty = floatval($batch->intake_quantity > 0 ? $batch->intake_quantity : $batch->current_weight_mt);
+        $soldQty = floatval($validated['sold_weight_kg']);
+        $availQty = $this->getBatchRawQuantity($batch);
 
-        if ($availQty < $soldWeightKg - 0.001) {
+        if ($availQty < $soldQty - 0.001) {
             return response()->json([
                 'success' => false,
-                'message' => 'Kiasi unachotaka kuuza ni kikubwa kuliko mzigo uliopo ('.$availQty.' '.($batch->intake_unit ?? 'Units').').'
+                'message' => 'Kiasi unachotaka kuuza ('.number_format($soldQty).' '.($batch->intake_unit ?? 'Units').') ni kikubwa kuliko mzigo uliopo ghalani ('.number_format($availQty).' '.($batch->intake_unit ?? 'Units').').'
             ], 422);
         }
 
@@ -78,32 +105,30 @@ class SalesController extends Controller
             ], 422);
         }
 
-        $grossSales = $soldWeightKg * $validated['price_per_kg'];
+        $grossSales = $soldQty * floatval($validated['price_per_kg']);
         $batchIds = $this->getRelatedBatchIds($batch);
 
         // 1. Calculate Storage Fees
         $daysInStorage = max(0, now()->diffInDays($batch->created_at));
         $storageFees = $this->calculateStorageFees($batch);
 
-        // 2. Fetch Unpaid Drying Fees across processing tree
+        // 2. Fetch Unpaid Drying Fees
         $dryingJobs = DryingJob::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
-        $dryingFees = $dryingJobs->sum(function($j) {
-            return $j->fee_amount > 0 ? $j->fee_amount : 0;
+        $dryingFees = $dryingJobs->sum(function($j) use ($batch) {
+            return $this->calculateJobFee($j, $batch);
         });
 
-        // 3. Fetch Unpaid Milling Fees across processing tree
+        // 3. Fetch Unpaid Milling Fees
         $millingJobs = MillingJob::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
-        $millingFees = $millingJobs->sum(function($j) {
-            if ($j->fee_amount > 0 && $j->fee_amount < 500) {
-                $weightKg = ($j->output_weight_mt > 0 ? $j->output_weight_mt : $j->input_weight_mt) * 1000;
-                return $j->fee_amount * ($weightKg > 0 ? $weightKg : 1);
-            }
-            return $j->fee_amount ?: 0;
+        $millingFees = $millingJobs->sum(function($j) use ($batch) {
+            return $this->calculateJobFee($j, $batch);
         });
 
-        // 4. Fetch Unpaid Grading Fees across processing tree
+        // 4. Fetch Unpaid Grading Fees
         $gradingRecords = GradingRecord::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
-        $gradingFees = $gradingRecords->sum('fee_amount');
+        $gradingFees = $gradingRecords->sum(function($j) use ($batch) {
+            return $this->calculateJobFee($j, $batch);
+        });
 
         // 5. Fetch Active Loans
         $loans = Loan::where('farmer_id', $batch->farmer_id)
@@ -128,64 +153,48 @@ class SalesController extends Controller
                 'loan_interest' => 0.00,
             ],
             'total_deductions' => $totalDeductions,
-            'net_payout' => $netPayout,
-            'days_in_storage' => $daysInStorage,
+            'net_payout' => $netPayout
         ]);
     }
 
     public function confirmSale(Request $request)
     {
+        $validated = $request->validate([
+            'farmer_id' => 'required|exists:farmers,id',
+            'batch_id' => 'required|exists:batches,id',
+            'buyer_name' => 'required|string|max:255',
+            'price_per_kg' => 'required|numeric|min:0',
+            'sold_weight_kg' => 'required|numeric|gt:0',
+        ]);
+
+        $batch = Batch::with(['farmer'])->findOrFail($validated['batch_id']);
+
+        $soldQty = floatval($validated['sold_weight_kg']);
+        $availQty = $this->getBatchRawQuantity($batch);
+
+        if ($availQty < $soldQty - 0.001) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kiasi unachotaka kuuza ('.number_format($soldQty).' '.($batch->intake_unit ?? 'Units').') ni kikubwa kuliko mzigo uliopo ghalani ('.number_format($availQty).' '.($batch->intake_unit ?? 'Units').').'
+            ], 422);
+        }
+
+        if ($batch->status === 'sold') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Shehena hii tayari imeshauzwa yote.'
+            ], 422);
+        }
+
         try {
-            $validated = $request->validate([
-                'batch_id' => 'required|exists:batches,id',
-                'buyer_id' => 'nullable|exists:buyers,id',
-                'buyer_name' => 'nullable|string|max:255',
-                'price_per_kg' => 'required|numeric|min:0',
-                'sold_weight_kg' => 'required|numeric|gt:0',
-            ]);
-            
-            if (empty($validated['buyer_id']) && empty($validated['buyer_name'])) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Tafadhali chagua mnunuzi au ingiza jina la mnunuzi mpya.'
-                ], 422);
-            }
+            $buyerName = $validated['buyer_name'] ?? 'Mnunuzi wa Jumla';
+            $buyer = Buyer::firstOrCreate(
+                ['name' => $buyerName, 'tenant_id' => $batch->tenant_id],
+                ['status' => 'active']
+            );
 
-            $batch = Batch::findOrFail($validated['batch_id']);
-
-            $soldWeightKg = floatval($validated['sold_weight_kg']);
-            $availQty = floatval($batch->intake_quantity > 0 ? $batch->intake_quantity : $batch->current_weight_mt);
-
-            if ($availQty < $soldWeightKg - 0.001) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Kiasi unachotaka kuuza ni kikubwa kuliko mzigo uliopo ('.$availQty.' '.($batch->intake_unit ?? 'Units').').'
-                ], 422);
-            }
-
-            if ($batch->status === 'sold') {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Shehena hii tayari imeshauzwa yote.'
-                ], 422);
-            }
-
-            $tenant = \App\Models\Tenant::first() ?? \App\Models\Tenant::create(['name' => 'Garanoki Main Store', 'subdomain' => 'garanoki-store', 'status' => 'active']);
-            $tenantId = $tenant->id;
-
-            if (!empty($validated['buyer_id'])) {
-                $buyer = Buyer::findOrFail($validated['buyer_id']);
-            } else {
-                $buyer = Buyer::create([
-                    'tenant_id' => $tenantId,
-                    'name' => $validated['buyer_name'],
-                    'phone' => null,
-                    'status' => 'active'
-                ]);
-            }
-
-            // Auto-generate invoice number
-            $lastInvoice = Invoice::orderBy('created_at', 'desc')->first();
+            $tenantId = $batch->tenant_id;
+            $lastInvoice = Invoice::where('tenant_id', $tenantId)->orderBy('created_at', 'desc')->first();
             $nextNumber = 1001;
             if ($lastInvoice) {
                 preg_match('/INV-(\d+)/', $lastInvoice->invoice_number, $matches);
@@ -195,36 +204,34 @@ class SalesController extends Controller
             }
             $invoiceNumber = 'INV-' . $nextNumber;
 
-            $pricePerKg = floatval($validated['price_per_kg']);
-            $grossSales = $soldWeightKg * $pricePerKg;
+            $pricePerUnit = floatval($validated['price_per_kg']);
+            $grossSales = $soldQty * $pricePerUnit;
 
             $batchIds = $this->getRelatedBatchIds($batch);
 
             // Calculate all deductions across processing tree
             $storageFees = $this->calculateStorageFees($batch);
             $dryingJobs = DryingJob::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
-            $dryingFees = $dryingJobs->sum(function($j) {
-                return $j->fee_amount > 0 ? $j->fee_amount : 0;
+            $dryingFees = $dryingJobs->sum(function($j) use ($batch) {
+                return $this->calculateJobFee($j, $batch);
             });
             
             $millingJobs = MillingJob::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
-            $millingFees = $millingJobs->sum(function($j) {
-                if ($j->fee_amount > 0 && $j->fee_amount < 500) {
-                    $weightKg = ($j->output_weight_mt > 0 ? $j->output_weight_mt : $j->input_weight_mt) * 1000;
-                    return $j->fee_amount * ($weightKg > 0 ? $weightKg : 1);
-                }
-                return $j->fee_amount ?: 0;
+            $millingFees = $millingJobs->sum(function($j) use ($batch) {
+                return $this->calculateJobFee($j, $batch);
             });
             
             $gradingRecords = GradingRecord::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
-            $gradingFees = $gradingRecords->sum('fee_amount');
+            $gradingFees = $gradingRecords->sum(function($j) use ($batch) {
+                return $this->calculateJobFee($j, $batch);
+            });
 
             $loans = Loan::where('farmer_id', $batch->farmer_id)->whereIn('status', ['active', 'overdue'])->orderBy('created_at', 'asc')->get();
             $loanPrincipal = $loans->sum('current_balance');
 
             $totalDeductions = $storageFees + $dryingFees + $millingFees + $gradingFees + $loanPrincipal;
             
-            // Waterfall payment logic to figure out what actually gets paid
+            // Waterfall payment logic
             $availableFunds = $grossSales;
             
             $paidStorage = min($availableFunds, $storageFees);
@@ -240,22 +247,15 @@ class SalesController extends Controller
             $availableFunds -= $paidGrading;
             
             $fundsBeforeLoans = $availableFunds;
-            $paidLoansTotal = 0;
-            foreach ($loans as $loan) {
-                if ($availableFunds <= 0) break;
-                $payAmount = min($availableFunds, $loan->current_balance);
-                $paidLoansTotal += $payAmount;
-                $availableFunds -= $payAmount;
-            }
             
             $netPayout = $availableFunds;
             $actualDeductions = $grossSales - $netPayout;
 
             $result = DB::transaction(function () use (
-                $tenantId, $batch, $buyer, $invoiceNumber, $pricePerKg, $soldWeightKg, $availQty, $grossSales,
+                $tenantId, $batch, $buyer, $invoiceNumber, $pricePerUnit, $soldQty, $availQty, $grossSales,
                 $paidStorage, $paidDrying, $paidMilling, $paidGrading,
                 $loans, $actualDeductions, $netPayout, $fundsBeforeLoans,
-                $dryingJobs, $millingJobs
+                $dryingJobs, $millingJobs, $gradingRecords
             ) {
                 // 1. Create Invoice
                 $invoice = Invoice::create([
@@ -263,7 +263,7 @@ class SalesController extends Controller
                     'buyer_id' => $buyer->id,
                     'invoice_number' => $invoiceNumber,
                     'subtotal' => $grossSales,
-                    'vat_amount' => $grossSales * 0.18, // 18% VAT
+                    'vat_amount' => $grossSales * 0.18,
                     'total_amount' => $grossSales * 1.18,
                     'status' => 'unpaid',
                     'due_date' => now()->addDays(30),
@@ -272,8 +272,8 @@ class SalesController extends Controller
                 InvoiceItem::create([
                     'invoice_id' => $invoice->id,
                     'batch_id' => $batch->id,
-                    'quantity_mt' => $soldWeightKg,
-                    'unit_price' => $pricePerKg,
+                    'quantity_mt' => $soldQty,
+                    'unit_price' => $pricePerUnit,
                     'total_price' => $grossSales,
                 ]);
 
@@ -325,6 +325,9 @@ class SalesController extends Controller
                         'deduction_type' => 'grading_fee',
                         'amount' => $paidGrading,
                     ]);
+                    if ($paidGrading >= $gradingRecords->sum('fee_amount')) {
+                        foreach($gradingRecords as $gr) $gr->update(['status' => 'paid']);
+                    }
                 }
                 
                 // Loans waterfall
@@ -356,20 +359,20 @@ class SalesController extends Controller
                     ]);
                 }
 
-                // 4. Update Batch status and weight
-                $newQty = max(0, $availQty - $soldWeightKg);
+                // 4. Update Batch status and remaining weight/quantity
+                $newQty = max(0, $availQty - $soldQty);
                 $isFullySold = $newQty <= 0.001;
 
                 $batch->update([
-                    'current_weight_mt' => $newQty,
                     'intake_quantity' => $newQty,
+                    'current_weight_mt' => $newQty,
                     'status' => $isFullySold ? 'sold' : $batch->status
                 ]);
 
                 // 5. Decrement Bin Occupancy
                 if ($batch->current_bin_id && $batch->bin) {
                     $bin = $batch->bin;
-                    $soldWeightMt = $soldWeightKg / 1000;
+                    $soldWeightMt = $soldQty / 1000;
                     if ($bin->current_occupancy_mt > 0) {
                         $bin->decrement('current_occupancy_mt', min($bin->current_occupancy_mt, $soldWeightMt));
                     }
@@ -378,7 +381,7 @@ class SalesController extends Controller
                     }
                 }
 
-                // 6. Sync Farmer Active Status (If all stock sold out, mark inactive)
+                // 6. Sync Farmer Active Status
                 $farmerId = $batch->farmer_id;
                 $hasActiveStock = Batch::where('farmer_id', $farmerId)
                     ->where('status', '!=', 'sold')
@@ -408,7 +411,6 @@ class SalesController extends Controller
 
     private function calculateStorageFees($batch)
     {
-        // Fetch storage service safely (check if category column exists, or fallback to name search)
         $hasCategory = \Illuminate\Support\Facades\Schema::hasColumn('services', 'category');
         $storageService = \App\Models\Service::where(function ($q) use ($hasCategory) {
             if ($hasCategory) {
@@ -426,24 +428,10 @@ class SalesController extends Controller
         $years = floor($daysInStorage / 365);
 
         if ($years > 0) {
-            $qty = $this->calculateQuantityForUnit($batch->current_weight_mt, $storageService->unit);
-            return $years * $storageService->rate * $qty;
+            $rawQty = $this->getBatchRawQuantity($batch);
+            return $years * $storageService->rate * $rawQty;
         }
 
         return 0.00;
-    }
-
-    private function calculateQuantityForUnit($weightMt, $unit)
-    {
-        $unit = strtolower($unit);
-        if ($unit === 'kg' || $unit === 'kilo') {
-            return $weightMt * 1000;
-        } elseif ($unit === 'gunia' || $unit === 'bag' || $unit === 'bags') {
-            return $weightMt * 10;
-        } elseif ($unit === 'roba') {
-            return $weightMt * 20;
-        } else {
-            return $weightMt; // 'mt' or 'ton' or default
-        }
     }
 }

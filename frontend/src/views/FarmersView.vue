@@ -1191,11 +1191,11 @@
             <div class="grid grid-cols-3 gap-2 text-[11px] pt-1">
               <div>
                 <span class="text-slate-500 dark:text-slate-400 block">Ada Hifadhi:</span>
-                <strong class="text-slate-900 dark:text-slate-50 font-bold">Tsh {{ (settlementForm.storage_fee || 45000).toLocaleString() }}</strong>
+                <strong class="text-slate-900 dark:text-slate-50 font-bold">Tsh {{ settleStorageFee.toLocaleString() }}</strong>
               </div>
               <div>
-                <span class="text-slate-500 dark:text-slate-400 block">Ada Kinu:</span>
-                <strong class="text-slate-900 dark:text-slate-50 font-bold">Tsh {{ (settlementForm.milling_fee || 120000).toLocaleString() }}</strong>
+                <span class="text-slate-500 dark:text-slate-400 block">Ada Huduma & Kinu:</span>
+                <strong class="text-slate-900 dark:text-slate-50 font-bold">Tsh {{ settleMillingDryingFee.toLocaleString() }}</strong>
               </div>
               <div>
                 <span class="text-slate-500 dark:text-slate-400 block">Den la Mkopo:</span>
@@ -1239,24 +1239,25 @@
 
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block font-extrabold text-slate-900 dark:text-slate-50 mb-1">Uzito wa Kuuza (Kg) *</label>
+                <label class="block font-extrabold text-slate-900 dark:text-slate-50 mb-1">Kiasi cha Kuuza (Idadi) *</label>
                 <input 
                   v-model.number="settlementForm.sold_weight_kg" 
                   :disabled="settlementForm.sale_type === 'full'"
                   type="number" 
-                  placeholder="Uzito kwa Kg..." 
+                  placeholder="Idadi ya Kuuza..." 
                   class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-600 rounded-xl font-bold text-slate-900 dark:text-slate-50 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 dark:text-slate-400"
                 />
                 <div v-if="selectedSettlementBatch" class="text-[10.5px] text-slate-500 dark:text-slate-400 font-semibold mt-1 space-y-0.5">
-                  <div>Uliopo: <strong class="text-slate-900 dark:text-slate-50 font-bold">{{ availableBatchKg.toLocaleString() }} Kg</strong> | Utakaobaki: <strong class="text-emerald-700 dark:text-emerald-400 font-extrabold">{{ remainingBatchKgAfterSale.toLocaleString() }} Kg</strong></div>
+                  <div>Mzigo Uliopo: <strong class="text-emerald-700 dark:text-emerald-400 font-black">{{ getBatchRawQuantity(selectedSettlementBatch).toLocaleString() }} {{ selectedSettlementBatch.intake_unit || 'Units' }}</strong></div>
+                  <div>Utakaobaki Ghalani: <strong class="text-slate-900 dark:text-slate-50 font-bold">{{ remainingBatchKgAfterSale.toLocaleString() }} {{ selectedSettlementBatch.intake_unit || 'Units' }}</strong></div>
                   <div class="text-amber-900 dark:text-amber-400 font-bold flex items-center gap-1 bg-amber-50 dark:bg-amber-500/10 p-1 rounded border border-amber-200 dark:border-amber-500/20">
-                    <span>⏱️ Muda wa Utunzaji: <strong class="text-amber-950 dark:text-amber-400 font-black">Siku {{ calculateStorageDays(selectedSettlementBatch.created_at, selectedSettlementBatch.status, selectedSettlementBatch.updated_at) }}</strong> (Mapokezi: {{ formatDate(selectedSettlementBatch.created_at) }})</span>
+                    <span>⏱️ Utunzaji: <strong class="text-amber-950 dark:text-amber-400 font-black">Siku {{ calculateStorageDays(selectedSettlementBatch.created_at, selectedSettlementBatch.status, selectedSettlementBatch.updated_at) }}</strong> (Tarehe: {{ formatDate(selectedSettlementBatch.created_at) }})</span>
                   </div>
                 </div>
               </div>
               <div>
-                <label class="block font-extrabold text-slate-900 dark:text-slate-50 mb-1">Bei ya Mauzo (Tsh/Kg) *</label>
-                <input v-model.number="settlementForm.price_per_kg" type="number" placeholder="e.g. 1800" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-600 rounded-xl font-bold text-slate-900 dark:text-slate-50"/>
+                <label class="block font-extrabold text-slate-900 dark:text-slate-50 mb-1">Bei ya Mauzo (Tsh kwa Unit) *</label>
+                <input v-model.number="settlementForm.price_per_kg" type="number" placeholder="e.g. 120000" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-600 rounded-xl font-bold text-slate-900 dark:text-slate-50"/>
               </div>
             </div>
 
@@ -1267,12 +1268,26 @@
           </div>
 
           <!-- Summary Badge -->
-          <div class="p-3 bg-slate-900 text-white rounded-2xl flex items-center justify-between text-xs font-bold">
-            <div>
-              <span class="text-slate-400 block text-[10px]">Malipo Halisi kwa Mkulima (Payout)</span>
-              <span class="text-emerald-400 font-black text-sm">Tsh {{ settleNetPayout.toLocaleString() }}</span>
+          <div class="p-3.5 bg-slate-900 text-white rounded-2xl space-y-2 text-xs font-bold">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <div>
+                <span class="text-slate-400 block text-[10px]">1. Mauzo Ghafi (Gross Sales)</span>
+                <span class="text-amber-400 font-black text-sm">Tsh {{ settleGrossSales.toLocaleString() }}</span>
+              </div>
+              <div class="text-right">
+                <span class="text-slate-400 block text-[10px]">2. Jumla ya Makato (Deductions)</span>
+                <span class="text-rose-400 font-black text-sm">- Tsh {{ settleTotalDeductions.toLocaleString() }}</span>
+              </div>
             </div>
-            <span class="text-[10.5px] bg-slate-800 text-slate-300 px-2.5 py-1 rounded-lg">Ghafi: Tsh {{ settleGrossSales.toLocaleString() }}</span>
+            <div class="flex items-center justify-between pt-1">
+              <div>
+                <span class="text-emerald-400 block text-[10px] uppercase tracking-wider font-extrabold">3. Malipo Halisi kwa Mkulima (Net Payout)</span>
+                <span class="text-emerald-400 font-black text-base">Tsh {{ settleNetPayout.toLocaleString() }}</span>
+              </div>
+              <div class="text-[10px] text-slate-400 bg-slate-800 px-2.5 py-1 rounded-lg font-semibold">
+                Huduma: Tsh {{ settleMillingDryingFee.toLocaleString() }}
+              </div>
+            </div>
           </div>
 
           <div class="flex items-center gap-2 pt-2">
@@ -1831,22 +1846,6 @@ const settlementForm = ref({
   milling_fee: 120000 
 });
 
-const onSettlementBatchChange = () => {
-  const b = activeNonTransformedBatches.value.find(item => item.id === settlementForm.value.batch_id);
-  if (b) {
-    const availKg = parseFloat(b.intake_quantity || b.current_weight_mt || b.current_weight || 0);
-    settlementForm.value.sold_weight_kg = availKg;
-    settlementForm.value.sale_type = 'full';
-  }
-};
-
-const onSaleTypeChange = () => {
-  const b = activeNonTransformedBatches.value.find(item => item.id === settlementForm.value.batch_id);
-  if (b && settlementForm.value.sale_type === 'full') {
-    settlementForm.value.sold_weight_kg = parseFloat(b.intake_quantity || b.current_weight_mt || b.current_weight || 0);
-  }
-};
-
 const selectedSettlementBatch = computed(() => {
   if (!settlementForm.value.batch_id) return null;
   return activeNonTransformedBatches.value.find(b => String(b.id) === String(settlementForm.value.batch_id)) || null;
@@ -1854,12 +1853,25 @@ const selectedSettlementBatch = computed(() => {
 
 const availableBatchKg = computed(() => {
   if (!selectedSettlementBatch.value) return 0;
-  return parseFloat(selectedSettlementBatch.value.intake_quantity || selectedSettlementBatch.value.current_weight_mt || selectedSettlementBatch.value.current_weight || 0);
+  return getBatchWeightKg(selectedSettlementBatch.value);
 });
 
 const remainingBatchKgAfterSale = computed(() => {
   return Math.max(0, availableBatchKg.value - (Number(settlementForm.value.sold_weight_kg) || 0));
 });
+
+const onSettlementBatchChange = () => {
+  if (selectedSettlementBatch.value) {
+    settlementForm.value.sold_weight_kg = availableBatchKg.value;
+    settlementForm.value.sale_type = 'full';
+  }
+};
+
+const onSaleTypeChange = () => {
+  if (selectedSettlementBatch.value && settlementForm.value.sale_type === 'full') {
+    settlementForm.value.sold_weight_kg = availableBatchKg.value;
+  }
+};
 
 // Top-level parent batches (without parent_batch_id) to avoid visual card duplication
 const topLevelFarmerBatches = computed(() => {
@@ -1937,17 +1949,7 @@ const filteredCatalogServices = computed(() => {
 
 const getServiceRate = (cs) => {
   if (!cs) return 0;
-
-  // 1. Check registered catalogServices to get true catalog rate
-  const foundCatalog = catalogServices.value.find(cat => 
-    (cs.service_id && String(cat.id) === String(cs.service_id)) ||
-    (cat.name_sw && String(cat.name_sw).toLowerCase().trim() === String(cs.service_name || cs.type || '').toLowerCase().trim())
-  );
-  if (foundCatalog && foundCatalog.rate !== undefined && foundCatalog.rate !== null && parseFloat(foundCatalog.rate) > 0) {
-    return parseFloat(foundCatalog.rate);
-  }
-
-  // 2. Direct rate or unit_price properties
+  // 1. Direct rate or unit_price properties on the service item
   if (cs.rate !== undefined && cs.rate !== null && parseFloat(cs.rate) > 0) {
     return parseFloat(cs.rate);
   }
@@ -1955,48 +1957,51 @@ const getServiceRate = (cs) => {
     return parseFloat(cs.unit_price);
   }
 
-  // 3. Fallback
-  return parseFloat(cs.fee_amount || cs.fee || cs.cost || 0);
+  // 2. Check registered catalogServices to get true catalog rate
+  const foundCatalog = catalogServices.value.find(cat => 
+    (cs.service_id && String(cat.id) === String(cs.service_id)) ||
+    (cat.name_sw && String(cat.name_sw).toLowerCase().trim() === String(cs.service_name || cs.type || '').toLowerCase().trim()) ||
+    (cat.name_en && String(cat.name_en).toLowerCase().trim() === String(cs.service_name || cs.type || '').toLowerCase().trim())
+  );
+  if (foundCatalog && foundCatalog.rate !== undefined && foundCatalog.rate !== null && parseFloat(foundCatalog.rate) > 0) {
+    return parseFloat(foundCatalog.rate);
+  }
+
+  // 3. Fallback: return stored fee_amount as the unit rate
+  const fee = parseFloat(cs.fee_amount || cs.fee || cs.cost || 0);
+  return fee;
 };
 
 const getBatchWeightKg = (batch) => {
   if (!batch) return 0;
-  // Use intake_quantity as the source of truth (unit-agnostic system)
   if (batch.intake_quantity && parseFloat(batch.intake_quantity) > 0) {
     return parseFloat(batch.intake_quantity);
   }
-  // Fallback to current_weight_mt (which now stores raw quantity, NOT metric tons)
-  let wMt = parseFloat(batch.current_weight_mt || batch.current_weight || 0);
-  let initMt = parseFloat(batch.initial_weight_mt || 0);
-  if (wMt <= 0 && initMt > 0) {
-    wMt = initMt;
-  }
-  return wMt;
+  return parseFloat(batch.current_weight_mt || batch.current_weight || 0);
+};
+
+const getBatchRawQuantity = (batch) => {
+  return getBatchWeightKg(batch);
 };
 
 const getServiceQuantity = (cs, batch) => {
   if (!cs) return 0;
   let q = cs && cs.quantity !== undefined && cs.quantity !== null ? parseFloat(cs.quantity) : 0;
   if (q > 0) return q;
-  if (!batch) return 1;
 
-  const intakeQty = parseFloat(batch.intake_quantity || 0);
-  const intakeUnit = batch.intake_unit || 'Gunia';
-  const serviceUnit = cs.unit || 'Gunia';
+  const targetB = batch || farmerBatches.value.find(b => String(b.id) === String(cs.batch_id) || b.batch_code === cs.batch_code);
+  if (!targetB) return 1;
 
-  if (intakeQty > 0) {
-    return convertUnits(intakeQty, intakeUnit, serviceUnit);
-  }
+  const intakeQty = parseFloat(targetB.intake_quantity || 0);
+  if (intakeQty > 0) return intakeQty;
 
-  const batchWeightMt = parseFloat(batch.current_weight_mt || batch.initial_weight_mt || batch.current_weight || 0);
-  if (batchWeightMt > 0) {
-    return convertUnits(batchWeightMt, 'Tani', serviceUnit);
-  }
-  return 1;
+  const batchWeight = parseFloat(targetB.current_weight_mt || targetB.initial_weight_mt || targetB.current_weight || 0);
+  return batchWeight > 0 ? batchWeight : 1;
 };
 
 const calculateServiceTotalFee = (cs, batch) => {
   if (!cs) return 0;
+
   const rate = getServiceRate(cs);
   const qty = getServiceQuantity(cs, batch);
 
@@ -2004,11 +2009,8 @@ const calculateServiceTotalFee = (cs, batch) => {
     return Math.round(rate * qty);
   }
 
-  const baseFee = parseFloat(cs.fee_amount || cs.fee || cs.cost || 0);
-  if (baseFee > 0 && baseFee < 1000 && rate > 0 && qty > 0) {
-    return Math.round(rate * qty);
-  }
-  return baseFee > 0 ? baseFee : Math.round(rate * qty);
+  const storedTotalFee = parseFloat(cs.fee_amount || cs.fee || cs.cost || 0);
+  return Math.round(storedTotalFee);
 };
 
 const editAssignedService = async (b, s) => {
@@ -2364,7 +2366,7 @@ const openNewSaleModal = () => {
   if (activeNonTransformedBatches.value.length > 0) {
     const firstB = activeNonTransformedBatches.value[0];
     settlementForm.value.batch_id = firstB.id;
-    settlementForm.value.sold_weight_kg = (parseFloat(firstB.current_weight_mt || firstB.current_weight || 0));
+    settlementForm.value.sold_weight_kg = getBatchWeightKg(firstB);
   } else {
     settlementForm.value.batch_id = '';
     settlementForm.value.sold_weight_kg = 0;
@@ -2931,21 +2933,42 @@ const totalFarmerNetPayout = computed(() => {
 });
 
 const settleGrossSales = computed(() => {
-  const b = activeNonTransformedBatches.value.find(item => item.id === settlementForm.value.batch_id);
-  const defaultKg = b ? (parseFloat(b.current_weight_mt || b.current_weight || 0)) : totalFarmerStockKg.value;
+  const b = selectedSettlementBatch.value;
+  const defaultKg = b ? getBatchWeightKg(b) : totalFarmerStockKg.value;
   const soldKg = Number(settlementForm.value.sold_weight_kg) || defaultKg || 0;
-  return soldKg * (settlementForm.value.price_per_kg || 0);
+  return Math.round(soldKg * (settlementForm.value.price_per_kg || 0));
+});
+
+const settleStorageFee = computed(() => {
+  let fee = 0;
+  const targetBatchId = settlementForm.value.batch_id;
+  (farmerServices.value || []).forEach(s => {
+    if (s.status !== 'paid' && String(s.type || s.service_name || '').toLowerCase().includes('stor')) {
+      const b = (farmerBatches.value || []).find(item => String(item.id) === String(s.batch_id));
+      if (!targetBatchId || String(s.batch_id) === String(targetBatchId) || (b && String(b.parent_batch_id) === String(targetBatchId))) {
+        fee += calculateServiceTotalFee(s, b);
+      }
+    }
+  });
+  return fee;
+});
+
+const settleMillingDryingFee = computed(() => {
+  let fee = 0;
+  const targetBatchId = settlementForm.value.batch_id;
+  (farmerServices.value || []).forEach(s => {
+    if (s.status !== 'paid' && !String(s.type || s.service_name || '').toLowerCase().includes('stor')) {
+      const b = (farmerBatches.value || []).find(item => String(item.id) === String(s.batch_id));
+      if (!targetBatchId || String(s.batch_id) === String(targetBatchId) || (b && String(b.parent_batch_id) === String(targetBatchId))) {
+        fee += calculateServiceTotalFee(s, b);
+      }
+    }
+  });
+  return fee;
 });
 
 const settleTotalDeductions = computed(() => {
-  let totalFees = 0;
-  farmerServices.value.forEach(s => {
-    if (s.status !== 'paid') {
-      const b = (farmerBatches.value || []).find(item => String(item.id) === String(s.batch_id));
-      totalFees += calculateServiceTotalFee(s, b);
-    }
-  });
-  return totalFees + totalFarmerLoanBalance.value;
+  return settleStorageFee.value + settleMillingDryingFee.value + totalFarmerLoanBalance.value;
 });
 
 const settleNetPayout = computed(() => {
@@ -2958,17 +2981,17 @@ const submitSettlement = async () => {
     return;
   }
 
-  const b = activeNonTransformedBatches.value.find(item => item.id === settlementForm.value.batch_id);
-  const defaultKg = b ? (parseFloat(b.current_weight_mt || b.current_weight || 0)) : 0;
-  const soldKg = Number(settlementForm.value.sold_weight_kg) || defaultKg;
+  const b = selectedSettlementBatch.value;
+  const availKg = b ? getBatchWeightKg(b) : 0;
+  const soldKg = Number(settlementForm.value.sold_weight_kg) || availKg;
 
   if (soldKg <= 0) {
     triggerToast('Ingiza uzito wa Kg wa kuuza!', 'error');
     return;
   }
 
-  if (b && soldKg > defaultKg + 0.01) {
-    triggerToast(`Kiasi cha kuuza (${soldKg.toLocaleString()} Kg) kinazidi uzito uliopo ghalani (${defaultKg.toLocaleString()} Kg)!`, 'error');
+  if (b && soldKg > availKg + 0.01) {
+    triggerToast(`Kiasi cha kuuza (${soldKg.toLocaleString()} Kg) kinazidi uzito uliopo ghalani (${availKg.toLocaleString()} Kg)!`, 'error');
     return;
   }
 
