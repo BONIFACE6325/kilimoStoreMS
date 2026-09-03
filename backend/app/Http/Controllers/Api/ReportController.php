@@ -318,4 +318,46 @@ class ReportController extends Controller
             'other_income_net_profit' => $otherIncomeNetProfit,
         ]);
     }
+
+    public function resetAllData(Request $request)
+    {
+        try {
+            \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
+
+            SettlementDeduction::truncate();
+            Settlement::truncate();
+            InvoiceItem::truncate();
+            Invoice::truncate();
+            Buyer::truncate();
+            LoanTransaction::truncate();
+            Loan::truncate();
+            GradingRecord::truncate();
+            MillingJob::truncate();
+            DryingJob::truncate();
+            BatchMovement::truncate();
+            Batch::truncate();
+            Farmer::truncate();
+            \App\Models\OtherIncome::truncate();
+            \App\Models\Expense::truncate();
+
+            \App\Models\Bin::query()->update([
+                'current_occupancy_mt' => 0,
+                'crop_type' => null,
+                'status' => 'empty'
+            ]);
+
+            \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Operational data wiped successfully. Users, Tenants, Branches & Services preserved.'
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

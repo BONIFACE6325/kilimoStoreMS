@@ -32,6 +32,7 @@ Route::prefix('v1')->group(function () {
     // Dashboard & Reports
     Route::get('/dashboard/stats', [ReportController::class, 'getDashboardStats']);
     Route::get('/reports/profit-loss', [ReportController::class, 'profitLossReport']);
+    Route::post('/system/reset-data', [ReportController::class, 'resetAllData']);
 
     // Farmers
     Route::apiResource('farmers', FarmerController::class);
