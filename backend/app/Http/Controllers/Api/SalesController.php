@@ -408,10 +408,13 @@ class SalesController extends Controller
 
     private function calculateStorageFees($batch)
     {
-        // Fetch storage service from registered services (category 'stock' or name containing hifadhi/storage)
-        $storageService = \App\Models\Service::where(function ($q) {
-            $q->where('category', 'stock')
-              ->orWhere('name_sw', 'like', '%hifadhi%')
+        // Fetch storage service safely (check if category column exists, or fallback to name search)
+        $hasCategory = \Illuminate\Support\Facades\Schema::hasColumn('services', 'category');
+        $storageService = \App\Models\Service::where(function ($q) use ($hasCategory) {
+            if ($hasCategory) {
+                $q->where('category', 'stock');
+            }
+            $q->orWhere('name_sw', 'like', '%hifadhi%')
               ->orWhere('name_en', 'like', '%storage%');
         })->first();
 
