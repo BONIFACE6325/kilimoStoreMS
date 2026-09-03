@@ -2831,11 +2831,6 @@ const submitCompleteService = async () => {
 
   const isChanging = completeForm.value.has_changed === 'yes';
 
-  // VALIDATION: Removed output weight > input weight check because units are now agnostic.
-
-  const outKg = getUnitKg(completeForm.value.output_unit, completeForm.value.output_quantity || 0);
-  const byKg = (isChanging && completeForm.value.has_byproduct === 'yes') ? getUnitKg(completeForm.value.byproduct_unit, completeForm.value.byproduct_quantity || 0) : 0;
-
   try {
     const payload = {
       type: completeForm.value.type || (s ? (s.type || 'milling').toLowerCase() : 'milling'),
@@ -2845,7 +2840,7 @@ const submitCompleteService = async () => {
       output_crop: isChanging ? completeForm.value.output_crop : parent.crop_type,
       output_unit: completeForm.value.output_unit,
       output_quantity: completeForm.value.output_quantity,
-      final_value: isChanging ? completeForm.value.output_quantity : (parent.current_weight_mt || parent.current_weight || 0),
+      final_value: isChanging ? completeForm.value.output_quantity : (parent.current_weight_mt || parent.current_weight || parent.intake_quantity || 0),
       has_byproduct: isChanging ? completeForm.value.has_byproduct : 'no',
       by_product_crop: (isChanging && completeForm.value.has_byproduct === 'yes') ? completeForm.value.byproduct_crop : null,
       by_product_unit: (isChanging && completeForm.value.has_byproduct === 'yes') ? completeForm.value.byproduct_unit : null,
@@ -2857,11 +2852,16 @@ const submitCompleteService = async () => {
 
     const res = await fetch(`/api/v1/batches/${parent.id}/processing`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
       body: JSON.stringify(payload)
     });
 
-    if (res.ok) {
+    const data = await res.json().catch(() => ({}));
+
+    if (res.ok && data.success !== false) {
       modals.value.completeService = false;
       await openFarmerProfile(selectedFarmer.value.id);
       await fetchFarmers();
@@ -2870,9 +2870,11 @@ const submitCompleteService = async () => {
       } else {
         triggerToast(`Huduma ya "${s ? (s.service_name || s.type) : 'Kinu'}" Imekamilika! Mzigo unabaki salama kupewa huduma zingine! ⚙️✓`);
       }
+    } else {
+      triggerToast(data.message || data.error || 'Imefeli kukamilisha huduma.', 'error');
     }
   } catch (e) {
-    triggerToast('Imefeli kukamilisha huduma.', 'error');
+    triggerToast('Imefeli kukamilisha huduma: ' + e.message, 'error');
   }
 };
 
