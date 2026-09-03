@@ -18,7 +18,8 @@ class ReportController extends Controller
 {
     public function getDashboardStats(Request $request)
     {
-        $startDate = $request->query('start_date');
+        try {
+            $startDate = $request->query('start_date');
         $endDate = $request->query('end_date') ? $request->query('end_date') . ' 23:59:59' : null;
 
         $activeWeight = (float) Batch::whereIn('status', ['stored', 'received', 'processing'])->sum('current_weight_mt');
@@ -112,6 +113,14 @@ class ReportController extends Controller
                 'Maharage / Beans' => (float) Batch::whereIn('crop_type', ['Beans', 'Maharage'])->whereIn('status', ['stored', 'received', 'processing'])->sum('current_weight_mt'),
             ]
         ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('getDashboardStats failed: ' . $e->getMessage());
+            return response()->json([
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ], 500);
+        }
     }
 
     private function getSumByDateRange($query, string $dateColumn, ?string $start, ?string $end, string $sumColumn = 'amount'): float
