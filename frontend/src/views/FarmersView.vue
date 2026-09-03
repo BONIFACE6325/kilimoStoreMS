@@ -2943,13 +2943,62 @@ const settleGrossSales = computed(() => {
   return Math.round(soldKg * (settlementForm.value.price_per_kg || 0));
 });
 
+const getRelatedBatchIdsSet = (targetBatchId) => {
+  const set = new Set();
+  const codeSet = new Set();
+  if (!targetBatchId) return { ids: set, codes: codeSet };
+  
+  const all = farmerBatches.value || [];
+  const targetB = all.find(b => String(b.id) === String(targetBatchId));
+  if (!targetB) {
+    set.add(String(targetBatchId));
+    return { ids: set, codes: codeSet };
+  }
+
+  set.add(String(targetB.id));
+  if (targetB.batch_code) codeSet.add(String(targetB.batch_code));
+
+  if (targetB.parent_batch_id) {
+    const parentIdStr = String(targetB.parent_batch_id);
+    set.add(parentIdStr);
+    const parentB = all.find(b => String(b.id) === parentIdStr);
+    if (parentB && parentB.batch_code) codeSet.add(String(parentB.batch_code));
+
+    all.forEach(b => {
+      if (String(b.parent_batch_id) === parentIdStr) {
+        set.add(String(b.id));
+        if (b.batch_code) codeSet.add(String(b.batch_code));
+      }
+    });
+  }
+
+  all.forEach(b => {
+    if (String(b.parent_batch_id) === String(targetB.id)) {
+      set.add(String(b.id));
+      if (b.batch_code) codeSet.add(String(b.batch_code));
+    }
+  });
+
+  return { ids: set, codes: codeSet };
+};
+
 const settleStorageFee = computed(() => {
   let fee = 0;
   const targetBatchId = settlementForm.value.batch_id;
+  const { ids: relatedIds, codes: relatedCodes } = getRelatedBatchIdsSet(targetBatchId);
+
   (farmerServices.value || []).forEach(s => {
     if (s.status !== 'paid' && String(s.type || s.service_name || '').toLowerCase().includes('stor')) {
-      const b = (farmerBatches.value || []).find(item => String(item.id) === String(s.batch_id));
-      if (!targetBatchId || String(s.batch_id) === String(targetBatchId) || (b && String(b.parent_batch_id) === String(targetBatchId))) {
+      const b = (farmerBatches.value || []).find(item => String(item.id) === String(s.batch_id) || (item.batch_code && item.batch_code === s.batch_code));
+      const sBatchIdStr = String(s.batch_id || (b ? b.id : ''));
+      const sBatchCodeStr = String(s.batch_code || (b ? b.batch_code : ''));
+
+      const isMatch = !targetBatchId ||
+        relatedIds.has(sBatchIdStr) ||
+        relatedCodes.has(sBatchCodeStr) ||
+        (b && (relatedIds.has(String(b.id)) || (b.parent_batch_id && relatedIds.has(String(b.parent_batch_id)))));
+
+      if (isMatch) {
         fee += calculateServiceTotalFee(s, b);
       }
     }
@@ -2960,10 +3009,20 @@ const settleStorageFee = computed(() => {
 const settleMillingDryingFee = computed(() => {
   let fee = 0;
   const targetBatchId = settlementForm.value.batch_id;
+  const { ids: relatedIds, codes: relatedCodes } = getRelatedBatchIdsSet(targetBatchId);
+
   (farmerServices.value || []).forEach(s => {
     if (s.status !== 'paid' && !String(s.type || s.service_name || '').toLowerCase().includes('stor')) {
-      const b = (farmerBatches.value || []).find(item => String(item.id) === String(s.batch_id));
-      if (!targetBatchId || String(s.batch_id) === String(targetBatchId) || (b && String(b.parent_batch_id) === String(targetBatchId))) {
+      const b = (farmerBatches.value || []).find(item => String(item.id) === String(s.batch_id) || (item.batch_code && item.batch_code === s.batch_code));
+      const sBatchIdStr = String(s.batch_id || (b ? b.id : ''));
+      const sBatchCodeStr = String(s.batch_code || (b ? b.batch_code : ''));
+
+      const isMatch = !targetBatchId ||
+        relatedIds.has(sBatchIdStr) ||
+        relatedCodes.has(sBatchCodeStr) ||
+        (b && (relatedIds.has(String(b.id)) || (b.parent_batch_id && relatedIds.has(String(b.parent_batch_id)))));
+
+      if (isMatch) {
         fee += calculateServiceTotalFee(s, b);
       }
     }
