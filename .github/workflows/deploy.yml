@@ -73,9 +73,8 @@ jobs:
             sudo systemctl enable mysql || true
             sudo systemctl start mysql || true
 
-            echo "🔑 Creating Clean MySQL Database & User..."
-            sudo mysql -e "DROP DATABASE IF EXISTS kilimostore_db;" || true
-            sudo mysql -e "CREATE DATABASE kilimostore_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" || true
+            echo "🔑 Ensuring MySQL Database & User Exist..."
+            sudo mysql -e "CREATE DATABASE IF NOT EXISTS kilimostore_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" || true
             sudo mysql -e "CREATE USER IF NOT EXISTS 'kilimo_user'@'localhost' IDENTIFIED BY 'KilimoPass2026!';" || true
             sudo mysql -e "ALTER USER 'kilimo_user'@'localhost' IDENTIFIED BY 'KilimoPass2026!';" || true
             sudo mysql -e "GRANT ALL PRIVILEGES ON kilimostore_db.* TO 'kilimo_user'@'localhost';" || true
@@ -91,28 +90,28 @@ jobs:
             cd /var/www/kilimostore/backend
             rm -rf bootstrap/cache/*.php || true
 
-            echo "APP_NAME=KilimoStore" > .env
-            echo "APP_ENV=production" >> .env
-            echo "APP_KEY=base64:7vFwX9zK2L3mN4pQ5rS6tU7vW8xY9zA0bC1dE2fG3hI=" >> .env
-            echo "APP_DEBUG=false" >> .env
-            echo "APP_URL=http://51.20.191.151" >> .env
-            echo "LOG_CHANNEL=stack" >> .env
-            echo "DB_CONNECTION=mysql" >> .env
-            echo "DB_HOST=127.0.0.1" >> .env
-            echo "DB_PORT=3306" >> .env
-            echo "DB_DATABASE=kilimostore_db" >> .env
-            echo "DB_USERNAME=kilimo_user" >> .env
-            echo "DB_PASSWORD=KilimoPass2026!" >> .env
-            echo "CACHE_DRIVER=file" >> .env
-            echo "SESSION_DRIVER=file" >> .env
+            if [ ! -f .env ]; then
+              echo "APP_NAME=KilimoStore" > .env
+              echo "APP_ENV=production" >> .env
+              echo "APP_KEY=base64:7vFwX9zK2L3mN4pQ5rS6tU7vW8xY9zA0bC1dE2fG3hI=" >> .env
+              echo "APP_DEBUG=false" >> .env
+              echo "APP_URL=http://51.20.191.151" >> .env
+              echo "LOG_CHANNEL=stack" >> .env
+              echo "DB_CONNECTION=mysql" >> .env
+              echo "DB_HOST=127.0.0.1" >> .env
+              echo "DB_PORT=3306" >> .env
+              echo "DB_DATABASE=kilimostore_db" >> .env
+              echo "DB_USERNAME=kilimo_user" >> .env
+              echo "DB_PASSWORD=KilimoPass2026!" >> .env
+              echo "CACHE_DRIVER=file" >> .env
+              echo "SESSION_DRIVER=file" >> .env
+            fi
 
             composer install --no-dev --optimize-autoloader --no-interaction
-            php artisan key:generate --force || true
             php artisan config:clear || true
             php artisan route:clear || true
             php artisan view:clear || true
-            php artisan migrate:fresh --force
-            php artisan db:seed --force
+            php artisan migrate --force
             php artisan config:clear || true
 
             echo "🎨 Building Frontend on EC2 (with Swap protection)..."
