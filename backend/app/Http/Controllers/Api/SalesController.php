@@ -379,13 +379,13 @@ class SalesController extends Controller
 
                 // 6. Sync Farmer Active Status (If all stock sold out, mark inactive)
                 $farmerId = $batch->farmer_id;
-                $hasActiveStock = \App\Models\Batch::where('farmer_id', $farmerId)
+                $hasActiveStock = Batch::where('farmer_id', $farmerId)
                     ->where('status', '!=', 'sold')
                     ->where('current_weight_mt', '>', 0.001)
                     ->exists();
 
                 if (!$hasActiveStock) {
-                    \App\Models\Farmer::where('id', $farmerId)->update(['status' => 'inactive']);
+                    Farmer::where('id', $farmerId)->update(['status' => 'inactive']);
                 }
 
                 return $settlement;
