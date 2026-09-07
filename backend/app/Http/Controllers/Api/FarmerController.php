@@ -169,9 +169,15 @@ class FarmerController extends Controller
         $settlements = $farmer->settlements()->with(['invoice.buyer', 'invoice.items.batch', 'deductions'])->orderBy('created_at', 'desc')->get();
 
         $services = collect();
+        $batchIds = $batches->pluck('id');
+        $allInvoiceItems = \App\Models\InvoiceItem::whereIn('batch_id', $batchIds)
+            ->with(['invoice.buyer', 'invoice.settlement.deductions'])
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->groupBy('batch_id');
 
-        // Append applied_services to each batch for frontend, and gather all services
-        $batches->transform(function ($batch) use (&$services) {
+        // Append applied_services and sales_summary to each batch for frontend, and gather all services
+        $batches->transform(function ($batch) use (&$services, $allInvoiceItems) {
             if ($batch->current_weight_mt <= 0 && $batch->status !== 'transformed') {
                 $batch->status = 'sold';
                 $batch->current_weight_mt = 0;
@@ -261,8 +267,76 @@ class FarmerController extends Controller
                 ]);
             }
 
+            // Compute sales summary for this batch
+            $items = $allInvoiceItems->get($batch->id, collect());
+            $totalSoldQty = (float) $items->sum('quantity_mt');
+            $totalGrossSales = (float) $items->sum('total_price');
+
+            $isTransformed = ($batch->status === 'transformed');
+            $isSold = ($batch->status === 'sold');
+            
+            if ($isTransformed || $isSold || (float) $batch->current_weight_mt <= 0.001) {
+                $currentQty = 0.0;
+            } else {
+                $currentQty = (float) ($batch->intake_quantity > 0 ? $batch->intake_quantity : ($batch->current_weight_mt ?? 0));
+            }
+
+            if ($totalSoldQty > 0) {
+                $originalQty = $currentQty + $totalSoldQty;
+            } else {
+                $originalQty = (float) ($batch->intake_quantity > 0 ? $batch->intake_quantity : ($batch->initial_weight_mt ?? $batch->current_weight_mt ?? 0));
+            }
+
+            $salesRecords = [];
+            foreach ($items as $item) {
+                $inv = $item->invoice;
+                $settlement = $inv ? $inv->settlement : null;
+                $settledAt = null;
+                if ($settlement && $settlement->settled_at) {
+                    $settledAt = $settlement->settled_at instanceof \DateTimeInterface 
+                        ? $settlement->settled_at->format('Y-m-d H:i') 
+                        : (string) $settlement->settled_at;
+                } elseif ($item->created_at) {
+                    $settledAt = $item->created_at instanceof \DateTimeInterface 
+                        ? $item->created_at->format('Y-m-d H:i') 
+                        : (string) $item->created_at;
+                }
+
+                $salesRecords[] = [
+                    'id' => $item->id,
+                    'invoice_id' => $item->invoice_id,
+                    'invoice_number' => $inv ? $inv->invoice_number : null,
+                    'buyer_name' => ($inv && $inv->buyer) ? $inv->buyer->name : 'Mteja wa Jumla',
+                    'quantity_sold' => (float) $item->quantity_mt,
+                    'unit_price' => (float) $item->unit_price,
+                    'total_price' => (float) $item->total_price,
+                    'gross_amount' => $settlement ? (float) $settlement->gross_amount : (float) $item->total_price,
+                    'total_deductions' => $settlement ? (float) $settlement->total_deductions : 0,
+                    'net_payout' => $settlement ? (float) $settlement->net_payout : (float) $item->total_price,
+                    'payment_status' => $settlement ? $settlement->payment_status : 'settled',
+                    'payment_method' => $settlement ? $settlement->payment_method : 'mobile_money',
+                    'payment_reference' => $settlement ? $settlement->payment_reference : null,
+                    'settled_at' => $settledAt,
+                ];
+            }
+
+            $isFullySold = ($batch->status === 'sold' || (count($salesRecords) > 0 && $currentQty <= 0.001));
+            $isPartiallySold = (count($salesRecords) > 0 && $currentQty > 0.001);
+
+            $salesSummary = [
+                'has_sales' => count($salesRecords) > 0,
+                'total_sold_qty' => $totalSoldQty,
+                'total_sales_amount' => $totalGrossSales,
+                'original_quantity' => $originalQty,
+                'remaining_quantity' => $currentQty,
+                'is_fully_sold' => $isFullySold,
+                'is_partially_sold' => $isPartiallySold,
+                'records' => $salesRecords,
+            ];
+
             // Also attach it directly to the model as an attribute before toArray()
             $batch->setAttribute('applied_services', $appliedServices);
+            $batch->setAttribute('sales_summary', $salesSummary);
             return $batch;
         });
 

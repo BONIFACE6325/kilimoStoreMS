@@ -367,11 +367,27 @@ class ReportController extends Controller
                 'status' => 'empty'
             ]);
 
+            $tenant = \App\Models\Tenant::first();
+            $tenantId = $tenant ? $tenant->id : null;
+
+            Farmer::create([
+                'tenant_id' => $tenantId,
+                'farmer_code' => 'FRM-001',
+                'name' => 'boniface gwakila',
+                'phone' => '07645367365',
+                'region' => 'Kigoma',
+                'district' => 'Kigoma',
+                'ward' => 'Mahembe',
+                'village' => 'Nkungwe',
+                'street' => 'Kabuta b',
+                'status' => 'inactive',
+            ]);
+
             Schema::enableForeignKeyConstraints();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Operational data wiped successfully. Users, Tenants, Branches & Services preserved.'
+                'message' => 'Operational data wiped successfully. Default farmer boniface gwakila preserved clean.'
             ]);
         } catch (\Throwable $e) {
             Schema::enableForeignKeyConstraints();

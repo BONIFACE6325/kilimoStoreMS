@@ -463,8 +463,11 @@
                             {{ formatStorageDaysBadge(b.created_at, b.status, b.updated_at) }}
                             <span class="text-amber-800 dark:text-amber-400 font-bold">({{ formatDate(b.created_at) }})</span>
                           </span>
-                          <span v-if="(b.status === 'sold' || b.status === 'partially_sold')" class="px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 text-[10px] font-black">
-                            Umeuzwa: {{ Math.max(0, ((parseFloat(b.initial_weight_mt || 0)) - (parseFloat(b.current_weight_mt || 0)))).toLocaleString() }} {{ b.intake_unit || 'Units' }}
+                          <span v-if="getBatchSalesSummary(b).is_partially_sold" class="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-300 text-[10px] font-black border border-amber-300 dark:border-amber-700 shadow-2xs">
+                            ⚖️ Umeuzwa Sehemu: {{ getBatchSalesSummary(b).total_sold_qty.toLocaleString() }} {{ b.intake_unit || 'Kg' }} (Baki: {{ getBatchSalesSummary(b).remaining_quantity.toLocaleString() }} {{ b.intake_unit || 'Kg' }})
+                          </span>
+                          <span v-else-if="getBatchSalesSummary(b).is_fully_sold || b.status === 'sold'" class="px-2 py-0.5 rounded-md bg-rose-100 dark:bg-rose-900/40 text-rose-800 dark:text-rose-300 text-[10px] font-black border border-rose-300 dark:border-rose-700 shadow-2xs">
+                            🏷️ Umeuzwa Wote: {{ getBatchSalesSummary(b).total_sold_qty.toLocaleString() }} {{ b.intake_unit || 'Kg' }}
                           </span>
                         </div>
                       </div>
@@ -532,6 +535,97 @@
                     
                     <div class="pl-6 relative space-y-3">
                       <div class="absolute left-3 top-2 bottom-3 w-0.5 bg-emerald-400 dark:bg-emerald-600/50"></div>
+
+                      <!-- 0. TOP-LEVEL BATCH SALES CALCULATION BREAKDOWN -->
+                      <div v-if="getBatchSalesSummary(b).has_sales" class="p-3 bg-gradient-to-r from-emerald-50/90 via-slate-50 to-teal-50/80 dark:from-emerald-950/30 dark:via-slate-900/60 dark:to-teal-950/30 border-2 border-emerald-400/80 dark:border-emerald-600/60 rounded-xl shadow-xs space-y-2.5">
+                        <div class="flex items-center justify-between pb-1.5 border-b border-emerald-200 dark:border-emerald-700/50">
+                          <div class="flex items-center gap-1.5 text-xs font-black text-emerald-900 dark:text-emerald-300 uppercase tracking-wide">
+                            <span>💰 Mahesabu ya Mauzo ya Mzigo (Sales Calculation Breakdown):</span>
+                          </div>
+                          <div class="text-[11px] font-bold">
+                            <span v-if="getBatchSalesSummary(b).is_partially_sold" class="text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/40 px-2 py-0.5 rounded-md border border-amber-300 dark:border-amber-700/60 flex items-center gap-1">
+                              <span>⚖️ Mzigo Umeuzwa Sehemu:</span>
+                              <strong>{{ getBatchSalesSummary(b).total_sold_qty.toLocaleString() }} / {{ getBatchSalesSummary(b).original_quantity.toLocaleString() }} {{ b.intake_unit || 'Kg' }}</strong>
+                            </span>
+                            <span v-else class="text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/40 px-2 py-0.5 rounded-md border border-emerald-300 dark:border-emerald-700/60 flex items-center gap-1">
+                              <span>🏷️ Mzigo Umeuzwa Wote:</span>
+                              <strong>{{ getBatchSalesSummary(b).total_sold_qty.toLocaleString() }} {{ b.intake_unit || 'Kg' }}</strong>
+                            </span>
+                          </div>
+                        </div>
+
+                        <!-- Individual Sale Calculations -->
+                        <div v-for="(sale, sIdx) in getBatchSalesSummary(b).records" :key="sale.id || sIdx" class="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-emerald-200 dark:border-emerald-700/40 shadow-2xs space-y-2">
+                          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-slate-600 dark:text-slate-300">
+                            <div class="flex items-center gap-2 flex-wrap">
+                              <span class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 font-extrabold text-[10px] flex items-center justify-center">#{{ sIdx + 1 }}</span>
+                              <span>Mnunuzi: <strong class="text-slate-900 dark:text-white font-bold">{{ sale.buyer_name || 'Mnunuzi wa Jumla' }}</strong></span>
+                              <span v-if="sale.invoice_number" class="text-slate-400">•</span>
+                              <span v-if="sale.invoice_number">Invoice: <strong class="font-mono text-emerald-800 dark:text-emerald-300">{{ sale.invoice_number }}</strong></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                              <span v-if="sale.settled_at" class="text-slate-500 dark:text-slate-400 text-[10.5px]">📅 {{ sale.settled_at }}</span>
+                              <span class="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 border border-emerald-300/80 dark:border-emerald-700/50 rounded font-black text-[9.5px] uppercase">
+                                {{ sale.payment_status === 'settled' ? '✅ Imelipwa' : sale.payment_status }}
+                              </span>
+                            </div>
+                          </div>
+
+                          <!-- Multiplication Math Formula -->
+                          <div class="p-2.5 bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-lg flex flex-col md:flex-row md:items-center justify-between gap-2.5">
+                            <div class="flex items-center gap-1.5 flex-wrap font-mono">
+                              <span class="text-slate-500 dark:text-slate-400 text-xs font-sans font-bold">Hesabu:</span>
+                              <div class="inline-flex items-center gap-1 px-2 py-1 bg-white dark:bg-slate-800 rounded border border-emerald-300 dark:border-emerald-700 shadow-2xs">
+                                <span class="text-xs font-black text-slate-800 dark:text-slate-100">{{ Number(sale.quantity_sold).toLocaleString() }}</span>
+                                <span class="text-[10px] text-slate-500 font-bold uppercase">{{ b.intake_unit || 'Kg' }}</span>
+                              </div>
+                              <span class="text-slate-400 font-black text-sm">×</span>
+                              <div class="inline-flex items-center gap-1 px-2 py-1 bg-white dark:bg-slate-800 rounded border border-emerald-300 dark:border-emerald-700 shadow-2xs">
+                                <span class="text-[10px] text-slate-500 font-bold">Tsh</span>
+                                <span class="text-xs font-black text-slate-800 dark:text-slate-100">{{ Number(sale.unit_price).toLocaleString() }}</span>
+                                <span class="text-[10px] text-slate-500 font-bold">/ {{ b.intake_unit || 'Kg' }}</span>
+                              </div>
+                              <span class="text-slate-400 font-black text-sm">=</span>
+                              <div class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-600 text-white rounded border border-emerald-700 shadow-2xs">
+                                <span class="text-[10px] text-emerald-200 font-bold">Jumla: Tsh</span>
+                                <span class="text-sm font-black">{{ Number(sale.total_price).toLocaleString() }}</span>
+                              </div>
+                            </div>
+
+                            <div class="flex items-center gap-3 text-xs self-end md:self-auto border-t md:border-t-0 md:border-l border-emerald-200 dark:border-emerald-800/60 pt-1.5 md:pt-0 md:pl-3">
+                              <div v-if="sale.total_deductions > 0" class="text-right">
+                                <div class="text-[9.5px] text-slate-500 dark:text-slate-400 font-bold uppercase">Makato ya Huduma:</div>
+                                <div class="font-extrabold text-rose-600 dark:text-rose-400 text-xs">- Tsh {{ Number(sale.total_deductions).toLocaleString() }}</div>
+                              </div>
+                              <div class="text-right">
+                                <div class="text-[9.5px] text-slate-500 dark:text-slate-400 font-bold uppercase">Pato Safi (Net):</div>
+                                <div class="font-black text-emerald-800 dark:text-emerald-300 text-xs">Tsh {{ Number(sale.net_payout).toLocaleString() }}</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Partial Sales Stock Status & Quick Sell Button -->
+                        <div v-if="getBatchSalesSummary(b).is_partially_sold" class="p-2.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                          <div class="flex items-center gap-2 flex-wrap">
+                            <span class="font-extrabold text-amber-800 dark:text-amber-300 flex items-center gap-1">
+                              <span>📦 Hali ya Shehena:</span>
+                            </span>
+                            <span class="text-slate-600 dark:text-slate-400">Awali: <strong class="text-slate-800 dark:text-slate-200">{{ getBatchSalesSummary(b).original_quantity.toLocaleString() }} {{ b.intake_unit || 'Kg' }}</strong></span>
+                            <span class="text-slate-400">•</span>
+                            <span class="text-emerald-700 dark:text-emerald-400">Uliouzwa: <strong class="font-bold">{{ getBatchSalesSummary(b).total_sold_qty.toLocaleString() }} {{ b.intake_unit || 'Kg' }}</strong></span>
+                            <span class="text-slate-400">•</span>
+                            <span class="text-amber-900 dark:text-amber-300 font-black bg-amber-200/70 dark:bg-amber-900/60 px-2 py-0.5 rounded border border-amber-300 dark:border-amber-700">
+                              Uliobaki Ghalani: {{ getBatchSalesSummary(b).remaining_quantity.toLocaleString() }} {{ b.intake_unit || 'Kg' }}
+                            </span>
+                          </div>
+                          <div>
+                            <button @click="openNewSaleModal(b)" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-xs flex items-center gap-1 cursor-pointer transition">
+                              <span>🏷️ Uza Baki ({{ getBatchSalesSummary(b).remaining_quantity.toLocaleString() }} {{ b.intake_unit || 'Kg' }})</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
 
                       <!-- 1. SERVICES PIPELINE SECTION -->
                       <div v-if="getBatchServices(b).length > 0" class="space-y-2.5">
@@ -602,7 +696,8 @@
                                 <div class="font-black text-slate-900 dark:text-slate-50 text-xs flex items-center gap-1.5 flex-wrap">
                                   <span>{{ child.crop_type }}</span>
                                   <span class="px-1.5 py-0.5 bg-teal-100 dark:bg-teal-900/40 text-teal-800 dark:text-teal-400 text-[9.5px] font-black rounded uppercase">Result Product</span>
-                                  <span v-if="child.status === 'sold'" class="px-2 py-0.5 bg-rose-600 text-white text-[9.5px] font-black rounded-lg uppercase shadow-2xs">🏷️ IMEUZWA</span>
+                                  <span v-if="getBatchSalesSummary(child).is_partially_sold" class="px-2 py-0.5 bg-amber-600 text-white text-[9.5px] font-black rounded-lg uppercase shadow-2xs">⚖️ IMEUZWA SEHEMU</span>
+                                  <span v-else-if="getBatchSalesSummary(child).is_fully_sold || child.status === 'sold'" class="px-2 py-0.5 bg-rose-600 text-white text-[9.5px] font-black rounded-lg uppercase shadow-2xs">🏷️ IMEUZWA YOTE</span>
                                   <span v-else class="px-2 py-0.5 bg-emerald-600 text-white text-[9.5px] font-black rounded-lg uppercase shadow-2xs">🟢 GHALANI</span>
                                 </div>
                                 <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-2 mt-0.5">
@@ -615,21 +710,141 @@
                               </div>
                             </div>
                             <div class="flex items-center gap-3">
-                              <div v-if="child.status !== 'sold'" class="font-black text-emerald-800 dark:text-emerald-400 text-sm">
-                                {{ child.intake_quantity ? Number(child.intake_quantity).toLocaleString() + ' ' + child.intake_unit : 'N/A' }}
+                              <!-- Stock values -->
+                              <div v-if="getBatchSalesSummary(child).is_partially_sold" class="text-right">
+                                <div class="font-black text-amber-700 dark:text-amber-400 text-sm">
+                                  {{ getBatchSalesSummary(child).remaining_quantity.toLocaleString() }} <span class="text-[10px]">{{ child.intake_unit || 'Kg' }}</span>
+                                </div>
+                                <div class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase">Ghalani (Imeuzwa: {{ getBatchSalesSummary(child).total_sold_qty.toLocaleString() }})</div>
                               </div>
-                              <div v-else class="font-black text-rose-600 text-sm font-mono">
-                                0 (Imeuzwa)
+                              <div v-else-if="getBatchSalesSummary(child).is_fully_sold || child.status === 'sold'" class="text-right">
+                                <div class="font-black text-rose-600 dark:text-rose-400 text-sm font-mono">
+                                  0 <span class="text-[10px]">{{ child.intake_unit || 'Kg' }}</span>
+                                </div>
+                                <div class="text-[9px] text-slate-400 font-bold uppercase">Imeuzwa ({{ getBatchSalesSummary(child).total_sold_qty.toLocaleString() }})</div>
                               </div>
-                              <button v-if="child.status !== 'sold'" @click="openNewSaleModal(child)" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold rounded-lg shadow-2xs flex items-center gap-1 cursor-pointer transition" :title="'Uza ' + child.crop_type + ' na fanya settlement'">
+                              <div v-else class="text-right">
+                                <div class="font-black text-emerald-800 dark:text-emerald-400 text-sm">
+                                  {{ (child.intake_quantity ? Number(child.intake_quantity) : getBatchRawQuantity(child)).toLocaleString() }} <span class="text-[10px]">{{ child.intake_unit || 'Kg' }}</span>
+                                </div>
+                                <div class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase">Ghalani</div>
+                              </div>
+
+                              <!-- Action buttons -->
+                              <button 
+                                v-if="!getBatchSalesSummary(child).is_fully_sold && child.status !== 'sold' && getBatchSalesSummary(child).remaining_quantity > 0.001" 
+                                @click="openNewSaleModal(child)" 
+                                class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold rounded-lg shadow-2xs flex items-center gap-1 cursor-pointer transition" 
+                                :title="'Uza ' + child.crop_type + ' na fanya settlement'"
+                              >
                                 <span>🏷️ Uza {{ child.crop_type }}</span>
                               </button>
-                              <button v-if="child.status !== 'sold'" @click="openApplyServiceForChild(child)" class="px-2.5 py-1 bg-teal-700 hover:bg-teal-800 text-white text-[11px] font-bold rounded-lg shadow-2xs flex items-center gap-1 cursor-pointer transition">
+                              <button 
+                                v-if="!getBatchSalesSummary(child).is_fully_sold && child.status !== 'sold' && getBatchSalesSummary(child).remaining_quantity > 0.001" 
+                                @click="openApplyServiceForChild(child)" 
+                                class="px-2.5 py-1 bg-teal-700 hover:bg-teal-800 text-white text-[11px] font-bold rounded-lg shadow-2xs flex items-center gap-1 cursor-pointer transition"
+                              >
                                 <span>+ Huduma</span>
                               </button>
-                              <button v-if="child.status !== 'sold' && (!getBatchChildren(b) || !getBatchChildren(b).some(c => c.status === 'sold'))" @click="revertTransformationFromChild(b, child)" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-[11px] font-bold rounded-lg shadow-2xs flex items-center gap-1 cursor-pointer transition" title="Futa matokeo haya ya transformation na urudishe mpunga">
+                              <button 
+                                v-if="!getBatchSalesSummary(child).has_sales && child.status !== 'sold' && (!getBatchChildren(b) || !getBatchChildren(b).some(c => c.status === 'sold' || getBatchSalesSummary(c).has_sales))" 
+                                @click="revertTransformationFromChild(b, child)" 
+                                class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-[11px] font-bold rounded-lg shadow-2xs flex items-center gap-1 cursor-pointer transition" 
+                                title="Futa matokeo haya ya transformation na urudishe mpunga"
+                              >
                                 <span>🗑️ Futa Zao / Revert</span>
                               </button>
+                            </div>
+                          </div>
+
+                          <!-- SALES CALCULATION BREAKDOWN FOR CHILD PRODUCT -->
+                          <div v-if="getBatchSalesSummary(child).has_sales" class="p-3 bg-gradient-to-r from-emerald-50/90 via-slate-50 to-teal-50/80 dark:from-emerald-950/30 dark:via-slate-900/60 dark:to-teal-950/30 border-2 border-emerald-400/80 dark:border-emerald-600/60 rounded-xl shadow-xs space-y-2.5">
+                            <div class="flex items-center justify-between pb-1.5 border-b border-emerald-200 dark:border-emerald-700/50">
+                              <div class="flex items-center gap-1.5 text-xs font-black text-emerald-900 dark:text-emerald-300 uppercase tracking-wide">
+                                <span>💰 Mahesabu ya Mauzo ya Zao (Sales Calculation Breakdown):</span>
+                              </div>
+                              <div class="text-[11px] font-bold">
+                                <span v-if="getBatchSalesSummary(child).is_partially_sold" class="text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/40 px-2 py-0.5 rounded-md border border-amber-300 dark:border-amber-700/60 flex items-center gap-1">
+                                  <span>⚖️ Mzigo Umeuzwa Sehemu:</span>
+                                  <strong>{{ getBatchSalesSummary(child).total_sold_qty.toLocaleString() }} / {{ getBatchSalesSummary(child).original_quantity.toLocaleString() }} {{ child.intake_unit || 'Kg' }}</strong>
+                                </span>
+                                <span v-else class="text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/40 px-2 py-0.5 rounded-md border border-emerald-300 dark:border-emerald-700/60 flex items-center gap-1">
+                                  <span>🏷️ Mzigo Umeuzwa Wote:</span>
+                                  <strong>{{ getBatchSalesSummary(child).total_sold_qty.toLocaleString() }} {{ child.intake_unit || 'Kg' }}</strong>
+                                </span>
+                              </div>
+                            </div>
+
+                            <!-- Individual Sale Calculations -->
+                            <div v-for="(sale, sIdx) in getBatchSalesSummary(child).records" :key="sale.id || sIdx" class="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-emerald-200 dark:border-emerald-700/40 shadow-2xs space-y-2">
+                              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-slate-600 dark:text-slate-300">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                  <span class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 font-extrabold text-[10px] flex items-center justify-center">#{{ sIdx + 1 }}</span>
+                                  <span>Mnunuzi: <strong class="text-slate-900 dark:text-white font-bold">{{ sale.buyer_name || 'Mnunuzi wa Jumla' }}</strong></span>
+                                  <span v-if="sale.invoice_number" class="text-slate-400">•</span>
+                                  <span v-if="sale.invoice_number">Invoice: <strong class="font-mono text-emerald-800 dark:text-emerald-300">{{ sale.invoice_number }}</strong></span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                  <span v-if="sale.settled_at" class="text-slate-500 dark:text-slate-400 text-[10.5px]">📅 {{ sale.settled_at }}</span>
+                                  <span class="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 border border-emerald-300/80 dark:border-emerald-700/50 rounded font-black text-[9.5px] uppercase">
+                                    {{ sale.payment_status === 'settled' ? '✅ Imelipwa' : sale.payment_status }}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <!-- Multiplication Math Formula -->
+                              <div class="p-2.5 bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-lg flex flex-col md:flex-row md:items-center justify-between gap-2.5">
+                                <div class="flex items-center gap-1.5 flex-wrap font-mono">
+                                  <span class="text-slate-500 dark:text-slate-400 text-xs font-sans font-bold">Hesabu:</span>
+                                  <div class="inline-flex items-center gap-1 px-2 py-1 bg-white dark:bg-slate-800 rounded border border-emerald-300 dark:border-emerald-700 shadow-2xs">
+                                    <span class="text-xs font-black text-slate-800 dark:text-slate-100">{{ Number(sale.quantity_sold).toLocaleString() }}</span>
+                                    <span class="text-[10px] text-slate-500 font-bold uppercase">{{ child.intake_unit || 'Kg' }}</span>
+                                  </div>
+                                  <span class="text-slate-400 font-black text-sm">×</span>
+                                  <div class="inline-flex items-center gap-1 px-2 py-1 bg-white dark:bg-slate-800 rounded border border-emerald-300 dark:border-emerald-700 shadow-2xs">
+                                    <span class="text-[10px] text-slate-500 font-bold">Tsh</span>
+                                    <span class="text-xs font-black text-slate-800 dark:text-slate-100">{{ Number(sale.unit_price).toLocaleString() }}</span>
+                                    <span class="text-[10px] text-slate-500 font-bold">/ {{ child.intake_unit || 'Kg' }}</span>
+                                  </div>
+                                  <span class="text-slate-400 font-black text-sm">=</span>
+                                  <div class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-600 text-white rounded border border-emerald-700 shadow-2xs">
+                                    <span class="text-[10px] text-emerald-200 font-bold">Jumla: Tsh</span>
+                                    <span class="text-sm font-black">{{ Number(sale.total_price).toLocaleString() }}</span>
+                                  </div>
+                                </div>
+
+                                <div class="flex items-center gap-3 text-xs self-end md:self-auto border-t md:border-t-0 md:border-l border-emerald-200 dark:border-emerald-800/60 pt-1.5 md:pt-0 md:pl-3">
+                                  <div v-if="sale.total_deductions > 0" class="text-right">
+                                    <div class="text-[9.5px] text-slate-500 dark:text-slate-400 font-bold uppercase">Makato ya Huduma:</div>
+                                    <div class="font-extrabold text-rose-600 dark:text-rose-400 text-xs">- Tsh {{ Number(sale.total_deductions).toLocaleString() }}</div>
+                                  </div>
+                                  <div class="text-right">
+                                    <div class="text-[9.5px] text-slate-500 dark:text-slate-400 font-bold uppercase">Pato Safi (Net):</div>
+                                    <div class="font-black text-emerald-800 dark:text-emerald-300 text-xs">Tsh {{ Number(sale.net_payout).toLocaleString() }}</div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <!-- Partial Sales Stock Status & Quick Sell Button -->
+                            <div v-if="getBatchSalesSummary(child).is_partially_sold" class="p-2.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                              <div class="flex items-center gap-2 flex-wrap">
+                                <span class="font-extrabold text-amber-800 dark:text-amber-300 flex items-center gap-1">
+                                  <span>📦 Hali ya Shehena:</span>
+                                </span>
+                                <span class="text-slate-600 dark:text-slate-400">Awali: <strong class="text-slate-800 dark:text-slate-200">{{ getBatchSalesSummary(child).original_quantity.toLocaleString() }} {{ child.intake_unit || 'Kg' }}</strong></span>
+                                <span class="text-slate-400">•</span>
+                                <span class="text-emerald-700 dark:text-emerald-400">Uliouzwa: <strong class="font-bold">{{ getBatchSalesSummary(child).total_sold_qty.toLocaleString() }} {{ child.intake_unit || 'Kg' }}</strong></span>
+                                <span class="text-slate-400">•</span>
+                                <span class="text-amber-900 dark:text-amber-300 font-black bg-amber-200/70 dark:bg-amber-900/60 px-2 py-0.5 rounded border border-amber-300 dark:border-amber-700">
+                                  Uliobaki Ghalani: {{ getBatchSalesSummary(child).remaining_quantity.toLocaleString() }} {{ child.intake_unit || 'Kg' }}
+                                </span>
+                              </div>
+                              <div>
+                                <button @click="openNewSaleModal(child)" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-xs flex items-center gap-1 cursor-pointer transition">
+                                  <span>🏷️ Uza Baki ({{ getBatchSalesSummary(child).remaining_quantity.toLocaleString() }} {{ child.intake_unit || 'Kg' }})</span>
+                                </button>
+                              </div>
                             </div>
                           </div>
 
@@ -2521,6 +2736,35 @@ const getBatchServices = (b) => {
 const getBatchChildren = (b) => {
   if (b.children && b.children.length > 0) return b.children;
   return farmerBatches.value.filter(child => child.parent_batch_id === b.id);
+};
+
+const getBatchSalesSummary = (b) => {
+  if (!b) {
+    return {
+      has_sales: false,
+      total_sold_qty: 0,
+      total_sales_amount: 0,
+      original_quantity: 0,
+      remaining_quantity: 0,
+      is_fully_sold: false,
+      is_partially_sold: false,
+      records: []
+    };
+  }
+  if (b.sales_summary && typeof b.sales_summary === 'object') {
+    return b.sales_summary;
+  }
+  const rawQty = getBatchRawQuantity(b);
+  return {
+    has_sales: false,
+    total_sold_qty: 0,
+    total_sales_amount: 0,
+    original_quantity: rawQty,
+    remaining_quantity: rawQty,
+    is_fully_sold: b.status === 'sold',
+    is_partially_sold: false,
+    records: []
+  };
 };
 
 const closeProfileModal = () => {
