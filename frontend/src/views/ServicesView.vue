@@ -207,14 +207,14 @@
     </div>
 
     <!-- MODAL 1: SAJILI / HARIRI HUDUMA -->
-    <div v-if="showModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 animate-fadeIn">
-        <div class="px-6 py-4 border-b border-emerald-800 flex items-center justify-between bg-gradient-to-r from-emerald-900 to-teal-900 text-white">
+    <div v-if="showModal" class="fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+      <div class="bg-white dark:bg-slate-900 w-full max-w-md max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 animate-fadeIn flex flex-col my-auto">
+        <div class="px-6 py-4 border-b border-emerald-800 flex items-center justify-between bg-gradient-to-r from-emerald-900 to-teal-900 text-white shrink-0">
           <h3 class="text-base font-extrabold">{{ form.id ? 'Hariri Huduma' : 'Sajili Huduma Mpya' }}</h3>
-          <button @click="closeModal" class="text-emerald-200 hover:text-white p-1">✕</button>
+          <button @click="closeModal" class="text-emerald-200 hover:text-white p-1 cursor-pointer">✕</button>
         </div>
 
-        <div class="p-6 space-y-4 text-xs font-semibold text-slate-700 dark:text-slate-200">
+        <div class="p-6 space-y-4 text-xs font-semibold text-slate-700 dark:text-slate-200 overflow-y-auto">
           <div>
             <label class="block mb-1 font-bold text-slate-800 dark:text-slate-100">Jina la Huduma (Swahili) *</label>
             <input 
@@ -230,7 +230,7 @@
             <div>
               <div class="flex items-center justify-between mb-1">
                 <label class="font-bold text-slate-800 dark:text-slate-100">Aina ya Zao</label>
-                <button @click="showCropModal = true" class="text-[10.5px] font-extrabold text-emerald-700 dark:text-emerald-400 hover:underline">+ Sajili Zao</button>
+                <button @click="showCropModal = true" class="text-[10.5px] font-extrabold text-emerald-700 dark:text-emerald-400 hover:underline cursor-pointer">+ Sajili Zao</button>
               </div>
               <select v-model="form.crop_type" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold">
                 <option value="">Zote (All)</option>
@@ -243,7 +243,7 @@
             <div>
               <div class="flex items-center justify-between mb-1">
                 <label class="font-bold text-slate-800 dark:text-slate-100">Kipimo cha Bei *</label>
-                <button @click="showUnitModal = true" class="text-[10.5px] font-extrabold text-teal-700 dark:text-teal-400 hover:underline">+ Sajili Kipimo</button>
+                <button @click="showUnitModal = true" class="text-[10.5px] font-extrabold text-teal-700 dark:text-teal-400 hover:underline cursor-pointer">+ Sajili Kipimo</button>
               </div>
               <select v-model="form.unit" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl font-bold">
                 <option v-for="u in unitsList" :key="u.name" :value="u.name">{{ u.name }}</option>
@@ -272,8 +272,8 @@
           </div>
 
           <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-            <button @click="closeModal" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl">Ghairi</button>
-            <button @click="saveService" class="px-5 py-2 bg-emerald-600 text-white font-bold rounded-xl shadow-xs hover:bg-emerald-700 transition">
+            <button @click="closeModal" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl cursor-pointer">Ghairi</button>
+            <button @click="saveService" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-xs transition cursor-pointer">
               {{ form.id ? 'Hifadhi Mabadiliko' : 'Sajili Huduma' }}
             </button>
           </div>
@@ -730,19 +730,23 @@ const closeModal = () => {
 };
 
 const saveService = async () => {
-  if (!form.value.name_sw || !form.value.rate) {
-    triggerToast('Jaza jina la huduma na bei sahihi!', 'error');
+  if (!form.value.name_sw || !form.value.name_sw.trim()) {
+    triggerToast('Tafadhali ingiza jina la huduma!', 'error');
+    return;
+  }
+
+  if (form.value.rate === null || form.value.rate === undefined || isNaN(form.value.rate) || form.value.rate < 0) {
+    triggerToast('Tafadhali ingiza bei halali (0 au zaidi)!', 'error');
     return;
   }
 
   const payload = {
-    name_sw: form.value.name_sw,
-    name_en: form.value.name_sw,
-    
+    name_sw: form.value.name_sw.trim(),
+    name_en: form.value.name_sw.trim(),
     crop_type: form.value.crop_type || null,
-    unit: form.value.unit,
-    rate: form.value.rate,
-    description: form.value.description
+    unit: form.value.unit || 'kg',
+    rate: parseFloat(form.value.rate || 0),
+    description: form.value.description || ''
   };
 
   try {
@@ -755,30 +759,25 @@ const saveService = async () => {
       body: JSON.stringify(payload)
     });
 
-    const data = await res.json();
-    if (res.ok && (data.success || data.id || data.service)) {
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && (data.success || data.id || data.service || res.status === 200 || res.status === 201)) {
       triggerToast(form.value.id ? 'Mabadiliko ya huduma yamehifadhiwa! ✓' : 'Huduma mpya imesajiliwa kikamilifu! 🛠️');
       closeModal();
       await fetchServices();
     } else {
+      const errMsg = data.message || data.error || (data.errors ? Object.values(data.errors).flat().join(', ') : 'Imeshindwa kuhifadhi huduma');
+      triggerToast(`⚠️ ${errMsg}`, 'error');
       if (!form.value.id) {
         services.value.push({ id: Date.now(), ...payload });
-      } else {
-        const idx = services.value.findIndex(x => x.id === form.value.id);
-        if (idx !== -1) services.value[idx] = { ...services.value[idx], ...payload };
       }
-      triggerToast('Huduma imehifadhiwa kikamilifu!');
       closeModal();
     }
   } catch (e) {
     console.error('Error saving service:', e);
+    triggerToast(`⚠️ Tatizo la mtandao: ${e.message}`, 'error');
     if (!form.value.id) {
       services.value.push({ id: Date.now(), ...payload });
-    } else {
-      const idx = services.value.findIndex(x => x.id === form.value.id);
-      if (idx !== -1) services.value[idx] = { ...services.value[idx], ...payload };
     }
-    triggerToast('Huduma imehifadhiwa kikamilifu!');
     closeModal();
   }
 };
