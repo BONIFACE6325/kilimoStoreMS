@@ -13,9 +13,9 @@ class ServiceController extends Controller
     {
         // Auto-patch missing crop_type for existing services directly in database
         try {
-            \Illuminate\Support\Facades\DB::statement("UPDATE services SET crop_type = 'Mpunga' WHERE (crop_type IS NULL OR crop_type = '') AND (LOWER(name_sw) LIKE '%mpunga%' OR LOWER(name_en) LIKE '%paddy%')");
-            \Illuminate\Support\Facades\DB::statement("UPDATE services SET crop_type = 'Mchele' WHERE (crop_type IS NULL OR crop_type = '') AND (LOWER(name_sw) LIKE '%mchele%' OR LOWER(name_en) LIKE '%rice%' OR LOWER(name_sw) LIKE '%giredi%' OR LOWER(name_sw) LIKE '%doloti%')");
-            \Illuminate\Support\Facades\DB::statement("UPDATE services SET crop_type = 'Mahindi' WHERE (crop_type IS NULL OR crop_type = '') AND (LOWER(name_sw) LIKE '%mahindi%' OR LOWER(name_en) LIKE '%maize%')");
+            \Illuminate\Support\Facades\DB::statement("UPDATE services SET crop_type = 'Mpunga' WHERE (LOWER(name_sw) LIKE '%mpunga%' OR LOWER(name_en) LIKE '%paddy%' OR LOWER(name_sw) LIKE '%kuanika%')");
+            \Illuminate\Support\Facades\DB::statement("UPDATE services SET crop_type = 'Mchele' WHERE (LOWER(name_sw) LIKE '%mchele%' OR LOWER(name_en) LIKE '%rice%' OR LOWER(name_sw) LIKE '%giredi%' OR LOWER(name_sw) LIKE '%doloti%')");
+            \Illuminate\Support\Facades\DB::statement("UPDATE services SET crop_type = 'Mahindi' WHERE (LOWER(name_sw) LIKE '%mahindi%' OR LOWER(name_en) LIKE '%maize%')");
         } catch (\Throwable $e) {}
 
         $query = Service::query();
