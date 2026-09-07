@@ -11,19 +11,12 @@ class ServiceController extends Controller
 {
     public function index(Request $request)
     {
-        // Auto-patch crop_type for default services if null or empty
-        Service::where(function($q) {
-            $q->whereNull('crop_type')->orWhere('crop_type', '');
-        })->get()->each(function ($s) {
-            $name = strtolower($s->name_sw . ' ' . $s->name_en);
-            if (str_contains($name, 'mpunga') || str_contains($name, 'paddy')) {
-                $s->update(['crop_type' => 'Mpunga']);
-            } elseif (str_contains($name, 'mchele') || str_contains($name, 'rice')) {
-                $s->update(['crop_type' => 'Mchele']);
-            } elseif (str_contains($name, 'mahindi') || str_contains($name, 'maize') || str_contains($name, 'sembe')) {
-                $s->update(['crop_type' => 'Mahindi']);
-            }
-        });
+        // Auto-patch missing crop_type for existing services directly in database
+        try {
+            \Illuminate\Support\Facades\DB::statement("UPDATE services SET crop_type = 'Mpunga' WHERE (crop_type IS NULL OR crop_type = '') AND (LOWER(name_sw) LIKE '%mpunga%' OR LOWER(name_en) LIKE '%paddy%')");
+            \Illuminate\Support\Facades\DB::statement("UPDATE services SET crop_type = 'Mchele' WHERE (crop_type IS NULL OR crop_type = '') AND (LOWER(name_sw) LIKE '%mchele%' OR LOWER(name_en) LIKE '%rice%' OR LOWER(name_sw) LIKE '%giredi%' OR LOWER(name_sw) LIKE '%doloti%')");
+            \Illuminate\Support\Facades\DB::statement("UPDATE services SET crop_type = 'Mahindi' WHERE (crop_type IS NULL OR crop_type = '') AND (LOWER(name_sw) LIKE '%mahindi%' OR LOWER(name_en) LIKE '%maize%')");
+        } catch (\Throwable $e) {}
 
         $query = Service::query();
         $services = $query->orderBy('name_sw')->get();
