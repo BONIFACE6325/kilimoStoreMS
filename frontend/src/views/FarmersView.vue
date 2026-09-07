@@ -2312,6 +2312,29 @@ const selectedBatchForService = computed(() => {
   ) || null;
 });
 
+const normalizeUnitStr = (u) => {
+  if (!u) return '';
+  const s = String(u).toLowerCase().trim();
+  if (s.includes('gunia') || s.includes('bag')) return 'gunia';
+  if (s.includes('kilo') || s.includes('kg')) return 'kg';
+  if (s.includes('roba') || s.includes('bale')) return 'roba';
+  if (s.includes('tani') || s.includes('ton')) return 'tani';
+  return s;
+};
+
+const normalizeCropStr = (c) => {
+  if (!c) return '';
+  const s = String(c).toLowerCase().trim();
+  if (s.includes('mpunga') || s.includes('paddy') || s.includes('rice')) return 'mpunga';
+  if (s.includes('mchele')) return 'mchele';
+  if (s.includes('pumba')) return 'pumba';
+  if (s.includes('mahindi') || s.includes('maize') || s.includes('sembe') || s.includes('dona')) return 'mahindi';
+  if (s.includes('maharage') || s.includes('beans')) return 'maharage';
+  if (s.includes('alizeti') || s.includes('sunflower')) return 'alizeti';
+  if (s.includes('ufuta') || s.includes('sesame')) return 'ufuta';
+  return s;
+};
+
 const filteredCatalogServices = computed(() => {
   const batch = selectedBatchForService.value;
   if (!batch) {
@@ -2327,9 +2350,10 @@ const filteredCatalogServices = computed(() => {
     existingServices.map(s => String(s.service_id || s.id))
   );
 
-  const crop = String(batch.crop_type || '').toLowerCase();
-  
-  return catalogServices.value.filter(s => {
+  const batchCropNorm = normalizeCropStr(batch.crop_type);
+  const batchUnitNorm = normalizeUnitStr(batch.intake_unit || batch.unit);
+
+  const eligibleCropServices = catalogServices.value.filter(s => {
     // 1. DUPLICATE CHECK
     const sNameLower = String(s.name_sw || s.name || '').toLowerCase().trim();
     if (existingServiceIds.has(String(s.id)) || existingServiceNames.has(sNameLower)) {
@@ -2337,21 +2361,39 @@ const filteredCatalogServices = computed(() => {
     }
 
     // 2. CROP FILTER
-    if (!s.crop_type || s.crop_type === 'Zote' || String(s.crop_type).toLowerCase() === 'all' || s.crop_type === '') {
+    const sCropRaw = String(s.crop_type || '').toLowerCase().trim();
+    if (!sCropRaw || sCropRaw === 'zote' || sCropRaw === 'all') {
+      if (batchCropNorm === 'mpunga' && (sNameLower.includes('mahindi') || sNameLower.includes('sembe') || sNameLower.includes('dona'))) {
+        return false;
+      }
+      if (batchCropNorm === 'mahindi' && (sNameLower.includes('mpunga') || sNameLower.includes('paddy') || sNameLower.includes('mchele') || sNameLower.includes('pumba'))) {
+        return false;
+      }
       return true;
     }
-    
-    const sCrop = String(s.crop_type).toLowerCase();
-    
-    if (crop.includes(sCrop) || sCrop.includes(crop)) return true;
-    if (crop.includes('mchele') && sCrop.includes('mchele')) return true;
-    if (crop.includes('pumba') && sCrop.includes('pumba')) return true;
-    if (crop.includes('mpunga') && sCrop.includes('mpunga')) return true;
-    if (crop.includes('mahindi') && sCrop.includes('mahindi')) return true;
-    if (crop.includes('alizeti') && sCrop.includes('alizeti')) return true;
-    
-    return false;
+
+    const sCropNorm = normalizeCropStr(sCropRaw);
+
+    if (sCropNorm === 'mahindi' && batchCropNorm !== 'mahindi') return false;
+    if (sCropNorm === 'mpunga' && batchCropNorm !== 'mpunga' && batchCropNorm !== 'mchele' && batchCropNorm !== 'pumba') return false;
+    if (sCropNorm === 'mchele' && batchCropNorm !== 'mpunga' && batchCropNorm !== 'mchele') return false;
+    if (sCropNorm === 'pumba' && batchCropNorm !== 'mpunga' && batchCropNorm !== 'pumba') return false;
+
+    return sCropNorm === batchCropNorm || batchCropNorm.includes(sCropNorm) || sCropNorm.includes(batchCropNorm);
   });
+
+  if (batchUnitNorm) {
+    const unitMatched = eligibleCropServices.filter(s => {
+      const sUnitNorm = normalizeUnitStr(s.unit);
+      return !sUnitNorm || sUnitNorm === batchUnitNorm;
+    });
+
+    if (unitMatched.length > 0) {
+      return unitMatched;
+    }
+  }
+
+  return eligibleCropServices;
 });
 
 const getServiceRate = (cs) => {
