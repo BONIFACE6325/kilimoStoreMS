@@ -224,7 +224,13 @@ class BatchController extends Controller
     public function updateProcessing(Request $request, $id)
     {
         try {
-            $batch = Batch::findOrFail($id);
+            $batch = Batch::find($id);
+            if (!$batch) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Mzigo huu haupo kwenye mfumo (pengine database ilisafishwa). Tafadhali fanya Refresh kwenye ukurasa wako kisha jaribu tena.'
+                ], 404);
+            }
 
             $jobId = $request->input('job_id');
             $availableQty = floatval($batch->current_weight_mt > 0 ? $batch->current_weight_mt : $batch->intake_quantity);
