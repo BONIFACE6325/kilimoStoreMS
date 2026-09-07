@@ -558,9 +558,16 @@
                             <div class="flex items-center gap-2 self-end sm:self-auto">
                               <div class="text-right mr-1">
                                 <div class="text-xs font-black text-emerald-700 dark:text-emerald-400">Tsh {{ calculateServiceTotalFee(s, b).toLocaleString() }}</div>
-                                <div class="text-[9.5px] text-slate-400 font-bold uppercase">Jumla ya Ada</div>
+                                <div class="text-[9.5px] text-slate-400 font-bold uppercase">
+                                  <span v-if="s.status === 'paid'">Ada Imelipwa</span>
+                                  <span v-else-if="s.already_paid > 0">Baki ya Ada</span>
+                                  <span v-else>Jumla ya Ada</span>
+                                </div>
                               </div>
-                              <button v-if="s.status !== 'completed' && b.status !== 'transformed'" @click="openCompleteServiceModal(b, s)" class="px-2.5 py-1 bg-amber-100 dark:bg-amber-500/20 hover:bg-amber-200 text-amber-900 dark:text-amber-400 border border-amber-300 rounded-lg text-[10px] font-black uppercase tracking-wider cursor-pointer flex items-center gap-1 transition shadow-2xs" title="Bonyeza hapa kukamilisha huduma hii">
+                              <span v-if="s.status === 'paid'" class="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30 rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shadow-2xs">
+                                <span>💳 IMELIPWA</span>
+                              </span>
+                              <button v-else-if="s.status !== 'completed' && b.status !== 'transformed'" @click="openCompleteServiceModal(b, s)" class="px-2.5 py-1 bg-amber-100 dark:bg-amber-500/20 hover:bg-amber-200 text-amber-900 dark:text-amber-400 border border-amber-300 rounded-lg text-[10px] font-black uppercase tracking-wider cursor-pointer flex items-center gap-1 transition shadow-2xs" title="Bonyeza hapa kukamilisha huduma hii">
                                 <span>⚙️ INAENDELEA</span>
                                 <span class="text-[9px] font-bold text-amber-700 dark:text-amber-400">(Kamilisha)</span>
                               </button>
@@ -570,7 +577,7 @@
                               <span v-else class="px-2.5 py-1 bg-amber-100 dark:bg-amber-500/20 text-amber-900 dark:text-amber-400 border border-amber-300 rounded-lg text-[10px] font-black uppercase tracking-wider">
                                 ⚙️ INAENDELEA
                               </span>
-                              <button v-if="s.status !== 'completed'" @click="deleteAssignedService(b, s)" class="px-2 py-1 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-500/20 rounded-lg text-[10px] font-bold transition shadow-2xs cursor-pointer" title="Futa Huduma & Rejelea Mzigo">
+                              <button v-if="s.status !== 'completed' && s.status !== 'paid'" @click="deleteAssignedService(b, s)" class="px-2 py-1 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-500/20 rounded-lg text-[10px] font-bold transition shadow-2xs cursor-pointer" title="Futa Huduma & Rejelea Mzigo">
                                 🗑️ Futa
                               </button>
                             </div>
@@ -614,8 +621,11 @@
                               <div v-else class="font-black text-rose-600 text-sm font-mono">
                                 0 (Imeuzwa)
                               </div>
+                              <button v-if="child.status !== 'sold'" @click="openNewSaleModal(child)" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold rounded-lg shadow-2xs flex items-center gap-1 cursor-pointer transition" :title="'Uza ' + child.crop_type + ' na fanya settlement'">
+                                <span>🏷️ Uza {{ child.crop_type }}</span>
+                              </button>
                               <button v-if="child.status !== 'sold'" @click="openApplyServiceForChild(child)" class="px-2.5 py-1 bg-teal-700 hover:bg-teal-800 text-white text-[11px] font-bold rounded-lg shadow-2xs flex items-center gap-1 cursor-pointer transition">
-                                <span>+ Huduma ya {{ child.crop_type }}</span>
+                                <span>+ Huduma</span>
                               </button>
                               <button v-if="child.status !== 'sold' && (!getBatchChildren(b) || !getBatchChildren(b).some(c => c.status === 'sold'))" @click="revertTransformationFromChild(b, child)" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-[11px] font-bold rounded-lg shadow-2xs flex items-center gap-1 cursor-pointer transition" title="Futa matokeo haya ya transformation na urudishe mpunga">
                                 <span>🗑️ Futa Zao / Revert</span>
@@ -641,16 +651,23 @@
                                   <div class="text-xs font-black text-teal-800 dark:text-teal-400">
                                     Tsh {{ calculateServiceTotalFee(cs, child).toLocaleString() }}
                                   </div>
-                                  <div class="text-[9px] text-slate-400 font-bold uppercase">Jumla ya Ada</div>
+                                  <div class="text-[9px] text-slate-400 font-bold uppercase">
+                                    <span v-if="cs.status === 'paid'">Ada Imelipwa</span>
+                                    <span v-else-if="cs.already_paid > 0">Baki ya Ada</span>
+                                    <span v-else>Jumla ya Ada</span>
+                                  </div>
                                 </div>
-                                <button v-if="cs.status !== 'completed'" @click="openCompleteServiceModal(child, cs)" class="px-2 py-0.5 bg-amber-100 dark:bg-amber-500/20 hover:bg-amber-200 text-amber-900 dark:text-amber-400 border border-amber-300 rounded-md text-[9.5px] font-black uppercase cursor-pointer flex items-center gap-1 transition shadow-2xs" title="Bonyeza hapa kukamilisha huduma hii">
+                                <span v-if="cs.status === 'paid'" class="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30 rounded-md text-[9.5px] font-black uppercase flex items-center gap-1 shadow-2xs">
+                                  <span>💳 IMELIPWA</span>
+                                </span>
+                                <button v-else-if="cs.status !== 'completed'" @click="openCompleteServiceModal(child, cs)" class="px-2 py-0.5 bg-amber-100 dark:bg-amber-500/20 hover:bg-amber-200 text-amber-900 dark:text-amber-400 border border-amber-300 rounded-md text-[9.5px] font-black uppercase cursor-pointer flex items-center gap-1 transition shadow-2xs" title="Bonyeza hapa kukamilisha huduma hii">
                                   <span>⚙️ INAENDELEA</span>
                                   <span class="text-[8.5px] font-bold text-amber-700 dark:text-amber-400">(Kamilisha)</span>
                                 </button>
                                 <span v-else class="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30 rounded-md text-[9.5px] font-black uppercase flex items-center gap-1 shadow-2xs">
                                   <span>✅ IMEKAMILIKA</span>
                                 </span>
-                                <button v-if="cs.status !== 'completed'" @click="deleteAssignedService(child, cs)" class="px-1.5 py-0.5 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-500/20 rounded-md text-[9.5px] font-bold transition shadow-2xs cursor-pointer">
+                                <button v-if="cs.status !== 'completed' && cs.status !== 'paid'" @click="deleteAssignedService(child, cs)" class="px-1.5 py-0.5 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-500/20 rounded-md text-[9.5px] font-bold transition shadow-2xs cursor-pointer">
                                   🗑️ Futa
                                 </button>
                               </div>
@@ -1341,8 +1358,11 @@
                 <span class="text-amber-400 font-black text-sm">Tsh {{ settleGrossSales.toLocaleString() }}</span>
               </div>
               <div class="text-right">
-                <span class="text-slate-400 block text-[10px]">2. Jumla ya Makato (Deductions)</span>
-                <span class="text-rose-400 font-black text-sm">- Tsh {{ settleTotalDeductions.toLocaleString() }}</span>
+                <span class="text-slate-400 block text-[10px]">2. Makato Yatakayokatwa (Deductions)</span>
+                <span class="text-rose-400 font-black text-sm">- Tsh {{ settleActualDeductions.toLocaleString() }}</span>
+                <span v-if="settleTotalDeductions > settleGrossSales" class="block text-[9px] text-amber-300 font-normal">
+                  (Deni litakalobaki: Tsh {{ (settleTotalDeductions - settleActualDeductions).toLocaleString() }})
+                </span>
               </div>
             </div>
             <div class="flex items-center justify-between pt-1">
@@ -2139,9 +2159,7 @@ const getServiceRate = (cs) => {
     return parseFloat(foundCatalog.rate);
   }
 
-  // 3. Fallback: return stored fee_amount as the unit rate
-  const fee = parseFloat(cs.fee_amount || cs.fee || cs.cost || 0);
-  return fee;
+  return 0;
 };
 
 const getBatchWeightKg = (batch) => {
@@ -2174,6 +2192,19 @@ const getServiceQuantity = (cs, batch) => {
 const calculateServiceTotalFee = (cs, batch) => {
   if (!cs) return 0;
 
+  // 1. If unpaid_fee is explicitly returned from backend
+  if (cs.unpaid_fee !== undefined && cs.unpaid_fee !== null) {
+    return Math.max(0, parseFloat(cs.unpaid_fee));
+  }
+
+  // 2. If stored fee_amount exists, that is the authoritative fee for this service job
+  const storedTotalFee = parseFloat(cs.fee_amount || cs.fee || cs.cost || 0);
+  if (storedTotalFee > 0) {
+    const alreadyPaid = parseFloat(cs.already_paid || 0);
+    return Math.max(0, Math.round(storedTotalFee - alreadyPaid));
+  }
+
+  // 3. Fallback: only calculate rate * qty if fee_amount was never saved
   const rate = getServiceRate(cs);
   const qty = getServiceQuantity(cs, batch);
 
@@ -2181,8 +2212,7 @@ const calculateServiceTotalFee = (cs, batch) => {
     return Math.round(rate * qty);
   }
 
-  const storedTotalFee = parseFloat(cs.fee_amount || cs.fee || cs.cost || 0);
-  return Math.round(storedTotalFee);
+  return 0;
 };
 
 const editAssignedService = async (b, s) => {
@@ -2536,10 +2566,13 @@ const openFarmerProfile = async (id) => {
   }
 };
 
-const openNewSaleModal = () => {
+const openNewSaleModal = (targetB = null) => {
   closeAllSubModals();
   settlementForm.value.sale_type = 'full';
-  if (activeNonTransformedBatches.value.length > 0) {
+  if (targetB && targetB.id) {
+    settlementForm.value.batch_id = targetB.id;
+    settlementForm.value.sold_weight_kg = getBatchWeightKg(targetB);
+  } else if (activeNonTransformedBatches.value.length > 0) {
     const firstB = activeNonTransformedBatches.value[0];
     settlementForm.value.batch_id = firstB.id;
     settlementForm.value.sold_weight_kg = getBatchWeightKg(firstB);
@@ -3204,6 +3237,10 @@ const settleMillingDryingFee = computed(() => {
 
 const settleTotalDeductions = computed(() => {
   return settleStorageFee.value + settleMillingDryingFee.value + totalFarmerLoanBalance.value;
+});
+
+const settleActualDeductions = computed(() => {
+  return Math.min(settleGrossSales.value, settleTotalDeductions.value);
 });
 
 const settleNetPayout = computed(() => {

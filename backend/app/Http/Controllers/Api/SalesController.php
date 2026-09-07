@@ -39,16 +39,28 @@ class SalesController extends Controller
 
     private function getRelatedBatchIds($batch)
     {
-        $ids = [$batch->id];
-        if ($batch->parent_batch_id) {
-            $ids[] = $batch->parent_batch_id;
-            $siblingIds = Batch::where('parent_batch_id', $batch->parent_batch_id)->pluck('id')->toArray();
-            $ids = array_merge($ids, $siblingIds);
-        }
-        $childIds = Batch::where('parent_batch_id', $batch->id)->pluck('id')->toArray();
-        $ids = array_merge($ids, $childIds);
+        if (!$batch) return [];
 
-        return array_unique($ids);
+        // 1. Find root parent batch
+        $root = $batch;
+        while (!empty($root->parent_batch_id)) {
+            $parent = Batch::find($root->parent_batch_id);
+            if (!$parent) break;
+            $root = $parent;
+        }
+
+        // 2. Traverse all descendants from root
+        $allIds = [$root->id];
+        $queue = [$root->id];
+        while (!empty($queue)) {
+            $childIds = Batch::whereIn('parent_batch_id', $queue)->pluck('id')->toArray();
+            $newChildren = array_diff($childIds, $allIds);
+            if (empty($newChildren)) break;
+            $allIds = array_merge($allIds, $newChildren);
+            $queue = $newChildren;
+        }
+
+        return array_values(array_unique($allIds));
     }
 
     private function getBatchRawQuantity($batch)
@@ -59,23 +71,28 @@ class SalesController extends Controller
         return floatval($batch->current_weight_mt ?? $batch->initial_weight_mt ?? 0);
     }
 
-    private function calculateJobFee($job, $batch)
+    private function getJobUnpaidFee($job)
     {
-        if (!$job) return 0.0;
-        
-        $rawQty = $this->getBatchRawQuantity($batch);
-        if ($rawQty <= 0) $rawQty = 1.0;
-
-        $rate = floatval($job->rate ?? $job->unit_price ?? 0);
-        if ($rate <= 0) {
-            $rate = floatval($job->fee_amount ?? $job->fee ?? $job->cost ?? 0);
+        if (!$job || $job->status === 'paid') {
+            return 0.0;
         }
 
-        if ($rate > 0) {
-            return $rate * $rawQty;
+        $totalFee = floatval($job->fee_amount ?? 0);
+        if ($totalFee <= 0) {
+            return 0.0;
         }
 
-        return floatval($job->fee_amount ?? 0);
+        $alreadyPaid = floatval(SettlementDeduction::where('source_reference_id', $job->id)->sum('amount'));
+        $unpaid = max(0.0, $totalFee - $alreadyPaid);
+
+        if ($unpaid <= 0.001) {
+            if ($job->status !== 'paid') {
+                $job->update(['status' => 'paid']);
+            }
+            return 0.0;
+        }
+
+        return $unpaid;
     }
 
     public function previewDeductions(Request $request)
@@ -109,25 +126,24 @@ class SalesController extends Controller
         $batchIds = $this->getRelatedBatchIds($batch);
 
         // 1. Calculate Storage Fees
-        $daysInStorage = max(0, now()->diffInDays($batch->created_at));
         $storageFees = $this->calculateStorageFees($batch);
 
         // 2. Fetch Unpaid Drying Fees
         $dryingJobs = DryingJob::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
-        $dryingFees = $dryingJobs->sum(function($j) use ($batch) {
-            return $this->calculateJobFee($j, $batch);
+        $dryingFees = $dryingJobs->sum(function($j) {
+            return $this->getJobUnpaidFee($j);
         });
 
         // 3. Fetch Unpaid Milling Fees
         $millingJobs = MillingJob::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
-        $millingFees = $millingJobs->sum(function($j) use ($batch) {
-            return $this->calculateJobFee($j, $batch);
+        $millingFees = $millingJobs->sum(function($j) {
+            return $this->getJobUnpaidFee($j);
         });
 
         // 4. Fetch Unpaid Grading Fees
         $gradingRecords = GradingRecord::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
-        $gradingFees = $gradingRecords->sum(function($j) use ($batch) {
-            return $this->calculateJobFee($j, $batch);
+        $gradingFees = $gradingRecords->sum(function($j) {
+            return $this->getJobUnpaidFee($j);
         });
 
         // 5. Fetch Active Loans
@@ -194,15 +210,22 @@ class SalesController extends Controller
             );
 
             $tenantId = $batch->tenant_id;
-            $lastInvoice = Invoice::where('tenant_id', $tenantId)->orderBy('created_at', 'desc')->first();
-            $nextNumber = 1001;
-            if ($lastInvoice) {
-                preg_match('/INV-(\d+)/', $lastInvoice->invoice_number, $matches);
-                if (!empty($matches[1])) {
-                    $nextNumber = intval($matches[1]) + 1;
+            $allInvoiceNumbers = Invoice::where('tenant_id', $tenantId)->pluck('invoice_number');
+            $maxNum = 1000;
+            foreach ($allInvoiceNumbers as $numStr) {
+                if (preg_match('/INV-(\d+)/', $numStr, $matches)) {
+                    $val = intval($matches[1]);
+                    if ($val > $maxNum) {
+                        $maxNum = $val;
+                    }
                 }
             }
+            $nextNumber = $maxNum + 1;
             $invoiceNumber = 'INV-' . $nextNumber;
+            while (Invoice::where('tenant_id', $tenantId)->where('invoice_number', $invoiceNumber)->exists()) {
+                $nextNumber++;
+                $invoiceNumber = 'INV-' . $nextNumber;
+            }
 
             $pricePerUnit = floatval($validated['price_per_kg']);
             $grossSales = $soldQty * $pricePerUnit;
@@ -212,50 +235,87 @@ class SalesController extends Controller
             // Calculate all deductions across processing tree
             $storageFees = $this->calculateStorageFees($batch);
             $dryingJobs = DryingJob::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
-            $dryingFees = $dryingJobs->sum(function($j) use ($batch) {
-                return $this->calculateJobFee($j, $batch);
-            });
-            
             $millingJobs = MillingJob::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
-            $millingFees = $millingJobs->sum(function($j) use ($batch) {
-                return $this->calculateJobFee($j, $batch);
-            });
-            
             $gradingRecords = GradingRecord::whereIn('batch_id', $batchIds)->where('status', '!=', 'paid')->get();
-            $gradingFees = $gradingRecords->sum(function($j) use ($batch) {
-                return $this->calculateJobFee($j, $batch);
-            });
-
             $loans = Loan::where('farmer_id', $batch->farmer_id)->whereIn('status', ['active', 'overdue'])->orderBy('created_at', 'asc')->get();
-            $loanPrincipal = $loans->sum('current_balance');
 
-            $totalDeductions = $storageFees + $dryingFees + $millingFees + $gradingFees + $loanPrincipal;
-            
             // Waterfall payment logic
             $availableFunds = $grossSales;
-            
-            $paidStorage = min($availableFunds, $storageFees);
-            $availableFunds -= $paidStorage;
-            
-            $paidDrying = min($availableFunds, $dryingFees);
-            $availableFunds -= $paidDrying;
-            
-            $paidMilling = min($availableFunds, $millingFees);
-            $availableFunds -= $paidMilling;
-            
-            $paidGrading = min($availableFunds, $gradingFees);
-            $availableFunds -= $paidGrading;
-            
-            $fundsBeforeLoans = $availableFunds;
-            
+
+            // 1. Storage Fees
+            $paidStorage = 0.0;
+            if ($storageFees > 0 && $availableFunds > 0) {
+                $paidStorage = min($availableFunds, $storageFees);
+                $availableFunds -= $paidStorage;
+            }
+
+            // 2. Drying Jobs Waterfall
+            $dryingPayments = [];
+            foreach ($dryingJobs as $job) {
+                if ($availableFunds <= 0) break;
+                $unpaid = $this->getJobUnpaidFee($job);
+                if ($unpaid <= 0) continue;
+                $pay = min($availableFunds, $unpaid);
+                $availableFunds -= $pay;
+                $dryingPayments[] = [
+                    'job' => $job,
+                    'amount' => $pay,
+                    'is_full' => ($pay >= $unpaid - 0.001)
+                ];
+            }
+
+            // 3. Milling Jobs Waterfall
+            $millingPayments = [];
+            foreach ($millingJobs as $job) {
+                if ($availableFunds <= 0) break;
+                $unpaid = $this->getJobUnpaidFee($job);
+                if ($unpaid <= 0) continue;
+                $pay = min($availableFunds, $unpaid);
+                $availableFunds -= $pay;
+                $millingPayments[] = [
+                    'job' => $job,
+                    'amount' => $pay,
+                    'is_full' => ($pay >= $unpaid - 0.001)
+                ];
+            }
+
+            // 4. Grading Jobs Waterfall
+            $gradingPayments = [];
+            foreach ($gradingRecords as $job) {
+                if ($availableFunds <= 0) break;
+                $unpaid = $this->getJobUnpaidFee($job);
+                if ($unpaid <= 0) continue;
+                $pay = min($availableFunds, $unpaid);
+                $availableFunds -= $pay;
+                $gradingPayments[] = [
+                    'job' => $job,
+                    'amount' => $pay,
+                    'is_full' => ($pay >= $unpaid - 0.001)
+                ];
+            }
+
+            // 5. Loans Waterfall
+            $loanPayments = [];
+            foreach ($loans as $loan) {
+                if ($availableFunds <= 0) break;
+                $bal = floatval($loan->current_balance);
+                if ($bal <= 0) continue;
+                $pay = min($availableFunds, $bal);
+                $availableFunds -= $pay;
+                $loanPayments[] = [
+                    'loan' => $loan,
+                    'amount' => $pay,
+                    'new_balance' => max(0, $bal - $pay)
+                ];
+            }
+
             $netPayout = $availableFunds;
             $actualDeductions = $grossSales - $netPayout;
 
             $result = DB::transaction(function () use (
                 $tenantId, $batch, $buyer, $invoiceNumber, $pricePerUnit, $soldQty, $availQty, $grossSales,
-                $paidStorage, $paidDrying, $paidMilling, $paidGrading,
-                $loans, $actualDeductions, $netPayout, $fundsBeforeLoans,
-                $dryingJobs, $millingJobs, $gradingRecords
+                $paidStorage, $dryingPayments, $millingPayments, $gradingPayments, $loanPayments,
+                $actualDeductions, $netPayout
             ) {
                 // 1. Create Invoice
                 $invoice = Invoice::create([
@@ -296,65 +356,62 @@ class SalesController extends Controller
                     SettlementDeduction::create([
                         'settlement_id' => $settlement->id,
                         'deduction_type' => 'storage_fee',
+                        'source_reference_id' => $batch->id,
                         'amount' => $paidStorage,
                     ]);
                 }
-                if ($paidDrying > 0) {
+
+                foreach ($dryingPayments as $dp) {
                     SettlementDeduction::create([
                         'settlement_id' => $settlement->id,
                         'deduction_type' => 'drying_fee',
-                        'amount' => $paidDrying,
+                        'source_reference_id' => $dp['job']->id,
+                        'amount' => $dp['amount'],
                     ]);
-                    if ($paidDrying >= $dryingJobs->sum('fee_amount')) {
-                        foreach($dryingJobs as $dj) $dj->update(['status' => 'paid']);
+                    if ($dp['is_full']) {
+                        $dp['job']->update(['status' => 'paid']);
                     }
                 }
-                if ($paidMilling > 0) {
+
+                foreach ($millingPayments as $mp) {
                     SettlementDeduction::create([
                         'settlement_id' => $settlement->id,
                         'deduction_type' => 'milling_fee',
-                        'amount' => $paidMilling,
+                        'source_reference_id' => $mp['job']->id,
+                        'amount' => $mp['amount'],
                     ]);
-                    if ($paidMilling >= $millingJobs->sum('fee_amount')) {
-                        foreach($millingJobs as $mj) $mj->update(['status' => 'paid']);
+                    if ($mp['is_full']) {
+                        $mp['job']->update(['status' => 'paid']);
                     }
                 }
-                if ($paidGrading > 0) {
+
+                foreach ($gradingPayments as $gp) {
                     SettlementDeduction::create([
                         'settlement_id' => $settlement->id,
                         'deduction_type' => 'grading_fee',
-                        'amount' => $paidGrading,
+                        'source_reference_id' => $gp['job']->id,
+                        'amount' => $gp['amount'],
                     ]);
-                    if ($paidGrading >= $gradingRecords->sum('fee_amount')) {
-                        foreach($gradingRecords as $gr) $gr->update(['status' => 'paid']);
+                    if ($gp['is_full']) {
+                        $gp['job']->update(['status' => 'paid']);
                     }
                 }
-                
-                // Loans waterfall
-                $loanFunds = $fundsBeforeLoans;
-                foreach ($loans as $loan) {
-                    if ($loanFunds <= 0) break;
-                    
-                    $payAmount = min($loanFunds, $loan->current_balance);
-                    $loanFunds -= $payAmount;
-                    
+
+                foreach ($loanPayments as $lp) {
                     SettlementDeduction::create([
                         'settlement_id' => $settlement->id,
                         'deduction_type' => 'loan_principal',
-                        'source_reference_id' => $loan->id,
-                        'amount' => $payAmount,
+                        'source_reference_id' => $lp['loan']->id,
+                        'amount' => $lp['amount'],
                     ]);
-
-                    $newBalance = $loan->current_balance - $payAmount;
-                    $loan->update([
-                        'current_balance' => $newBalance,
-                        'status' => $newBalance <= 0 ? 'paid' : 'active',
+                    $lp['loan']->update([
+                        'current_balance' => $lp['new_balance'],
+                        'status' => $lp['new_balance'] <= 0.001 ? 'paid' : 'active',
                     ]);
-                    
                     \App\Models\LoanTransaction::create([
-                        'loan_id' => $loan->id,
+                        'loan_id' => $lp['loan']->id,
                         'transaction_type' => 'payment',
-                        'amount' => $payAmount,
+                        'amount' => $lp['amount'],
                         'reference_number' => 'SETT-' . $settlement->id,
                     ]);
                 }

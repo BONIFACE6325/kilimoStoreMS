@@ -162,27 +162,38 @@ class ReportController extends Controller
     private function calculateServiceMetrics(?string $start, ?string $end): array
     {
         $dynamicServiceBreakdown = [];
-        $services = Service::all();
 
-        foreach ($services as $srv) {
-            $serviceName = $srv->name_sw ?: $srv->name_en;
-            
-            $dQuery = DryingJob::where('service_id', $srv->id);
-            $mQuery = MillingJob::where('service_id', $srv->id);
-            $gQuery = GradingRecord::where('service_id', $srv->id);
-
-            if ($start && $end) {
-                $dQuery->whereBetween('created_at', [$start, $end]);
-                $mQuery->whereBetween('created_at', [$start, $end]);
-                $gQuery->whereBetween('created_at', [$start, $end]);
-            }
-
-            $tot = (float)$dQuery->sum('fee_amount') + (float)$mQuery->sum('fee_amount') + (float)$gQuery->sum('fee_amount');
-            if ($tot > 0) {
-                $dynamicServiceBreakdown[$serviceName] = $tot;
-            }
+        // 1. Drying Jobs
+        $dQuery = DryingJob::with('service');
+        if ($start && $end) {
+            $dQuery->whereBetween('created_at', [$start, $end]);
+        }
+        foreach ($dQuery->where('fee_amount', '>', 0)->get() as $dj) {
+            $name = $dj->service ? ($dj->service->name_sw ?: $dj->service->name_en) : ($dj->machine_id ?: 'Huduma ya Kuanika (Drying)');
+            $dynamicServiceBreakdown[$name] = ($dynamicServiceBreakdown[$name] ?? 0.0) + (float)$dj->fee_amount;
         }
 
+        // 2. Milling Jobs
+        $mQuery = MillingJob::with('service');
+        if ($start && $end) {
+            $mQuery->whereBetween('created_at', [$start, $end]);
+        }
+        foreach ($mQuery->where('fee_amount', '>', 0)->get() as $mj) {
+            $name = $mj->service ? ($mj->service->name_sw ?: $mj->service->name_en) : ($mj->machine_id ?: 'Huduma ya Kukoboa (Milling)');
+            $dynamicServiceBreakdown[$name] = ($dynamicServiceBreakdown[$name] ?? 0.0) + (float)$mj->fee_amount;
+        }
+
+        // 3. Grading Records
+        $gQuery = GradingRecord::with('service');
+        if ($start && $end) {
+            $gQuery->whereBetween('created_at', [$start, $end]);
+        }
+        foreach ($gQuery->where('fee_amount', '>', 0)->get() as $gr) {
+            $name = $gr->service ? ($gr->service->name_sw ?: $gr->service->name_en) : 'Huduma ya Kupanga Madaraja (Grading)';
+            $dynamicServiceBreakdown[$name] = ($dynamicServiceBreakdown[$name] ?? 0.0) + (float)$gr->fee_amount;
+        }
+
+        // 4. Storage Fee Deductions
         $deductionQuery = SettlementDeduction::query();
         if ($start && $end) {
             $deductionQuery->whereBetween('created_at', [$start, $end]);
@@ -190,7 +201,7 @@ class ReportController extends Controller
 
         $storageRev = (float) (clone $deductionQuery)->where('deduction_type', 'storage_fee')->sum('amount');
         if ($storageRev > 0) {
-            $dynamicServiceBreakdown['Ada ya Hifadhi (Storage)'] = $storageRev;
+            $dynamicServiceBreakdown['Ada ya Hifadhi (Storage)'] = ($dynamicServiceBreakdown['Ada ya Hifadhi (Storage)'] ?? 0.0) + $storageRev;
         }
 
         $totalMappedSrv = array_sum($dynamicServiceBreakdown);
@@ -198,7 +209,7 @@ class ReportController extends Controller
         if ($totalDeductionsSrv > $totalMappedSrv) {
             $unmappedDiff = $totalDeductionsSrv - $totalMappedSrv;
             if ($unmappedDiff > 0) {
-                $dynamicServiceBreakdown['Huduma za Mauzo (Settlements)'] = $unmappedDiff;
+                $dynamicServiceBreakdown['Huduma Nyingine za Mauzo'] = $unmappedDiff;
             }
         }
 

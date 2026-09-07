@@ -226,11 +226,12 @@ class BatchController extends Controller
         try {
             $batch = Batch::findOrFail($id);
 
+            $jobId = $request->input('job_id');
             $availableQty = floatval($batch->current_weight_mt > 0 ? $batch->current_weight_mt : $batch->intake_quantity);
-            if (in_array($batch->status, ['sold', 'transformed']) || $availableQty <= 0) {
+            if (!$jobId && (in_array($batch->status, ['sold', 'transformed']) || $availableQty <= 0)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Mzigo huu tayari umeshauzwa au kubadilishwa wote! Huwezi kupanga au kukamilisha huduma kwenye mzigo huu.'
+                    'message' => 'Mzigo huu tayari umeshauzwa au kubadilishwa wote! Huwezi kupanga huduma mpya kwenye mzigo huu.'
                 ], 422);
             }
 
@@ -354,6 +355,9 @@ class BatchController extends Controller
 
                         if ($batch->current_weight_mt <= 0.001) {
                             $batch->update(['status' => 'transformed', 'current_weight_mt' => 0]);
+                            MillingJob::where('batch_id', $batch->id)->whereIn('status', ['queued', 'in_progress'])->update(['status' => 'completed']);
+                            DryingJob::where('batch_id', $batch->id)->whereIn('status', ['queued', 'in_progress'])->update(['status' => 'completed']);
+                            GradingRecord::where('batch_id', $batch->id)->whereIn('status', ['queued', 'in_progress'])->update(['status' => 'completed']);
                         }
                     } else {
                         $restoredWeight = $batch->current_weight_mt > 0 ? $batch->current_weight_mt : ($batch->initial_weight_mt ?: 0.5);
@@ -445,6 +449,9 @@ class BatchController extends Controller
 
                         if ($batch->current_weight_mt <= 0.001) {
                             $batch->update(['status' => 'transformed', 'current_weight_mt' => 0]);
+                            MillingJob::where('batch_id', $batch->id)->whereIn('status', ['queued', 'in_progress'])->update(['status' => 'completed']);
+                            DryingJob::where('batch_id', $batch->id)->whereIn('status', ['queued', 'in_progress'])->update(['status' => 'completed']);
+                            GradingRecord::where('batch_id', $batch->id)->whereIn('status', ['queued', 'in_progress'])->update(['status' => 'completed']);
                         }
                     } else {
                         $batch->update(['status' => $batch->status === 'received' ? 'received' : 'stored']);

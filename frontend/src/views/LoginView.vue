@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen w-full flex items-center justify-center bg-[#050B14] relative overflow-hidden font-sans">
-    
+  
     <!-- Abstract Premium Background -->
     <div class="absolute inset-0 z-0 opacity-40">
       <div class="absolute -top-[30%] -left-[10%] w-[70%] h-[70%] rounded-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/40 via-[#050B14]/0 to-[#050B14]/0 blur-3xl pointer-events-none"></div>
