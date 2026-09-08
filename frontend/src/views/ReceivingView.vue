@@ -427,9 +427,9 @@
     </div>
 
     <!-- MODAL 1: SAJILI MATUMIZI YA OFISI -->
-    <div v-if="modals.expense" class="fixed inset-0 z-[90] bg-slate-900/75 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700">
-        <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-900 text-white">
+    <div v-if="modals.expense" class="fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+      <div class="bg-white dark:bg-slate-900 w-full max-w-md max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 flex flex-col my-auto animate-fadeIn">
+        <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-slate-900 to-slate-950 text-white shrink-0">
           <div class="flex items-center gap-2">
             <span class="text-lg">💸</span>
             <h3 class="text-base font-extrabold">Sajili Matumizi ya Ofisi / Uendeshaji</h3>
@@ -437,37 +437,37 @@
           <button @click="modals.expense = false" class="text-slate-300 hover:text-white p-1 cursor-pointer">✕</button>
         </div>
 
-        <div class="p-6 space-y-4 text-xs font-semibold text-slate-700 dark:text-slate-200">
+        <div class="p-6 space-y-4 text-xs font-semibold text-slate-700 dark:text-slate-200 overflow-y-auto">
           <div>
-            <label class="block mb-1 font-bold">Kipengele cha Matumizi (Category) *</label>
-            <select v-model="expenseForm.category_name" class="w-full p-2.5 border rounded-xl font-bold bg-slate-50 dark:bg-slate-950 focus:bg-white dark:bg-slate-900">
-              <option value="Chakula cha Wafanyakazi">🍲 Chakula cha Wafanyakazi / Vibarua</option>
-              <option value="Umeme wa Mashine">⚡ Umeme wa Mashine / Kinu</option>
-              <option value="Mafuta ya Generator">⛽ Mafuta ya Generator / Usafiri</option>
-              <option value="Mishahara ya Vibarua">👷 Mishahara ya Vibarua (Casual Wages)</option>
-              <option value="Ukarabati na Maintenance">🛠️ Ukarabati na Maintenance</option>
-              <option value="Matumizi Mengineyo">📝 Matumizi Mengineyo (Office Expenses)</option>
+            <label class="block mb-1 font-bold text-slate-800 dark:text-slate-100">Kipengele cha Matumizi (Category) *</label>
+            <select v-model="expenseForm.category_name" class="w-full p-2.5 border border-slate-300 dark:border-slate-700 rounded-xl font-bold bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500">
+              <option value="Chakula cha Wafanyakazi" class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50">🍲 Chakula cha Wafanyakazi / Vibarua</option>
+              <option value="Umeme wa Mashine" class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50">⚡ Umeme wa Mashine / Kinu</option>
+              <option value="Mafuta ya Generator" class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50">⛽ Mafuta ya Generator / Usafiri</option>
+              <option value="Mishahara ya Vibarua" class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50">👷 Mishahara ya Vibarua (Casual Wages)</option>
+              <option value="Ukarabati na Maintenance" class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50">🛠️ Ukarabati na Maintenance</option>
+              <option value="Matumizi Mengineyo" class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50">📝 Matumizi Mengineyo (Office Expenses)</option>
             </select>
           </div>
 
           <div>
-            <label class="block mb-1 font-bold">Kiasi cha Matumizi (TZS) *</label>
-            <input v-model.number="expenseForm.amount" type="number" placeholder="e.g. 35000" class="w-full p-2.5 border rounded-xl font-bold text-sm text-slate-900 dark:text-slate-50 font-mono"/>
+            <label class="block mb-1 font-bold text-slate-800 dark:text-slate-100">Kiasi cha Matumizi (TZS) *</label>
+            <input v-model.number="expenseForm.amount" type="number" placeholder="e.g. 35000" class="w-full p-2.5 border border-slate-300 dark:border-slate-700 rounded-xl font-bold text-sm text-slate-900 dark:text-slate-50 bg-slate-50 dark:bg-slate-950 focus:bg-white dark:focus:bg-slate-900 font-mono"/>
           </div>
 
           <div>
-            <label class="block mb-1 font-bold">Tarehe ya Matumizi *</label>
-            <input v-model="expenseForm.date_incurred" type="date" class="w-full p-2.5 border rounded-xl font-bold bg-slate-50 dark:bg-slate-950"/>
+            <label class="block mb-1 font-bold text-slate-800 dark:text-slate-100">Tarehe ya Matumizi *</label>
+            <input v-model="expenseForm.date_incurred" type="date" class="w-full p-2.5 border border-slate-300 dark:border-slate-700 rounded-xl font-bold bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50"/>
           </div>
 
           <div>
-            <label class="block mb-1 font-bold">Maelezo (Notes / Receipt Ref) *</label>
-            <textarea v-model="expenseForm.description" rows="2" placeholder="e.g. Chakula cha mchana vibarua 12 waliopakia mzigo..." class="w-full p-2.5 border rounded-xl font-medium"></textarea>
+            <label class="block mb-1 font-bold text-slate-800 dark:text-slate-100">Maelezo (Notes / Receipt Ref) *</label>
+            <textarea v-model="expenseForm.description" rows="2" placeholder="e.g. Chakula cha mchana vibarua 12 waliopakia mzigo..." class="w-full p-2.5 border border-slate-300 dark:border-slate-700 rounded-xl font-medium bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50"></textarea>
           </div>
 
-          <div class="flex justify-end gap-2 pt-2">
+          <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
             <button @click="modals.expense = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl cursor-pointer">Ghairi</button>
-            <button @click="submitExpense" class="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-black rounded-xl shadow-xs cursor-pointer">Hifadhi Matumizi</button>
+            <button @click="submitExpense" class="px-5 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white font-black rounded-xl shadow-xs cursor-pointer transition">Hifadhi Matumizi</button>
           </div>
         </div>
       </div>
