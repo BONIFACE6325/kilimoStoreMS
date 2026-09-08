@@ -633,24 +633,33 @@ const applyCustomDateFilter = () => {
 const getDateRangeParams = () => {
   if (activeFilter.value === 'all_time') return '';
 
+  const formatLocalDate = (d) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const now = new Date();
-  const formatIsoDate = (d) => d.toISOString().split('T')[0];
-  let start, end = formatIsoDate(now);
+  const end = formatLocalDate(now);
+  let start = end;
 
   if (activeFilter.value === 'today') {
     start = end;
   } else if (activeFilter.value === 'this_week') {
-    const day = now.getDay();
-    const diff = now.getDate() - day + (day === 0 ? -6 : 1); // Monday
-    start = formatIsoDate(new Date(now.setDate(diff)));
+    const d = new Date();
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday
+    d.setDate(diff);
+    start = formatLocalDate(d);
   } else if (activeFilter.value === 'this_month') {
-    start = formatIsoDate(new Date(now.getFullYear(), now.getMonth(), 1));
+    start = formatLocalDate(new Date(now.getFullYear(), now.getMonth(), 1));
   } else if (activeFilter.value === 'last_3_months') {
-    start = formatIsoDate(new Date(now.getFullYear(), now.getMonth() - 3, now.getDate()));
+    start = formatLocalDate(new Date(now.getFullYear(), now.getMonth() - 3, now.getDate()));
   } else if (activeFilter.value === 'last_6_months') {
-    start = formatIsoDate(new Date(now.getFullYear(), now.getMonth() - 6, now.getDate()));
+    start = formatLocalDate(new Date(now.getFullYear(), now.getMonth() - 6, now.getDate()));
   } else if (activeFilter.value === 'this_year') {
-    start = formatIsoDate(new Date(now.getFullYear(), 0, 1));
+    start = formatLocalDate(new Date(now.getFullYear(), 0, 1));
   } else if (activeFilter.value === 'custom') {
     if (customStartDate.value && customEndDate.value) {
       return `?start_date=${customStartDate.value}&end_date=${customEndDate.value}`;
@@ -905,8 +914,8 @@ const fetchFinancialData = async () => {
     }
 
     const [settRes, expRes] = await Promise.all([
-      fetch('/api/v1/sales/settlements').catch(() => null),
-      fetch('/api/v1/expenses').catch(() => null)
+      fetch('/api/v1/sales/settlements' + dateQueryParams).catch(() => null),
+      fetch('/api/v1/expenses' + dateQueryParams).catch(() => null)
     ]);
 
     // Build Recent Financial Ledger
