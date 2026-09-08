@@ -131,7 +131,7 @@
             </tr>
             <tr 
               v-else
-              v-for="buyer in filteredBuyers" 
+              v-for="buyer in paginatedBuyers" 
               :key="buyer.id"
               class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors"
             >
@@ -229,6 +229,11 @@
             </tr>
           </tbody>
         </table>
+        <Pagination
+          v-model:currentPage="currentPage"
+          v-model:perPage="perPage"
+          :totalItems="filteredBuyers.length"
+        />
       </div>
     </div>
 
@@ -444,7 +449,7 @@
                     ℹ️ Mnunuzi huyu bado hana kumbukumbu ya ankara yoyote.
                   </td>
                 </tr>
-                <tr v-else v-for="inv in buyerInvoicesHistory" :key="inv.id" class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30">
+                <tr v-else v-for="inv in paginatedHistory" :key="inv.id" class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30">
                   <td class="py-2.5 px-3 font-extrabold text-slate-900 dark:text-white">
                     {{ inv.invoice_number }}
                   </td>
@@ -474,6 +479,12 @@
                 </tr>
               </tbody>
             </table>
+            <Pagination
+              v-model:currentPage="currentHistoryPage"
+              v-model:perPage="perHistoryPage"
+              :totalItems="buyerInvoicesHistory.length"
+              :perPageOptions="[5, 10, 20]"
+            />
           </div>
 
           <div class="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-right">
@@ -504,10 +515,17 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useLanguage } from '../composables/useLanguage.js';
+import Pagination from '../components/Pagination.vue';
 
 const { t } = useLanguage();
+
+const currentPage = ref(1);
+const perPage = ref(10);
+
+const currentHistoryPage = ref(1);
+const perHistoryPage = ref(5);
 
 const buyersList = ref([]);
 const dbStats = ref({
@@ -575,6 +593,24 @@ const filteredBuyers = computed(() => {
     (b.phone && b.phone.includes(q)) ||
     (b.tax_number && b.tax_number.toLowerCase().includes(q))
   );
+});
+
+const paginatedBuyers = computed(() => {
+  const start = (currentPage.value - 1) * perPage.value;
+  return filteredBuyers.value.slice(start, start + perPage.value);
+});
+
+watch([filteredBuyers, perPage], () => {
+  currentPage.value = 1;
+});
+
+const paginatedHistory = computed(() => {
+  const start = (currentHistoryPage.value - 1) * perHistoryPage.value;
+  return buyerInvoicesHistory.value.slice(start, start + perHistoryPage.value);
+});
+
+watch([buyerInvoicesHistory, perHistoryPage], () => {
+  currentHistoryPage.value = 1;
 });
 
 const fetchBuyersData = async () => {

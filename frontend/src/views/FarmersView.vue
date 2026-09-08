@@ -168,14 +168,12 @@
         </table>
       </div>
 
-      <!-- Pagination Footer -->
-      <div class="px-6 py-4 bg-emerald-50/40 dark:bg-emerald-900/40 border-t border-emerald-100 dark:border-emerald-800/40 flex items-center justify-between text-xs text-slate-600 dark:text-slate-300 font-semibold">
-        <div>Inaonyesha {{ (currentPage - 1) * pageSize + 1 }} hadi {{ Math.min(currentPage * pageSize, filteredFarmers.length) }} kati ya {{ filteredFarmers.length }}</div>
-        <div class="flex gap-2">
-          <button @click="currentPage--" :disabled="currentPage === 1" class="px-3.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-200 disabled:opacity-40 font-bold shadow-2xs">Iliyopita</button>
-          <button @click="currentPage++" :disabled="currentPage * pageSize >= filteredFarmers.length" class="px-3.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-200 disabled:opacity-40 font-bold shadow-2xs">Ifuatayo</button>
-        </div>
-      </div>
+      <Pagination
+        v-model:currentPage="currentPage"
+        v-model:perPage="pageSize"
+        :totalItems="filteredFarmers.length"
+        :perPageOptions="[10, 15, 25, 50, 100]"
+      />
     </div>
 
     <!-- MAIN FARMER PROFILE MODAL (With Strict Transformed Batch Locking & Product Tree Services) -->
@@ -931,7 +929,7 @@
                     <tr v-if="farmerLoans.length === 0" class="text-center text-slate-400">
                       <td colspan="6" class="py-6">Hakuna historia ya mikopo iliyotolewa.</td>
                     </tr>
-                    <tr v-for="l in farmerLoans" :key="l.id" class="hover:bg-slate-50 dark:bg-slate-950 transition">
+                    <tr v-for="l in paginatedFarmerLoans" :key="l.id" class="hover:bg-slate-50 dark:bg-slate-950 transition">
                       <td class="py-2 px-3 text-slate-600 dark:text-slate-300 font-mono font-semibold">{{ formatDate(l.created_at) }}</td>
                       <td class="py-2 px-3 font-bold text-emerald-800 dark:text-emerald-400 font-mono">{{ l.collateral_batch?.batch_code || l.collateral_batch_id || 'Dhamana ya Mazao' }}</td>
                       <td class="py-2 px-3 font-bold text-slate-900 dark:text-slate-50">Tsh {{ parseFloat(l.principal_amount || 0).toLocaleString() }}</td>
@@ -955,6 +953,12 @@
                     </tr>
                   </tbody>
                 </table>
+                <Pagination
+                  v-model:currentPage="currentLoansPage"
+                  v-model:perPage="perLoansPage"
+                  :totalItems="farmerLoans.length"
+                  :perPageOptions="[5, 10, 20]"
+                />
               </div>
             </div>
 
@@ -1005,7 +1009,7 @@
                     <tr v-if="farmerSettlements.length === 0" class="text-center text-slate-400">
                       <td colspan="7" class="py-6">Hakuna historia ya mauzo yaliyokamilishwa.</td>
                     </tr>
-                    <tr v-for="st in farmerSettlements" :key="st.id" class="hover:bg-slate-50 dark:bg-slate-950 transition">
+                    <tr v-for="st in paginatedFarmerSettlements" :key="st.id" class="hover:bg-slate-50 dark:bg-slate-950 transition">
                       <td class="py-2 px-3 text-slate-600 dark:text-slate-300 font-mono font-semibold">{{ formatDate(st.created_at || st.settled_at) }}</td>
                       <td class="py-2 px-3 font-bold text-emerald-800 dark:text-emerald-400 font-mono">{{ st.invoice?.invoice_number || ('SETT-' + st.id) }}</td>
                       <td class="py-2 px-3 font-bold text-slate-800 dark:text-slate-100">{{ st.invoice?.buyer?.name || 'Mnunuzi wa Jumla' }}</td>
@@ -1020,6 +1024,12 @@
                     </tr>
                   </tbody>
                 </table>
+                <Pagination
+                  v-model:currentPage="currentSettlementsPage"
+                  v-model:perPage="perSettlementsPage"
+                  :totalItems="farmerSettlements.length"
+                  :perPageOptions="[5, 10, 20]"
+                />
               </div>
 
             </div>
@@ -1734,6 +1744,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useAgroMaster } from '../composables/useAgroMaster.js';
 import { useLanguage } from '../composables/useLanguage.js';
+import Pagination from '../components/Pagination.vue';
 
 const { cropsList, unitsList, addCrop, addUnit, getUnitKg, convertUnits } = useAgroMaster();
 const { t } = useLanguage();
@@ -1747,6 +1758,15 @@ const regionFilter = ref('');
 const statusFilter = ref('');
 const currentPage = ref(1);
 const pageSize = ref(15);
+
+const currentLoansPage = ref(1);
+const perLoansPage = ref(5);
+
+const currentSettlementsPage = ref(1);
+const perSettlementsPage = ref(5);
+
+const currentMovementsPage = ref(1);
+const perMovementsPage = ref(5);
 
 const selectedFarmer = ref({});
 const farmerBatches = ref([]);
@@ -2785,6 +2805,33 @@ const filteredFarmers = computed(() => {
 const paginatedFarmers = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value;
   return filteredFarmers.value.slice(start, start + pageSize.value);
+});
+
+const paginatedFarmerLoans = computed(() => {
+  const start = (currentLoansPage.value - 1) * perLoansPage.value;
+  return farmerLoans.value.slice(start, start + perLoansPage.value);
+});
+
+watch([farmerLoans, perLoansPage], () => {
+  currentLoansPage.value = 1;
+});
+
+const paginatedFarmerSettlements = computed(() => {
+  const start = (currentSettlementsPage.value - 1) * perSettlementsPage.value;
+  return farmerSettlements.value.slice(start, start + perSettlementsPage.value);
+});
+
+watch([farmerSettlements, perSettlementsPage], () => {
+  currentSettlementsPage.value = 1;
+});
+
+const paginatedBatchMovements = computed(() => {
+  const start = (currentMovementsPage.value - 1) * perMovementsPage.value;
+  return (selectedBatchDetails.value?.movements || []).slice(start, start + perMovementsPage.value);
+});
+
+watch([selectedBatchDetails, perMovementsPage], () => {
+  currentMovementsPage.value = 1;
 });
 
 const expandedBatchIds = ref(new Set());

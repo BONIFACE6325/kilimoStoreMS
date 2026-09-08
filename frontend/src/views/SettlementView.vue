@@ -118,7 +118,7 @@
             <tr v-if="filteredInvoices.length === 0">
               <td colspan="9" class="p-8 text-center text-slate-400 font-medium">Hakuna invoice iliyopatikana.</td>
             </tr>
-            <tr v-for="inv in filteredInvoices" :key="inv.id" class="hover:bg-slate-50/80 dark:bg-slate-950/80 transition">
+            <tr v-for="inv in paginatedInvoices" :key="inv.id" class="hover:bg-slate-50/80 dark:bg-slate-950/80 transition">
               <td class="p-4 font-mono font-bold text-indigo-700">{{ inv.invoice_number }}</td>
               <td class="p-4 font-extrabold text-slate-900 dark:text-slate-50">{{ inv.buyer ? inv.buyer.name : (inv.buyer_name || 'Buyer Corporate') }}</td>
               <td class="p-4"><span class="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 rounded-md font-extrabold text-[10.5px]">{{ inv.crop_type || 'Mchele Grade A' }}</span></td>
@@ -145,6 +145,11 @@
             </tr>
           </tbody>
         </table>
+        <Pagination
+          v-model:currentPage="currentPage"
+          v-model:perPage="perPage"
+          :totalItems="filteredInvoices.length"
+        />
       </div>
     </div>
 
@@ -350,7 +355,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
+import Pagination from '../components/Pagination.vue';
+
+const currentPage = ref(1);
+const perPage = ref(10);
 
 const invoices = ref([]);
 const buyers = ref([]);
@@ -429,6 +438,15 @@ const filteredInvoices = computed(() => {
     const matchesSt = !statusFilter.value || inv.status === statusFilter.value;
     return matchesQ && matchesSt;
   });
+});
+
+const paginatedInvoices = computed(() => {
+  const start = (currentPage.value - 1) * perPage.value;
+  return filteredInvoices.value.slice(start, start + perPage.value);
+});
+
+watch([filteredInvoices, perPage], () => {
+  currentPage.value = 1;
 });
 
 const previewInvoicePDF = (inv) => {

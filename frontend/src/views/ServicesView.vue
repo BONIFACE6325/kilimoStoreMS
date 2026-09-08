@@ -182,7 +182,7 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50 font-medium">
-              <tr v-for="s in filteredServices" :key="s.id" class="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+              <tr v-for="s in paginatedServices" :key="s.id" class="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
                 <td class="py-2.5 px-4">
                   <div class="font-extrabold text-slate-900 dark:text-slate-50 text-xs">{{ s.name_sw }}</div>
                   <div v-if="s.description" class="text-[10px] text-slate-500 dark:text-slate-400 max-w-[200px] truncate">{{ s.description }}</div>
@@ -202,6 +202,11 @@
               </tr>
             </tbody>
           </table>
+          <Pagination
+            v-model:currentPage="currentPage"
+            v-model:perPage="perPage"
+            :totalItems="filteredServices.length"
+          />
         </div>
       </div>
     </div>
@@ -472,12 +477,17 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useAgroMaster } from '../composables/useAgroMaster.js';
 import { useLanguage } from '../composables/useLanguage.js';
+import Pagination from '../components/Pagination.vue';
+
+const { t } = useLanguage();
+
+const currentPage = ref(1);
+const perPage = ref(10);
 
 const { cropsList, unitsList, addCrop, deleteCrop, addUnit, updateUnitRatio, updateUnit, deleteUnit, getUnitKg, convertUnits } = useAgroMaster();
-const { t } = useLanguage();
 
 const editingUnitName = ref(null);
 const editUnitForm = ref({ name: '', kg: 1 });
@@ -709,6 +719,15 @@ const filteredServices = computed(() => {
     const matchCat = true;
     return matchQ && matchCat;
   });
+});
+
+const paginatedServices = computed(() => {
+  const start = (currentPage.value - 1) * perPage.value;
+  return filteredServices.value.slice(start, start + perPage.value);
+});
+
+watch([filteredServices, perPage], () => {
+  currentPage.value = 1;
 });
 
 const openAddModal = () => {

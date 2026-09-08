@@ -368,7 +368,7 @@
             </tr>
             <tr 
               v-else
-              v-for="inc in filteredIncomes" 
+              v-for="inc in paginatedIncomes" 
               :key="inc.id"
               class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors"
             >
@@ -411,6 +411,11 @@
             </tr>
           </tbody>
         </table>
+        <Pagination
+          v-model:currentPage="currentIncomePage"
+          v-model:perPage="perIncomePage"
+          :totalItems="filteredIncomes.length"
+        />
       </div>
     </div>
 
@@ -470,7 +475,7 @@
             </tr>
             <tr 
               v-else
-              v-for="exp in filteredExpenses" 
+              v-for="exp in paginatedExpenses" 
               :key="exp.id"
               class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors"
             >
@@ -513,6 +518,11 @@
             </tr>
           </tbody>
         </table>
+        <Pagination
+          v-model:currentPage="currentExpensePage"
+          v-model:perPage="perExpensePage"
+          :totalItems="filteredExpenses.length"
+        />
       </div>
     </div>
 
@@ -699,14 +709,21 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 import { Doughnut, Bar } from 'vue-chartjs';
 import { useLanguage } from '../composables/useLanguage.js';
+import Pagination from '../components/Pagination.vue';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend);
 
 const { t } = useLanguage();
+
+const currentIncomePage = ref(1);
+const perIncomePage = ref(10);
+
+const currentExpensePage = ref(1);
+const perExpensePage = ref(10);
 
 const activeTab = ref('analysis');
 
@@ -926,6 +943,24 @@ const filteredExpenses = computed(() => {
     (exp.category_name && exp.category_name.toLowerCase().includes(q)) ||
     (exp.description && exp.description.toLowerCase().includes(q))
   );
+});
+
+const paginatedIncomes = computed(() => {
+  const start = (currentIncomePage.value - 1) * perIncomePage.value;
+  return filteredIncomes.value.slice(start, start + perIncomePage.value);
+});
+
+watch([filteredIncomes, perIncomePage], () => {
+  currentIncomePage.value = 1;
+});
+
+const paginatedExpenses = computed(() => {
+  const start = (currentExpensePage.value - 1) * perExpensePage.value;
+  return filteredExpenses.value.slice(start, start + perExpensePage.value);
+});
+
+watch([filteredExpenses, perExpensePage], () => {
+  currentExpensePage.value = 1;
 });
 
 const fetchAccountingData = async () => {

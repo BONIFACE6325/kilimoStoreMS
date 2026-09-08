@@ -331,7 +331,7 @@
                   🔍 Hakuna data ya mazao iliyopatikana.
                 </td>
               </tr>
-              <tr v-for="c in cropAnalyticsList" :key="c.crop_type" class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors">
+              <tr v-for="c in paginatedCrops" :key="c.crop_type" class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors">
                 <td class="py-3.5 px-4 font-black text-slate-900 dark:text-white text-sm">
                   {{ c.crop_type }}
                 </td>
@@ -370,6 +370,11 @@
               </tr>
             </tbody>
           </table>
+          <Pagination
+            v-model:currentPage="currentPage"
+            v-model:perPage="perPage"
+            :totalItems="cropAnalyticsList.length"
+          />
         </div>
       </div>
 
@@ -720,14 +725,18 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 import { Doughnut, Bar } from 'vue-chartjs';
 import { useLanguage } from '../composables/useLanguage.js';
+import Pagination from '../components/Pagination.vue';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend);
 
 const { t } = useLanguage();
+
+const currentPage = ref(1);
+const perPage = ref(10);
 
 const activeTab = ref('executive');
 const selectedPeriod = ref('all');
@@ -749,6 +758,14 @@ const machineStats = ref({});
 const trends = ref({ months: [], revenue: [], expenses: [], intake: [], dispatch: [] });
 
 const cropAnalyticsList = ref([]);
+const paginatedCrops = computed(() => {
+  const start = (currentPage.value - 1) * perPage.value;
+  return cropAnalyticsList.value.slice(start, start + perPage.value);
+});
+
+watch([cropAnalyticsList, perPage], () => {
+  currentPage.value = 1;
+});
 const topRevenueService = ref(null);
 const topUsageService = ref(null);
 

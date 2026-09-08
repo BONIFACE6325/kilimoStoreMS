@@ -488,7 +488,7 @@
             <tr v-if="recentTransactions.length === 0" class="text-center text-slate-400">
               <td colspan="5" class="py-8 text-xs font-normal">{{ t('noRecentTransactions', 'Hakuna miamala ya hivi karibuni.') }}</td>
             </tr>
-            <tr v-for="t in recentTransactions" :key="t.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+            <tr v-for="t in paginatedRecentTransactions" :key="t.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
               <td class="py-3 px-4 text-slate-500 dark:text-slate-400 font-mono text-[11px] whitespace-nowrap">{{ t.date }}</td>
               <td class="py-3 px-4 whitespace-nowrap">
                 <span :class="t.isExpense ? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600' : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'" class="px-2.5 py-0.5 rounded-md text-[10px] font-bold capitalize border">
@@ -507,6 +507,13 @@
             </tr>
           </tbody>
         </table>
+        
+        <Pagination 
+          v-model:currentPage="currentPage" 
+          v-model:perPage="perPage" 
+          :totalItems="recentTransactions.length" 
+          :perPageOptions="[5, 10, 20, 50]"
+        />
       </div>
     </div>
 
@@ -538,10 +545,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 import { Line, Doughnut } from 'vue-chartjs';
 import { useLanguage } from '../composables/useLanguage';
+import Pagination from '../components/Pagination.vue';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend);
 
@@ -552,6 +560,18 @@ const activeFilter = ref('all_time');
 const customStartDate = ref('');
 const customEndDate = ref('');
 const trendMode = ref('finance'); // 'finance' or 'volume'
+
+const currentPage = ref(1);
+const perPage = ref(5);
+
+const paginatedRecentTransactions = computed(() => {
+  const start = (currentPage.value - 1) * perPage.value;
+  return recentTransactions.value.slice(start, start + perPage.value);
+});
+
+watch([recentTransactions, perPage], () => {
+  currentPage.value = 1;
+});
 
 const filterOptions = computed(() => [
   { id: 'all_time', label: t('allTime', 'Muda Wote') },

@@ -301,7 +301,7 @@
                 </td>
               </tr>
               <tr 
-                v-for="(item, idx) in filteredCombinedLedger" 
+                v-for="(item, idx) in paginatedLedger" 
                 :key="idx"
                 class="odd:bg-white even:bg-slate-50/60 dark:odd:bg-slate-900 dark:even:bg-slate-800/40 hover:bg-emerald-50/60 dark:hover:bg-slate-800/90 transition-colors"
               >
@@ -341,6 +341,11 @@
               </tr>
             </tbody>
           </table>
+          <Pagination
+            v-model:currentPage="currentPage"
+            v-model:perPage="perPage"
+            :totalItems="filteredCombinedLedger.length"
+          />
         </div>
       </div>
 
@@ -794,6 +799,7 @@
 <script setup>
 import { ref, computed, onMounted, nextTick, watch } from 'vue';
 import Chart from 'chart.js/auto';
+import Pagination from '../components/Pagination.vue';
 
 // Today and Yesterday Date Strings
 const todayDateStr = new Date().toISOString().split('T')[0];
@@ -802,6 +808,8 @@ yesterdayDate.setDate(yesterdayDate.getDate() - 1);
 const yesterdayDateStr = yesterdayDate.toISOString().split('T')[0];
 
 // Reactive State
+const currentPage = ref(1);
+const perPage = ref(10);
 const selectedDate = ref(todayDateStr);
 const activeTab = ref('ledger');
 const searchQuery = ref('');
@@ -1478,6 +1486,15 @@ const filteredCombinedLedger = computed(() => {
     item.description.toLowerCase().includes(q) ||
     item.reference.toLowerCase().includes(q)
   );
+});
+
+const paginatedLedger = computed(() => {
+  const start = (currentPage.value - 1) * perPage.value;
+  return filteredCombinedLedger.value.slice(start, start + perPage.value);
+});
+
+watch([filteredCombinedLedger, perPage], () => {
+  currentPage.value = 1;
 });
 
 // ACTIONS

@@ -230,6 +230,11 @@
             </tr>
           </tbody>
         </table>
+        <Pagination
+          v-model:currentPage="currentInvoicesPage"
+          v-model:perPage="perInvoicesPage"
+          :totalItems="filteredInvoices.length"
+        />
       </div>
     </div>
 
@@ -268,7 +273,7 @@
             </tr>
             <tr 
               v-else
-              v-for="settle in settlementsList" 
+              v-for="settle in paginatedSettlements" 
               :key="settle.id"
               class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors"
             >
@@ -308,6 +313,11 @@
             </tr>
           </tbody>
         </table>
+        <Pagination
+          v-model:currentPage="currentSettlementsPage"
+          v-model:perPage="perSettlementsPage"
+          :totalItems="settlementsList.length"
+        />
       </div>
     </div>
 
@@ -569,10 +579,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useLanguage } from '../composables/useLanguage.js';
+import Pagination from '../components/Pagination.vue';
 
 const { t } = useLanguage();
+
+const currentPage = ref(1);
+const perPage = ref(10);
 
 const activeTab = ref('invoices');
 
@@ -649,6 +663,12 @@ const getInvoiceFarmerName = (inv) => {
   return 'N/A';
 };
 
+const currentInvoicesPage = ref(1);
+const perInvoicesPage = ref(10);
+
+const currentSettlementsPage = ref(1);
+const perSettlementsPage = ref(10);
+
 const filteredInvoices = computed(() => {
   return invoicesList.value.filter(inv => {
     const matchesStatus = !invoiceStatusFilter.value || inv.status === invoiceStatusFilter.value;
@@ -660,6 +680,24 @@ const filteredInvoices = computed(() => {
 
     return matchesStatus && matchesSearch;
   });
+});
+
+const paginatedInvoices = computed(() => {
+  const start = (currentInvoicesPage.value - 1) * perInvoicesPage.value;
+  return filteredInvoices.value.slice(start, start + perInvoicesPage.value);
+});
+
+watch([filteredInvoices, perInvoicesPage], () => {
+  currentInvoicesPage.value = 1;
+});
+
+const paginatedSettlements = computed(() => {
+  const start = (currentSettlementsPage.value - 1) * perSettlementsPage.value;
+  return settlementsList.value.slice(start, start + perSettlementsPage.value);
+});
+
+watch([settlementsList, perSettlementsPage], () => {
+  currentSettlementsPage.value = 1;
 });
 
 const fetchData = async () => {

@@ -690,7 +690,7 @@
             </tr>
 
             <tr 
-              v-for="batch in filteredBatches" 
+              v-for="batch in paginatedBatches" 
               :key="batch.id"
               class="hover:bg-slate-50/80 dark:bg-slate-950/80 dark:hover:bg-slate-800/50 transition-colors"
             >
@@ -781,6 +781,11 @@
 
           </tbody>
         </table>
+        <Pagination
+          v-model:currentPage="currentPage"
+          v-model:perPage="perPage"
+          :totalItems="filteredBatches.length"
+        />
       </div>
 
     </div>
@@ -981,10 +986,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useLanguage } from '../composables/useLanguage.js';
+import Pagination from '../components/Pagination.vue';
 
 const { t } = useLanguage();
+
+const currentPage = ref(1);
+const perPage = ref(10);
 
 const loading = ref(false);
 const submitting = ref(false);
@@ -1276,6 +1285,15 @@ const filteredBatches = computed(() => {
 
     return true;
   });
+});
+
+const paginatedBatches = computed(() => {
+  const start = (currentPage.value - 1) * perPage.value;
+  return filteredBatches.value.slice(start, start + perPage.value);
+});
+
+watch([filteredBatches, perPage], () => {
+  currentPage.value = 1;
 });
 
 // Modal Actions

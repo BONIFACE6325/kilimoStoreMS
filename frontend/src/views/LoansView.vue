@@ -237,7 +237,7 @@
             </tr>
             <tr 
               v-else
-              v-for="loan in filteredLoans" 
+              v-for="loan in paginatedLoans" 
               :key="loan.id"
               class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors"
             >
@@ -327,6 +327,11 @@
             </tr>
           </tbody>
         </table>
+        <Pagination
+          v-model:currentPage="currentPage"
+          v-model:perPage="perPage"
+          :totalItems="filteredLoans.length"
+        />
       </div>
 
     </div>
@@ -584,10 +589,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useLanguage } from '../composables/useLanguage.js';
+import Pagination from '../components/Pagination.vue';
 
 const { t } = useLanguage();
+
+const currentPage = ref(1);
+const perPage = ref(10);
 
 const loansList = ref([]);
 const farmersList = ref([]);
@@ -759,6 +768,15 @@ const filteredLoans = computed(() => {
 
     return true;
   });
+});
+
+const paginatedLoans = computed(() => {
+  const start = (currentPage.value - 1) * perPage.value;
+  return filteredLoans.value.slice(start, start + perPage.value);
+});
+
+watch([filteredLoans, perPage], () => {
+  currentPage.value = 1;
 });
 
 // Batches belonging to selected farmer
