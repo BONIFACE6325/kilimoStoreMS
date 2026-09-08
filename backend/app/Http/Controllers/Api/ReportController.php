@@ -22,6 +22,7 @@ use App\Models\Bin;
 use App\Models\Service;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Traits\HasTenantScope;
 use Illuminate\Http\Request;
 
@@ -48,7 +49,12 @@ class ReportController extends Controller
             $totalServiceFeeRevenue = $serviceMetrics['total_revenue'];
             $dynamicServiceBreakdown = $serviceMetrics['breakdown'];
 
-            $totalLoansRecovered = $this->getSumByDateRange(SettlementDeduction::query()->where('deduction_type', 'loan_principal'), 'created_at', $startDate, $endDate);
+            $totalLoansRecovered = $this->getSumByDateRange(
+                SettlementDeduction::whereHas('settlement', function($q) use ($tenantId) {
+                    $q->where('tenant_id', $tenantId);
+                })->where('deduction_type', 'loan_principal'),
+                'created_at', $startDate, $endDate
+            );
             $otherIncomeTotal = $this->getSumByDateRange(OtherIncome::where('tenant_id', $tenantId), 'date_received', $request->query('start_date'), $request->query('end_date'));
             $totalLoansDisbursed = $this->getSumByDateRange(Loan::where('tenant_id', $tenantId), 'created_at', $startDate, $endDate, 'principal_amount');
             $totalExpenses = $this->getSumByDateRange(Expense::where('tenant_id', $tenantId), 'date_incurred', $request->query('start_date'), $request->query('end_date'));
