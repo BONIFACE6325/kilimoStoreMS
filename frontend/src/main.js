@@ -7,7 +7,7 @@ import './style.css';
 // Global Fetch Interceptor to automatically append X-Tenant-ID header for multi-tenancy
 const nativeFetch = window.fetch;
 window.fetch = async function (resource, config = {}) {
-  const activeTenantId = localStorage.getItem('garanoki_active_tenant_id') || 'tenant_kigoma';
+  const activeTenantId = localStorage.getItem('garanoki_active_tenant_id') || '';
   const newConfig = { ...config };
   
   if (!newConfig.headers) {

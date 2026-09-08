@@ -22,17 +22,7 @@ const getInitialUser = () => {
   if (localUser) {
     try { return JSON.parse(localUser); } catch (e) {}
   }
-  return {
-    name: 'Boniface Gwakila',
-    email: 'gwakilabonface@gmail.com',
-    phone: '0750000000',
-    role: 'System Owner',
-    tenantId: 'tenant_kigoma',
-    tenantName: 'Kigoma Grain Mills Ltd',
-    subscriptionPlan: 'enterprise',
-    isSuperAdmin: true,
-    avatarUrl: ''
-  };
+  return null;
 };
 
 const getStoredPassword = () => {

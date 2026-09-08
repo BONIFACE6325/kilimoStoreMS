@@ -159,7 +159,7 @@
                   type="email" 
                   v-model="email"
                   required
-                  placeholder="gwakilabonface@gmail.com"
+                  placeholder="email@example.com"
                   class="w-full pl-11 pr-4 py-3 bg-slate-950/80 border border-slate-700/80 focus:border-emerald-500 rounded-2xl text-sm font-semibold text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-inner"
                 />
               </div>

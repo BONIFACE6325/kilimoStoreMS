@@ -49,7 +49,7 @@
           <span v-else class="text-base shrink-0">🏢</span>
           <div class="text-left hidden sm:block">
             <div class="text-[11px] font-extrabold truncate max-w-[130px] md:max-w-[170px]">
-              {{ activeTenant?.name || 'Kigoma Grain Mills Ltd' }}
+              {{ activeTenant?.name || user?.tenantName || 'Ghala Yako' }}
             </div>
             <div class="text-[9px] uppercase tracking-wider font-black text-emerald-600 dark:text-emerald-400">
               {{ activeTenant?.plan || 'enterprise' }} PLAN

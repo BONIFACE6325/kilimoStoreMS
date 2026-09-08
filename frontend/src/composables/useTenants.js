@@ -3,62 +3,21 @@ import { ref, computed } from 'vue';
 const STORAGE_KEY_TENANTS = 'garanoki_saas_tenants';
 const STORAGE_KEY_ACTIVE_TENANT = 'garanoki_active_tenant_id';
 
-const defaultTenants = [
-  {
-    id: 'tenant_kigoma',
-    name: 'Kigoma Grain Mills Ltd',
-    ownerName: 'Boniface Gwakila',
-    ownerEmail: 'gwakilabonface@gmail.com',
-    phone: '+255 764 536 736',
-    plan: 'enterprise',
-    status: 'active',
-    monthlyPriceTzs: 500000,
-    createdDate: '2026-01-01',
-    expiresAt: '2027-12-31',
-    warehouseCount: 2,
-    totalStorageMt: 5000
-  },
-  {
-    id: 'tenant_mpanda',
-    name: 'Mpanda Agri-Business Corp',
-    ownerName: 'Juma Ally',
-    ownerEmail: 'juma@mpandaagri.co.tz',
-    phone: '+255 754 112 233',
-    plan: 'business',
-    status: 'active',
-    monthlyPriceTzs: 150000,
-    createdDate: '2026-02-15',
-    expiresAt: '2026-12-31',
-    warehouseCount: 1,
-    totalStorageMt: 2500
-  },
-  {
-    id: 'tenant_sumbawanga',
-    name: 'Sumbawanga Cereals Depot',
-    ownerName: 'Amina Rashid',
-    ownerEmail: 'amina@sumbawanga.co.tz',
-    phone: '+255 712 998 877',
-    plan: 'trial',
-    status: 'active',
-    monthlyPriceTzs: 0,
-    createdDate: '2026-09-01',
-    expiresAt: '2026-09-15',
-    warehouseCount: 1,
-    totalStorageMt: 1000
-  }
-];
+const defaultTenants = [];
 
 const loadInitialTenants = () => {
   const stored = localStorage.getItem(STORAGE_KEY_TENANTS);
   if (stored) {
-    try { return JSON.parse(stored); } catch (e) {}
+    try {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed)) return parsed;
+    } catch (e) {}
   }
-  localStorage.setItem(STORAGE_KEY_TENANTS, JSON.stringify(defaultTenants));
   return defaultTenants;
 };
 
 const tenants = ref(loadInitialTenants());
-const activeTenantId = ref(localStorage.getItem(STORAGE_KEY_ACTIVE_TENANT) || 'tenant_kigoma');
+const activeTenantId = ref(localStorage.getItem(STORAGE_KEY_ACTIVE_TENANT) || '');
 
 export function useTenants() {
 
