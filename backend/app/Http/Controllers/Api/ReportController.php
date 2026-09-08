@@ -74,8 +74,10 @@ class ReportController extends Controller
                 $totalCropSales = (float) $invoiceSalesQuery->sum('total_amount');
             }
 
-            $totalCapacity = Bin::sum('capacity_mt') ?: 1;
-            $totalOccupied = Bin::where('tenant_id', $tenantId)->sum('current_occupancy_mt');
+            $branchIds = \App\Models\Branch::where('tenant_id', $tenantId)->pluck('id');
+            $rawBins = Bin::whereIn('branch_id', $branchIds)->get();
+            $totalCapacity = floatval($rawBins->sum('capacity_mt')) ?: 1;
+            $totalOccupied = floatval(Batch::where('tenant_id', $tenantId)->whereNotIn('status', ['transformed', 'sold'])->sum('current_weight_mt'));
             $occupancyPercentage = round(($totalOccupied / $totalCapacity) * 100, 1);
 
             $otherIncomeMap = $this->getGroupedMap(OtherIncome::where('tenant_id', $tenantId), 'source_name', 'date_received', $request->query('start_date'), $request->query('end_date'));
@@ -108,7 +110,7 @@ class ReportController extends Controller
                     'total_other_income_tzs' => $otherIncomeTotal,
                     'total_net_service_profit_tzs' => $totalNetServiceProfit,
                     'total_expenses_tzs' => $totalExpenses,
-                    'stock_valuation_tzs' => $this->getStockValuation(),
+                    'stock_valuation_tzs' => $this->getStockValuation($tenantId),
                     'active_loans_count' => $activeLoansCount,
                     'overdue_loans_count' => $overdueLoansCount,
                 ],
@@ -121,16 +123,16 @@ class ReportController extends Controller
                 'other_income_breakdown' => $otherIncomeMap,
                 'expenses_breakdown' => $expensesMap,
                 'machine_stats' => [
-                    'drying_jobs' => DryingJob::count(),
-                    'drying_active' => DryingJob::whereIn('status', ['queued', 'processing'])->count(),
-                    'drying_completed' => DryingJob::where('status', 'completed')->count(),
-                    'drying_qty' => DryingJob::sum('weight_before_mt'),
-                    'milling_jobs' => MillingJob::count(),
-                    'milling_active' => MillingJob::whereIn('status', ['queued', 'processing'])->count(),
-                    'milling_completed' => MillingJob::where('status', 'completed')->count(),
-                    'milling_qty' => MillingJob::sum('input_weight_mt'),
-                    'grading_jobs' => GradingRecord::count(),
-                    'grading_qty' => GradingRecord::count(),
+                    'drying_jobs' => DryingJob::whereHas('batch', function($q) use ($tenantId) { $q->where('tenant_id', $tenantId); })->count(),
+                    'drying_active' => DryingJob::whereHas('batch', function($q) use ($tenantId) { $q->where('tenant_id', $tenantId); })->whereIn('status', ['queued', 'processing'])->count(),
+                    'drying_completed' => DryingJob::whereHas('batch', function($q) use ($tenantId) { $q->where('tenant_id', $tenantId); })->where('status', 'completed')->count(),
+                    'drying_qty' => DryingJob::whereHas('batch', function($q) use ($tenantId) { $q->where('tenant_id', $tenantId); })->sum('weight_before_mt'),
+                    'milling_jobs' => MillingJob::whereHas('batch', function($q) use ($tenantId) { $q->where('tenant_id', $tenantId); })->count(),
+                    'milling_active' => MillingJob::whereHas('batch', function($q) use ($tenantId) { $q->where('tenant_id', $tenantId); })->whereIn('status', ['queued', 'processing'])->count(),
+                    'milling_completed' => MillingJob::whereHas('batch', function($q) use ($tenantId) { $q->where('tenant_id', $tenantId); })->where('status', 'completed')->count(),
+                    'milling_qty' => MillingJob::whereHas('batch', function($q) use ($tenantId) { $q->where('tenant_id', $tenantId); })->sum('input_weight_mt'),
+                    'grading_jobs' => GradingRecord::whereHas('batch', function($q) use ($tenantId) { $q->where('tenant_id', $tenantId); })->count(),
+                    'grading_qty' => GradingRecord::whereHas('batch', function($q) use ($tenantId) { $q->where('tenant_id', $tenantId); })->count(),
                 ],
                 'trends' => $trends,
                 'crop_distribution' => $cropDistribution
@@ -289,20 +291,15 @@ class ReportController extends Controller
             $revSum = $sQuery->sum('total_deductions') + $oiQuery->sum('amount');
             $monthlyRevenue[$monthName] = (float)$revSum;
 
-            $expSum = Expense::whereYear('date_incurred', $date->year)
-                ->whereMonth('date_incurred', $date->month)
-                ->sum('amount');
+            $expQuery = Expense::whereYear('date_incurred', $date->year)->whereMonth('date_incurred', $date->month);
+            if ($tenantId) $expQuery->where('tenant_id', $tenantId);
+            $expSum = $expQuery->sum('amount');
             $monthlyExpenses[$monthName] = (float)$expSum;
             
-            $intakeSum = Batch::whereYear('created_at', $date->year)
-                ->whereMonth('created_at', $date->month)
-                ->sum(DB::raw('COALESCE(NULLIF(intake_quantity, 0), initial_weight_mt)'));
+            $intakeSum = $bIntakeQuery->sum(DB::raw('COALESCE(NULLIF(intake_quantity, 0), initial_weight_mt)'));
             $monthlyIntake[$monthName] = (float)$intakeSum;
 
-            $dispatchSum = Batch::where('status', 'sold')
-                ->whereYear('updated_at', $date->year)
-                ->whereMonth('updated_at', $date->month)
-                ->sum(DB::raw('COALESCE(NULLIF(intake_quantity, 0), current_weight_mt)'));
+            $dispatchSum = $bDispatchQuery->sum(DB::raw('COALESCE(NULLIF(intake_quantity, 0), current_weight_mt)'));
             $monthlyDispatch[$monthName] = (float)$dispatchSum;
         }
 
@@ -317,12 +314,15 @@ class ReportController extends Controller
 
     public function profitLossReport(Request $request)
     {
+        $tenantId = $this->getTenantId($request);
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
 
-        $deductionsQuery = SettlementDeduction::query();
-        $otherIncomeQuery = OtherIncome::query();
-        $expensesQuery = Expense::query();
+        $deductionsQuery = SettlementDeduction::whereHas('settlement', function($q) use ($tenantId) {
+            $q->where('tenant_id', $tenantId);
+        });
+        $otherIncomeQuery = OtherIncome::where('tenant_id', $tenantId);
+        $expensesQuery = Expense::where('tenant_id', $tenantId);
 
         if ($startDate && $endDate) {
             $endDateTime = $endDate . ' 23:59:59';
@@ -386,10 +386,11 @@ class ReportController extends Controller
     public function getInventoryAnalytics(Request $request)
     {
         try {
+            $tenantId = $this->getTenantId($request);
             $startDate = $request->query('start_date');
             $endDate = $request->query('end_date') ? $request->query('end_date') . ' 23:59:59' : null;
 
-            $batchQuery = Batch::with(['bin', 'farmer', 'dryingJobs.service', 'millingJobs.service', 'gradingRecords.service']);
+            $batchQuery = Batch::where('tenant_id', $tenantId)->with(['bin', 'farmer', 'dryingJobs.service', 'millingJobs.service', 'gradingRecords.service']);
             if ($startDate && $endDate) {
                 $batchQuery->whereBetween('created_at', [$startDate, $endDate]);
             }
@@ -463,7 +464,7 @@ class ReportController extends Controller
             }
             unset($cData);
 
-            $serviceMetrics = $this->calculateServiceMetrics($startDate, $endDate);
+            $serviceMetrics = $this->calculateServiceMetrics($startDate, $endDate, $tenantId);
             $serviceBreakdownMap = $serviceMetrics['breakdown'];
 
             $topRevenueService = null;
@@ -479,9 +480,16 @@ class ReportController extends Controller
             }
 
             $serviceCountsMap = [];
-            $dQuery = DryingJob::with('service');
-            $mQuery = MillingJob::with('service');
-            $gQuery = GradingRecord::with('service');
+            $dQuery = DryingJob::whereHas('batch', function($q) use ($tenantId) {
+                $q->where('tenant_id', $tenantId);
+            })->with('service');
+            $mQuery = MillingJob::whereHas('batch', function($q) use ($tenantId) {
+                $q->where('tenant_id', $tenantId);
+            })->with('service');
+            $gQuery = GradingRecord::whereHas('batch', function($q) use ($tenantId) {
+                $q->where('tenant_id', $tenantId);
+            })->with('service');
+
             if ($startDate && $endDate) {
                 $dQuery->whereBetween('created_at', [$startDate, $endDate]);
                 $mQuery->whereBetween('created_at', [$startDate, $endDate]);
