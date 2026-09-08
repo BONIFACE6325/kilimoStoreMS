@@ -300,6 +300,9 @@ class BatchController extends Controller
                 return $code;
             };
 
+            $rateVal = $service ? floatval($service->rate) : 0.0;
+            $batchQty = floatval($batch->intake_quantity ?: ($batch->initial_weight_mt ?: 1.0));
+
             if (strtolower($type) === 'drying') {
                 $job = $jobId ? DryingJob::find($jobId) : null;
                 if (!$job) {
@@ -313,6 +316,9 @@ class BatchController extends Controller
                     ]);
                 }
                 $finalFee = ($incomingFee && floatval($incomingFee) > 0) ? floatval($incomingFee) : ($job->fee_amount ?: 0);
+                if ($rateVal > 0 && $batchQty > 1.0 && (abs($finalFee - $rateVal) < 0.01 || $finalFee <= 0)) {
+                    $finalFee = $rateVal * $batchQty;
+                }
                 $job->update([
                     'status' => $validated['status'],
                     'final_moisture' => $validated['final_value'] ?? $job->final_moisture,
@@ -341,6 +347,9 @@ class BatchController extends Controller
                     ]);
                 }
                 $finalFee = ($incomingFee && floatval($incomingFee) > 0) ? floatval($incomingFee) : ($job->fee_amount ?: 0);
+                if ($rateVal > 0 && $batchQty > 1.0 && (abs($finalFee - $rateVal) < 0.01 || $finalFee <= 0)) {
+                    $finalFee = $rateVal * $batchQty;
+                }
                 $job->update([
                     'status' => $validated['status'],
                     'output_weight_mt' => $validated['final_value'] ?? $job->output_weight_mt,

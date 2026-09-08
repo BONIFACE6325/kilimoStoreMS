@@ -189,6 +189,12 @@ class FarmerController extends Controller
             foreach ($batch->dryingJobs as $job) {
                 $alreadyPaid = (float) \App\Models\SettlementDeduction::where('source_reference_id', $job->id)->sum('amount');
                 $feeAmount = (float) ($job->fee_amount ?? 0);
+                $serviceRate = $job->service ? (float) ($job->service->rate ?? 0) : 0.0;
+                $batchQty = (float) ($batch->intake_quantity ?: ($batch->initial_weight_mt ?: 1.0));
+                if ($serviceRate > 0 && $batchQty > 1.0 && abs($feeAmount - $serviceRate) < 0.01) {
+                    $feeAmount = $serviceRate * $batchQty;
+                    $job->update(['fee_amount' => $feeAmount]);
+                }
                 $unpaidFee = max(0.0, $feeAmount - $alreadyPaid);
                 if ($job->status !== 'paid' && $feeAmount > 0 && $unpaidFee <= 0.001) {
                     $job->update(['status' => 'paid']);
@@ -216,6 +222,12 @@ class FarmerController extends Controller
             foreach ($batch->millingJobs as $job) {
                 $alreadyPaid = (float) \App\Models\SettlementDeduction::where('source_reference_id', $job->id)->sum('amount');
                 $feeAmount = (float) ($job->fee_amount ?? 0);
+                $serviceRate = $job->service ? (float) ($job->service->rate ?? 0) : 0.0;
+                $batchQty = (float) ($batch->intake_quantity ?: ($batch->initial_weight_mt ?: 1.0));
+                if ($serviceRate > 0 && $batchQty > 1.0 && abs($feeAmount - $serviceRate) < 0.01) {
+                    $feeAmount = $serviceRate * $batchQty;
+                    $job->update(['fee_amount' => $feeAmount]);
+                }
                 $unpaidFee = max(0.0, $feeAmount - $alreadyPaid);
                 if ($job->status !== 'paid' && $feeAmount > 0 && $unpaidFee <= 0.001) {
                     $job->update(['status' => 'paid']);
@@ -243,6 +255,12 @@ class FarmerController extends Controller
             foreach ($batch->gradingRecords as $job) {
                 $alreadyPaid = (float) \App\Models\SettlementDeduction::where('source_reference_id', $job->id)->sum('amount');
                 $feeAmount = (float) ($job->fee_amount ?? 0);
+                $serviceRate = $job->service ? (float) ($job->service->rate ?? 0) : 0.0;
+                $batchQty = (float) ($batch->intake_quantity ?: ($batch->initial_weight_mt ?: 1.0));
+                if ($serviceRate > 0 && $batchQty > 1.0 && abs($feeAmount - $serviceRate) < 0.01) {
+                    $feeAmount = $serviceRate * $batchQty;
+                    $job->update(['fee_amount' => $feeAmount]);
+                }
                 $unpaidFee = max(0.0, $feeAmount - $alreadyPaid);
                 if ($job->status !== 'paid' && $feeAmount > 0 && $unpaidFee <= 0.001) {
                     $job->update(['status' => 'paid']);
@@ -260,8 +278,8 @@ class FarmerController extends Controller
                     'fee_amount' => $feeAmount,
                     'already_paid' => $alreadyPaid,
                     'unpaid_fee' => $unpaidFee,
-                    'rate' => null,
-                    'unit' => 'gunia',
+                    'rate' => $job->service ? $job->service->rate : null,
+                    'unit' => $job->service ? $job->service->unit : 'gunia',
                     'status' => $job->status,
                     'created_at' => $job->created_at->format('Y-m-d H:i:s'),
                 ]);

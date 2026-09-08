@@ -2523,22 +2523,29 @@ const getServiceQuantity = (cs, batch) => {
 const calculateServiceTotalFee = (cs, batch) => {
   if (!cs) return 0;
 
+  const rate = getServiceRate(cs);
+  const qty = getServiceQuantity(cs, batch);
+
   // 1. If unpaid_fee is explicitly returned from backend
   if (cs.unpaid_fee !== undefined && cs.unpaid_fee !== null) {
-    return Math.max(0, parseFloat(cs.unpaid_fee));
+    const backendUnpaid = parseFloat(cs.unpaid_fee);
+    if (rate > 0 && qty > 1 && Math.abs(backendUnpaid - rate) < 0.01) {
+      return Math.round(rate * qty);
+    }
+    return Math.max(0, backendUnpaid);
   }
 
   // 2. If stored fee_amount exists, that is the authoritative fee for this service job
   const storedTotalFee = parseFloat(cs.fee_amount || cs.fee || cs.cost || 0);
   if (storedTotalFee > 0) {
+    if (rate > 0 && qty > 1 && Math.abs(storedTotalFee - rate) < 0.01) {
+      return Math.round(rate * qty);
+    }
     const alreadyPaid = parseFloat(cs.already_paid || 0);
     return Math.max(0, Math.round(storedTotalFee - alreadyPaid));
   }
 
-  // 3. Fallback: only calculate rate * qty if fee_amount was never saved
-  const rate = getServiceRate(cs);
-  const qty = getServiceQuantity(cs, batch);
-
+  // 3. Fallback: calculate rate * qty
   if (rate > 0 && qty > 0) {
     return Math.round(rate * qty);
   }
@@ -3498,8 +3505,8 @@ const submitCompleteService = async () => {
       by_product_unit: (isChanging && completeForm.value.has_byproduct === 'yes') ? completeForm.value.byproduct_unit : null,
       by_product_quantity: (isChanging && completeForm.value.has_byproduct === 'yes') ? completeForm.value.byproduct_quantity : 0,
       by_product_value: (isChanging && completeForm.value.has_byproduct === 'yes') ? completeForm.value.byproduct_quantity : 0,
-      fee: s ? (s.fee_amount || s.fee || s.cost || 0) : 0,
-      fee_amount: s ? (s.fee_amount || s.fee || s.cost || 0) : 0
+      fee: s ? calculateServiceTotalFee(s, parent) : 0,
+      fee_amount: s ? calculateServiceTotalFee(s, parent) : 0
     };
 
     const res = await fetch(`/api/v1/batches/${parent.id}/processing`, {
