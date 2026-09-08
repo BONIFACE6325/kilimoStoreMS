@@ -19,16 +19,17 @@
       
       <!-- Brand Logo Header -->
       <div class="h-18 flex items-center justify-between border-b border-slate-800/80 bg-slate-950 shrink-0" :class="isSidebarCollapsed ? 'px-2.5 justify-center' : 'px-4.5'">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-emerald-400 flex items-center justify-center text-white font-black text-lg shadow-md shadow-emerald-500/20 ring-1 ring-white/20 shrink-0">
-            ⭐
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-emerald-400 flex items-center justify-center text-white font-black text-lg shadow-md shadow-emerald-500/20 ring-1 ring-white/20 shrink-0 overflow-hidden">
+            <img v-if="activeTenant?.logoUrl" :src="activeTenant.logoUrl" class="w-full h-full object-cover" />
+            <span v-else>🏢</span>
           </div>
-          <div v-if="!isSidebarCollapsed">
-            <div class="font-extrabold text-white text-base tracking-tight leading-none bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent whitespace-nowrap">
-              GARANOKI
+          <div v-if="!isSidebarCollapsed" class="min-w-0">
+            <div class="font-extrabold text-white text-sm tracking-tight leading-none truncate max-w-[150px]" :title="activeTenant?.name || 'GARANOKI'">
+              {{ activeTenant?.name || 'GARANOKI' }}
             </div>
-            <div class="text-[10.5px] text-emerald-400 font-extrabold uppercase tracking-widest mt-1 whitespace-nowrap">
-              Store & Finance MS
+            <div class="text-[10px] text-emerald-400 font-extrabold uppercase tracking-wider mt-1 truncate max-w-[150px]">
+              {{ activeTenant?.slogan || 'Store & Finance MS' }}
             </div>
           </div>
         </div>
@@ -342,11 +343,13 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useLayout } from '../composables/useLayout';
 import { useAuth } from '../composables/useAuth';
+import { useTenants } from '../composables/useTenants';
 import { useLanguage } from '../composables/useLanguage';
 
 const router = useRouter();
 const { isSidebarCollapsed, isMobileSidebarOpen, toggleSidebar, closeMobileSidebar } = useLayout();
 const { user, logout, isSuperAdmin } = useAuth();
+const { activeTenant } = useTenants();
 const { t } = useLanguage();
 
 const userInitials = computed(() => {

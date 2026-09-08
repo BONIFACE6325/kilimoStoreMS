@@ -173,6 +173,19 @@ export function useTenants() {
     return tenants.value.filter(t => t.plan === 'trial' && t.status === 'active').length;
   });
 
+  const updateTenantBranding = (tenantId, { name, logoUrl, slogan, phone }) => {
+    const t = tenants.value.find(item => item.id === tenantId);
+    if (t) {
+      if (name !== undefined) t.name = name.trim();
+      if (logoUrl !== undefined) t.logoUrl = logoUrl;
+      if (slogan !== undefined) t.slogan = slogan.trim();
+      if (phone !== undefined) t.phone = phone.trim();
+      saveTenants();
+      return { success: true, message: 'Taarifa za Nembo na Kampuni zimehifadhiwa kikamilifu! 🏢' };
+    }
+    return { success: false, message: 'Akaunti haikupatikana.' };
+  };
+
   return {
     tenants,
     activeTenant,
@@ -181,6 +194,7 @@ export function useTenants() {
     registerTenant,
     updateTenantStatus,
     extendSubscription,
+    updateTenantBranding,
     deleteTenant,
     totalMrrTzs,
     activeTenantsCount,

@@ -45,7 +45,8 @@
           :class="isSuperAdmin ? 'cursor-pointer hover:bg-emerald-100 dark:hover:bg-emerald-900/80' : ''"
           :title="isSuperAdmin ? 'Badili Ghala (Switch Warehouse)' : 'Ghala Yako'"
         >
-          <span class="text-base shrink-0">🏢</span>
+          <img v-if="activeTenant?.logoUrl" :src="activeTenant.logoUrl" class="w-5 h-5 rounded-md object-cover shrink-0 border border-emerald-300" />
+          <span v-else class="text-base shrink-0">🏢</span>
           <div class="text-left hidden sm:block">
             <div class="text-[11px] font-extrabold truncate max-w-[130px] md:max-w-[170px]">
               {{ activeTenant?.name || 'Kigoma Grain Mills Ltd' }}

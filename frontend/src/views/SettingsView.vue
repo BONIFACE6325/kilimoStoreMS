@@ -290,42 +290,117 @@
       </form>
     </div>
 
-    <!-- TAB 3: TAARIFA ZA KINU NA MFUMO -->
-    <div v-if="activeTab === 'system'" class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-6">
-      <div class="border-b border-slate-100 dark:border-slate-800 pb-3">
-        <h2 class="text-sm font-extrabold text-slate-900 dark:text-slate-50 uppercase tracking-wider">
-          {{ currentLang === 'sw' ? 'Taarifa za Kinu cha GARANOKI' : 'GARANOKI Warehouse & Mill Preferences' }}
-        </h2>
-        <p class="text-xs text-slate-400 mt-0.5">Vigezo vya msingi vya uendeshaji wa ghalani na mfumo.</p>
+    <!-- TAB 3: TAARIFA ZA KAMPUNI NA NEMBO (BRANDING) -->
+    <div v-if="activeTab === 'system'" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Company Logo Preview Card -->
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs text-center space-y-4">
+        <div class="relative w-32 h-32 mx-auto">
+          <div class="w-full h-full rounded-3xl bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center overflow-hidden shadow-inner">
+            <img v-if="companyForm.logoUrl" :src="companyForm.logoUrl" class="w-full h-full object-cover" />
+            <div v-else class="text-center p-2">
+              <span class="text-3xl block">🏢</span>
+              <span class="text-[10px] text-slate-400 font-bold uppercase mt-1 block">Weka Logo</span>
+            </div>
+          </div>
+          <label class="absolute -bottom-2 -right-2 p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-md cursor-pointer transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <input type="file" accept="image/*" class="hidden" @change="onCompanyLogoChange" />
+          </label>
+        </div>
+
+        <div>
+          <h3 class="text-base font-extrabold text-slate-900 dark:text-slate-50">{{ companyForm.name || activeTenant?.name }}</h3>
+          <p class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">{{ companyForm.slogan || 'Store & Finance MS' }}</p>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-center gap-2">
+          <label class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 rounded-xl text-xs font-extrabold cursor-pointer transition border border-emerald-200/80">
+            <span>📷 Pakia Logo ya Kampuni</span>
+            <input type="file" accept="image/*" class="hidden" @change="onCompanyLogoChange" />
+          </label>
+          <button 
+            v-if="companyForm.logoUrl"
+            @click="removeCompanyLogo"
+            class="px-3.5 py-2 bg-red-50 hover:bg-red-100 dark:bg-red-950/50 text-red-600 dark:text-red-400 rounded-xl text-xs font-extrabold transition cursor-pointer"
+          >
+            <span>🗑️ Ondoa Logo</span>
+          </button>
+        </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1">
-          <span class="text-xs font-bold text-slate-500">Jina la Ghala / Kinu:</span>
-          <div class="text-sm font-black text-slate-900 dark:text-slate-50">GARANOKI Millers & Warehouse</div>
+      <!-- Company Branding Details Form -->
+      <div class="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-5">
+        <div class="border-b border-slate-100 dark:border-slate-800 pb-3">
+          <h2 class="text-sm font-extrabold text-slate-900 dark:text-slate-50 uppercase tracking-wider">
+            Taarifa za Kinu & Brand ya Kampuni
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Badili jina la Kampuni/Ghala, Kaulimbiu, na Nembo maalum kwa akaunti hii.</p>
         </div>
 
-        <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1">
-          <span class="text-xs font-bold text-slate-500">Matawi Active:</span>
-          <div class="text-sm font-black text-slate-900 dark:text-slate-50">Main Silo Complex (Bin 01 - 06)</div>
-        </div>
+        <form @submit.prevent="saveCompanyBranding" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                Jina la Kampuni / Ghala *
+              </label>
+              <input 
+                v-model="companyForm.name" 
+                type="text" 
+                required 
+                class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+              />
+            </div>
 
-        <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1">
-          <span class="text-xs font-bold text-slate-500">Muda wa Kufunga Session:</span>
-          <div class="text-sm font-black text-emerald-600 dark:text-emerald-400">Dakika 15 Inactivity Lockout</div>
-        </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                Namba ya Simu ya Kampuni
+              </label>
+              <input 
+                v-model="companyForm.phone" 
+                type="text" 
+                class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+              />
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                Kaulimbiu / Subtitle (Slogan)
+              </label>
+              <input 
+                v-model="companyForm.slogan" 
+                type="text" 
+                placeholder="e.g. Processing & Grain Storage Solutions" 
+                class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+              />
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+            <button 
+              type="submit"
+              class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow-md border border-emerald-400/30 transition cursor-pointer flex items-center gap-2"
+            >
+              <span>💾</span>
+              <span>Hifadhi Nembo na Taarifa za Kampuni</span>
+            </button>
+          </div>
+        </form>
       </div>
+
     </div>
 
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useAuth } from '../composables/useAuth';
+import { useTenants } from '../composables/useTenants';
 import { useLanguage } from '../composables/useLanguage';
 
 const { user, updateProfile, changePassword } = useAuth();
+const { activeTenant, updateTenantBranding } = useTenants();
 const { currentLang, t } = useLanguage();
 
 const activeTab = ref('profile');
@@ -337,6 +412,24 @@ const profileForm = ref({
   role: user.value?.role || 'System Owner',
   avatarUrl: user.value?.avatarUrl || ''
 });
+
+const companyForm = ref({
+  name: activeTenant.value?.name || '',
+  phone: activeTenant.value?.phone || '',
+  slogan: activeTenant.value?.slogan || 'Store & Finance MS',
+  logoUrl: activeTenant.value?.logoUrl || ''
+});
+
+watch(activeTenant, (tVal) => {
+  if (tVal) {
+    companyForm.value = {
+      name: tVal.name || '',
+      phone: tVal.phone || '',
+      slogan: tVal.slogan || 'Store & Finance MS',
+      logoUrl: tVal.logoUrl || ''
+    };
+  }
+}, { immediate: true });
 
 const passwordForm = ref({
   currentPassword: '',
@@ -398,6 +491,51 @@ const removeAvatar = () => {
   profileForm.value.avatarUrl = '';
   updateProfile({ avatarUrl: '' });
   triggerToast(currentLang.value === 'sw' ? 'Picha ya akaunti imeondolewa.' : 'Profile photo removed.', 'success');
+};
+
+const onCompanyLogoChange = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith('image/')) {
+    triggerToast('Tafadhali chagua picha iliyo sahihi (PNG, JPG, JPEG).', 'error');
+    return;
+  }
+
+  if (file.size > 3 * 1024 * 1024) {
+    triggerToast('Ukubwa wa picha ya logo usiwe zaidi ya 3MB.', 'error');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    companyForm.value.logoUrl = dataUrl;
+    updateTenantBranding(activeTenant.value.id, { logoUrl: dataUrl });
+    triggerToast('Nembo ya Kampuni imepakiwa na kuhifadhiwa kikamilifu! 🏢', 'success');
+  };
+  reader.readAsDataURL(file);
+};
+
+const removeCompanyLogo = () => {
+  companyForm.value.logoUrl = '';
+  updateTenantBranding(activeTenant.value.id, { logoUrl: '' });
+  triggerToast('Nembo ya kampuni imeondolewa.', 'success');
+};
+
+const saveCompanyBranding = () => {
+  const res = updateTenantBranding(activeTenant.value.id, {
+    name: companyForm.value.name,
+    phone: companyForm.value.phone,
+    slogan: companyForm.value.slogan,
+    logoUrl: companyForm.value.logoUrl
+  });
+
+  if (res.success) {
+    triggerToast('Taarifa na Brand ya Kampuni zimehifadhiwa kikamilifu! 🏢', 'success');
+  } else {
+    triggerToast(res.message || 'Hitilafu imetokea.', 'error');
+  }
 };
 
 const saveProfile = () => {

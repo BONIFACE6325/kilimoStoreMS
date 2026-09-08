@@ -16,11 +16,11 @@ class ServiceController extends Controller
     {
         $tenantId = $this->getTenantId($request);
 
-        // Auto-patch missing crop_type for existing services directly in database
+        // Auto-patch missing crop_type for existing services directly in database for current tenant
         try {
-            \Illuminate\Support\Facades\DB::statement("UPDATE services SET crop_type = 'Mpunga' WHERE (LOWER(name_sw) LIKE '%mpunga%' OR LOWER(name_en) LIKE '%paddy%' OR LOWER(name_sw) LIKE '%kuanika%')");
-            \Illuminate\Support\Facades\DB::statement("UPDATE services SET crop_type = 'Mchele' WHERE (LOWER(name_sw) LIKE '%mchele%' OR LOWER(name_en) LIKE '%rice%' OR LOWER(name_sw) LIKE '%giredi%' OR LOWER(name_sw) LIKE '%doloti%')");
-            \Illuminate\Support\Facades\DB::statement("UPDATE services SET crop_type = 'Mahindi' WHERE (LOWER(name_sw) LIKE '%mahindi%' OR LOWER(name_en) LIKE '%maize%')");
+            \Illuminate\Support\Facades\DB::statement("UPDATE services SET crop_type = 'Mpunga' WHERE tenant_id = ? AND (LOWER(name_sw) LIKE '%mpunga%' OR LOWER(name_en) LIKE '%paddy%' OR LOWER(name_sw) LIKE '%kuanika%')", [$tenantId]);
+            \Illuminate\Support\Facades\DB::statement("UPDATE services SET crop_type = 'Mchele' WHERE tenant_id = ? AND (LOWER(name_sw) LIKE '%mchele%' OR LOWER(name_en) LIKE '%rice%' OR LOWER(name_sw) LIKE '%giredi%' OR LOWER(name_sw) LIKE '%doloti%')", [$tenantId]);
+            \Illuminate\Support\Facades\DB::statement("UPDATE services SET crop_type = 'Mahindi' WHERE tenant_id = ? AND (LOWER(name_sw) LIKE '%mahindi%' OR LOWER(name_en) LIKE '%maize%')", [$tenantId]);
         } catch (\Throwable $e) {}
 
         if (Service::where('tenant_id', $tenantId)->count() === 0) {
@@ -72,7 +72,8 @@ class ServiceController extends Controller
 
     public function update(Request $request, $id)
     {
-        $service = Service::findOrFail($id);
+        $tenantId = $this->getTenantId($request);
+        $service = Service::where('tenant_id', $tenantId)->findOrFail($id);
 
         $validated = $request->validate([
             'name_sw' => 'required|string|max:255',
@@ -93,9 +94,10 @@ class ServiceController extends Controller
         ]);
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        $service = Service::findOrFail($id);
+        $tenantId = $this->getTenantId($request);
+        $service = Service::where('tenant_id', $tenantId)->findOrFail($id);
         $service->delete();
 
         return response()->json([
