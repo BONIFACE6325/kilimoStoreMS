@@ -666,17 +666,7 @@ const handleSaveUnit = () => {
   }
 };
 
-const defaultServices = [
-  { id: 1, name_sw: 'Kukoboa (Sembe/Mpunga)',  rate: 70.00, unit: 'kg', crop_type: 'Mpunga/Mahindi', description: 'Ada ya kukoboa nafaka kwa kilo.' },
-  { id: 2, name_sw: 'Kusogeza kwenye kinu',  rate: 300.00, unit: 'gunia', crop_type: 'Zote', description: 'Ada ya kubeba na kusogeza gunia kwenye kinu.' },
-  { id: 3, name_sw: 'Kuanika mpunga (Drying)',  rate: 1000.00, unit: 'gunia', crop_type: 'Mpunga', description: 'Ada ya kuanika mpunga juani kwa gunia.' },
-  { id: 4, name_sw: 'Kugiredi (Grading)',  rate: 8.00, unit: 'kg', crop_type: 'Mchele', description: 'Ada ya kupambanua daraja la mchele.' },
-  { id: 5, name_sw: 'Kudoloti (Color sorting)',  rate: 22.00, unit: 'kg', crop_type: 'Mchele', description: 'Kutenganisha mchele mweusi/mwekundu kwa mashine ya rangi.' },
-  { id: 6, name_sw: 'Kuanika + Kuchanganya',  rate: 1500.00, unit: 'gunia', crop_type: 'Mpunga', description: 'Ada ya kuanika na kuchanganya mpunga.' },
-  { id: 7, name_sw: 'Kuchanganya Mchele na Mafuta',  rate: 2.50, unit: 'kg', crop_type: 'Mchele', description: 'Polishing na kurutubisha mchele.' },
-  { id: 8, name_sw: 'Kupanga stoko (Warehouse)',  rate: 700.00, unit: 'gunia', crop_type: 'Zote', description: 'Ada ya kupanga magunia ghalani.' },
-  { id: 9, name_sw: 'Wafanyakazi (Labor)',  rate: 1000.00, unit: 'gunia', crop_type: 'Zote', description: 'Gharama za vibarua vya kinu.' }
-];
+
 
 const form = ref({
   id: null,
