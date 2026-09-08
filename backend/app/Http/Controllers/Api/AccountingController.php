@@ -6,8 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Expense;
 use App\Models\OtherIncome;
 use App\Models\SettlementDeduction;
-use App\Models\Invoice;
-use App\Models\Settlement;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -53,7 +52,7 @@ class AccountingController extends Controller
         $profitMargin = $totalRevenue > 0 ? round(($netProfit / $totalRevenue) * 100, 1) : 0.0;
         $costToIncomeRatio = $totalRevenue > 0 ? round(($totalExpenses / $totalRevenue) * 100, 1) : 0.0;
 
-        // 4. Expenses Breakdown by Category
+        // 4. Expenses Breakdown by Category (From Database)
         $expensesByCategory = (clone $expenseQuery)
             ->select('category_name', DB::raw('SUM(amount) as total_amount'))
             ->groupBy('category_name')
@@ -68,31 +67,46 @@ class AccountingController extends Controller
                 ];
             });
 
-        // 5. Income Breakdown by Source
-        $incomeBreakdown = [
-            [
-                'source_name' => 'Ada za Hifadhi ya Ghala (Storage)',
-                'total_amount' => $storageFees,
-                'percentage' => $totalRevenue > 0 ? round(($storageFees / $totalRevenue) * 100, 1) : 0.0
-            ],
-            [
-                'source_name' => 'Ada za Ukoboaji (Milling)',
-                'total_amount' => $millingFees,
-                'percentage' => $totalRevenue > 0 ? round(($millingFees / $totalRevenue) * 100, 1) : 0.0
-            ],
-            [
-                'source_name' => 'Ada za Ukaushaji (Drying)',
-                'total_amount' => $dryingFees,
-                'percentage' => $totalRevenue > 0 ? round(($dryingFees / $totalRevenue) * 100, 1) : 0.0
-            ],
-            [
-                'source_name' => 'Ada za Upangaji Daraja (Grading)',
-                'total_amount' => $gradingFees,
-                'percentage' => $totalRevenue > 0 ? round(($gradingFees / $totalRevenue) * 100, 1) : 0.0
-            ],
-        ];
+        // 5. Dynamic Income Breakdown from Registered Services & Other Income Sources
+        $registeredServices = Service::all();
+        $incomeBreakdown = [];
 
-        // Add other income sources breakdown
+        if ($registeredServices->count() > 0) {
+            foreach ($registeredServices as $svc) {
+                $name = $svc->name_sw ?: $svc->name_en;
+                if ($svc->crop_type) {
+                    $name .= " ({$svc->crop_type})";
+                }
+                
+                $amt = 0.0;
+                $cat = strtolower($svc->category ?? '');
+                $nameLower = strtolower($svc->name_sw . ' ' . $svc->name_en);
+
+                if (str_contains($nameLower, 'hifadhi') || str_contains($nameLower, 'storage') || $cat === 'stock') {
+                    $amt = $storageFees;
+                } elseif (str_contains($nameLower, 'kobo') || str_contains($nameLower, 'mill') || $cat === 'milling') {
+                    $amt = $millingFees;
+                } elseif (str_contains($nameLower, 'ukaush') || str_contains($nameLower, 'dry') || $cat === 'drying') {
+                    $amt = $dryingFees;
+                } elseif (str_contains($nameLower, 'daraja') || str_contains($nameLower, 'grade') || $cat === 'grading') {
+                    $amt = $gradingFees;
+                }
+
+                $incomeBreakdown[] = [
+                    'source_name' => $name,
+                    'total_amount' => $amt,
+                    'percentage' => $totalRevenue > 0 ? round(($amt / $totalRevenue) * 100, 1) : 0.0
+                ];
+            }
+        } else {
+            // Fallback dynamically from settlement deductions if services table is unpopulated
+            if ($storageFees > 0) $incomeBreakdown[] = ['source_name' => 'Ada za Hifadhi ya Ghala', 'total_amount' => $storageFees, 'percentage' => $totalRevenue > 0 ? round(($storageFees / $totalRevenue) * 100, 1) : 0.0];
+            if ($millingFees > 0) $incomeBreakdown[] = ['source_name' => 'Ada za Ukoboaji', 'total_amount' => $millingFees, 'percentage' => $totalRevenue > 0 ? round(($millingFees / $totalRevenue) * 100, 1) : 0.0];
+            if ($dryingFees > 0) $incomeBreakdown[] = ['source_name' => 'Ada za Ukaushaji', 'total_amount' => $dryingFees, 'percentage' => $totalRevenue > 0 ? round(($dryingFees / $totalRevenue) * 100, 1) : 0.0];
+            if ($gradingFees > 0) $incomeBreakdown[] = ['source_name' => 'Ada za Upangaji Daraja', 'total_amount' => $gradingFees, 'percentage' => $totalRevenue > 0 ? round(($gradingFees / $totalRevenue) * 100, 1) : 0.0];
+        }
+
+        // Add other income sources breakdown dynamically from database
         $otherIncomeSources = (clone $otherIncomeQuery)
             ->select('source_name', DB::raw('SUM(amount) as total_amount'))
             ->groupBy('source_name')
@@ -108,12 +122,24 @@ class AccountingController extends Controller
             ];
         }
 
-        // Sort income breakdown by amount descending
+        // Remove duplicate sources and sort by amount descending
+        $uniqueBreakdown = [];
+        foreach ($incomeBreakdown as $ib) {
+            $key = $ib['source_name'];
+            if (!isset($uniqueBreakdown[$key])) {
+                $uniqueBreakdown[$key] = $ib;
+            } else {
+                $uniqueBreakdown[$key]['total_amount'] += $ib['total_amount'];
+                $uniqueBreakdown[$key]['percentage'] = $totalRevenue > 0 ? round(($uniqueBreakdown[$key]['total_amount'] / $totalRevenue) * 100, 1) : 0.0;
+            }
+        }
+        $incomeBreakdown = array_values($uniqueBreakdown);
+
         usort($incomeBreakdown, function ($a, $b) {
             return $b['total_amount'] <=> $a['total_amount'];
         });
 
-        // 6. Professional Executive Insights Generation
+        // 6. Executive Insights Generation from Database
         $topRevenueDriver = !empty($incomeBreakdown[0]) && $incomeBreakdown[0]['total_amount'] > 0 
             ? $incomeBreakdown[0] 
             : null;
@@ -122,11 +148,10 @@ class AccountingController extends Controller
             ? $expensesByCategory[0] 
             : null;
 
-        // Health Status Evaluation
         if ($profitMargin >= 30) {
             $healthStatus = 'Healthy';
             $healthBadge = '🟢 Afya ya Kifedha ni Imara Sana (Healthy Profitability)';
-            $recommendation = 'Ghalani linaendesha shughuli zake kwa faida kubwa ya margin ya ' . $profitMargin . '%. Pendekezo: Endelea kuboresha huduma za ukoboaji na hifadhi ili kuvutia wakulima wengi zaidi.';
+            $recommendation = 'Ghalani linaendesha shughuli zake kwa faida kubwa ya margin ya ' . $profitMargin . '%. Endelea kuimarisha huduma za kibiashara zilizosajiliwa.';
         } elseif ($profitMargin >= 10) {
             $healthStatus = 'Moderate';
             $healthBadge = '🟡 Afya ya Kifedha ni ya Kati (Moderate Performance)';

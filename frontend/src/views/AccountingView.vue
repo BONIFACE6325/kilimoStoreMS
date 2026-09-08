@@ -10,9 +10,9 @@
         </div>
         <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
           <span>📊 Daftari Kuu: Mapato na Matumizi</span>
-          <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-extrabold">Accounting & P&L Analysis</span>
+          <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-extrabold">Executive Financial Ledger</span>
         </h1>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Uchambuzi wa kina wa faida na hasara, vyanzo vya mapato, na gharama za uendeshaji ghalani.</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Uchambuzi wa kina wa faida na hasara, vyanzo vya mapato, na gharama za uendeshaji ghalani kulingana na data za database.</p>
       </div>
 
       <div class="flex items-center gap-2 self-start sm:self-auto">
@@ -43,7 +43,7 @@
         :class="activeTab === 'analysis' ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
         class="px-4 py-2 rounded-xl text-xs transition cursor-pointer flex items-center gap-2"
       >
-        <span>📊 Ripoti ya Faida & Hasara (P&L Analysis)</span>
+        <span>📈 Ripoti & Grafu za Faida na Hasara (P&L Charts)</span>
       </button>
 
       <button 
@@ -65,7 +65,7 @@
       </button>
     </div>
 
-    <!-- TAB 1: Executive Financial Analysis & P&L Dashboard -->
+    <!-- TAB 1: Executive Financial Analysis & Interactive P&L Charts -->
     <div v-if="activeTab === 'analysis'" class="space-y-6">
       
       <!-- Executive KPI Cards -->
@@ -90,7 +90,7 @@
           <div>
             <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Jumla ya Matumizi (OPEX)</p>
             <h3 class="text-xl font-black text-rose-600 dark:text-rose-400 mt-0.5">TZS {{ formatCurrency(financialSummary.total_expenses) }}</h3>
-            <p class="text-[10.5px] text-slate-400 mt-0.5">Cost-to-Income: {{ financialSummary.cost_to_income_ratio_pct }}%</p>
+            <p class="text-[10.5px] text-slate-400 mt-0.5">Cost-to-Income Ratio: {{ financialSummary.cost_to_income_ratio_pct }}%</p>
           </div>
         </div>
 
@@ -127,12 +127,12 @@
         </div>
       </div>
 
-      <!-- Professional Executive Insights Card (Generated from real DB) -->
+      <!-- Professional Insights Card -->
       <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-4">
         <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
           <h2 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
             <span>🧠 Professional Executive Financial Insights</span>
-            <span class="text-xs px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold">Real-time Analysis</span>
+            <span class="text-xs px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold">Real-time Database Analysis</span>
           </h2>
 
           <div class="text-xs font-black">
@@ -140,7 +140,7 @@
           </div>
         </div>
 
-        <!-- Key Metrics Highlights Grid -->
+        <!-- Highlights Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <!-- Top Revenue Driver -->
           <div class="p-4 bg-emerald-50/60 dark:bg-emerald-950/30 rounded-xl border border-emerald-200/60 dark:border-emerald-800/40 space-y-1">
@@ -165,60 +165,78 @@
           </div>
         </div>
 
-        <!-- Executive Recommendation -->
+        <!-- Recommendation -->
         <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 space-y-1">
-          <p class="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">💡 Mapendekezo ya Kiushauri ya Kiutaalamu (Management Recommendations)</p>
+          <p class="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">💡 Mapendekezo ya Kiushauri (Executive Recommendations)</p>
           <p class="text-xs font-bold text-slate-800 dark:text-slate-200 leading-relaxed">
             {{ executiveInsights.recommendation }}
           </p>
         </div>
       </div>
 
-      <!-- Breakdown Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <!-- Interactive Visual Charts Section -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        <!-- Income Breakdown Card -->
+        <!-- Interactive Chart 1: Income Breakdown (Doughnut Chart) -->
         <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-4">
           <div class="font-black text-sm text-slate-900 dark:text-white flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-            <span>🌾 Mchanganuo wa Vyanzo vya Mapato</span>
+            <span>🍩 Mchanganuo wa Grafu: Vyanzo vya Mapato</span>
             <span class="text-xs text-emerald-600 dark:text-emerald-400 font-bold">TZS {{ formatCurrency(financialSummary.total_revenue) }}</span>
           </div>
 
-          <div class="space-y-3 text-xs font-bold">
-            <div v-for="(inc, idx) in incomeBreakdownList" :key="idx" class="space-y-1">
-              <div class="flex justify-between text-slate-700 dark:text-slate-300">
-                <span>{{ inc.source_name }}</span>
-                <span class="font-black text-emerald-600 dark:text-emerald-400">TZS {{ formatCurrency(inc.total_amount) }} ({{ inc.percentage }}%)</span>
-              </div>
-              <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
-                <div class="bg-emerald-500 h-full rounded-full transition-all duration-500" :style="{ width: inc.percentage + '%' }"></div>
-              </div>
+          <div class="h-64 flex items-center justify-center relative">
+            <Doughnut 
+              v-if="incomeChartData.labels.length > 0" 
+              :data="incomeChartData" 
+              :options="doughnutOptions" 
+            />
+            <div v-else class="text-center py-10 text-slate-400 font-semibold text-xs">
+              📊 Bado hakuna mapato ya kuonyesha kwenye grafu.
             </div>
-            <div v-if="incomeBreakdownList.length === 0" class="text-center py-6 text-slate-400 font-semibold">
-              Bado hakuna mapato yaliyosajiliwa.
+          </div>
+
+          <!-- Income Table Details -->
+          <div class="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+            <div v-for="(inc, idx) in incomeBreakdownList" :key="idx" class="flex items-center justify-between text-xs">
+              <span class="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full inline-block" :style="{ backgroundColor: incomeChartColors[idx % incomeChartColors.length] }"></span>
+                <span>{{ inc.source_name }}</span>
+              </span>
+              <span class="font-extrabold text-emerald-600 dark:text-emerald-400">
+                TZS {{ formatCurrency(inc.total_amount) }} ({{ inc.percentage }}%)
+              </span>
             </div>
           </div>
         </div>
 
-        <!-- Expenses Breakdown Card -->
+        <!-- Interactive Chart 2: Expenses OPEX Breakdown (Bar Chart) -->
         <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-4">
           <div class="font-black text-sm text-slate-900 dark:text-white flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-            <span>📉 Mchanganuo wa Makundi ya Matumizi (OPEX)</span>
+            <span>📊 Mchanganuo wa Grafu: Makundi ya Matumizi (OPEX)</span>
             <span class="text-xs text-rose-600 dark:text-rose-400 font-bold">TZS {{ formatCurrency(financialSummary.total_expenses) }}</span>
           </div>
 
-          <div class="space-y-3 text-xs font-bold">
-            <div v-for="(exp, idx) in expensesBreakdownList" :key="idx" class="space-y-1">
-              <div class="flex justify-between text-slate-700 dark:text-slate-300">
-                <span>{{ exp.category_name }}</span>
-                <span class="font-black text-rose-600 dark:text-rose-400">TZS {{ formatCurrency(exp.total_amount) }} ({{ exp.percentage }}%)</span>
-              </div>
-              <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
-                <div class="bg-rose-500 h-full rounded-full transition-all duration-500" :style="{ width: exp.percentage + '%' }"></div>
-              </div>
+          <div class="h-64 flex items-center justify-center relative">
+            <Bar 
+              v-if="expensesChartData.labels.length > 0" 
+              :data="expensesChartData" 
+              :options="barOptions" 
+            />
+            <div v-else class="text-center py-10 text-slate-400 font-semibold text-xs">
+              📊 Bado hakuna matumizi ya kuonyesha kwenye grafu.
             </div>
-            <div v-if="expensesBreakdownList.length === 0" class="text-center py-6 text-slate-400 font-semibold">
-              Bado hakuna matumizi yaliyosajiliwa.
+          </div>
+
+          <!-- Expenses Table Details -->
+          <div class="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+            <div v-for="(exp, idx) in expensesBreakdownList" :key="idx" class="flex items-center justify-between text-xs">
+              <span class="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>
+                <span>{{ exp.category_name }}</span>
+              </span>
+              <span class="font-extrabold text-rose-600 dark:text-rose-400">
+                TZS {{ formatCurrency(exp.total_amount) }} ({{ exp.percentage }}%)
+              </span>
             </div>
           </div>
         </div>
@@ -615,6 +633,10 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
+import { Doughnut, Bar } from 'vue-chartjs';
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend);
 
 const activeTab = ref('analysis');
 
@@ -684,6 +706,98 @@ const triggerToast = (msg, type = 'success') => {
 
 const formatCurrency = (val) => {
   return Number(val || 0).toLocaleString('en-US');
+};
+
+const incomeChartColors = ['#10b981', '#06b6d4', '#3b82f6', '#8b5cf6', '#f59e0b', '#ec4899', '#64748b'];
+
+// Income Doughnut Chart Setup
+const incomeChartData = computed(() => {
+  const labels = incomeBreakdownList.value.map(i => i.source_name);
+  const data = incomeBreakdownList.value.map(i => i.total_amount);
+
+  return {
+    labels,
+    datasets: [
+      {
+        data,
+        backgroundColor: incomeChartColors.slice(0, labels.length),
+        borderWidth: 2,
+        borderColor: '#ffffff'
+      }
+    ]
+  };
+});
+
+const doughnutOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'right',
+      labels: {
+        font: { family: 'Inter', size: 11, weight: '700' },
+        padding: 12
+      }
+    },
+    tooltip: {
+      callbacks: {
+        label: function(context) {
+          const val = context.raw || 0;
+          return ` TZS ${val.toLocaleString('en-US')}`;
+        }
+      }
+    }
+  }
+};
+
+// Expenses Bar Chart Setup
+const expensesChartData = computed(() => {
+  const labels = expensesBreakdownList.value.map(e => e.category_name);
+  const data = expensesBreakdownList.value.map(e => e.total_amount);
+
+  return {
+    labels,
+    datasets: [
+      {
+        label: 'Gharama (TZS)',
+        data,
+        backgroundColor: '#f43f5e',
+        borderRadius: 8
+      }
+    ]
+  };
+});
+
+const barOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      callbacks: {
+        label: function(context) {
+          const val = context.raw || 0;
+          return ` TZS ${val.toLocaleString('en-US')}`;
+        }
+      }
+    }
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      grid: { color: 'rgba(226, 232, 240, 0.4)' },
+      ticks: {
+        font: { size: 10, weight: '600' },
+        callback: function(val) {
+          return val >= 1000000 ? (val / 1000000) + 'M' : val >= 1000 ? (val / 1000) + 'k' : val;
+        }
+      }
+    },
+    x: {
+      grid: { display: false },
+      ticks: { font: { size: 10, weight: '700' } }
+    }
+  }
 };
 
 const filteredIncomes = computed(() => {
