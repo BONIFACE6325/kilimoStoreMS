@@ -296,13 +296,28 @@
 
               <!-- Action Buttons -->
               <td class="py-3.5 px-4 text-right">
-                <button 
-                  v-if="loan.status !== 'settled' && parseFloat(loan.current_balance) > 0"
-                  @click="openRepayModal(loan)"
-                  class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow-xs border border-emerald-400/30 transition cursor-pointer"
-                >
-                  💵 Rejesha Mkopo
-                </button>
+                <div v-if="loan.status !== 'settled' && parseFloat(loan.current_balance) > 0" class="flex items-center justify-end gap-1.5">
+                  <button 
+                    @click="openRepayModal(loan)"
+                    class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-[11px] rounded-lg shadow-xs border border-emerald-400/30 transition cursor-pointer"
+                  >
+                    💵 Rejesha
+                  </button>
+                  <button 
+                    @click="openEditLoanModal(loan)"
+                    class="p-1 bg-slate-100 dark:bg-slate-800 hover:bg-blue-100 text-blue-600 rounded-lg text-xs font-bold cursor-pointer"
+                    title="Edit Mkopo"
+                  >
+                    ✏️
+                  </button>
+                  <button 
+                    @click="deleteLoan(loan)"
+                    class="p-1 bg-slate-100 dark:bg-slate-800 hover:bg-rose-100 text-rose-600 rounded-lg text-xs font-bold cursor-pointer"
+                    title="Futa Mkopo"
+                  >
+                    🗑️
+                  </button>
+                </div>
                 <span v-else class="text-xs font-bold text-emerald-600 dark:text-emerald-400">
                   ✓ Paid Off
                 </span>
@@ -362,18 +377,14 @@
               </select>
             </div>
 
-            <!-- Live Collateral Limit Card -->
+            <!-- Live Collateral Batch Info Card -->
             <div v-if="selectedBatchInfo" class="p-3.5 bg-indigo-50/70 dark:bg-indigo-950/40 rounded-2xl border border-indigo-200/80 dark:border-indigo-800/60 space-y-1 text-xs">
               <div class="flex items-center justify-between">
-                <span class="font-bold text-indigo-900 dark:text-indigo-200">Mzigo Ghalani:</span>
+                <span class="font-bold text-indigo-900 dark:text-indigo-200">Mzigo Ghalani (Dhamana):</span>
                 <span class="font-black text-indigo-700 dark:text-indigo-300">{{ selectedBatchInfo.intake_quantity || selectedBatchInfo.current_weight }} {{ selectedBatchInfo.intake_unit || 'Gunia' }}</span>
               </div>
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-indigo-900 dark:text-indigo-200">Kikomo cha Mkopo (50% Collateral Limit):</span>
-                <span class="font-black text-emerald-600 dark:text-emerald-400">TZS {{ formatCurrency(selectedBatchMaxLoan) }}</span>
-              </div>
               <p class="text-[10.5px] text-slate-500 dark:text-slate-400 mt-1">
-                ℹ️ Kwa sera ya mfumo, mkopo hauwezi kuzidi 50% ya thamani ya mzigo wa mkulima uliopo ghalani.
+                ℹ️ Riba: <strong>0% (Bila Riba)</strong>. Kiasi kitakatwa kikamilifu kwenye mauzo yajayo.
               </p>
             </div>
 
@@ -388,9 +399,6 @@
                 placeholder="e.g. 500000"
                 class="w-full py-2.5 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
               />
-              <span v-if="selectedBatchMaxLoan && loanForm.principal_amount > selectedBatchMaxLoan" class="text-[11px] font-bold text-rose-500 block">
-                ⚠️ Kiasi kinazidi kikomo cha TZS {{ formatCurrency(selectedBatchMaxLoan) }}!
-              </span>
             </div>
 
             <!-- Due Date Selector -->
@@ -415,7 +423,7 @@
               </button>
               <button 
                 type="submit" 
-                :disabled="submitting || (selectedBatchMaxLoan && loanForm.principal_amount > selectedBatchMaxLoan)"
+                :disabled="submitting || !loanForm.principal_amount || loanForm.principal_amount <= 0"
                 class="py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow-md border border-emerald-400/30 transition cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
               >
                 <span>{{ submitting ? 'Inasajili...' : 'Thibitisha Mkopo →' }}</span>
@@ -504,6 +512,70 @@
       </div>
     </transition>
 
+    <!-- MODAL 3: Edit Loan -->
+    <transition name="fade">
+      <div v-if="showEditLoanModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 max-w-md w-full space-y-4 transform transition-all">
+          
+          <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="p-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 text-base">✏️</span>
+              <h3 class="text-base font-extrabold text-slate-900 dark:text-white">Badili Taarifa za Mkopo</h3>
+            </div>
+            <button @click="showEditLoanModal = false" class="text-slate-400 hover:text-slate-600 dark:text-slate-300 text-lg font-bold cursor-pointer">✕</button>
+          </div>
+
+          <div class="p-3.5 bg-slate-50 dark:bg-slate-800/70 rounded-2xl space-y-1 text-xs text-left border border-slate-200 dark:border-slate-700/60">
+            <div class="font-extrabold text-slate-900 dark:text-white">Namba ya Mkopo: {{ editLoanForm.loan_code }}</div>
+          </div>
+
+          <form @submit.prevent="submitEditLoan" class="space-y-4 text-left">
+            
+            <div class="space-y-1">
+              <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Kiasi Kipya cha Mkopo (TZS)</label>
+              <input 
+                type="number" 
+                v-model.number="editLoanForm.principal_amount" 
+                required
+                min="1"
+                placeholder="e.g. 500000"
+                class="w-full py-2.5 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+              />
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Tarehe Mpya ya Mwisho ya Marejesho (Due Date)</label>
+              <input 
+                type="date" 
+                v-model="editLoanForm.due_date" 
+                required
+                class="w-full py-2.5 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+              />
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-2">
+              <button 
+                type="button"
+                @click="showEditLoanModal = false"
+                class="py-2.5 px-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold text-xs rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer"
+              >
+                Ghairi
+              </button>
+              <button 
+                type="submit" 
+                :disabled="submitting || !editLoanForm.principal_amount || editLoanForm.principal_amount <= 0"
+                class="py-2.5 px-4 bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs rounded-xl shadow-md border border-blue-400/30 transition cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
+              >
+                <span>{{ submitting ? 'Inasave...' : 'Hifadhi Mabadiliko →' }}</span>
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+    </transition>
+
     <!-- Toast Notification Overlay -->
     <transition name="fade">
       <div 
@@ -533,7 +605,15 @@ const statusFilter = ref('');
 
 const showNewLoanModal = ref(false);
 const showRepayModal = ref(false);
+const showEditLoanModal = ref(false);
 const activeRepayLoan = ref(null);
+
+const editLoanForm = ref({
+  id: '',
+  loan_code: '',
+  principal_amount: null,
+  due_date: ''
+});
 
 const toastMessage = ref('');
 const toastType = ref('success');
@@ -548,6 +628,82 @@ const triggerToast = (msg, type = 'success') => {
 
 const formatCurrency = (val) => {
   return Number(val || 0).toLocaleString('en-US');
+};
+
+const openEditLoanModal = (loan) => {
+  if (loan.status === 'settled' || parseFloat(loan.current_balance) <= 0) {
+    triggerToast('Huwezi kufanya marekebisho kwa mkopo ambao umeshalipwa na kukamilika!', 'error');
+    return;
+  }
+  editLoanForm.value = {
+    id: loan.id,
+    loan_code: loan.loan_code,
+    principal_amount: loan.principal_amount,
+    due_date: loan.due_date || new Date().toISOString().split('T')[0]
+  };
+  showEditLoanModal.value = true;
+};
+
+const submitEditLoan = async () => {
+  if (!editLoanForm.value.principal_amount || editLoanForm.value.principal_amount <= 0) {
+    triggerToast('Kiasi cha mkopo kinatakiwa kuwa zaidi ya 0', 'error');
+    return;
+  }
+
+  submitting.value = true;
+  try {
+    const res = await fetch(`/api/v1/loans/${editLoanForm.value.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        principal_amount: editLoanForm.value.principal_amount,
+        due_date: editLoanForm.value.due_date
+      })
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      triggerToast('Taarifa za mkopo zimesasishwa kikamilifu!');
+      showEditLoanModal.value = false;
+      await fetchLoansData();
+    } else {
+      triggerToast(data.error || data.message || 'Imeshindwa kusasisha mkopo', 'error');
+    }
+  } catch (err) {
+    console.error('Error updating loan:', err);
+    triggerToast('Kosa wakati wa kusasisha mkopo', 'error');
+  } finally {
+    submitting.value = false;
+  }
+};
+
+const deleteLoan = async (loan) => {
+  if (loan.status === 'settled' || parseFloat(loan.current_balance) <= 0) {
+    triggerToast('Huwezi kufuta mkopo ambao umeshalipwa na kukamilika!', 'error');
+    return;
+  }
+
+  if (!confirm(`Je, una uhakika unataka kufuta mkopo "${loan.loan_code}" wa TZS ${formatCurrency(loan.principal_amount)}?`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/v1/loans/${loan.id}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      triggerToast('Mkopo umefutwa kikamilifu!');
+      await fetchLoansData();
+    } else {
+      triggerToast(data.error || data.message || 'Imeshindwa kufuta mkopo', 'error');
+    }
+  } catch (err) {
+    console.error('Error deleting loan:', err);
+    triggerToast('Kosa wakati wa kufuta mkopo', 'error');
+  }
 };
 
 const loanForm = ref({

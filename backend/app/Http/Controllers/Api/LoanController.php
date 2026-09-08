@@ -69,17 +69,6 @@ class LoanController extends Controller
             ], 422);
         }
 
-        // 2. RULE: Loan cannot exceed 50% of the collateral crop value (Nusu ya thamani ya mzigo ghalani)
-        // Baseline price per Kg = TZS 1,000 (Max Loan per Kg = TZS 500)
-        $estimatedCropValue = $batchWeightKg * 1000;
-        $maxLoanAllowed = $estimatedCropValue * 0.50; // 50% limit
-
-        if ($validated['principal_amount'] > $maxLoanAllowed) {
-            return response()->json([
-                'error' => 'Kiasi cha mkopo unachoomba (Tsh ' . number_format($validated['principal_amount']) . ') kinazidi kikomo cha 50% ya thamani ya mzigo ghalani! Kikomo cha juu kwa batch hii ni Tsh ' . number_format($maxLoanAllowed) . ' (kulingana na Kg ' . number_format($batchWeightKg) . ' zilizopo ghalani).'
-            ], 422);
-        }
-
         $tenant = \App\Models\Tenant::first() ?? \App\Models\Tenant::create(['name' => 'Garanoki Main Store', 'subdomain' => 'garanoki-store', 'status' => 'active']);
         $tenantId = $tenant->id;
 
@@ -123,6 +112,57 @@ class LoanController extends Controller
             'message' => 'Mkopo umesajiliwa na kutolewa kikamilifu bila riba (0% Interest)',
             'loan' => $loan
         ], 201);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $loan = Loan::findOrFail($id);
+
+        if ($loan->status === 'settled' || floatval($loan->current_balance) <= 0) {
+            return response()->json([
+                'error' => 'Huwezi kufanya marekebisho kwa mkopo ambao umeshalipwa na kukamilika!'
+            ], 422);
+        }
+
+        $validated = $request->validate([
+            'principal_amount' => 'required|numeric|min:1',
+            'due_date' => 'nullable|date',
+        ]);
+
+        $diff = floatval($validated['principal_amount']) - floatval($loan->principal_amount);
+        $newBalance = max(0, floatval($loan->current_balance) + $diff);
+
+        $loan->update([
+            'principal_amount' => $validated['principal_amount'],
+            'current_balance' => $newBalance,
+            'due_date' => $validated['due_date'] ?? $loan->due_date,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Taarifa za mkopo zimesasishwa kikamilifu',
+            'loan' => $loan
+        ]);
+    }
+
+    public function destroy($id)
+    {
+        $loan = Loan::findOrFail($id);
+
+        if ($loan->status === 'settled' || floatval($loan->current_balance) <= 0) {
+            return response()->json([
+                'error' => 'Huwezi kufuta mkopo ambao umeshalipwa na kukamilika!'
+            ], 422);
+        }
+
+        // Delete associated transactions first
+        LoanTransaction::where('loan_id', $loan->id)->delete();
+        $loan->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Mkopo umefutwa kikamilifu'
+        ]);
     }
 
     public function approve($id)

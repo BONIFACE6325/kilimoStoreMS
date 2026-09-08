@@ -924,11 +924,12 @@
                       <th class="py-2.5 px-3">Kiasi cha Mkopo</th>
                       <th class="py-2.5 px-3">Salio la Mkopo</th>
                       <th class="py-2.5 px-3">Hali</th>
+                      <th class="py-2.5 px-3 text-right">Vitendo</th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-slate-100 font-medium">
                     <tr v-if="farmerLoans.length === 0" class="text-center text-slate-400">
-                      <td colspan="5" class="py-6">Hakuna historia ya mikopo iliyotolewa.</td>
+                      <td colspan="6" class="py-6">Hakuna historia ya mikopo iliyotolewa.</td>
                     </tr>
                     <tr v-for="l in farmerLoans" :key="l.id" class="hover:bg-slate-50 dark:bg-slate-950 transition">
                       <td class="py-2 px-3 text-slate-600 dark:text-slate-300 font-mono font-semibold">{{ formatDate(l.created_at) }}</td>
@@ -940,6 +941,15 @@
                       <td class="py-2 px-3 whitespace-nowrap">
                         <span :class="parseFloat(l.current_balance || l.remaining_balance || 0) <= 0 ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20' : 'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-500/20'" class="px-2 py-0.5 rounded-md text-[10px] font-black border uppercase whitespace-nowrap inline-flex items-center gap-1">
                           {{ parseFloat(l.current_balance || l.remaining_balance || 0) <= 0 ? '✅ IMEKATWA' : '⚙️ IPO HAI' }}
+                        </span>
+                      </td>
+                      <td class="py-2 px-3 text-right whitespace-nowrap">
+                        <div v-if="parseFloat(l.current_balance || l.remaining_balance || 0) > 0 && l.status !== 'settled'" class="flex items-center justify-end gap-1.5">
+                          <button @click="openEditLoanModal(l)" class="p-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 cursor-pointer" title="Badili Mkopo">✏️</button>
+                          <button @click="deleteLoan(l)" class="p-1 text-rose-600 hover:text-rose-800 dark:text-rose-400 cursor-pointer" title="Futa Mkopo">🗑️</button>
+                        </div>
+                        <span v-else class="text-[10.5px] font-extrabold text-emerald-600 dark:text-emerald-400">
+                          ✓ Paid Off
                         </span>
                       </td>
                     </tr>
@@ -1099,18 +1109,12 @@
               </select>
             </div>
 
-            <!-- Calculated Max Limit Card -->
+            <!-- Collateral Batch Summary Card -->
             <div v-if="selectedCollateralBatch" class="p-3.5 bg-emerald-50/80 dark:bg-emerald-900/40 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl space-y-1.5">
               <div class="flex justify-between items-center text-xs">
-                <span class="text-slate-600 dark:text-slate-300 font-bold">Akiba ya Mzigo Ghalani:</span>
+                <span class="text-slate-600 dark:text-slate-300 font-bold">Akiba ya Mzigo Ghalani (Dhamana):</span>
                 <span class="font-mono font-black text-emerald-900 dark:text-emerald-400">
                   {{ selectedCollateralBatch.intake_quantity || (parseFloat(selectedCollateralBatch.current_weight_mt||0)).toLocaleString() }} {{ selectedCollateralBatch.intake_unit || 'Units' }}
-                </span>
-              </div>
-              <div class="flex justify-between items-center text-xs border-t border-emerald-200/80 dark:border-emerald-700/50 pt-1.5">
-                <span class="text-emerald-950 dark:text-emerald-400 font-extrabold">Kikomo cha Juu cha Mkopo (Max 50% ya Thamani):</span>
-                <span class="font-mono font-black text-emerald-700 dark:text-emerald-400 text-sm">
-                  Tsh {{ maxLoanLimit.toLocaleString() }}
                 </span>
               </div>
               <span class="text-[10px] text-emerald-800 dark:text-emerald-400 font-medium block pt-0.5">
@@ -1123,14 +1127,10 @@
               <input 
                 v-model.number="loanForm.amount" 
                 type="number" 
-                :max="maxLoanLimit"
+                min="1"
                 placeholder="Ingiza kiasi cha mkopo..." 
-                class="w-full p-2.5 bg-white dark:bg-slate-900 border rounded-xl font-black text-slate-900 dark:text-slate-50 text-sm"
-                :class="loanForm.amount > maxLoanLimit ? 'border-red-500 text-red-600 dark:text-red-400 focus:ring-red-500' : 'border-slate-300 dark:border-slate-600'"
+                class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl font-black text-slate-900 dark:text-slate-50 text-sm focus:ring-emerald-500"
               />
-              <span v-if="loanForm.amount > maxLoanLimit" class="text-[10.5px] text-red-600 dark:text-red-400 font-bold mt-1 block">
-                ⚠️ Kiasi hiki kinazidi kikomo cha 50% cha mzigo ghalani (Tsh {{ maxLoanLimit.toLocaleString() }}).
-              </span>
             </div>
 
             <div>
@@ -1144,10 +1144,51 @@
             <button 
               v-if="activeNonTransformedBatches.length > 0"
               @click="submitNewLoan" 
-              :disabled="loanForm.amount > maxLoanLimit || !loanForm.collateral_batch_id || loanForm.amount <= 0"
+              :disabled="!loanForm.collateral_batch_id || !loanForm.amount || loanForm.amount <= 0"
               class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow-xs cursor-pointer transition"
             >
               Tuma Ombi
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: EDIT MKOPO (Edit Loan Modal) -->
+    <div v-if="modals.editLoan" class="fixed inset-0 z-[90] bg-slate-900/75 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 animate-fadeIn">
+        <div class="px-6 py-4 border-b border-blue-800 flex items-center justify-between bg-gradient-to-r from-blue-900 to-indigo-900 text-white">
+          <div>
+            <h3 class="text-base font-extrabold">Badili Taarifa za Mkopo</h3>
+            <p class="text-[10.5px] text-blue-200 font-medium">Mkopo Code: {{ editLoanForm.loan_code }}</p>
+          </div>
+          <button @click="modals.editLoan = false" class="text-blue-200 hover:text-white p-1 cursor-pointer">✕</button>
+        </div>
+        <div class="p-6 space-y-3.5 text-xs font-semibold text-slate-700 dark:text-slate-200">
+          <div>
+            <label class="block mb-1 font-bold">Kiasi Kipya cha Mkopo (Tsh) *</label>
+            <input 
+              v-model.number="editLoanForm.amount" 
+              type="number" 
+              min="1"
+              placeholder="Ingiza kiasi kipya cha mkopo..." 
+              class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl font-black text-slate-900 dark:text-slate-50 text-sm focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label class="block mb-1 font-bold">Tarehe Mpya ya Kulipa (Due Date) *</label>
+            <input v-model="editLoanForm.due_date" type="date" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50"/>
+          </div>
+
+          <div class="flex justify-end gap-2 pt-2">
+            <button @click="modals.editLoan = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl cursor-pointer">Ghairi</button>
+            <button 
+              @click="submitEditLoan" 
+              :disabled="!editLoanForm.amount || editLoanForm.amount <= 0"
+              class="px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow-xs cursor-pointer transition"
+            >
+              Hifadhi Mabadiliko
             </button>
           </div>
         </div>
@@ -1730,11 +1771,19 @@ const modals = ref({
   intake: false,
   applyService: false,
   newLoan: false,
+  editLoan: false,
   newSale: false,
   completeService: false,
   farmerReceipt: false,
   quickCrop: false,
   quickUnit: false
+});
+
+const editLoanForm = ref({
+  id: '',
+  loan_code: '',
+  amount: null,
+  due_date: ''
 });
 
 const confirmModal = ref({
@@ -3244,11 +3293,6 @@ const submitNewLoan = async () => {
     return;
   }
 
-  if (maxLoanLimit.value > 0 && loanForm.value.amount > maxLoanLimit.value) {
-    triggerToast(`Kiasi cha mkopo (Tsh ${loanForm.value.amount.toLocaleString()}) kinazidi kikomo cha 50% cha mzigo ghalani (Tsh ${maxLoanLimit.value.toLocaleString()})!`, 'error');
-    return;
-  }
-
   try {
     const res = await fetch('/api/v1/loans', {
       method: 'POST',
@@ -3270,7 +3314,82 @@ const submitNewLoan = async () => {
       triggerToast(data.error || 'Imefeli kuwasilisha ombi la mkopo.', 'error');
     }
   } catch (e) {
-    triggerToast('Imefeli kuwasilisha ombi la mkopo.', 'error');
+    triggerToast('Kosa wakati wa kutuma ombi la mkopo.', 'error');
+  }
+};
+
+const openEditLoanModal = (loan) => {
+  if (parseFloat(loan.current_balance || loan.remaining_balance || 0) <= 0 || loan.status === 'settled') {
+    triggerToast('Huwezi kufanya marekebisho kwa mkopo ambao umeshalipwa na kukamilika!', 'error');
+    return;
+  }
+  editLoanForm.value = {
+    id: loan.id,
+    loan_code: loan.loan_code || 'LN',
+    amount: loan.principal_amount,
+    due_date: loan.due_date || new Date().toISOString().split('T')[0]
+  };
+  modals.value.editLoan = true;
+};
+
+const submitEditLoan = async () => {
+  if (!editLoanForm.value.amount || editLoanForm.value.amount <= 0) {
+    triggerToast('Kiasi cha mkopo lazima kiwe zaidi ya 0.', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/v1/loans/${editLoanForm.value.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        principal_amount: editLoanForm.value.amount,
+        due_date: editLoanForm.value.due_date
+      })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      modals.value.editLoan = false;
+      if (selectedFarmer.value) {
+        await openFarmerProfile(selectedFarmer.value.id);
+      }
+      await fetchFarmers();
+      triggerToast('Taarifa za mkopo zimesasishwa kikamilifu! ✏️');
+    } else {
+      triggerToast(data.error || 'Imefeli kusasisha mkopo.', 'error');
+    }
+  } catch (e) {
+    triggerToast('Kosa wakati wa kusasisha mkopo.', 'error');
+  }
+};
+
+const deleteLoan = async (loan) => {
+  if (parseFloat(loan.current_balance || loan.remaining_balance || 0) <= 0 || loan.status === 'settled') {
+    triggerToast('Huwezi kufuta mkopo ambao umeshalipwa na kukamilika!', 'error');
+    return;
+  }
+
+  if (!confirm(`Je, una uhakika unataka kufuta mkopo "${loan.loan_code || 'LN'}" wa Tsh ${parseFloat(loan.principal_amount || 0).toLocaleString()}?`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/v1/loans/${loan.id}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      if (selectedFarmer.value) {
+        await openFarmerProfile(selectedFarmer.value.id);
+      }
+      await fetchFarmers();
+      triggerToast('Mkopo umefutwa kikamilifu! 🗑️');
+    } else {
+      triggerToast(data.error || 'Imefeli kufuta mkopo.', 'error');
+    }
+  } catch (e) {
+    triggerToast('Kosa wakati wa kufuta mkopo.', 'error');
   }
 };
 
