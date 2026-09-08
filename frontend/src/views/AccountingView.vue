@@ -4,15 +4,14 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs">
       <div>
         <div class="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1">
-          <router-link to="/" class="hover:text-emerald-600">Dashboard</router-link>
+          <router-link to="/" class="hover:text-emerald-600">{{ t('dashboard', 'Dashboard') }}</router-link>
           <span>/</span>
-          <span class="text-slate-700 dark:text-slate-200 font-bold">Daftari Kuu & Hesabu</span>
+          <span class="text-slate-700 dark:text-slate-200 font-bold">{{ t('accounting', 'Mapato na Matumizi') }}</span>
         </div>
         <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-          <span>📊 Daftari Kuu: Mapato na Matumizi</span>
-          <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-extrabold">Executive Financial Ledger</span>
+          <span>📊 {{ t('accountingManagement', 'Kituo cha Uahasibu & Matumizi') }}</span>
         </h1>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Uchambuzi wa kina wa faida na hasara, vyanzo vya mapato, na gharama za uendeshaji ghalani kulingana na data za database.</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">{{ t('accountingSubtitle', 'Kuingiza gharama za uendeshaji, mafuta, matengenezo na mshahara') }}</p>
       </div>
 
       <div class="flex items-center gap-2 self-start sm:self-auto">
@@ -703,8 +702,11 @@
 import { ref, computed, onMounted } from 'vue';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 import { Doughnut, Bar } from 'vue-chartjs';
+import { useLanguage } from '../composables/useLanguage.js';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend);
+
+const { t } = useLanguage();
 
 const activeTab = ref('analysis');
 

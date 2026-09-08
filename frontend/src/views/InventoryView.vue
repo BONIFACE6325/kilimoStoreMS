@@ -10,10 +10,10 @@
           </span>
           <div>
             <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              Warehouse Inventory & Grain Storage System
+              {{ t('inventoryManagement', 'Stoko & Vihenge vya Kinu') }}
             </h1>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-              Real-time grain stock control, bags/kg sold & received breakdown, 2D bin capacity monitoring.
+              {{ t('inventorySubtitle', 'Viwango vya nafaka, mpunga, sembe, mchele na pumba ghalani') }}
             </p>
           </div>
         </div>
@@ -982,6 +982,9 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { useLanguage } from '../composables/useLanguage.js';
+
+const { t } = useLanguage();
 
 const loading = ref(false);
 const submitting = ref(false);

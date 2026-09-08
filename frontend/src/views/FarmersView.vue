@@ -5,16 +5,16 @@
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs">
       <div>
         <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tight flex items-center gap-2">
-          Usimamizi wa Wakulima 👨‍🌾
+          {{ t('farmerManagement', 'Usimamizi wa Wakulima') }} 👨‍🌾
         </h1>
         <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-          Orodha ya wakulima, mizigo ghalani, huduma za kinu, mikopo na taarifa za mauzo
+          {{ t('farmerSubtitle', 'Orodha ya wakulima waliosajiliwa, stoko yao na mizani ya akaunti') }}
         </p>
       </div>
       <div class="flex items-center gap-2.5 w-full sm:w-auto">
         <button @click="openAddFarmerModal" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-emerald-600/20 transition flex items-center justify-center gap-2 w-full sm:w-auto">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          <span>Sajili Mkulima Mpya</span>
+          <span>{{ t('registerFarmer', 'Sajili Mkulima Mpya') }}</span>
         </button>
       </div>
     </div>
@@ -1730,12 +1730,13 @@
   </div>
 </template>
 
-
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useAgroMaster } from '../composables/useAgroMaster.js';
+import { useLanguage } from '../composables/useLanguage.js';
 
 const { cropsList, unitsList, addCrop, addUnit, getUnitKg, convertUnits } = useAgroMaster();
+const { t } = useLanguage();
 
 const loading = ref(false);
 const loadingProfile = ref(false);

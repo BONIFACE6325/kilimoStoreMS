@@ -6,10 +6,10 @@
       <div>
         <div class="flex items-center gap-2">
           <span class="p-2 rounded-2xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 text-lg">💰</span>
-          <h1 class="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">Mikopo & Dhamana za Mazao</h1>
+          <h1 class="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">{{ t('loanManagement', 'Usimamizi wa Mikopo ya Wakulima') }}</h1>
         </div>
         <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">
-          Usimamizi kamili wa mikopo inayotolewa kwa wakulima kwa kuwekea dhamana mazao yao yaliyopo ghalani (0% Interest).
+          {{ t('loanSubtitle', 'Mikopo ya fedha na pembejeo zilizotolewa kwa wakulima') }}
         </p>
       </div>
 
@@ -585,6 +585,9 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { useLanguage } from '../composables/useLanguage.js';
+
+const { t } = useLanguage();
 
 const loansList = ref([]);
 const farmersList = ref([]);

@@ -5,10 +5,10 @@
     <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs">
       <div>
         <h1 class="text-lg sm:text-xl font-black text-slate-900 dark:text-slate-50 tracking-tight flex items-center gap-2">
-          Financial Control Center 📊
+          {{ t('financialControlCenter', 'Financial Control Center') }} 📊
         </h1>
         <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-          Financial Overview — <strong class="text-slate-800 dark:text-slate-100 font-mono">{{ todayFormatted }}</strong>
+          {{ t('financialOverview', 'Financial Overview') }} — <strong class="text-slate-800 dark:text-slate-100 font-mono">{{ todayFormatted }}</strong>
         </p>
       </div>
 
@@ -53,14 +53,14 @@
       <!-- CARD 1: GROSS CROP SALES -->
       <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-emerald-500/50 transition-all space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">1. Mauzo ya Mazao</span>
+          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ t('grossCropSales', '1. Mauzo ya Mazao') }}</span>
           <div class="w-6.5 h-6.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold text-xs shadow-2xs">🌾</div>
         </div>
         <div class="text-lg font-black text-slate-900 dark:text-slate-50 font-mono">
           Tsh {{ (finances.totalCropSales || 0).toLocaleString() }}
         </div>
         <div class="text-[9px] text-slate-500 dark:text-slate-400 font-semibold pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <span>Invoices & Cashbook</span>
+          <span>{{ t('invoicesCashbook', 'Invoices & Cashbook') }}</span>
           <span class="font-mono text-[8px] bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 px-1 rounded font-extrabold uppercase">CROP SALES</span>
         </div>
       </div>
@@ -68,14 +68,14 @@
       <!-- CARD 2: SERVICE REVENUE -->
       <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-indigo-500/50 transition-all space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">2. Ada za Huduma</span>
+          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ t('serviceRevenue', '2. Ada za Huduma') }}</span>
           <div class="w-6.5 h-6.5 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 flex items-center justify-center font-bold text-xs shadow-2xs">💰</div>
         </div>
         <div class="text-lg font-black text-indigo-700 dark:text-indigo-400 font-mono">
           Tsh {{ (finances.totalServiceRevenue || 0).toLocaleString() }}
         </div>
         <div class="text-[9px] text-slate-500 dark:text-slate-400 font-semibold pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <span>Kukoboa + Kuanika</span>
+          <span>{{ t('millingDrying', 'Kukoboa + Kuanika') }}</span>
           <span class="text-[8px] bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 px-1 rounded font-extrabold uppercase border border-indigo-200 dark:border-indigo-500/20">SERVICES</span>
         </div>
       </div>
@@ -83,14 +83,14 @@
       <!-- CARD 3: OPERATING EXPENSES / COSTS -->
       <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-red-400 transition-all space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">3. Matumizi</span>
+          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ t('operatingExpenses', '3. Matumizi') }}</span>
           <div class="w-6.5 h-6.5 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center font-bold text-xs shadow-2xs">🧾</div>
         </div>
         <div class="text-lg font-black text-red-600 dark:text-red-400 font-mono">
           Tsh {{ (finances.totalExpenses || 0).toLocaleString() }}
         </div>
         <div class="text-[9px] text-red-600 dark:text-red-400 font-bold pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <span>Mafuta + Matengenezo</span>
+          <span>{{ t('fuelMaintenance', 'Mafuta + Matengenezo') }}</span>
           <span class="text-[8px] bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 px-1 rounded font-extrabold uppercase border border-red-200 dark:border-red-500/20">EXPENSES</span>
         </div>
       </div>
@@ -98,14 +98,14 @@
       <!-- CARD 4: TOTAL LOANS DISBURSED -->
       <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-amber-500/50 transition-all space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">4. Mikopo</span>
+          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ t('totalLoansDisbursed', '4. Mikopo') }}</span>
           <div class="w-6.5 h-6.5 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 flex items-center justify-center font-bold text-xs shadow-2xs">📤</div>
         </div>
         <div class="text-lg font-black text-amber-700 dark:text-amber-400 font-mono">
           Tsh {{ (finances.totalLoansDisbursed || 0).toLocaleString() }}
         </div>
         <div class="text-[9px] text-slate-500 dark:text-slate-400 font-semibold pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <span>Iliyorejeshwa: Tsh {{ (finances.totalLoansRecovered || 0).toLocaleString() }}</span>
+          <span>{{ t('recovered', 'Iliyorejeshwa') }}: Tsh {{ (finances.totalLoansRecovered || 0).toLocaleString() }}</span>
           <span class="text-[8px] bg-amber-50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-400 px-1 rounded font-extrabold uppercase border border-amber-200 dark:border-amber-500/20">LOANS</span>
         </div>
       </div>
@@ -113,14 +113,14 @@
       <!-- CARD 5: OUTSTANDING LOAN DEBT -->
       <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-orange-400 transition-all space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">5. Deni la Mikopo</span>
+          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ t('outstandingDebt', '5. Deni la Mikopo') }}</span>
           <div class="w-6.5 h-6.5 rounded-xl bg-orange-50 dark:bg-orange-900/40 text-orange-700 dark:text-orange-400 flex items-center justify-center font-bold text-xs shadow-2xs">💳</div>
         </div>
         <div class="text-lg font-black text-orange-700 dark:text-orange-400 font-mono">
           Tsh {{ (finances.loanPortfolio || 0).toLocaleString() }}
         </div>
         <div class="text-[9px] text-orange-800 dark:text-orange-400 font-bold pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <span>Salio la Mikopo</span>
+          <span>{{ t('loanBalance', 'Salio la Mikopo') }}</span>
           <span v-if="finances.overdueLoansCount > 0" class="text-[8px] bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 font-extrabold px-1 rounded">
             {{ finances.overdueLoansCount }} Overdue
           </span>
@@ -133,7 +133,7 @@
       <!-- CARD 6: NET OPERATING PROFIT -->
       <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:border-teal-500/50 transition-all space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">6. Faida Halisi</span>
+          <span class="text-[9.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ t('netProfit', '6. Faida Halisi') }}</span>
           <div class="w-6.5 h-6.5 rounded-xl bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-400 flex items-center justify-center font-bold text-xs shadow-2xs">📈</div>
         </div>
         <div class="text-lg font-black text-teal-700 dark:text-teal-400 font-mono">
@@ -155,9 +155,9 @@
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
           <div>
             <h2 class="text-sm font-extrabold text-slate-900 dark:text-slate-50 flex items-center gap-2">
-              <span>📈 Financial Performance Trend (Revenues vs Expenses)</span>
+              <span>📈 {{ t('financialTrendTitle', 'Mwenendo wa Kifedha (Mapato dhidi ya Matumizi)') }}</span>
             </h2>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Monthly performance comparison over the last 6 months (Revenues vs Expenses in TZS).</p>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{{ t('financialTrendSub', 'Ulinganisho wa miezi 6 iliyopita (Mapato dhidi ya Matumizi kwa TZS).') }}</p>
           </div>
         </div>
 
@@ -170,8 +170,8 @@
       <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex flex-col justify-between space-y-3">
         <div>
           <div class="flex items-center justify-between mb-1">
-            <h2 class="text-sm font-extrabold text-slate-900 dark:text-slate-50">🍩 Grain Services & Stock Distribution</h2>
-            <span class="text-[10px] font-bold text-slate-400">Live DB Metrics</span>
+            <h2 class="text-sm font-extrabold text-slate-900 dark:text-slate-50">🍩 {{ t('grainServicesStock', 'Huduma za Nafaka & Mzigo Ghalani') }}</h2>
+            <span class="text-[10px] font-bold text-slate-400">{{ t('liveMetrics', 'Live System Metrics') }}</span>
           </div>
           <div class="h-44 flex items-center justify-center relative my-1">
             <Doughnut :data="revenueSourcesData" :options="revenueSourcesOptions" />
@@ -180,7 +180,7 @@
 
         <div class="space-y-1.5 pt-2.5 border-t border-slate-100 dark:border-slate-800 text-xs font-semibold">
           <div v-if="Object.keys(finances.serviceBreakdown).length === 0" class="text-slate-400 italic text-[11px] py-2 text-center">
-            No service revenues recorded.
+            {{ t('noServiceRevenue', 'Hakuna mapato ya huduma yaliyosajiliwa.') }}
           </div>
           <div 
             v-for="(amount, serviceName, idx) in finances.serviceBreakdown" 
@@ -196,7 +196,7 @@
 
           <!-- Crop Stock Distribution Pills -->
           <div v-if="Object.keys(finances.cropDistribution).length > 0" class="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1">
-            <div class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Mzigo Uliopo Ghalani (By Unit)</div>
+            <div class="text-[10px] font-black text-slate-400 uppercase tracking-wider">{{ t('grainInWarehouse', 'Mzigo Uliopo Ghalani') }}</div>
             <div class="flex flex-wrap gap-1.5">
               <div 
                 v-for="(qty, cName) in finances.cropDistribution" 
@@ -220,16 +220,16 @@
         <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
           <div>
             <h2 class="text-sm font-extrabold text-slate-900 dark:text-slate-50 flex items-center gap-1.5">
-              <span>🚚 Other Operational Incomes</span>
+              <span>🚚 {{ t('otherIncomeTitle', 'Mapato Mengine ya Uendeshaji') }}</span>
             </h2>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Logistics, Trucking, Rentals & Misc Revenue</p>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{{ t('otherIncomeSub', 'Usafirishaji, Magari, Kodi & Mapato Mengine') }}</p>
           </div>
           <span class="text-xs font-black text-emerald-700 dark:text-emerald-400 font-mono">Tsh {{ (finances.totalOtherIncome || 0).toLocaleString() }}</span>
         </div>
 
         <div class="space-y-2">
           <div v-if="Object.keys(finances.otherIncomeBreakdown).length === 0" class="text-slate-400 italic text-xs py-3 text-center">
-            No other operational incomes recorded.
+            {{ t('noOtherIncome', 'Hakuna mapato mengine yaliyorekodiwa.') }}
           </div>
           <div 
             v-for="(amount, srcName) in finances.otherIncomeBreakdown" 
@@ -249,15 +249,15 @@
       <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
           <div>
-            <h2 class="text-sm font-extrabold text-slate-900 dark:text-slate-50">🧾 Operating Expenses</h2>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Categorized Operational Costs</p>
+            <h2 class="text-sm font-extrabold text-slate-900 dark:text-slate-50">🧾 {{ t('operatingExpensesTitle', 'Matumizi ya Uendeshaji') }}</h2>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{{ t('operatingExpensesSub', 'Gharama za Uendeshaji kwa Makundi') }}</p>
           </div>
           <span class="text-xs font-black text-red-600 dark:text-red-400 font-mono">Tsh {{ (finances.totalExpenses || 0).toLocaleString() }}</span>
         </div>
 
         <div class="space-y-2">
           <div v-if="Object.keys(finances.expensesBreakdown).length === 0" class="text-slate-400 italic text-xs py-3 text-center">
-            No operational expenses recorded.
+            {{ t('noExpensesRecorded', 'Hakuna matumizi yaliyorekodiwa.') }}
           </div>
           <div 
             v-for="(amount, catName) in finances.expensesBreakdown" 
@@ -278,25 +278,25 @@
         <div>
           <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5 mb-3">
             <div>
-              <h2 class="text-sm font-extrabold text-slate-900 dark:text-slate-50">⚖️ Loan Portfolio Reconciliation</h2>
-              <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Disbursed - Recovered = Outstanding</p>
+              <h2 class="text-sm font-extrabold text-slate-900 dark:text-slate-50">⚖️ {{ t('loanReconciliationTitle', 'Ulinganisho wa Mikopo ya Wakulima') }}</h2>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{{ t('loanReconciliationSub', 'Iliyotolewa - Iliyorejeshwa = Deni') }}</p>
             </div>
             <span class="px-2 py-0.5 rounded-lg text-[9.5px] font-black bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
-              AUDITED
+              {{ t('audited', 'AUDITED') }}
             </span>
           </div>
 
           <div class="space-y-2 text-xs font-semibold text-slate-700 dark:text-slate-200">
             <div class="flex justify-between items-center p-2 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-700">
-              <span>(+) Total Principal Disbursed:</span>
+              <span>(+) {{ t('totalDisbursed', 'Jumla ya Mikopo Iliyotolewa') }}:</span>
               <span class="font-mono font-bold text-amber-900 dark:text-amber-400">+ Tsh {{ (finances.totalLoansDisbursed || 0).toLocaleString() }}</span>
             </div>
             <div class="flex justify-between items-center p-2 bg-emerald-50/50 dark:bg-emerald-900/40 rounded-xl border border-emerald-200 dark:border-emerald-700/50 text-emerald-900 dark:text-emerald-400">
-              <span>(-) Principal Recovered:</span>
+              <span>(-) {{ t('totalRecovered', 'Jumla Iliyorejeshwa') }}:</span>
               <span class="font-mono font-bold">- Tsh {{ (finances.totalLoansRecovered || 0).toLocaleString() }}</span>
             </div>
             <div class="flex justify-between items-center p-2 bg-orange-50 dark:bg-orange-900/40/60 dark:bg-orange-900/40 rounded-xl border border-orange-200 dark:border-orange-700/50 text-orange-950 dark:text-orange-400 font-black">
-              <span>(=) Outstanding Balance:</span>
+              <span>(=) {{ t('outstandingBalance', 'Salio la Deni') }}:</span>
               <span class="font-mono font-black text-orange-900 dark:text-orange-400 text-xs">= Tsh {{ (finances.loanPortfolio || 0).toLocaleString() }}</span>
             </div>
           </div>
@@ -304,10 +304,10 @@
 
         <div class="p-2.5 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-700 text-[10.5px] text-slate-700 dark:text-slate-200 space-y-0.5">
           <div class="font-black flex items-center gap-1.5 text-slate-900 dark:text-slate-50">
-            <span>🔒 Financial Governance Policy:</span>
+            <span>🔒 {{ t('governancePolicy', 'Sera ya Mikopo ya Wakulima') }}:</span>
           </div>
           <p class="text-slate-600 dark:text-slate-300">
-            All farmer loans are 0% Interest, capped at 50% of collateral crop value stored in warehouse.
+            {{ t('governancePolicyText', 'Mikopo yote ya wakulima haina riba (0%), na haizidi 50% ya thamani ya nafaka iliyopo ghalani.') }}
           </p>
         </div>
       </div>
@@ -320,17 +320,17 @@
         <div>
           <div class="flex items-center gap-2">
             <span class="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
-              Live Database Intelligence
+              {{ t('liveDatabaseIntel', 'Live Database Intelligence') }}
             </span>
             <h2 class="text-sm font-extrabold text-slate-900 dark:text-slate-50 flex items-center gap-1.5">
-              🧠 Executive Analytics & Top Performance Drivers
+              🧠 {{ t('executiveAnalyticsTitle', 'Uchambuzi wa Kimkakati na Vyanzo vya Mapato') }}
             </h2>
           </div>
-          <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">Top 3 revenue generators, primary expense cost centers & strategic advisory</p>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">{{ t('executiveAnalyticsSub', 'Vyanzo vikuu 3 vya mapato, maeneo makuu ya gharama & ushauri') }}</p>
         </div>
         <div class="flex items-center gap-2">
           <span class="text-xs font-mono font-black bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 px-3 py-1.5 rounded-xl border border-emerald-200 dark:border-emerald-500/20">
-            Net Profit: Tsh {{ (finances.netProfit || 0).toLocaleString() }}
+            {{ t('netProfit', 'Faida Halisi') }}: Tsh {{ (finances.netProfit || 0).toLocaleString() }}
           </span>
         </div>
       </div>
@@ -342,7 +342,7 @@
         <div class="bg-slate-50/70 dark:bg-slate-950/70 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 space-y-3">
           <div class="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-700/60 pb-2">
             <h3 class="text-xs font-extrabold text-slate-900 dark:text-slate-50 flex items-center gap-1.5">
-              <span>🌾 Top 3 Core Services</span>
+              <span>🌾 {{ t('top3ServicesTitle', 'Huduma Kuu 3 za Mapato') }}</span>
             </h3>
             <span class="text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100/70 dark:bg-emerald-900/50 px-1.5 py-0.5 rounded">
               Tsh {{ (finances.totalRevenue || 0).toLocaleString() }}
@@ -366,7 +366,7 @@
                 <span>{{ item.pct }}% of revenue</span>
               </div>
             </div>
-            <div v-if="top3Services.length === 0" class="text-xs text-slate-400 py-3 text-center">No core services recorded</div>
+            <div v-if="top3Services.length === 0" class="text-xs text-slate-400 py-3 text-center">{{ t('noCoreServices', 'Hakuna huduma kuu zilizosajiliwa') }}</div>
           </div>
         </div>
 
@@ -374,7 +374,7 @@
         <div class="bg-slate-50/70 dark:bg-slate-950/70 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 space-y-3">
           <div class="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-700/60 pb-2">
             <h3 class="text-xs font-extrabold text-slate-900 dark:text-slate-50 flex items-center gap-1.5">
-              <span>🔥 Top 3 Expense Costs</span>
+              <span>🔥 {{ t('top3ExpensesTitle', 'Maeneo Makuu 3 ya Matumizi') }}</span>
             </h3>
             <span class="text-[10px] font-mono font-bold text-red-700 dark:text-red-400 bg-red-100/70 dark:bg-red-900/50 px-1.5 py-0.5 rounded">
               Tsh {{ (finances.totalExpenses || 0).toLocaleString() }}
@@ -398,7 +398,7 @@
                 <span>{{ item.pct }}% of expenses</span>
               </div>
             </div>
-            <div v-if="top3Expenses.length === 0" class="text-xs text-slate-400 py-3 text-center">No expenses recorded</div>
+            <div v-if="top3Expenses.length === 0" class="text-xs text-slate-400 py-3 text-center">{{ t('noExpensesRecorded', 'Hakuna matumizi yaliyorekodiwa') }}</div>
           </div>
         </div>
 
@@ -406,7 +406,7 @@
         <div class="bg-slate-50/70 dark:bg-slate-950/70 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 space-y-3">
           <div class="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-700/60 pb-2">
             <h3 class="text-xs font-extrabold text-slate-900 dark:text-slate-50 flex items-center gap-1.5">
-              <span>🚛 Top Other Incomes</span>
+              <span>🚛 {{ t('top3OtherIncomesTitle', 'Mapato Mengine Makuu') }}</span>
             </h3>
             <span class="text-[10px] font-mono font-bold text-blue-700 dark:text-blue-400 bg-blue-100/70 dark:bg-blue-900/50 px-1.5 py-0.5 rounded">
               Tsh {{ (finances.totalOtherIncome || 0).toLocaleString() }}
@@ -430,7 +430,7 @@
                 <span>{{ item.pct }}% of other income</span>
               </div>
             </div>
-            <div v-if="top3OtherIncomes.length === 0" class="text-xs text-slate-400 py-3 text-center">No other incomes recorded</div>
+            <div v-if="top3OtherIncomes.length === 0" class="text-xs text-slate-400 py-3 text-center">{{ t('noOtherIncomesRecorded', 'Hakuna mapato mengine yaliyorekodiwa') }}</div>
           </div>
         </div>
 
@@ -440,7 +440,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
         <div class="bg-amber-50/60 dark:bg-amber-900/40 p-3 rounded-xl border border-amber-200/80 dark:border-amber-700/50 space-y-1 text-xs text-amber-900 dark:text-amber-400">
           <div class="flex items-center gap-1.5 font-extrabold text-amber-950 dark:text-amber-400">
-            <span>⛽ Cost Control Advisory:</span>
+            <span>⛽ {{ t('costAdvisoryTitle', 'Ushauri wa Udhibiti wa Gharama') }}:</span>
           </div>
           <p class="leading-relaxed text-[11.5px] font-medium text-amber-900/90 dark:text-amber-400/90">
             Operational costs are dominated by <strong class="font-black text-amber-950 dark:text-amber-400">{{ topExpense.name }}</strong> (Tsh {{ topExpense.amount.toLocaleString() }}). Enforce fuel logbook tracking for trucks & machines to optimize mileage.
@@ -449,7 +449,7 @@
 
         <div class="bg-emerald-50/60 dark:bg-emerald-900/40 p-3 rounded-xl border border-emerald-200/80 dark:border-emerald-700/50 space-y-1 text-xs text-emerald-900 dark:text-emerald-400">
           <div class="flex items-center gap-1.5 font-extrabold text-emerald-950 dark:text-emerald-400">
-            <span>🌾 Service Revenue Strategy:</span>
+            <span>🌾 {{ t('revenueStrategyTitle', 'Mbinu ya Kuongeza Mapato') }}:</span>
           </div>
           <p class="leading-relaxed text-[11.5px] font-medium text-emerald-900 dark:text-emerald-400/90">
             <strong class="font-black text-emerald-950 dark:text-emerald-400">{{ topService.name }}</strong> generates the highest core revenue (Tsh {{ topService.amount.toLocaleString() }}). Keep equipment well-serviced to eliminate downtime during intake.
@@ -463,12 +463,12 @@
       <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
         <div>
           <h2 class="text-sm font-extrabold text-slate-900 dark:text-slate-50 flex items-center gap-2">
-            📑 Financial Ledger & Audit Trail
+            📑 {{ t('financialLedgerTitle', 'Daftari la Miamala & Kumbukumbu') }}
           </h2>
-          <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">Real-time ledger of settlements, deductions, and operating expenses</p>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">{{ t('financialLedgerSub', 'Daftari halisi la makato, malipo na matumizi ya uendeshaji') }}</p>
         </div>
         <router-link to="/cashbook" class="inline-flex items-center gap-1 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:text-slate-50 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200/80 dark:bg-slate-700/80 px-3 py-1.5 rounded-xl transition border border-slate-200 dark:border-slate-700">
-          <span>Full Cashbook</span>
+          <span>{{ t('fullCashbook', 'Daftari Kamili la Pesa') }}</span>
           <span>→</span>
         </router-link>
       </div>
@@ -477,16 +477,16 @@
         <table class="w-full text-left text-xs border-collapse">
           <thead>
             <tr class="bg-slate-50/80 dark:bg-slate-950/80 text-slate-600 dark:text-slate-300 font-bold border-b border-slate-200/70 dark:border-slate-700/70 capitalize text-[11px] tracking-wide">
-              <th class="py-3 px-4">Date</th>
-              <th class="py-3 px-4">Transaction Type</th>
-              <th class="py-3 px-4">Description</th>
-              <th class="py-3 px-4 text-right">Amount (TZS)</th>
-              <th class="py-3 px-4 text-center">Payment Method</th>
+              <th class="py-3 px-4">{{ t('date', 'Tarehe') }}</th>
+              <th class="py-3 px-4">{{ t('transactionType', 'Aina ya Muamala') }}</th>
+              <th class="py-3 px-4">{{ t('description', 'Maelezo') }}</th>
+              <th class="py-3 px-4 text-right">{{ t('amount', 'Kiasi (TZS)') }}</th>
+              <th class="py-3 px-4 text-center">{{ t('paymentMethod', 'Njia ya Malipo') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50 font-medium text-slate-700 dark:text-slate-200">
             <tr v-if="recentTransactions.length === 0" class="text-center text-slate-400">
-              <td colspan="5" class="py-8 text-xs font-normal">No recent transactions recorded.</td>
+              <td colspan="5" class="py-8 text-xs font-normal">{{ t('noRecentTransactions', 'Hakuna miamala ya hivi karibuni.') }}</td>
             </tr>
             <tr v-for="t in recentTransactions" :key="t.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
               <td class="py-3 px-4 text-slate-500 dark:text-slate-400 font-mono text-[11px] whitespace-nowrap">{{ t.date }}</td>

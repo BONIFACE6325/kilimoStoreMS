@@ -4,15 +4,14 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs">
       <div>
         <div class="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1">
-          <router-link to="/" class="hover:text-emerald-600">Dashboard</router-link>
+          <router-link to="/" class="hover:text-emerald-600">{{ t('dashboard', 'Dashboard') }}</router-link>
           <span>/</span>
-          <span class="text-slate-700 dark:text-slate-200 font-bold">Mauzo & Ankara</span>
+          <span class="text-slate-700 dark:text-slate-200 font-bold">{{ t('sales', 'Mauzo & Ankara') }}</span>
         </div>
         <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-          <span>🧾 Mauzo na Ankara</span>
-          <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-extrabold">Invoices & Payouts</span>
+          <span>🧾 {{ t('salesManagement', 'Mauzo & Invois za Wanunuzi') }}</span>
         </h1>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Simamia miamala ya wanunuzi, ankara za mauzo, na kumbukumbu za malipo ya wakulima.</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">{{ t('salesSubtitle', 'Invois zilizotolewa, malipo ya nafaka na stakabadhi za wanunuzi') }}</p>
       </div>
 
       <div class="flex items-center gap-2 self-start sm:self-auto">
@@ -571,6 +570,9 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { useLanguage } from '../composables/useLanguage.js';
+
+const { t } = useLanguage();
 
 const activeTab = ref('invoices');
 

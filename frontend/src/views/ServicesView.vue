@@ -4,15 +4,15 @@
     <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
         <div class="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1">
-          <span>Mwanzo</span>
+          <span>{{ t('navMain', 'Kuu') }}</span>
           <span>/</span>
-          <span class="text-emerald-700 dark:text-emerald-400 font-bold">Orodha ya Huduma</span>
+          <span class="text-emerald-700 dark:text-emerald-400 font-bold">{{ t('services', 'Huduma za Kinu') }}</span>
         </div>
         <h1 class="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tight flex items-center gap-2">
-          <span>🛠️ Usimamizi wa Ada na Huduma za Kinu</span>
+          <span>🛠️ {{ t('serviceManagement', 'Usimamizi wa Huduma za Kinu') }}</span>
         </h1>
         <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
-          Sajili, hariri, na usimamie fomula za bei za huduma za Galanoki, aina za mazao na vipimo vya uzito.
+          {{ t('serviceSubtitle', 'Ada za kukoboa, kuanika, kugiredi, kuchanganya na vipimo vya kinu') }}
         </p>
       </div>
 
@@ -474,8 +474,10 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useAgroMaster } from '../composables/useAgroMaster.js';
+import { useLanguage } from '../composables/useLanguage.js';
 
 const { cropsList, unitsList, addCrop, deleteCrop, addUnit, updateUnitRatio, updateUnit, deleteUnit, getUnitKg, convertUnits } = useAgroMaster();
+const { t } = useLanguage();
 
 const editingUnitName = ref(null);
 const editUnitForm = ref({ name: '', kg: 1 });
