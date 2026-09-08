@@ -68,6 +68,82 @@
     <!-- TAB 1: Executive Financial Analysis & Interactive P&L Charts -->
     <div v-if="activeTab === 'analysis'" class="space-y-6">
       
+      <!-- Period Filter Controls -->
+      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+            <span>🗓️</span>
+            <span>Chuja kwa Kipindi:</span>
+          </span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button 
+            @click="applyPeriodFilter('all')"
+            :class="selectedPeriod === 'all' ? 'bg-emerald-600 text-white font-black shadow-xs' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
+            class="px-3 py-1.5 rounded-xl text-xs transition cursor-pointer"
+          >
+            Muda Wote
+          </button>
+          <button 
+            @click="applyPeriodFilter('today')"
+            :class="selectedPeriod === 'today' ? 'bg-emerald-600 text-white font-black shadow-xs' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
+            class="px-3 py-1.5 rounded-xl text-xs transition cursor-pointer"
+          >
+            Leo
+          </button>
+          <button 
+            @click="applyPeriodFilter('this_week')"
+            :class="selectedPeriod === 'this_week' ? 'bg-emerald-600 text-white font-black shadow-xs' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
+            class="px-3 py-1.5 rounded-xl text-xs transition cursor-pointer"
+          >
+            Wiki Hii
+          </button>
+          <button 
+            @click="applyPeriodFilter('this_month')"
+            :class="selectedPeriod === 'this_month' ? 'bg-emerald-600 text-white font-black shadow-xs' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
+            class="px-3 py-1.5 rounded-xl text-xs transition cursor-pointer"
+          >
+            Mwezi Huu
+          </button>
+          <button 
+            @click="applyPeriodFilter('this_year')"
+            :class="selectedPeriod === 'this_year' ? 'bg-emerald-600 text-white font-black shadow-xs' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
+            class="px-3 py-1.5 rounded-xl text-xs transition cursor-pointer"
+          >
+            Mwaka Huu
+          </button>
+          <button 
+            @click="applyPeriodFilter('custom')"
+            :class="selectedPeriod === 'custom' ? 'bg-emerald-600 text-white font-black shadow-xs' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
+            class="px-3 py-1.5 rounded-xl text-xs transition cursor-pointer"
+          >
+            ⚙️ Tarehe Zako
+          </button>
+        </div>
+
+        <!-- Custom Date Inputs -->
+        <div v-if="selectedPeriod === 'custom'" class="flex items-center gap-2 pt-2 md:pt-0 border-t md:border-t-0 border-slate-100 dark:border-slate-800">
+          <input 
+            type="date" 
+            v-model="startDate" 
+            class="px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white"
+          />
+          <span class="text-xs text-slate-400 font-bold">hadi</span>
+          <input 
+            type="date" 
+            v-model="endDate" 
+            class="px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white"
+          />
+          <button 
+            @click="fetchAccountingData" 
+            class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow-xs cursor-pointer"
+          >
+            🔍 Onyesha
+          </button>
+        </div>
+      </div>
+
       <!-- Executive KPI Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <!-- Total Revenue -->
@@ -163,14 +239,6 @@
               TZS {{ formatCurrency(executiveInsights.top_cost_center.total_amount) }} ({{ executiveInsights.top_cost_center.percentage }}% ya matumizi yote)
             </p>
           </div>
-        </div>
-
-        <!-- Recommendation -->
-        <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 space-y-1">
-          <p class="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">💡 Mapendekezo ya Kiushauri (Executive Recommendations)</p>
-          <p class="text-xs font-bold text-slate-800 dark:text-slate-200 leading-relaxed">
-            {{ executiveInsights.recommendation }}
-          </p>
         </div>
       </div>
 
@@ -640,6 +708,46 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarEleme
 
 const activeTab = ref('analysis');
 
+const selectedPeriod = ref('all');
+const startDate = ref('');
+const endDate = ref('');
+
+const applyPeriodFilter = (period) => {
+  selectedPeriod.value = period;
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const todayStr = `${year}-${month}-${day}`;
+
+  if (period === 'all') {
+    startDate.value = '';
+    endDate.value = '';
+  } else if (period === 'today') {
+    startDate.value = todayStr;
+    endDate.value = todayStr;
+  } else if (period === 'this_week') {
+    const monday = new Date(now);
+    const dayOfWeek = now.getDay() || 7;
+    monday.setDate(now.getDate() - (dayOfWeek - 1));
+    const mYear = monday.getFullYear();
+    const mMonth = String(monday.getMonth() + 1).padStart(2, '0');
+    const mDay = String(monday.getDate()).padStart(2, '0');
+    startDate.value = `${mYear}-${mMonth}-${mDay}`;
+    endDate.value = todayStr;
+  } else if (period === 'this_month') {
+    startDate.value = `${year}-${month}-01`;
+    endDate.value = todayStr;
+  } else if (period === 'this_year') {
+    startDate.value = `${year}-01-01`;
+    endDate.value = todayStr;
+  }
+
+  if (period !== 'custom') {
+    fetchAccountingData();
+  }
+};
+
 const financialSummary = ref({
   total_revenue: 0,
   total_service_fee_revenue: 0,
@@ -821,10 +929,15 @@ const filteredExpenses = computed(() => {
 const fetchAccountingData = async () => {
   loading.value = true;
   try {
+    let queryParams = '';
+    if (startDate.value && endDate.value) {
+      queryParams = `?start_date=${startDate.value}&end_date=${endDate.value}`;
+    }
+
     const [summaryRes, incRes, expRes, incSourcesRes, expCatsRes] = await Promise.all([
-      fetch('/api/v1/accounting/financial-summary'),
-      fetch('/api/v1/incomes'),
-      fetch('/api/v1/expenses'),
+      fetch(`/api/v1/accounting/financial-summary${queryParams}`),
+      fetch(`/api/v1/incomes${queryParams}`),
+      fetch(`/api/v1/expenses${queryParams}`),
       fetch('/api/v1/incomes/sources'),
       fetch('/api/v1/expenses/categories')
     ]);
