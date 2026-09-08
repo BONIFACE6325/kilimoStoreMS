@@ -1057,15 +1057,15 @@
             <span class="text-[10.5px] text-amber-700 dark:text-amber-400 mt-1 block">⚠️ Batches zilizo-transformed (zilizotumika kikamilifu) haziruhusiwi kupangiwa huduma mpya.</span>
           </div>
           <div>
-            <label class="block mb-1 font-bold">Chagua Huduma Iliyosajiliwa (Huduma za Zao la {{ selectedBatchForService ? selectedBatchForService.crop_type : 'Mzigo Uliochaguliwa' }}) *</label>
+            <label class="block mb-1 font-bold">Chagua Huduma Iliyosajiliwa (Zao: {{ selectedBatchForService ? selectedBatchForService.crop_type : '' }} | Kipimo: {{ selectedBatchForService ? (selectedBatchForService.intake_unit || selectedBatchForService.unit || 'Gunia') : '' }}) *</label>
             <select v-model="serviceForm.service_id" @change="onServiceCatalogSelect" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-emerald-300 dark:border-emerald-500/50 rounded-xl font-extrabold text-emerald-950 dark:text-emerald-400 focus:ring-2 focus:ring-emerald-500/20">
-              <option value="" class="bg-white dark:bg-slate-900">Chagua huduma inayohusika na zao hili...</option>
+              <option value="" class="bg-white dark:bg-slate-900">Chagua huduma yenye zao na kipimo kinachofanana...</option>
               <option v-for="s in filteredCatalogServices" :key="s.id" :value="s.id" class="bg-white dark:bg-slate-900">
                 {{ s.name_sw }} — Tsh {{ parseFloat(s.rate).toLocaleString() }} / {{ s.unit }} ({{ s.crop_type || 'Zote' }})
               </option>
             </select>
             <span v-if="selectedBatchForService && filteredCatalogServices.length === 0" class="text-[10.5px] text-amber-700 dark:text-amber-400 mt-1 block font-bold">
-              ⚠️ Hakuna huduma iliyochujwa kwa zao hili. (Tafadhali sajili huduma ya {{ selectedBatchForService.crop_type }} kwenye Orodha ya Huduma).
+              ⚠️ Hakuna huduma iliyosajiliwa ya {{ selectedBatchForService.crop_type }} yenye kipimo cha {{ selectedBatchForService.intake_unit || selectedBatchForService.unit || 'Gunia' }}. (Tafadhali sajili huduma yenye kipimo cha {{ selectedBatchForService.intake_unit || selectedBatchForService.unit || 'Gunia' }} kwenye Orodha ya Huduma).
             </span>
           </div>
 
@@ -2427,14 +2427,20 @@ const filteredCatalogServices = computed(() => {
   const batchCropNorm = normalizeCropStr(batch.crop_type);
   const batchUnitNorm = normalizeUnitStr(batch.intake_unit || batch.unit);
 
-  const eligibleCropServices = catalogServices.value.filter(s => {
+  return catalogServices.value.filter(s => {
     // 1. DUPLICATE CHECK
     const sNameLower = String(s.name_sw || s.name || '').toLowerCase().trim();
     if (existingServiceIds.has(String(s.id)) || existingServiceNames.has(sNameLower)) {
       return false; // Already assigned to this batch!
     }
 
-    // 2. CROP FILTER
+    // 2. UNIT FILTER: Strict unit matching! (e.g. Gunia batch only gets Gunia services)
+    const sUnitNorm = normalizeUnitStr(s.unit);
+    if (batchUnitNorm && sUnitNorm && sUnitNorm !== batchUnitNorm) {
+      return false;
+    }
+
+    // 3. CROP FILTER: Crop matching!
     const sCropRaw = String(s.crop_type || '').toLowerCase().trim();
     if (!sCropRaw || sCropRaw === 'zote' || sCropRaw === 'all') {
       if (batchCropNorm === 'mpunga' && (sNameLower.includes('mahindi') || sNameLower.includes('sembe') || sNameLower.includes('dona'))) {
@@ -2455,19 +2461,6 @@ const filteredCatalogServices = computed(() => {
 
     return sCropNorm === batchCropNorm || batchCropNorm.includes(sCropNorm) || sCropNorm.includes(batchCropNorm);
   });
-
-  if (batchUnitNorm) {
-    const unitMatched = eligibleCropServices.filter(s => {
-      const sUnitNorm = normalizeUnitStr(s.unit);
-      return !sUnitNorm || sUnitNorm === batchUnitNorm;
-    });
-
-    if (unitMatched.length > 0) {
-      return unitMatched;
-    }
-  }
-
-  return eligibleCropServices;
 });
 
 const getServiceRate = (cs) => {
