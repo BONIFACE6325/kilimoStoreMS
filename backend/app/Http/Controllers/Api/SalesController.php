@@ -347,8 +347,8 @@ class SalesController extends Controller
                     'buyer_id' => $buyer->id,
                     'invoice_number' => $invoiceNumber,
                     'subtotal' => $grossSales,
-                    'vat_amount' => $grossSales * 0.18,
-                    'total_amount' => $grossSales * 1.18,
+                    'vat_amount' => 0.00,
+                    'total_amount' => $grossSales,
                     'status' => 'unpaid',
                     'due_date' => now()->addDays(30),
                 ]);

@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\BuyerController;
 // Group under v1
 Route::prefix('v1')->group(function () {
     // Buyers CRUD
+    Route::get('buyers/stats', [BuyerController::class, 'stats']);
     Route::get('buyers/{id}/history', [BuyerController::class, 'history']);
     Route::apiResource('buyers', BuyerController::class);
 

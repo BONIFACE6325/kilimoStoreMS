@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Buyer;
 use App\Models\Invoice;
+use App\Models\InvoiceItem;
+use App\Models\Settlement;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BuyerController extends Controller
 {
@@ -16,10 +19,25 @@ class BuyerController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $buyers->transform(function ($buyer) {
-            $totalSpent = Invoice::where('buyer_id', $buyer->id)->sum('total_amount');
-            $unpaidAmount = Invoice::where('buyer_id', $buyer->id)->where('status', 'unpaid')->sum('total_amount');
+        $result = $buyers->map(function ($buyer) {
+            $invoices = Invoice::where('buyer_id', $buyer->id)->get();
+            $invoiceIds = $invoices->pluck('id');
             
+            $totalSpent = $invoices->sum('subtotal');
+            $unpaidAmount = $invoices->where('status', 'unpaid')->sum('subtotal');
+
+            $items = InvoiceItem::with(['batch.farmer'])->whereIn('invoice_id', $invoiceIds)->get();
+            
+            $totalQuantity = $items->sum('quantity_mt');
+            
+            $crops = $items->map(function ($item) {
+                return $item->batch ? $item->batch->crop_type : null;
+            })->filter()->unique()->values()->all();
+
+            $farmers = $items->map(function ($item) {
+                return ($item->batch && $item->batch->farmer) ? $item->batch->farmer->name : null;
+            })->filter()->unique()->values()->all();
+
             return [
                 'id' => $buyer->id,
                 'name' => $buyer->name,
@@ -31,11 +49,50 @@ class BuyerController extends Controller
                 'invoices_count' => $buyer->invoices_count,
                 'total_spent' => floatval($totalSpent),
                 'unpaid_amount' => floatval($unpaidAmount),
+                'total_quantity' => floatval($totalQuantity),
+                'crops' => $crops,
+                'farmers' => $farmers,
                 'created_at' => $buyer->created_at ? $buyer->created_at->format('Y-m-d H:i') : null,
             ];
         });
 
-        return response()->json($buyers);
+        return response()->json($result);
+    }
+
+    public function stats()
+    {
+        $totalSalesRevenue = floatval(Invoice::sum('subtotal'));
+        $totalDeductions = floatval(Settlement::sum('total_deductions'));
+        $totalBuyersCount = Buyer::count();
+        $totalVolumeSold = floatval(InvoiceItem::sum('quantity_mt'));
+
+        // Top buyer calculation based on volume purchased
+        $topBuyerItem = InvoiceItem::join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
+            ->select('invoices.buyer_id', DB::raw('SUM(invoice_items.quantity_mt) as total_qty'), DB::raw('SUM(invoice_items.total_price) as total_spent'))
+            ->groupBy('invoices.buyer_id')
+            ->orderByDesc('total_qty')
+            ->first();
+
+        $topBuyer = null;
+        if ($topBuyerItem) {
+            $buyerModel = Buyer::find($topBuyerItem->buyer_id);
+            if ($buyerModel) {
+                $topBuyer = [
+                    'id' => $buyerModel->id,
+                    'name' => $buyerModel->name,
+                    'total_quantity' => floatval($topBuyerItem->total_qty),
+                    'total_spent' => floatval($topBuyerItem->total_spent),
+                ];
+            }
+        }
+
+        return response()->json([
+            'total_sales_revenue' => $totalSalesRevenue,
+            'total_deductions' => $totalDeductions,
+            'total_buyers_count' => $totalBuyersCount,
+            'total_volume_sold' => $totalVolumeSold,
+            'top_buyer' => $topBuyer,
+        ]);
     }
 
     public function store(Request $request)
@@ -73,7 +130,7 @@ class BuyerController extends Controller
 
     public function show($id)
     {
-        $buyer = Buyer::with(['invoices.items.batch'])->findOrFail($id);
+        $buyer = Buyer::with(['invoices.items.batch.farmer'])->findOrFail($id);
         return response()->json($buyer);
     }
 
@@ -127,14 +184,38 @@ class BuyerController extends Controller
     public function history($id)
     {
         $buyer = Buyer::findOrFail($id);
-        $invoices = Invoice::with(['items.batch'])
+        $invoices = Invoice::with(['items.batch.farmer'])
             ->where('buyer_id', $buyer->id)
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $invoicesFormatted = $invoices->map(function ($inv) {
+            $farmerNames = $inv->items->map(function ($item) {
+                return ($item->batch && $item->batch->farmer) ? $item->batch->farmer->name : null;
+            })->filter()->unique()->values()->all();
+
+            $cropTypes = $inv->items->map(function ($item) {
+                return $item->batch ? $item->batch->crop_type : 'Mazao Ghalani';
+            })->filter()->unique()->values()->all();
+
+            $totalQty = $inv->items->sum('quantity_mt');
+
+            return [
+                'id' => $inv->id,
+                'invoice_number' => $inv->invoice_number,
+                'subtotal' => floatval($inv->subtotal),
+                'total_amount' => floatval($inv->subtotal),
+                'status' => $inv->status,
+                'created_at' => $inv->created_at ? $inv->created_at->format('Y-m-d H:i') : null,
+                'farmer_names' => !empty($farmerNames) ? implode(', ', $farmerNames) : 'N/A',
+                'crop_types' => !empty($cropTypes) ? implode(', ', $cropTypes) : 'Mazao Ghalani',
+                'total_quantity' => floatval($totalQty),
+            ];
+        });
+
         return response()->json([
             'buyer' => $buyer,
-            'invoices' => $invoices
+            'invoices' => $invoicesFormatted
         ]);
     }
 }

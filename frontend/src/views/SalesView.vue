@@ -9,10 +9,10 @@
           <span class="text-slate-700 dark:text-slate-200 font-bold">Mauzo & Ankara</span>
         </div>
         <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-          <span>🧾 Mauzo na Ankara za Kodi</span>
-          <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-extrabold">Tax Invoices & Payouts</span>
+          <span>🧾 Mauzo na Ankara</span>
+          <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-extrabold">Invoices & Payouts</span>
         </h1>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Simamia miamala ya wanunuzi, ankara za KODI (18% VAT), na kumbukumbu za malipo ya wakulima.</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Simamia miamala ya wanunuzi, ankara za mauzo, na kumbukumbu za malipo ya wakulima.</p>
       </div>
 
       <div class="flex items-center gap-2 self-start sm:self-auto">
@@ -69,7 +69,7 @@
           <div>
             <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Jumla ya Ankara</p>
             <h3 class="text-xl font-black text-slate-900 dark:text-white mt-0.5">{{ invoicesList.length }}</h3>
-            <p class="text-[10.5px] text-slate-400 mt-0.5">{{ paidInvoicesCount }} zime lipwa, {{ unpaidInvoicesCount }} zinadaiwa</p>
+            <p class="text-[10.5px] text-slate-400 mt-0.5">{{ paidInvoicesCount }} zimelipwa, {{ unpaidInvoicesCount }} zinadaiwa</p>
           </div>
         </div>
 
@@ -137,9 +137,8 @@
             <tr class="bg-slate-50/80 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 font-extrabold border-b border-slate-100 dark:border-slate-800 uppercase tracking-wider text-[10.5px]">
               <th class="py-3.5 px-4">Ankara #</th>
               <th class="py-3.5 px-4">Mnunuzi (Buyer)</th>
-              <th class="py-3.5 px-4">Subtotal (TZS)</th>
-              <th class="py-3.5 px-4">VAT (18%)</th>
-              <th class="py-3.5 px-4">Jumla Kuu</th>
+              <th class="py-3.5 px-4">Mkulima Aliyeuza</th>
+              <th class="py-3.5 px-4">Jumla ya Fedha (TZS)</th>
               <th class="py-3.5 px-4">Tarehe</th>
               <th class="py-3.5 px-4">Hali</th>
               <th class="py-3.5 px-4 text-right">Vitendo</th>
@@ -147,12 +146,12 @@
           </thead>
           <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
             <tr v-if="loading" class="text-center py-8">
-              <td colspan="8" class="py-10 text-slate-400 font-bold text-xs">
+              <td colspan="7" class="py-10 text-slate-400 font-bold text-xs">
                 ⏳ Inapakia ankara kutoka kwenye database...
               </td>
             </tr>
             <tr v-else-if="filteredInvoices.length === 0" class="text-center py-8">
-              <td colspan="8" class="py-10 text-slate-400 font-bold text-xs">
+              <td colspan="7" class="py-10 text-slate-400 font-bold text-xs">
                 🔍 Hakuna ankara iliyopatikana.
               </td>
             </tr>
@@ -175,19 +174,14 @@
                 {{ inv.buyer ? inv.buyer.name : 'Mnunuzi wa Jumla' }}
               </td>
 
-              <!-- Subtotal -->
-              <td class="py-3.5 px-4 font-bold text-slate-700 dark:text-slate-300">
-                TZS {{ formatCurrency(inv.subtotal) }}
-              </td>
-
-              <!-- VAT Amount -->
-              <td class="py-3.5 px-4 font-semibold text-slate-500">
-                TZS {{ formatCurrency(inv.vat_amount) }}
+              <!-- Farmer Name -->
+              <td class="py-3.5 px-4 font-bold text-emerald-700 dark:text-emerald-300">
+                👤 {{ getInvoiceFarmerName(inv) }}
               </td>
 
               <!-- Total Amount -->
               <td class="py-3.5 px-4 font-black text-emerald-600 dark:text-emerald-400">
-                TZS {{ formatCurrency(inv.total_amount) }}
+                TZS {{ formatCurrency(inv.subtotal) }}
               </td>
 
               <!-- Created Date -->
@@ -210,7 +204,7 @@
                 <div class="flex items-center justify-end gap-1.5">
                   <button 
                     @click="viewInvoiceDoc(inv)"
-                    title="Onyesha Ankara ya Kodi"
+                    title="Onyesha Ankara"
                     class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 font-extrabold text-[11px] rounded-lg border border-emerald-200 dark:border-emerald-800 transition cursor-pointer flex items-center gap-1"
                   >
                     <span>👁️ Ankara</span>
@@ -318,7 +312,7 @@
       </div>
     </div>
 
-    <!-- MODAL 1: Create Tax Invoice & Sale Wizard -->
+    <!-- MODAL 1: Create Invoice & Sale Wizard -->
     <transition name="fade">
       <div v-if="showNewSaleModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-xl overflow-hidden animate-fadeIn">
@@ -326,7 +320,7 @@
           <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50">
             <h3 class="font-black text-base text-slate-900 dark:text-white flex items-center gap-2">
               <span>🧾</span>
-              <span>Sajili Mauzo & Ankara Mpya ya Kodi</span>
+              <span>Sajili Mauzo & Ankara Mpya</span>
             </h3>
             <button @click="showNewSaleModal = false" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg cursor-pointer">✕</button>
           </div>
@@ -342,7 +336,7 @@
                   @change="onBuyerSelectChange"
                   class="py-2.5 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none"
                 >
-                  <option value="">-- Chagua Mnunuzi aliyesajiliwa --</option>
+                  <option value="">-- Chagua Mnunuzi --</option>
                   <option v-for="b in buyersOptions" :key="b.id" :value="b.id">{{ b.name }}</option>
                 </select>
                 <input 
@@ -408,19 +402,9 @@
                 <span class="text-emerald-600 dark:text-emerald-400 font-black">{{ deductionsPreview.crop_type }} ({{ deductionsPreview.farmer_name }})</span>
               </div>
 
-              <div class="flex justify-between text-slate-600 dark:text-slate-300">
-                <span>Subtotal (Mapato Ghafi)</span>
-                <span class="font-bold">TZS {{ formatCurrency(deductionsPreview.gross_sales) }}</span>
-              </div>
-
-              <div class="flex justify-between text-slate-600 dark:text-slate-300">
-                <span>Kodi ya VAT (18%)</span>
-                <span class="font-bold">TZS {{ formatCurrency(deductionsPreview.gross_sales * 0.18) }}</span>
-              </div>
-
               <div class="flex justify-between text-slate-900 dark:text-white font-extrabold">
-                <span>Jumla ya Ankara (Total Invoice)</span>
-                <span class="text-emerald-600 dark:text-emerald-400 font-black">TZS {{ formatCurrency(deductionsPreview.gross_sales * 1.18) }}</span>
+                <span>Jumla ya Mauzo (Gross Sales)</span>
+                <span class="text-emerald-600 dark:text-emerald-400 font-black">TZS {{ formatCurrency(deductionsPreview.gross_sales) }}</span>
               </div>
 
               <div class="border-t border-slate-200 dark:border-slate-700 pt-2 space-y-1 text-[11.5px]">
@@ -462,14 +446,14 @@
       </div>
     </transition>
 
-    <!-- MODAL 2: Tax Invoice Viewer Document Modal -->
+    <!-- MODAL 2: Invoice Viewer Document Modal -->
     <transition name="fade">
       <div v-if="showInvoiceModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-2xl overflow-hidden animate-fadeIn">
           
           <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900">
             <h3 class="font-black text-sm text-slate-900 dark:text-white flex items-center gap-2">
-              <span>🧾 Document ya Ankara ya Kodi (Tax Invoice)</span>
+              <span>🧾 Document ya Ankara ya Mauzo (Invoice)</span>
             </h3>
             <button @click="showInvoiceModal = false" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg cursor-pointer">✕</button>
           </div>
@@ -481,13 +465,12 @@
               <div>
                 <h2 class="text-2xl font-black text-emerald-600 tracking-tight">KilimoStore MS</h2>
                 <p class="text-[11px] text-slate-500 mt-1">
-                  VAT Reg: 100-244-918 | TIN: 882-991-002<br/>
                   Garanoki Main Store & Warehouse, Industrial Area
                 </p>
               </div>
 
               <div class="text-right">
-                <h3 class="text-xl font-black text-slate-900 uppercase">TAX INVOICE</h3>
+                <h3 class="text-xl font-black text-slate-900 uppercase">SALES INVOICE</h3>
                 <p class="text-xs text-slate-600 mt-1">
                   <strong>Invoice #:</strong> {{ selectedInvoiceDoc?.invoice_number }}<br/>
                   <strong>Tarehe:</strong> {{ selectedInvoiceDoc?.created_at ? new Date(selectedInvoiceDoc.created_at).toISOString().split('T')[0] : 'N/A' }}
@@ -495,12 +478,19 @@
               </div>
             </div>
 
-            <!-- Bill To -->
-            <div>
-              <p class="text-slate-500 font-extrabold uppercase text-[10px]">Mteja / Mnunuzi (Bill To):</p>
-              <h4 class="text-sm font-black text-slate-900 mt-0.5">{{ selectedInvoiceDoc?.buyer ? selectedInvoiceDoc.buyer.name : 'Mnunuzi wa Jumla' }}</h4>
-              <p class="text-slate-600 text-xs">Simu: {{ selectedInvoiceDoc?.buyer?.phone || 'N/A' }} | Email: {{ selectedInvoiceDoc?.buyer?.email || 'N/A' }}</p>
-              <p class="text-slate-600 text-xs">TIN: {{ selectedInvoiceDoc?.buyer?.tax_number || 'N/A' }}</p>
+            <!-- Bill To & Farmer Details -->
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-slate-500 font-extrabold uppercase text-[10px]">Mteja / Mnunuzi (Bill To):</p>
+                <h4 class="text-sm font-black text-slate-900 mt-0.5">{{ selectedInvoiceDoc?.buyer ? selectedInvoiceDoc.buyer.name : 'Mnunuzi wa Jumla' }}</h4>
+                <p class="text-slate-600 text-xs">Simu: {{ selectedInvoiceDoc?.buyer?.phone || 'N/A' }} | Email: {{ selectedInvoiceDoc?.buyer?.email || 'N/A' }}</p>
+                <p class="text-slate-600 text-xs">TIN: {{ selectedInvoiceDoc?.buyer?.tax_number || 'N/A' }}</p>
+              </div>
+
+              <div>
+                <p class="text-slate-500 font-extrabold uppercase text-[10px]">Mkulima Aliyeuza Mzigo:</p>
+                <h4 class="text-sm font-black text-emerald-700 mt-0.5">👤 {{ getInvoiceFarmerName(selectedInvoiceDoc) }}</h4>
+              </div>
             </div>
 
             <!-- Items Table -->
@@ -533,17 +523,9 @@
 
             <!-- Totals Summary -->
             <div class="w-1/2 ml-auto space-y-1 text-xs">
-              <div class="flex justify-between text-slate-600">
-                <span>Subtotal (Kabla ya Kodi):</span>
-                <span class="font-bold">TZS {{ formatCurrency(selectedInvoiceDoc?.subtotal) }}</span>
-              </div>
-              <div class="flex justify-between text-slate-600 border-b border-slate-300 pb-1">
-                <span>VAT (18% Tax):</span>
-                <span class="font-bold">TZS {{ formatCurrency(selectedInvoiceDoc?.vat_amount) }}</span>
-              </div>
               <div class="flex justify-between font-black text-sm text-slate-900 pt-1">
                 <span>Jumla Kuu (Total Amount):</span>
-                <span class="text-emerald-600">TZS {{ formatCurrency(selectedInvoiceDoc?.total_amount) }}</span>
+                <span class="text-emerald-600">TZS {{ formatCurrency(selectedInvoiceDoc?.subtotal) }}</span>
               </div>
             </div>
 
@@ -633,7 +615,7 @@ const saleForm = ref({
 });
 
 const totalRevenue = computed(() => {
-  return invoicesList.value.reduce((acc, inv) => acc + parseFloat(inv.total_amount || 0), 0);
+  return invoicesList.value.reduce((acc, inv) => acc + parseFloat(inv.subtotal || 0), 0);
 });
 
 const paidInvoicesCount = computed(() => {
@@ -647,12 +629,23 @@ const unpaidInvoicesCount = computed(() => {
 const unpaidInvoicesAmount = computed(() => {
   return invoicesList.value
     .filter(inv => inv.status === 'unpaid')
-    .reduce((acc, inv) => acc + parseFloat(inv.total_amount || 0), 0);
+    .reduce((acc, inv) => acc + parseFloat(inv.subtotal || 0), 0);
 });
 
 const totalFarmerPayouts = computed(() => {
   return settlementsList.value.reduce((acc, s) => acc + parseFloat(s.net_payout || 0), 0);
 });
+
+const getInvoiceFarmerName = (inv) => {
+  if (!inv) return 'N/A';
+  if (inv.items && inv.items.length > 0) {
+    const fNames = inv.items
+      .map(item => (item.batch && item.batch.farmer) ? item.batch.farmer.name : null)
+      .filter(Boolean);
+    if (fNames.length > 0) return [...new Set(fNames)].join(', ');
+  }
+  return 'N/A';
+};
 
 const filteredInvoices = computed(() => {
   return invoicesList.value.filter(inv => {
@@ -660,7 +653,8 @@ const filteredInvoices = computed(() => {
     const q = searchQuery.value.toLowerCase().trim();
     const buyerName = inv.buyer ? inv.buyer.name.toLowerCase() : '';
     const invNum = inv.invoice_number ? inv.invoice_number.toLowerCase() : '';
-    const matchesSearch = !q || invNum.includes(q) || buyerName.includes(q);
+    const farmerName = getInvoiceFarmerName(inv).toLowerCase();
+    const matchesSearch = !q || invNum.includes(q) || buyerName.includes(q) || farmerName.includes(q);
 
     return matchesStatus && matchesSearch;
   });
@@ -764,7 +758,7 @@ const submitSaleConfirm = async () => {
 
     const data = await res.json();
     if (res.ok && data.success) {
-      triggerToast('Mauzo yamekamilika na ankara ya kodi imetolewa kikamilifu!');
+      triggerToast('Mauzo yamekamilika na ankara imetolewa kikamilifu!');
       showNewSaleModal.value = false;
       await fetchData();
     } else {
