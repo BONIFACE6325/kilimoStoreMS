@@ -12,14 +12,18 @@ use App\Models\DryingJob;
 use App\Models\MillingJob;
 use App\Models\GradingRecord;
 use App\Models\Service;
+use App\Traits\HasTenantScope;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class BatchController extends Controller
 {
+    use HasTenantScope;
+
     public function index(Request $request)
     {
-        $query = Batch::with(['farmer', 'bin', 'dryingJobs', 'millingJobs']);
+        $tenantId = $this->getTenantId($request);
+        $query = Batch::where('tenant_id', $tenantId)->with(['farmer', 'bin', 'dryingJobs', 'millingJobs']);
 
         if ($request->has('crop_type')) {
             $query->where('crop_type', $request->input('crop_type'));
@@ -50,7 +54,7 @@ class BatchController extends Controller
             return [
                 'id' => $batch->id,
                 'batch_code' => $batch->batch_code,
-                'farmer_name' => $batch->farmer->name,
+                'farmer_name' => $batch->farmer ? $batch->farmer->name : 'N/A',
                 'crop_type' => $batch->crop_type,
                 'variety' => $batch->variety,
                 'intake_quantity' => $batch->intake_quantity,
@@ -83,9 +87,8 @@ class BatchController extends Controller
             'bin_id' => 'nullable|exists:bins,id',
         ]);
 
-        $tenant = \App\Models\Tenant::first() ?? \App\Models\Tenant::create(['name' => 'Garanoki Main Store', 'subdomain' => 'garanoki-store', 'status' => 'active']);
-        $branch = Branch::first() ?? Branch::create(['tenant_id' => $tenant->id, 'name' => 'Arusha Main Branch', 'code' => 'BR-001', 'status' => 'active']);
-        $tenantId = $tenant->id;
+        $tenantId = $this->getTenantId($request);
+        $branch = Branch::where('tenant_id', $tenantId)->first() ?? Branch::create(['tenant_id' => $tenantId, 'name' => 'Main Branch', 'code' => 'BR-001', 'status' => 'active']);
         $branchId = $branch->id;
 
         // Calculate MT dynamically if not directly provided

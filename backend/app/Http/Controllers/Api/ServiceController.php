@@ -5,12 +5,17 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Service;
 use App\Models\Tenant;
+use App\Traits\HasTenantScope;
 use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
+    use HasTenantScope;
+
     public function index(Request $request)
     {
+        $tenantId = $this->getTenantId($request);
+
         // Auto-patch missing crop_type for existing services directly in database
         try {
             \Illuminate\Support\Facades\DB::statement("UPDATE services SET crop_type = 'Mpunga' WHERE (LOWER(name_sw) LIKE '%mpunga%' OR LOWER(name_en) LIKE '%paddy%' OR LOWER(name_sw) LIKE '%kuanika%')");
@@ -18,8 +23,7 @@ class ServiceController extends Controller
             \Illuminate\Support\Facades\DB::statement("UPDATE services SET crop_type = 'Mahindi' WHERE (LOWER(name_sw) LIKE '%mahindi%' OR LOWER(name_en) LIKE '%maize%')");
         } catch (\Throwable $e) {}
 
-        $query = Service::query();
-        $services = $query->orderBy('name_sw')->get();
+        $services = Service::where('tenant_id', $tenantId)->orderBy('name_sw')->get();
         return response()->json($services);
     }
 
@@ -35,8 +39,7 @@ class ServiceController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $tenant = Tenant::first() ?? Tenant::create(['name' => 'Garanoki Main Store', 'subdomain' => 'garanoki-store', 'status' => 'active']);
-        $tenantId = $tenant->id;
+        $tenantId = $this->getTenantId($request);
 
         $service = Service::create(array_merge($validated, [
             'tenant_id' => $tenantId

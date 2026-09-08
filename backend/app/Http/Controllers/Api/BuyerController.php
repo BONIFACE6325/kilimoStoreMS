@@ -8,14 +8,18 @@ use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Settlement;
 use App\Models\Tenant;
+use App\Traits\HasTenantScope;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class BuyerController extends Controller
 {
-    public function index()
+    use HasTenantScope;
+
+    public function index(Request $request)
     {
-        $buyers = Buyer::withCount('invoices')
+        $tenantId = $this->getTenantId($request);
+        $buyers = Buyer::where('tenant_id', $tenantId)->withCount('invoices')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -49,7 +53,7 @@ class BuyerController extends Controller
                 'invoices_count' => $buyer->invoices_count,
                 'total_spent' => floatval($totalSpent),
                 'unpaid_amount' => floatval($unpaidAmount),
-                'total_quantity' => floatval($totalQuantity),
+                'total_quantity_mt' => floatval($totalQuantity),
                 'crops' => $crops,
                 'farmers' => $farmers,
                 'created_at' => $buyer->created_at ? $buyer->created_at->format('Y-m-d H:i') : null,
@@ -59,15 +63,6 @@ class BuyerController extends Controller
         return response()->json($result);
     }
 
-    public function stats()
-    {
-        $totalSalesRevenue = floatval(Invoice::sum('subtotal'));
-        $totalDeductions = floatval(Settlement::sum('total_deductions'));
-        $totalBuyersCount = Buyer::count();
-        $totalVolumeSold = floatval(InvoiceItem::sum('quantity_mt'));
-
-        // Top buyer calculation based on volume purchased
-        $topBuyerItem = InvoiceItem::join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
             ->select('invoices.buyer_id', DB::raw('SUM(invoice_items.quantity_mt) as total_qty'), DB::raw('SUM(invoice_items.total_price) as total_spent'))
             ->groupBy('invoices.buyer_id')
             ->orderByDesc('total_qty')

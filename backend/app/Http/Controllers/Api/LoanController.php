@@ -7,14 +7,18 @@ use App\Models\Loan;
 use App\Models\LoanTransaction;
 use App\Models\Batch;
 use App\Models\Farmer;
+use App\Traits\HasTenantScope;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class LoanController extends Controller
 {
+    use HasTenantScope;
+
     public function index(Request $request)
     {
-        $query = Loan::with(['farmer', 'collateralBatch']);
+        $tenantId = $this->getTenantId($request);
+        $query = Loan::where('tenant_id', $tenantId)->with(['farmer', 'collateralBatch']);
 
         if ($request->has('status')) {
             $query->where('status', $request->input('status'));
@@ -69,8 +73,7 @@ class LoanController extends Controller
             ], 422);
         }
 
-        $tenant = \App\Models\Tenant::first() ?? \App\Models\Tenant::create(['name' => 'Garanoki Main Store', 'subdomain' => 'garanoki-store', 'status' => 'active']);
-        $tenantId = $tenant->id;
+        $tenantId = $this->getTenantId($request);
 
         // Auto-generate code
         $lastLoan = Loan::orderBy('created_at', 'desc')->first();

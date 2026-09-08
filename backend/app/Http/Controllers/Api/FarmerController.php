@@ -4,14 +4,18 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Farmer;
+use App\Traits\HasTenantScope;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class FarmerController extends Controller
 {
+    use HasTenantScope;
+
     public function index(Request $request)
     {
-        $query = Farmer::query();
+        $tenantId = $this->getTenantId($request);
+        $query = Farmer::where('tenant_id', $tenantId);
 
         if ($request->has('search')) {
             $search = $request->input('search');
@@ -37,12 +41,12 @@ class FarmerController extends Controller
             $paginatedArray = $paginated->toArray();
             $paginatedArray['data'] = $result;
 
-            $globalTotal = Farmer::count();
-            $globalActive = Farmer::where('status', 'active')->count();
-            $globalLoans = Farmer::whereHas('loans', function($q) {
+            $globalTotal = Farmer::where('tenant_id', $tenantId)->count();
+            $globalActive = Farmer::where('tenant_id', $tenantId)->where('status', 'active')->count();
+            $globalLoans = Farmer::where('tenant_id', $tenantId)->whereHas('loans', function($q) {
                 $q->whereIn('status', ['active', 'overdue']);
             })->count();
-            $globalRegions = Farmer::whereNotNull('region')->distinct('region')->count('region');
+            $globalRegions = Farmer::where('tenant_id', $tenantId)->whereNotNull('region')->distinct('region')->count('region');
 
             $paginatedArray['stats'] = [
                 'total' => $globalTotal,
@@ -109,16 +113,8 @@ class FarmerController extends Controller
                 'street' => 'nullable|string|max:100',
             ]);
 
-            // Auto-resolve tenant safely
-            $tenant = \App\Models\Tenant::first();
-            if (!$tenant) {
-                $tenant = \App\Models\Tenant::create([
-                    'name' => 'Garanoki Main Store',
-                    'subdomain' => 'garanoki-store',
-                    'status' => 'active'
-                ]);
-            }
-            $tenantId = $tenant->id;
+            // Auto-resolve tenant safely from request header / context
+            $tenantId = $this->getTenantId($request);
 
             // Auto-generate code uniquely without collisions
             $nextNumber = 1;

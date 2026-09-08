@@ -4,12 +4,16 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Traits\HasTenantScope;
 
 class IncomeController extends Controller
 {
+    use HasTenantScope;
+
     public function index(Request $request)
     {
-        $query = \App\Models\OtherIncome::query();
+        $tenantId = $this->getTenantId($request);
+        $query = \App\Models\OtherIncome::where('tenant_id', $tenantId);
         
         if ($request->has('start_date') && $request->has('end_date')) {
             $query->whereBetween('date_received', [$request->query('start_date'), $request->query('end_date')]);
@@ -73,6 +77,7 @@ class IncomeController extends Controller
 
         // assuming no auth for now, or you could do auth()->id() if available
         $validated['recorded_by'] = null;
+        $validated['tenant_id'] = $this->getTenantId($request);
 
         $income = \App\Models\OtherIncome::create($validated);
 

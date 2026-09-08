@@ -22,37 +22,41 @@ use App\Models\Bin;
 use App\Models\Service;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use App\Traits\HasTenantScope;
 use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
+    use HasTenantScope;
+
     public function getDashboardStats(Request $request)
     {
         try {
+            $tenantId = $this->getTenantId($request);
             $startDate = $request->query('start_date');
             $endDate = $request->query('end_date') ? $request->query('end_date') . ' 23:59:59' : null;
 
-            $activeWeight = (float) Batch::whereIn('status', ['stored', 'received', 'processing'])
+            $activeWeight = (float) Batch::where('tenant_id', $tenantId)->whereIn('status', ['stored', 'received', 'processing'])
                 ->sum(DB::raw('COALESCE(NULLIF(intake_quantity, 0), current_weight_mt)'));
-            $totalIntakeWeight = (float) Batch::sum(DB::raw('COALESCE(NULLIF(intake_quantity, 0), initial_weight_mt)'));
-            $farmersCount = Farmer::where('status', 'active')->count();
-            $outstandingLoans = (float) Loan::whereIn('status', ['active', 'overdue'])->sum('current_balance');
-            $activeLoansCount = Loan::where('status', 'active')->count();
-            $overdueLoansCount = Loan::where('status', 'overdue')->count();
+            $totalIntakeWeight = (float) Batch::where('tenant_id', $tenantId)->sum(DB::raw('COALESCE(NULLIF(intake_quantity, 0), initial_weight_mt)'));
+            $farmersCount = Farmer::where('tenant_id', $tenantId)->where('status', 'active')->count();
+            $outstandingLoans = (float) Loan::where('tenant_id', $tenantId)->whereIn('status', ['active', 'overdue'])->sum('current_balance');
+            $activeLoansCount = Loan::where('tenant_id', $tenantId)->where('status', 'active')->count();
+            $overdueLoansCount = Loan::where('tenant_id', $tenantId)->where('status', 'overdue')->count();
 
-            $serviceMetrics = $this->calculateServiceMetrics($startDate, $endDate);
+            $serviceMetrics = $this->calculateServiceMetrics($startDate, $endDate, $tenantId);
             $totalServiceFeeRevenue = $serviceMetrics['total_revenue'];
             $dynamicServiceBreakdown = $serviceMetrics['breakdown'];
 
             $totalLoansRecovered = $this->getSumByDateRange(SettlementDeduction::query()->where('deduction_type', 'loan_principal'), 'created_at', $startDate, $endDate);
-            $otherIncomeTotal = $this->getSumByDateRange(OtherIncome::query(), 'date_received', $request->query('start_date'), $request->query('end_date'));
-            $totalLoansDisbursed = $this->getSumByDateRange(Loan::query(), 'created_at', $startDate, $endDate, 'principal_amount');
-            $totalExpenses = $this->getSumByDateRange(Expense::query(), 'date_incurred', $request->query('start_date'), $request->query('end_date'));
+            $otherIncomeTotal = $this->getSumByDateRange(OtherIncome::where('tenant_id', $tenantId), 'date_received', $request->query('start_date'), $request->query('end_date'));
+            $totalLoansDisbursed = $this->getSumByDateRange(Loan::where('tenant_id', $tenantId), 'created_at', $startDate, $endDate, 'principal_amount');
+            $totalExpenses = $this->getSumByDateRange(Expense::where('tenant_id', $tenantId), 'date_incurred', $request->query('start_date'), $request->query('end_date'));
 
             $grossStoreInflows = $totalServiceFeeRevenue + $totalLoansRecovered + $otherIncomeTotal;
             $totalNetServiceProfit = ($totalServiceFeeRevenue + $otherIncomeTotal) - $totalExpenses;
 
-            $settlementSalesQuery = Settlement::query();
+            $settlementSalesQuery = Settlement::where('tenant_id', $tenantId);
             if ($startDate && $endDate) {
                 $settlementSalesQuery->where(function($q) use ($startDate, $endDate) {
                     $q->whereBetween('settled_at', [$startDate, $endDate])
@@ -63,7 +67,7 @@ class ReportController extends Controller
             }
             $totalCropSales = (float) $settlementSalesQuery->sum('gross_amount');
             if ($totalCropSales <= 0) {
-                $invoiceSalesQuery = Invoice::query();
+                $invoiceSalesQuery = Invoice::where('tenant_id', $tenantId);
                 if ($startDate && $endDate) {
                     $invoiceSalesQuery->whereBetween('created_at', [$startDate, $endDate]);
                 }
@@ -71,17 +75,17 @@ class ReportController extends Controller
             }
 
             $totalCapacity = Bin::sum('capacity_mt') ?: 1;
-            $totalOccupied = Bin::sum('current_occupancy_mt');
+            $totalOccupied = Bin::where('tenant_id', $tenantId)->sum('current_occupancy_mt');
             $occupancyPercentage = round(($totalOccupied / $totalCapacity) * 100, 1);
 
-            $otherIncomeMap = $this->getGroupedMap(OtherIncome::query(), 'source_name', 'date_received', $request->query('start_date'), $request->query('end_date'));
-            $expensesMap = $this->getGroupedMap(Expense::query(), 'category_name', 'date_incurred', $request->query('start_date'), $request->query('end_date'));
+            $otherIncomeMap = $this->getGroupedMap(OtherIncome::where('tenant_id', $tenantId), 'source_name', 'date_received', $request->query('start_date'), $request->query('end_date'));
+            $expensesMap = $this->getGroupedMap(Expense::where('tenant_id', $tenantId), 'category_name', 'date_incurred', $request->query('start_date'), $request->query('end_date'));
 
-            $trends = $this->getMonthlyTrends();
+            $trends = $this->getMonthlyTrends($tenantId);
 
             // Calculate registered crop distribution in original units (no forced MT conversion)
             $cropDistribution = [];
-            $batches = Batch::whereIn('status', ['stored', 'received', 'processing'])->get();
+            $batches = Batch::where('tenant_id', $tenantId)->whereIn('status', ['stored', 'received', 'processing'])->get();
             foreach ($batches as $b) {
                 $cropName = $b->crop_type ?: 'General';
                 $unit = $b->intake_unit ?: 'Gunia';
@@ -167,12 +171,17 @@ class ReportController extends Controller
         return $map;
     }
 
-    private function calculateServiceMetrics(?string $start, ?string $end): array
+    private function calculateServiceMetrics(?string $start, ?string $end, ?string $tenantId = null): array
     {
         $dynamicServiceBreakdown = [];
 
         // 1. Drying Jobs
         $dQuery = DryingJob::with('service');
+        if ($tenantId) {
+            $dQuery->whereHas('batch', function($q) use ($tenantId) {
+                $q->where('tenant_id', $tenantId);
+            });
+        }
         if ($start && $end) {
             $dQuery->whereBetween('created_at', [$start, $end]);
         }
@@ -183,6 +192,11 @@ class ReportController extends Controller
 
         // 2. Milling Jobs
         $mQuery = MillingJob::with('service');
+        if ($tenantId) {
+            $mQuery->whereHas('batch', function($q) use ($tenantId) {
+                $q->where('tenant_id', $tenantId);
+            });
+        }
         if ($start && $end) {
             $mQuery->whereBetween('created_at', [$start, $end]);
         }
@@ -193,6 +207,11 @@ class ReportController extends Controller
 
         // 3. Grading Records
         $gQuery = GradingRecord::with('service');
+        if ($tenantId) {
+            $gQuery->whereHas('batch', function($q) use ($tenantId) {
+                $q->where('tenant_id', $tenantId);
+            });
+        }
         if ($start && $end) {
             $gQuery->whereBetween('created_at', [$start, $end]);
         }
@@ -203,6 +222,11 @@ class ReportController extends Controller
 
         // 4. Storage Fee Deductions
         $deductionQuery = SettlementDeduction::query();
+        if ($tenantId) {
+            $deductionQuery->whereHas('settlement', function($q) use ($tenantId) {
+                $q->where('tenant_id', $tenantId);
+            });
+        }
         if ($start && $end) {
             $deductionQuery->whereBetween('created_at', [$start, $end]);
         }
@@ -227,15 +251,17 @@ class ReportController extends Controller
         ];
     }
 
-    private function getStockValuation(): float
+    private function getStockValuation(?string $tenantId = null): float
     {
-        $maizeWeight = Batch::where('crop_type', 'Maize')->where('status', 'stored')->sum('current_weight_mt') * 1000;
-        $riceWeight = Batch::where('crop_type', 'Rice')->where('status', 'stored')->sum('current_weight_mt') * 1000;
-        $beansWeight = Batch::where('crop_type', 'Beans')->where('status', 'stored')->sum('current_weight_mt') * 1000;
+        $bQuery = Batch::query();
+        if ($tenantId) $bQuery->where('tenant_id', $tenantId);
+        $maizeWeight = (clone $bQuery)->where('crop_type', 'Maize')->where('status', 'stored')->sum('current_weight_mt') * 1000;
+        $riceWeight = (clone $bQuery)->where('crop_type', 'Rice')->where('status', 'stored')->sum('current_weight_mt') * 1000;
+        $beansWeight = (clone $bQuery)->where('crop_type', 'Beans')->where('status', 'stored')->sum('current_weight_mt') * 1000;
         return ($maizeWeight * 800) + ($riceWeight * 1500) + ($beansWeight * 2000);
     }
 
-    private function getMonthlyTrends(): array
+    private function getMonthlyTrends(?string $tenantId = null): array
     {
         $monthlyRevenue = [];
         $monthlyExpenses = [];
@@ -246,12 +272,21 @@ class ReportController extends Controller
             $date = now()->subMonths($i);
             $monthName = $date->format('M');
             
-            $revSum = Settlement::whereYear('settled_at', $date->year)
-                ->whereMonth('settled_at', $date->month)
-                ->sum('total_deductions')
-                + OtherIncome::whereYear('date_received', $date->year)
-                ->whereMonth('date_received', $date->month)
-                ->sum('amount');
+            $sQuery = Settlement::whereYear('settled_at', $date->year)->whereMonth('settled_at', $date->month);
+            $oiQuery = OtherIncome::whereYear('date_received', $date->year)->whereMonth('date_received', $date->month);
+            $eQuery = Expense::whereYear('date_incurred', $date->year)->whereMonth('date_incurred', $date->month);
+            $bIntakeQuery = Batch::whereYear('created_at', $date->year)->whereMonth('created_at', $date->month);
+            $bDispatchQuery = Batch::whereYear('updated_at', $date->year)->whereMonth('updated_at', $date->month)->where('status', 'sold');
+
+            if ($tenantId) {
+                $sQuery->where('tenant_id', $tenantId);
+                $oiQuery->where('tenant_id', $tenantId);
+                $eQuery->where('tenant_id', $tenantId);
+                $bIntakeQuery->where('tenant_id', $tenantId);
+                $bDispatchQuery->where('tenant_id', $tenantId);
+            }
+
+            $revSum = $sQuery->sum('total_deductions') + $oiQuery->sum('amount');
             $monthlyRevenue[$monthName] = (float)$revSum;
 
             $expSum = Expense::whereYear('date_incurred', $date->year)

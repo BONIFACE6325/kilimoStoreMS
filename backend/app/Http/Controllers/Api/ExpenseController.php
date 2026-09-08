@@ -5,8 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+use App\Traits\HasTenantScope;
+
 class ExpenseController extends Controller
 {
+    use HasTenantScope;
+
     public function getCategories()
     {
         $categories = \App\Models\ExpenseCategory::orderBy('name')->get();
@@ -49,7 +53,8 @@ class ExpenseController extends Controller
 
     public function index(Request $request)
     {
-        $query = \App\Models\Expense::query();
+        $tenantId = $this->getTenantId($request);
+        $query = \App\Models\Expense::where('tenant_id', $tenantId);
 
         if ($request->has('start_date') && $request->has('end_date')) {
             $query->whereBetween('date_incurred', [$request->query('start_date'), $request->query('end_date')]);
@@ -68,6 +73,7 @@ class ExpenseController extends Controller
             'description' => 'nullable|string',
         ]);
         $validated['recorded_by'] = null;
+        $validated['tenant_id'] = $this->getTenantId($request);
 
         $expense = \App\Models\Expense::create($validated);
         return response()->json(['message' => 'Gharama imesajiliwa kikamilifu', 'expense' => $expense], 201);
