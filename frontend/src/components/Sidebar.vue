@@ -258,14 +258,15 @@
       <div class="border-t border-slate-900 bg-slate-950 flex items-center shrink-0" :class="isSidebarCollapsed ? 'p-2 justify-center' : 'p-3.5 justify-between'">
         <div class="flex items-center gap-3">
           <div class="relative shrink-0">
-            <div class="w-8.5 h-8.5 rounded-xl bg-gradient-to-tr from-slate-800 to-slate-700 text-emerald-400 font-extrabold flex items-center justify-center border border-slate-700 text-xs">
-              BG
+            <div class="w-8.5 h-8.5 rounded-xl bg-gradient-to-tr from-slate-800 to-slate-700 text-emerald-400 font-extrabold flex items-center justify-center border border-slate-700 text-xs overflow-hidden">
+              <img v-if="user?.avatarUrl" :src="user.avatarUrl" class="w-full h-full object-cover" />
+              <span v-else>{{ userInitials }}</span>
             </div>
             <span class="w-2 h-2 rounded-full bg-emerald-500 border-2 border-slate-950 absolute -bottom-0.5 -right-0.5"></span>
           </div>
           <div v-if="!isSidebarCollapsed">
-            <div class="font-bold text-white text-xs leading-tight whitespace-nowrap">Boniface Gwakila</div>
-            <div class="text-[10px] text-emerald-400 font-semibold whitespace-nowrap">{{ t('systemOwner') }}</div>
+            <div class="font-bold text-white text-xs leading-tight whitespace-nowrap">{{ user?.name || 'Boniface Gwakila' }}</div>
+            <div class="text-[10px] text-emerald-400 font-semibold whitespace-nowrap">{{ user?.role || t('systemOwner') }}</div>
           </div>
         </div>
         <button 
@@ -318,7 +319,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useLayout } from '../composables/useLayout';
 import { useAuth } from '../composables/useAuth';
@@ -326,8 +327,17 @@ import { useLanguage } from '../composables/useLanguage';
 
 const router = useRouter();
 const { isSidebarCollapsed, isMobileSidebarOpen, toggleSidebar, closeMobileSidebar } = useLayout();
-const { logout } = useAuth();
+const { user, logout } = useAuth();
 const { t } = useLanguage();
+
+const userInitials = computed(() => {
+  const name = user.value?.name || 'Boniface Gwakila';
+  const parts = name.trim().split(' ');
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+});
 
 const showLogoutModal = ref(false);
 

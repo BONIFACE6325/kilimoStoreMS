@@ -19,7 +19,9 @@
           ⭐
         </div>
         <span class="font-extrabold text-slate-900 dark:text-slate-50 text-base tracking-tight">GARANOKI</span>
-      </div>      <!-- Compact Search Bar (Max Width 280px for a clean look) -->
+      </div>
+
+      <!-- Compact Search Bar -->
       <div class="relative hidden sm:block w-64 md:w-72 group">
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-600 dark:text-emerald-500 transition-colors">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -27,7 +29,7 @@
         <input 
           type="text" 
           v-model="searchQuery"
-          placeholder="Search farmers, invoices..." 
+          :placeholder="t('searchPlaceholder', 'Search farmers, invoices...')" 
           class="w-full pl-9 pr-10 py-2 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-100 dark:bg-slate-800 focus:bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-200 shadow-2xs"
         />
         <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none">
@@ -48,6 +50,20 @@
       >
         <span class="text-sm leading-none">{{ currentLang === 'sw' ? '🇹🇿' : '🇬🇧' }}</span>
         <span>{{ currentLang.toUpperCase() }}</span>
+      </button>
+
+      <!-- Fullscreen / Expand Screen Toggle Button -->
+      <button 
+        @click="toggleFullscreen"
+        class="p-2.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-slate-50 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200/80 dark:bg-slate-700/80 rounded-xl transition-all duration-300 border border-slate-200/60 dark:border-slate-700/60 transform hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-1.5"
+        :title="isFullscreen ? (currentLang === 'sw' ? 'Punguza Skrini' : 'Exit Full Screen') : (currentLang === 'sw' ? 'Tanua Skrini (Full Screen)' : 'Full Screen')"
+      >
+        <svg v-if="!isFullscreen" class="w-5 h-5 text-slate-700 dark:text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+        </svg>
+        <svg v-else class="w-5 h-5 text-slate-700 dark:text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 15L4 20m0 0h4m-4 0v-4m16 4l-5-5m5 5v-4m0 4h-4M9 9L4 4m0 0h4M4 4v4m16-4l-5 5m5-5v4m0-4h-4" />
+        </svg>
       </button>
 
       <!-- Notifications Bell -->
@@ -88,15 +104,13 @@
         </transition>
       </div>
 
-      <!-- Intuitive & Consistent Theme Switcher Button -->
+      <!-- Theme Switcher Button -->
       <button 
         @click="toggleDark"
         class="p-2.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-slate-50 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200/80 dark:bg-slate-700/80 rounded-xl transition-all duration-300 border border-slate-200/60 dark:border-slate-700/60 transform hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-1.5"
         :title="isDark ? t('lightMode', 'Switch to Light Mode') : t('darkMode', 'Switch to Dark Mode')"
       >
-        <!-- Sun Icon when Light Mode is Active -->
         <svg v-if="!isDark" class="w-5 h-5 text-amber-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.591zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.061-1.06l-1.591-1.591a.75.75 0 10-1.06 1.061l1.59 1.59zM12 18.75a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-1.5a.75.75 0 01.75-.75zM6.166 17.834a.75.75 0 00-1.061 1.06l1.591 1.591a.75.75 0 101.06-1.061l-1.59-1.591zM4.5 12a.75.75 0 01-.75.75H1.5a.75.75 0 010-1.5h2.25a.75.75 0 01.75.75zM6.166 6.166a.75.75 0 001.06-1.06L5.635 3.515a.75.75 0 00-1.06 1.061l1.591 1.59z"/></svg>
-        <!-- Moon Icon when Dark Mode is Active -->
         <svg v-else class="w-5 h-5 text-indigo-400" fill="currentColor" viewBox="0 0 24 24"><path d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z"/></svg>
       </button>
 
@@ -106,29 +120,36 @@
       <div class="relative">
         <button 
           @click="showProfile = !showProfile"
-          class="flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100 dark:bg-slate-800 transition-all duration-200"
+          class="flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100 dark:bg-slate-800 transition-all duration-200 cursor-pointer"
         >
-          <div class="w-8.5 h-8.5 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-black text-xs flex items-center justify-center shadow-md shadow-emerald-600/20 ring-2 ring-emerald-500/20 transform hover:scale-105 transition">
-            BG
+          <div class="w-8.5 h-8.5 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-black text-xs flex items-center justify-center shadow-md shadow-emerald-600/20 ring-2 ring-emerald-500/20 transform hover:scale-105 transition overflow-hidden">
+            <img v-if="user?.avatarUrl" :src="user.avatarUrl" class="w-full h-full object-cover" />
+            <span v-else>{{ userInitials }}</span>
           </div>
           <div class="hidden lg:block text-left pr-1">
-            <div class="text-xs font-extrabold text-slate-900 dark:text-slate-50 leading-tight">Boniface Gwakila</div>
-            <div class="text-[10px] font-bold text-emerald-600 dark:text-emerald-500">{{ t('systemOwner') }}</div>
+            <div class="text-xs font-extrabold text-slate-900 dark:text-slate-50 leading-tight">{{ user?.name || 'Boniface Gwakila' }}</div>
+            <div class="text-[10px] font-bold text-emerald-600 dark:text-emerald-500">{{ user?.role || t('systemOwner') }}</div>
           </div>
         </button>
 
         <!-- User Profile Dropdown Menu -->
         <transition name="pop">
-          <div v-if="showProfile" class="absolute right-0 mt-3 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200/80 dark:border-slate-700/80 overflow-hidden z-50 p-2 space-y-1 text-xs font-bold text-slate-700 dark:text-slate-200">
-            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl mb-1 border border-slate-100 dark:border-slate-800">
-              <div class="font-extrabold text-slate-900 dark:text-slate-50">Boniface Gwakila</div>
-              <div class="text-[10.5px] text-slate-500 dark:text-slate-400 font-medium">gwakilabonface@gmail.com</div>
+          <div v-if="showProfile" class="absolute right-0 mt-3 w-60 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200/80 dark:border-slate-700/80 overflow-hidden z-50 p-2 space-y-1 text-xs font-bold text-slate-700 dark:text-slate-200">
+            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl mb-1 border border-slate-100 dark:border-slate-800 flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-black text-xs flex items-center justify-center shadow-md overflow-hidden shrink-0">
+                <img v-if="user?.avatarUrl" :src="user.avatarUrl" class="w-full h-full object-cover" />
+                <span v-else>{{ userInitials }}</span>
+              </div>
+              <div class="min-w-0">
+                <div class="font-extrabold text-slate-900 dark:text-slate-50 truncate">{{ user?.name || 'Boniface Gwakila' }}</div>
+                <div class="text-[10.5px] text-slate-500 dark:text-slate-400 font-medium truncate">{{ user?.email || 'gwakilabonface@gmail.com' }}</div>
+              </div>
             </div>
-            <router-link to="/settings" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-100 dark:bg-slate-800 transition">
-              <span>⚙️ {{ t('profileSettings') }}</span>
+            <router-link to="/settings" @click="showProfile = false" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-100 dark:bg-slate-800 transition">
+              <span>⚙️ {{ t('profileSettings', 'Mipangilio ya Akaunti') }}</span>
             </router-link>
             <button @click="openLogoutModal" class="w-full text-left flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 transition cursor-pointer">
-              <span>🚪 {{ t('logout') }}</span>
+              <span>🚪 {{ t('logout', 'Kutoka Mfumoni') }}</span>
             </button>
           </div>
         </transition>
@@ -174,7 +195,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useLayout } from '../composables/useLayout';
 import { useAuth } from '../composables/useAuth';
@@ -182,14 +203,24 @@ import { useLanguage } from '../composables/useLanguage';
 
 const router = useRouter();
 const { toggleSidebar } = useLayout();
-const { logout } = useAuth();
+const { user, logout } = useAuth();
 const { currentLang, toggleLanguage, t } = useLanguage();
 
 const searchQuery = ref('');
 const showNotifs = ref(false);
 const showProfile = ref(false);
 const isDark = ref(false);
+const isFullscreen = ref(false);
 const showLogoutModal = ref(false);
+
+const userInitials = computed(() => {
+  const name = user.value?.name || 'Boniface Gwakila';
+  const parts = name.trim().split(' ');
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+});
 
 const toggleDark = () => {
   isDark.value = !isDark.value;
@@ -200,6 +231,22 @@ const toggleDark = () => {
     document.documentElement.classList.remove('dark');
     localStorage.setItem('garanoki_theme', 'light');
   }
+};
+
+const toggleFullscreen = () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(err => {
+      console.error(`Error attempting to enable fullscreen: ${err.message}`);
+    });
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  }
+};
+
+const handleFullscreenChange = () => {
+  isFullscreen.value = !!document.fullscreenElement;
 };
 
 const openLogoutModal = () => {
@@ -221,6 +268,12 @@ onMounted(() => {
     isDark.value = false;
     document.documentElement.classList.remove('dark');
   }
+
+  document.addEventListener('fullscreenchange', handleFullscreenChange);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('fullscreenchange', handleFullscreenChange);
 });
 </script>
 
@@ -231,5 +284,11 @@ onMounted(() => {
 .pop-enter-from, .pop-leave-to {
   opacity: 0;
   transform: scale(0.95) translateY(-8px);
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 </style>
