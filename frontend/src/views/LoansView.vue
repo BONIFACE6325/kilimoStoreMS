@@ -369,15 +369,14 @@
 
             <!-- Select Collateral Batch -->
             <div class="space-y-1">
-              <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Chagua Batch ya Mzigo Ghalani (Dhamana)</label>
+              <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Chagua Batch ya Mzigo Ghalani (Dhamana - Siyo Lazima)</label>
               <select 
                 v-model="loanForm.collateral_batch_id" 
                 @change="onBatchChange"
-                required
                 :disabled="!loanForm.farmer_id"
                 class="w-full py-2.5 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40 disabled:opacity-50"
               >
-                <option value="" disabled>-- {{ farmerBatches.length > 0 ? 'Chagua Batch ya Dhamana' : 'Hakuna Batch Ghalani kwa Mkulima Huyu' }} --</option>
+                <option value="">-- {{ farmerBatches.length > 0 ? 'Chagua Batch au Acha Bila Dhamana' : 'Hakuna Batch Ghalani (Bila Dhamana ya Batch)' }} --</option>
                 <option v-for="batch in farmerBatches" :key="batch.id" :value="batch.id">
                   Batch: {{ batch.batch_code }} - {{ batch.crop_type }} ({{ batch.intake_quantity || batch.current_weight }} {{ batch.intake_unit || 'Gunia' }})
                 </option>
@@ -864,30 +863,36 @@ const openRepayModal = (loan) => {
 };
 
 const submitNewLoan = async () => {
-  if (!loanForm.value.farmer_id || !loanForm.value.collateral_batch_id || !loanForm.value.principal_amount) {
-    triggerToast('Tafadhali jaza taarifa zote zinazohitajika', 'error');
+  if (!loanForm.value.farmer_id || !loanForm.value.principal_amount || loanForm.value.principal_amount <= 0) {
+    triggerToast('Tafadhali chagua mkulima na uweke kiasi halali cha mkopo!', 'error');
     return;
   }
 
   submitting.value = true;
   try {
+    const payload = {
+      farmer_id: loanForm.value.farmer_id,
+      collateral_batch_id: loanForm.value.collateral_batch_id || null,
+      principal_amount: parseFloat(loanForm.value.principal_amount)
+    };
+
     const res = await fetch('/api/v1/loans', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(loanForm.value)
+      body: JSON.stringify(payload)
     });
 
     const data = await res.json();
-    if (res.ok && data.success) {
+    if (res.ok && (data.success || data.id || data.loan)) {
       triggerToast('Mkopo umesajiliwa kikamilifu!');
       showNewLoanModal.value = false;
       await fetchLoansData();
     } else {
-      triggerToast(data.error || data.message || 'Imeshindwa kusajili mkopo', 'error');
+      triggerToast(data.error || data.message || (data.errors ? Object.values(data.errors).flat().join(', ') : 'Imeshindwa kusajili mkopo'), 'error');
     }
   } catch (err) {
     console.error('Error submitting loan:', err);
-    triggerToast('Kosa wakati wa kusajili mkopo', 'error');
+    triggerToast(`Kosa wakati wa kusajili mkopo: ${err.message}`, 'error');
   } finally {
     submitting.value = false;
   }

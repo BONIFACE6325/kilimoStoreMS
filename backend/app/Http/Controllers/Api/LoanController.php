@@ -53,24 +53,26 @@ class LoanController extends Controller
     {
         $validated = $request->validate([
             'farmer_id' => 'required|exists:farmers,id',
-            'collateral_batch_id' => 'required|exists:batches,id',
+            'collateral_batch_id' => 'nullable|exists:batches,id',
             'principal_amount' => 'required|numeric|min:1',
             'due_date' => 'nullable|date',
         ]);
 
         $farmer = Farmer::findOrFail($validated['farmer_id']);
-        $batch = Batch::findOrFail($validated['collateral_batch_id']);
+        $collateralBatchId = $validated['collateral_batch_id'] ?? null;
 
-        if ($batch->farmer_id !== $validated['farmer_id']) {
-            return response()->json(['error' => 'Batch iliyochaguliwa haimhusu mkulima huyu!'], 422);
-        }
+        if ($collateralBatchId) {
+            $batch = Batch::findOrFail($collateralBatchId);
 
-        // 1. RULE: Farmer must have active stock ghalani (status != sold and weight > 0)
-        $batchWeightKg = floatval($batch->current_weight_mt ?? 0) * 1000;
-        if ($batch->status === 'sold' || $batchWeightKg <= 0) {
-            return response()->json([
-                'error' => 'Huwezi kumpa mkopo mkulima kwa batch iliyoezwa au isiyo na mzigo ghalani!'
-            ], 422);
+            if ($batch->farmer_id !== $validated['farmer_id']) {
+                return response()->json(['error' => 'Batch iliyochaguliwa haimhusu mkulima huyu!'], 422);
+            }
+
+            if ($batch->status === 'sold') {
+                return response()->json([
+                    'error' => 'Huwezi kumpa mkopo mkulima kwa batch iliyouzwa!'
+                ], 422);
+            }
         }
 
         $tenantId = $this->getTenantId($request);
