@@ -1,4 +1,5 @@
 import { ref, computed } from 'vue';
+import { syncAgroMasterForTenant } from './useAgroMaster';
 
 const STORAGE_KEY_TENANTS = 'garanoki_saas_tenants';
 const STORAGE_KEY_ACTIVE_TENANT = 'garanoki_active_tenant_id';
@@ -49,6 +50,7 @@ export function useTenants() {
     if (found) {
       activeTenantId.value = tenantId;
       localStorage.setItem(STORAGE_KEY_ACTIVE_TENANT, tenantId);
+      syncAgroMasterForTenant();
     }
   };
 

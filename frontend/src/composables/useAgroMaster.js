@@ -6,37 +6,49 @@ const defaultUnits = [
   { name: 'Kilo (Kg)', kg: 1 }
 ];
 
+const getActiveTenantId = () => {
+  return localStorage.getItem('garanoki_active_tenant_id') || 'tenant_default';
+};
+
+const getCropsStorageKey = () => `agroCropsList_${getActiveTenantId()}`;
+const getUnitsStorageKey = () => `agroUnitsList_${getActiveTenantId()}`;
+
 const loadSavedCrops = () => {
   try {
-    const saved = localStorage.getItem('agroCropsList');
+    const saved = localStorage.getItem(getCropsStorageKey());
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
   } catch (e) {}
-  return defaultCrops;
+  return [...defaultCrops];
 };
 
 const loadSavedUnits = () => {
   try {
-    const saved = localStorage.getItem('agroUnitsList');
+    const saved = localStorage.getItem(getUnitsStorageKey());
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
   } catch (e) {}
-  return defaultUnits;
+  return [...defaultUnits];
 };
 
 const cropsList = ref(loadSavedCrops());
 const unitsList = ref(loadSavedUnits());
 
+export const syncAgroMasterForTenant = () => {
+  cropsList.value = loadSavedCrops();
+  unitsList.value = loadSavedUnits();
+};
+
 watch(cropsList, (newVal) => {
-  localStorage.setItem('agroCropsList', JSON.stringify(newVal));
+  localStorage.setItem(getCropsStorageKey(), JSON.stringify(newVal));
 }, { deep: true });
 
 watch(unitsList, (newVal) => {
-  localStorage.setItem('agroUnitsList', JSON.stringify(newVal));
+  localStorage.setItem(getUnitsStorageKey(), JSON.stringify(newVal));
 }, { deep: true });
 
 export function useAgroMaster() {
@@ -130,6 +142,7 @@ export function useAgroMaster() {
   return {
     cropsList,
     unitsList,
+    syncAgroMasterForTenant,
     addCrop,
     deleteCrop,
     addUnit,
