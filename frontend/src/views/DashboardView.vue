@@ -155,25 +155,9 @@
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
           <div>
             <h2 class="text-sm font-extrabold text-slate-900 dark:text-slate-50 flex items-center gap-2">
-              <span>📈 {{ trendMode === 'finance' ? 'Financial Performance Trend (Revenues vs Expenses)' : '🌾 Grain Volume Analysis (Intake vs Dispatch)' }}</span>
+              <span>📈 Financial Performance Trend (Revenues vs Expenses)</span>
             </h2>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Monthly performance comparison over the last 6 months.</p>
-          </div>
-
-          <!-- Mode Toggle Switch -->
-          <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
-            <button 
-              @click="trendMode = 'finance'" 
-              :class="['px-2.5 py-1 text-[11px] font-extrabold rounded-lg transition-all cursor-pointer', trendMode === 'finance' ? 'bg-slate-900 text-white dark:bg-emerald-600 shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900']"
-            >
-              💰 TZS Trend
-            </button>
-            <button 
-              @click="trendMode = 'volume'" 
-              :class="['px-2.5 py-1 text-[11px] font-extrabold rounded-lg transition-all cursor-pointer', trendMode === 'volume' ? 'bg-slate-900 text-white dark:bg-blue-600 shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900']"
-            >
-              🌾 Volume (Qty)
-            </button>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Monthly performance comparison over the last 6 months (Revenues vs Expenses in TZS).</p>
           </div>
         </div>
 
@@ -650,42 +634,16 @@ const getDateRangeParams = () => {
   return start && end ? `?start_date=${start}&end_date=${end}` : '';
 };
 
-// Financial & Volume Trend Line Chart Config (Revenue vs Expenses OR Intake vs Dispatch MT)
+// Financial Performance Trend Line Chart Config (Revenue vs Expenses in TZS)
 const financialTrendData = computed(() => {
   const months = trendsData.value.months.length > 0 ? trendsData.value.months : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-
-  if (trendMode.value === 'volume') {
-    return {
-      labels: months,
-      datasets: [
-        {
-          label: 'Mzigo Uliopokelewa (Intake)',
-          data: trendsData.value.intake && trendsData.value.intake.length > 0 ? trendsData.value.intake : [0, 0, 0, 0, 0, 0],
-          borderColor: '#0284c7',
-          backgroundColor: 'rgba(2, 132, 199, 0.08)',
-          borderWidth: 2.5,
-          fill: true,
-          tension: 0.4
-        },
-        {
-          label: 'Mzigo Uliotoka/Uliouzwa (Dispatch)',
-          data: trendsData.value.dispatch && trendsData.value.dispatch.length > 0 ? trendsData.value.dispatch : [0, 0, 0, 0, 0, 0],
-          borderColor: '#f59e0b',
-          backgroundColor: 'rgba(245, 158, 11, 0.08)',
-          borderWidth: 2.5,
-          fill: true,
-          tension: 0.4
-        }
-      ]
-    };
-  }
 
   return {
     labels: months,
     datasets: [
       {
         label: 'Revenue (TZS)',
-        data: trendsData.value.revenue.length > 0 ? trendsData.value.revenue : [0, 0, 0, 0, 0, 0],
+        data: trendsData.value.revenue && trendsData.value.revenue.length > 0 ? trendsData.value.revenue : [0, 0, 0, 0, 0, 0],
         borderColor: '#059669',
         backgroundColor: 'rgba(5, 150, 105, 0.06)',
         borderWidth: 2.5,
@@ -728,7 +686,6 @@ const financialTrendOptions = computed(() => {
           color: textColor,
           font: { size: 10, weight: '600' },
           callback: (value) => {
-            if (trendMode.value === 'volume') return value.toLocaleString();
             if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
             if (value >= 1000) return (value / 1000).toFixed(0) + 'k';
             return value;
