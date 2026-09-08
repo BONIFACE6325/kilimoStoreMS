@@ -3,7 +3,22 @@ import { ref, computed } from 'vue';
 const STORAGE_KEY_TENANTS = 'garanoki_saas_tenants';
 const STORAGE_KEY_ACTIVE_TENANT = 'garanoki_active_tenant_id';
 
-const defaultTenants = [];
+const defaultTenants = [
+  {
+    id: 'tenant_kigoma',
+    name: 'Kigoma Grain Mills Ltd',
+    ownerName: 'Boniface Gwakila',
+    ownerEmail: 'gwakilabonface@gmail.com',
+    phone: '+255 764 536 736',
+    plan: 'enterprise',
+    status: 'active',
+    monthlyPriceTzs: 500000,
+    createdDate: '2026-01-01',
+    expiresAt: '2027-12-31',
+    warehouseCount: 1,
+    totalStorageMt: 5000
+  }
+];
 
 const loadInitialTenants = () => {
   const stored = localStorage.getItem(STORAGE_KEY_TENANTS);
