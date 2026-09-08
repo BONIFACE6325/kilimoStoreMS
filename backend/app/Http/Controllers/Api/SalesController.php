@@ -27,8 +27,32 @@ class SalesController extends Controller
 
     public function indexInvoices()
     {
-        $invoices = Invoice::with(['buyer'])->orderBy('created_at', 'desc')->get();
+        $invoices = Invoice::with(['buyer', 'items.batch.farmer'])->orderBy('created_at', 'desc')->get();
         return response()->json($invoices);
+    }
+
+    public function markInvoicePaid($id)
+    {
+        $invoice = Invoice::findOrFail($id);
+        $invoice->update(['status' => 'paid']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Ankara imetiwa alama ya kulipwa (Paid)',
+            'invoice' => $invoice
+        ]);
+    }
+
+    public function deleteInvoice($id)
+    {
+        $invoice = Invoice::findOrFail($id);
+        $invoice->items()->delete();
+        $invoice->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Ankara imefutwa kikamilifu'
+        ]);
     }
 
     public function indexSettlements()

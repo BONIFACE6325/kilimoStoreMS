@@ -10,8 +10,14 @@ use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\IncomeController;
 use App\Http\Controllers\Api\ExpenseController;
 
+use App\Http\Controllers\Api\BuyerController;
+
 // Group under v1
 Route::prefix('v1')->group(function () {
+    // Buyers CRUD
+    Route::get('buyers/{id}/history', [BuyerController::class, 'history']);
+    Route::apiResource('buyers', BuyerController::class);
+
     // Services catalog CRUD
     Route::apiResource('services', ServiceController::class);
     
@@ -55,6 +61,8 @@ Route::prefix('v1')->group(function () {
     // Sales & Deductions
     Route::get('/sales/buyers', [SalesController::class, 'getBuyers']);
     Route::get('/sales/invoices', [SalesController::class, 'indexInvoices']);
+    Route::put('/sales/invoices/{id}/pay', [SalesController::class, 'markInvoicePaid']);
+    Route::delete('/sales/invoices/{id}', [SalesController::class, 'deleteInvoice']);
     Route::get('/sales/settlements', [SalesController::class, 'indexSettlements']);
     Route::post('/sales/preview-deductions', [SalesController::class, 'previewDeductions']);
     Route::post('/sales/confirm', [SalesController::class, 'confirmSale']);
