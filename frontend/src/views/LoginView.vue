@@ -1,31 +1,36 @@
 <template>
   <div class="min-h-screen w-full relative flex items-center justify-center overflow-hidden font-sans select-none bg-slate-950">
     
-    <!-- 🌾 CINEMATIC FARM BACKGROUND WITH SLOW ANIMATED PAN (Ka Video ka Mkulima Shamba Effect) -->
+    <!-- 🌾 CINEMATIC FARM BACKGROUND SLIDESHOW WITH DYNAMIC ROTATION & KEN BURNS ZOOM -->
     <div class="absolute inset-0 z-0 overflow-hidden">
       
-      <!-- Video Element with High-Quality Agriculture Loop -->
+      <!-- Video Element with High-Quality Agriculture Loop (If supported) -->
       <video 
+        v-if="showVideo"
         autoplay 
         loop 
         muted 
         playsinline 
-        poster="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1920&q=80"
-        class="absolute inset-0 w-full h-full object-cover scale-105 filter brightness-[0.7] contrast-[1.1] animate-slow-pan pointer-events-none"
+        class="absolute inset-0 w-full h-full object-cover scale-105 filter brightness-[0.65] contrast-[1.1] animate-slow-pan pointer-events-none z-0"
+        @error="showVideo = false"
       >
-        <source src="https://assets.mixkit.co/videos/preview/mixkit-farmer-walking-through-a-field-of-wheat-42867-large.mp4" type="video/mp4" />
         <source src="https://cdn.pixabay.com/video/2019/04/20/22907-331560939_large.mp4" type="video/mp4" />
       </video>
 
-      <!-- High Resolution Shamba Photo Fallback with Animated Zoom -->
+      <!-- Multi-Image Smooth Cross-fade Slideshow -->
       <div 
-        class="absolute inset-0 bg-cover bg-center animate-kenburns transition-all duration-1000 z-0"
-        style="background-image: url('https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1920&q=80');"
+        v-for="(img, idx) in bgImages" 
+        :key="idx"
+        class="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out pointer-events-none"
+        :class="[
+          idx === currentBgIndex ? 'opacity-100 scale-105 z-0 animate-kenburns' : 'opacity-0 scale-100 -z-10'
+        ]"
+        :style="{ backgroundImage: `url('${img.url}')` }"
       ></div>
 
       <!-- Modern Gradient Overlays for Sunlight Glow & Dark Contrast -->
-      <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/65 to-slate-950/40 z-10"></div>
-      <div class="absolute inset-0 bg-gradient-to-r from-emerald-950/40 via-transparent to-slate-950/70 z-10"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-slate-950/40 z-10"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-emerald-950/50 via-transparent to-slate-950/80 z-10"></div>
       <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none z-10"></div>
     </div>
 
@@ -189,6 +194,24 @@
 
     </div>
 
+    <!-- BACKGROUND SLIDESHOW SELECTOR PILLS -->
+    <div class="absolute bottom-16 left-6 z-30 hidden md:flex items-center gap-2 bg-slate-950/80 backdrop-blur-md p-2 rounded-2xl border border-white/10 shadow-2xl">
+      <button 
+        v-for="(img, idx) in bgImages" 
+        :key="idx"
+        @click="setBgIndex(idx)"
+        class="px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5"
+        :class="[
+          idx === currentBgIndex 
+            ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/30' 
+            : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
+        ]"
+      >
+        <span>{{ img.icon }}</span>
+        <span>{{ currentLang === 'sw' ? img.swTitle : img.enTitle }}</span>
+      </button>
+    </div>
+
     <!-- FOOTER COPYRIGHT & TRUST BADGES -->
     <footer class="absolute bottom-4 left-0 right-0 z-30 text-center text-xs font-semibold text-slate-400/80">
       <div class="flex flex-wrap items-center justify-center gap-4 text-[11px]">
@@ -202,7 +225,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuth } from '../composables/useAuth';
 import { useLanguage } from '../composables/useLanguage';
@@ -218,14 +241,69 @@ const rememberMe = ref(false);
 const loading = ref(false);
 const errorMessage = ref('');
 const sessionWarning = ref('');
+const showVideo = ref(true);
+
+const bgImages = ref([
+  {
+    icon: '🌽',
+    swTitle: 'Mahindi',
+    enTitle: 'Corn Field',
+    url: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1920&q=80'
+  },
+  {
+    icon: '🌾',
+    swTitle: 'Ngano',
+    enTitle: 'Wheat Field',
+    url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1920&q=80'
+  },
+  {
+    icon: '🏢',
+    swTitle: 'Maghala',
+    enTitle: 'Grain Storage',
+    url: 'https://images.unsplash.com/photo-1595841696677-6489ff3f8cd1?auto=format&fit=crop&w=1920&q=80'
+  },
+  {
+    icon: '🌱',
+    swTitle: 'Shamba Kijani',
+    enTitle: 'Green Crops',
+    url: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=1920&q=80'
+  },
+  {
+    icon: '🚜',
+    swTitle: 'Mavuno',
+    enTitle: 'Harvesting',
+    url: 'https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=1920&q=80'
+  }
+]);
+
+const currentBgIndex = ref(0);
+let bgInterval = null;
+
+const setBgIndex = (idx) => {
+  currentBgIndex.value = idx;
+  resetBgTimer();
+};
+
+const resetBgTimer = () => {
+  if (bgInterval) clearInterval(bgInterval);
+  bgInterval = setInterval(() => {
+    currentBgIndex.value = (currentBgIndex.value + 1) % bgImages.value.length;
+  }, 6000);
+};
 
 onMounted(() => {
+  resetBgTimer();
+
   if (sessionStorage.getItem('garanoki_logout_reason') === 'inactivity') {
     sessionWarning.value = currentLang.value === 'sw' 
       ? '⚠️ Session yako ime-expire kutokana na kutokutumia mfumo kwa dakika 15. Tafadhali ingia tena.'
       : '⚠️ Your session expired due to 15 minutes of inactivity. Please log in again.';
     sessionStorage.removeItem('garanoki_logout_reason');
   }
+});
+
+onUnmounted(() => {
+  if (bgInterval) clearInterval(bgInterval);
 });
 
 const handleLoginSubmit = () => {
