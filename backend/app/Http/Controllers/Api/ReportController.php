@@ -55,9 +55,12 @@ class ReportController extends Controller
                 })->where('deduction_type', 'loan_principal'),
                 'created_at', $startDate, $endDate
             );
-            $otherIncomeTotal = $this->getSumByDateRange(OtherIncome::where('tenant_id', $tenantId), 'date_received', $request->query('start_date'), $request->query('end_date'));
+            $otherIncomeQuery = Schema::hasColumn('other_incomes', 'tenant_id') ? OtherIncome::where('tenant_id', $tenantId) : OtherIncome::query();
+            $expenseQuery = Schema::hasColumn('expenses', 'tenant_id') ? Expense::where('tenant_id', $tenantId) : Expense::query();
+
+            $otherIncomeTotal = $this->getSumByDateRange($otherIncomeQuery, 'date_received', $request->query('start_date'), $request->query('end_date'));
             $totalLoansDisbursed = $this->getSumByDateRange(Loan::where('tenant_id', $tenantId), 'created_at', $startDate, $endDate, 'principal_amount');
-            $totalExpenses = $this->getSumByDateRange(Expense::where('tenant_id', $tenantId), 'date_incurred', $request->query('start_date'), $request->query('end_date'));
+            $totalExpenses = $this->getSumByDateRange($expenseQuery, 'date_incurred', $request->query('start_date'), $request->query('end_date'));
 
             $grossStoreInflows = $totalServiceFeeRevenue + $totalLoansRecovered + $otherIncomeTotal;
             $totalNetServiceProfit = ($totalServiceFeeRevenue + $otherIncomeTotal) - $totalExpenses;
@@ -86,8 +89,8 @@ class ReportController extends Controller
             $totalOccupied = floatval(Batch::where('tenant_id', $tenantId)->whereNotIn('status', ['transformed', 'sold'])->sum('current_weight_mt'));
             $occupancyPercentage = round(($totalOccupied / $totalCapacity) * 100, 1);
 
-            $otherIncomeMap = $this->getGroupedMap(OtherIncome::where('tenant_id', $tenantId), 'source_name', 'date_received', $request->query('start_date'), $request->query('end_date'));
-            $expensesMap = $this->getGroupedMap(Expense::where('tenant_id', $tenantId), 'category_name', 'date_incurred', $request->query('start_date'), $request->query('end_date'));
+            $otherIncomeMap = $this->getGroupedMap(Schema::hasColumn('other_incomes', 'tenant_id') ? OtherIncome::where('tenant_id', $tenantId) : OtherIncome::query(), 'source_name', 'date_received', $request->query('start_date'), $request->query('end_date'));
+            $expensesMap = $this->getGroupedMap(Schema::hasColumn('expenses', 'tenant_id') ? Expense::where('tenant_id', $tenantId) : Expense::query(), 'category_name', 'date_incurred', $request->query('start_date'), $request->query('end_date'));
 
             $trends = $this->getMonthlyTrends($tenantId);
 
@@ -327,8 +330,8 @@ class ReportController extends Controller
         $deductionsQuery = SettlementDeduction::whereHas('settlement', function($q) use ($tenantId) {
             $q->where('tenant_id', $tenantId);
         });
-        $otherIncomeQuery = OtherIncome::where('tenant_id', $tenantId);
-        $expensesQuery = Expense::where('tenant_id', $tenantId);
+        $otherIncomeQuery = Schema::hasColumn('other_incomes', 'tenant_id') ? OtherIncome::where('tenant_id', $tenantId) : OtherIncome::query();
+        $expensesQuery = Schema::hasColumn('expenses', 'tenant_id') ? Expense::where('tenant_id', $tenantId) : Expense::query();
 
         if ($startDate && $endDate) {
             $endDateTime = $endDate . ' 23:59:59';

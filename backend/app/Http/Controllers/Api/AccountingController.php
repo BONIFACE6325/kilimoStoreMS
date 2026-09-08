@@ -13,6 +13,7 @@ use App\Models\GradingRecord;
 use App\Traits\HasTenantScope;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class AccountingController extends Controller
 {
@@ -40,7 +41,7 @@ class AccountingController extends Controller
         $totalServiceFeeRevenue = $storageFees + $dryingFees + $millingFees + $gradingFees;
 
         // 2. Other Incomes
-        $otherIncomeQuery = OtherIncome::where('tenant_id', $tenantId);
+        $otherIncomeQuery = Schema::hasColumn('other_incomes', 'tenant_id') ? OtherIncome::where('tenant_id', $tenantId) : OtherIncome::query();
         if ($startDate && $endDate) {
             $otherIncomeQuery->whereBetween('date_received', [$request->query('start_date'), $request->query('end_date')]);
         }
@@ -50,7 +51,7 @@ class AccountingController extends Controller
         $totalRevenue = $totalServiceFeeRevenue + $totalOtherIncome;
 
         // 3. Operating Expenses (OPEX)
-        $expenseQuery = Expense::where('tenant_id', $tenantId);
+        $expenseQuery = Schema::hasColumn('expenses', 'tenant_id') ? Expense::where('tenant_id', $tenantId) : Expense::query();
         if ($startDate && $endDate) {
             $expenseQuery->whereBetween('date_incurred', [$request->query('start_date'), $request->query('end_date')]);
         }

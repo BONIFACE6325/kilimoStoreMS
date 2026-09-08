@@ -13,7 +13,9 @@ class IncomeController extends Controller
     public function index(Request $request)
     {
         $tenantId = $this->getTenantId($request);
-        $query = \App\Models\OtherIncome::where('tenant_id', $tenantId);
+        $query = \Illuminate\Support\Facades\Schema::hasColumn('other_incomes', 'tenant_id') 
+            ? \App\Models\OtherIncome::where('tenant_id', $tenantId) 
+            : \App\Models\OtherIncome::query();
         
         if ($request->has('start_date') && $request->has('end_date')) {
             $query->whereBetween('date_received', [$request->query('start_date'), $request->query('end_date')]);

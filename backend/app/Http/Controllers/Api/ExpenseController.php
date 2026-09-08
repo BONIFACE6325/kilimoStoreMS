@@ -54,7 +54,9 @@ class ExpenseController extends Controller
     public function index(Request $request)
     {
         $tenantId = $this->getTenantId($request);
-        $query = \App\Models\Expense::where('tenant_id', $tenantId);
+        $query = \Illuminate\Support\Facades\Schema::hasColumn('expenses', 'tenant_id')
+            ? \App\Models\Expense::where('tenant_id', $tenantId)
+            : \App\Models\Expense::query();
 
         if ($request->has('start_date') && $request->has('end_date')) {
             $query->whereBetween('date_incurred', [$request->query('start_date'), $request->query('end_date')]);
