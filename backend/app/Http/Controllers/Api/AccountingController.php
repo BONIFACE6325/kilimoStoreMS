@@ -7,6 +7,9 @@ use App\Models\Expense;
 use App\Models\OtherIncome;
 use App\Models\SettlementDeduction;
 use App\Models\Service;
+use App\Models\MillingJob;
+use App\Models\DryingJob;
+use App\Models\GradingRecord;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -71,6 +74,117 @@ class AccountingController extends Controller
         $registeredServices = Service::all();
         $incomeBreakdown = [];
 
+        // Map revenue per service_id
+        $serviceRevenues = [];
+        foreach ($registeredServices as $svc) {
+            $serviceRevenues[$svc->id] = 0.0;
+        }
+
+        // 5a. Sum revenue per service from MillingJobs
+        $millingServiceSum = 0.0;
+        $millingDeductions = DB::table('settlement_deductions')
+            ->join('milling_jobs', 'settlement_deductions.source_reference_id', '=', 'milling_jobs.id')
+            ->where('settlement_deductions.deduction_type', 'milling_fee')
+            ->whereNotNull('milling_jobs.service_id');
+        if ($startDate && $endDate) {
+            $millingDeductions->whereBetween('settlement_deductions.created_at', [$startDate, $endDate]);
+        }
+        foreach ($millingDeductions->select('milling_jobs.service_id', DB::raw('SUM(settlement_deductions.amount) as total_amount'))->groupBy('milling_jobs.service_id')->get() as $item) {
+            if (isset($serviceRevenues[$item->service_id])) {
+                $amt = (float) $item->total_amount;
+                $serviceRevenues[$item->service_id] += $amt;
+                $millingServiceSum += $amt;
+            }
+        }
+
+        // 5b. Sum revenue per service from DryingJobs
+        $dryingServiceSum = 0.0;
+        $dryingDeductions = DB::table('settlement_deductions')
+            ->join('drying_jobs', 'settlement_deductions.source_reference_id', '=', 'drying_jobs.id')
+            ->where('settlement_deductions.deduction_type', 'drying_fee')
+            ->whereNotNull('drying_jobs.service_id');
+        if ($startDate && $endDate) {
+            $dryingDeductions->whereBetween('settlement_deductions.created_at', [$startDate, $endDate]);
+        }
+        foreach ($dryingDeductions->select('drying_jobs.service_id', DB::raw('SUM(settlement_deductions.amount) as total_amount'))->groupBy('drying_jobs.service_id')->get() as $item) {
+            if (isset($serviceRevenues[$item->service_id])) {
+                $amt = (float) $item->total_amount;
+                $serviceRevenues[$item->service_id] += $amt;
+                $dryingServiceSum += $amt;
+            }
+        }
+
+        // 5c. Sum revenue per service from GradingRecords
+        $gradingServiceSum = 0.0;
+        $gradingDeductions = DB::table('settlement_deductions')
+            ->join('grading_records', 'settlement_deductions.source_reference_id', '=', 'grading_records.id')
+            ->where('settlement_deductions.deduction_type', 'grading_fee')
+            ->whereNotNull('grading_records.service_id');
+        if ($startDate && $endDate) {
+            $gradingDeductions->whereBetween('settlement_deductions.created_at', [$startDate, $endDate]);
+        }
+        foreach ($gradingDeductions->select('grading_records.service_id', DB::raw('SUM(settlement_deductions.amount) as total_amount'))->groupBy('grading_records.service_id')->get() as $item) {
+            if (isset($serviceRevenues[$item->service_id])) {
+                $amt = (float) $item->total_amount;
+                $serviceRevenues[$item->service_id] += $amt;
+                $gradingServiceSum += $amt;
+            }
+        }
+
+        // 5d. Distribute any unassigned category fees ONCE to a matching service without duplicating!
+        $unassignedMilling = max(0, $millingFees - $millingServiceSum);
+        $unassignedDrying = max(0, $dryingFees - $dryingServiceSum);
+        $unassignedGrading = max(0, $gradingFees - $gradingServiceSum);
+        $unassignedStorage = $storageFees;
+
+        if ($unassignedMilling > 0) {
+            foreach ($registeredServices as $svc) {
+                $cat = strtolower($svc->category ?? '');
+                $nameLower = strtolower(($svc->name_sw ?? '') . ' ' . ($svc->name_en ?? ''));
+                if (str_contains($nameLower, 'kobo') || str_contains($nameLower, 'mill') || $cat === 'milling') {
+                    $serviceRevenues[$svc->id] += $unassignedMilling;
+                    $unassignedMilling = 0; // Assigned once to single service!
+                    break;
+                }
+            }
+        }
+
+        if ($unassignedDrying > 0) {
+            foreach ($registeredServices as $svc) {
+                $cat = strtolower($svc->category ?? '');
+                $nameLower = strtolower(($svc->name_sw ?? '') . ' ' . ($svc->name_en ?? ''));
+                if (str_contains($nameLower, 'ukaush') || str_contains($nameLower, 'dry') || $cat === 'drying') {
+                    $serviceRevenues[$svc->id] += $unassignedDrying;
+                    $unassignedDrying = 0;
+                    break;
+                }
+            }
+        }
+
+        if ($unassignedGrading > 0) {
+            foreach ($registeredServices as $svc) {
+                $cat = strtolower($svc->category ?? '');
+                $nameLower = strtolower(($svc->name_sw ?? '') . ' ' . ($svc->name_en ?? ''));
+                if (str_contains($nameLower, 'daraja') || str_contains($nameLower, 'grade') || $cat === 'grading') {
+                    $serviceRevenues[$svc->id] += $unassignedGrading;
+                    $unassignedGrading = 0;
+                    break;
+                }
+            }
+        }
+
+        if ($unassignedStorage > 0) {
+            foreach ($registeredServices as $svc) {
+                $cat = strtolower($svc->category ?? '');
+                $nameLower = strtolower(($svc->name_sw ?? '') . ' ' . ($svc->name_en ?? ''));
+                if (str_contains($nameLower, 'hifadhi') || str_contains($nameLower, 'storage') || $cat === 'stock') {
+                    $serviceRevenues[$svc->id] += $unassignedStorage;
+                    $unassignedStorage = 0;
+                    break;
+                }
+            }
+        }
+
         if ($registeredServices->count() > 0) {
             foreach ($registeredServices as $svc) {
                 $name = $svc->name_sw ?: $svc->name_en;
@@ -78,19 +192,7 @@ class AccountingController extends Controller
                     $name .= " ({$svc->crop_type})";
                 }
                 
-                $amt = 0.0;
-                $cat = strtolower($svc->category ?? '');
-                $nameLower = strtolower($svc->name_sw . ' ' . $svc->name_en);
-
-                if (str_contains($nameLower, 'hifadhi') || str_contains($nameLower, 'storage') || $cat === 'stock') {
-                    $amt = $storageFees;
-                } elseif (str_contains($nameLower, 'kobo') || str_contains($nameLower, 'mill') || $cat === 'milling') {
-                    $amt = $millingFees;
-                } elseif (str_contains($nameLower, 'ukaush') || str_contains($nameLower, 'dry') || $cat === 'drying') {
-                    $amt = $dryingFees;
-                } elseif (str_contains($nameLower, 'daraja') || str_contains($nameLower, 'grade') || $cat === 'grading') {
-                    $amt = $gradingFees;
-                }
+                $amt = (float) ($serviceRevenues[$svc->id] ?? 0.0);
 
                 $incomeBreakdown[] = [
                     'source_name' => $name,
