@@ -14,7 +14,8 @@
         class="absolute inset-0 w-full h-full object-cover scale-105 filter brightness-[0.65] contrast-[1.1] animate-slow-pan pointer-events-none z-0"
         @error="showVideo = false"
       >
-        <source src="https://cdn.pixabay.com/video/2019/04/20/22907-331560939_large.mp4" type="video/mp4" />
+        <source src="https://videos.pexels.com/video-files/3195394/3195394-hd_1280_720_25fps.mp4" type="video/mp4" />
+        <source src="https://videos.pexels.com/video-files/856942/856942-hd_1280_720_30fps.mp4" type="video/mp4" />
       </video>
 
       <!-- Multi-Image Slideshow with PowerPoint-Style Dynamic Animations -->
@@ -46,7 +47,7 @@
       ></div>
     </div>
 
-    <!-- TOP HEADER BAR: BRAND LOGO & LANGUAGE SWITCHER -->
+    <!-- TOP HEADER BAR: BRAND LOGO, FARMER AD & LANGUAGE SWITCHER -->
     <header class="absolute top-0 left-0 right-0 z-30 p-5 sm:p-8 flex items-center justify-between max-w-7xl mx-auto w-full">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-400 to-emerald-300 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-emerald-500/30 ring-2 ring-white/20">
@@ -58,15 +59,27 @@
         </div>
       </div>
 
-      <!-- Language Toggle Pill -->
-      <button 
-        @click="toggleLanguage" 
-        class="px-3.5 py-2 bg-slate-900/80 hover:bg-slate-800/90 backdrop-blur-md text-white text-xs font-black rounded-2xl border border-white/15 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center gap-2 shadow-lg cursor-pointer"
-        :title="currentLang === 'sw' ? 'Switch to English' : 'Badili kwenda Kiswahili'"
-      >
-        <span class="text-sm leading-none">{{ currentLang === 'sw' ? '🇹🇿' : '🇬🇧' }}</span>
-        <span class="tracking-wider">{{ currentLang.toUpperCase() }}</span>
-      </button>
+      <div class="flex items-center gap-2.5">
+        <!-- 🎥 TANGAZO LA WAKULIMA VIDEO BUTTON -->
+        <button 
+          @click="openAdModal"
+          class="px-3.5 py-2 bg-slate-900/80 hover:bg-slate-800/90 backdrop-blur-md text-emerald-400 text-xs font-black rounded-2xl border border-emerald-500/30 hover:border-emerald-400/60 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center gap-2 shadow-lg cursor-pointer"
+          title="Tazama Tangazo la Wakulima"
+        >
+          <span class="text-sm animate-pulse">🎥</span>
+          <span class="tracking-wide hidden sm:inline">{{ currentLang === 'sw' ? 'Tangazo la Wakulima' : 'Farmer Spotlight' }}</span>
+        </button>
+
+        <!-- Language Toggle Pill -->
+        <button 
+          @click="toggleLanguage" 
+          class="px-3.5 py-2 bg-slate-900/80 hover:bg-slate-800/90 backdrop-blur-md text-white text-xs font-black rounded-2xl border border-white/15 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center gap-2 shadow-lg cursor-pointer"
+          :title="currentLang === 'sw' ? 'Switch to English' : 'Badili kwenda Kiswahili'"
+        >
+          <span class="text-sm leading-none">{{ currentLang === 'sw' ? '🇹🇿' : '🇬🇧' }}</span>
+          <span class="tracking-wider">{{ currentLang.toUpperCase() }}</span>
+        </button>
+      </div>
     </header>
 
     <!-- MAIN LANDING FORM CONTAINER -->
@@ -222,6 +235,51 @@
       </div>
     </footer>
 
+    <!-- 🎥 TANGAZO LA WAKULIMA VIDEO AD MODAL -->
+    <div v-if="showAdModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-xl transition-all">
+      <div class="relative w-full max-w-3xl bg-slate-900 border border-white/20 rounded-3xl shadow-2xl overflow-hidden space-y-0">
+        
+        <!-- Modal Header -->
+        <div class="p-4 sm:p-5 bg-slate-950/90 border-b border-white/10 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <span class="text-xl">🌾</span>
+            <div>
+              <h3 class="text-sm sm:text-base font-black text-white">
+                {{ currentLang === 'sw' ? 'Tangazo la Wakulima & Mavuno Shambani' : 'Farmer & Harvest Commercial' }}
+              </h3>
+              <p class="text-[11px] text-emerald-400 font-medium">GARANOKI Store & Finance MS</p>
+            </div>
+          </div>
+
+          <button 
+            @click="closeAdModal" 
+            class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center font-bold text-base transition-colors cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+
+        <!-- Video Player Body -->
+        <div class="relative aspect-video bg-black flex items-center justify-center">
+          <video 
+            controls
+            autoplay
+            class="w-full h-full object-cover"
+            src="https://videos.pexels.com/video-files/3195394/3195394-hd_1280_720_25fps.mp4"
+          ></video>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="p-4 bg-slate-950/90 border-t border-white/10 flex items-center justify-between text-xs text-slate-300">
+          <span class="font-semibold text-slate-400">🧑‍🌾 Wakulima Wakagua Mazao Shambani</span>
+          <button @click="closeAdModal" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl cursor-pointer shadow-md">
+            {{ currentLang === 'sw' ? 'Funga Tangazo' : 'Close Ad' }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -243,6 +301,15 @@ const loading = ref(false);
 const errorMessage = ref('');
 const sessionWarning = ref('');
 const showVideo = ref(true);
+const showAdModal = ref(false);
+
+const openAdModal = () => {
+  showAdModal.value = true;
+};
+
+const closeAdModal = () => {
+  showAdModal.value = false;
+};
 
 const pptTransitions = [
   'animate-ppt-bubble',
