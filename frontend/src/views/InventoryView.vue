@@ -191,6 +191,211 @@
           </span>
         </div>
       </div>
+    </div>
+
+    <!-- 🌟 BOSS EXECUTIVE INVENTORY & SERVICE CONTROL CENTER -->
+    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-6 transition-colors">
+      
+      <!-- Header with Date Filters -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
+        <div>
+          <h2 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+            <span>📊 Boss Executive Inventory & Service Control Center</span>
+          </h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+            Uchambuzi wa kina wa mizigo, huduma zilizofanyika, na vyanzo vikuu vya mapato kwa kila zao.
+          </p>
+        </div>
+
+        <!-- Date Range Filter Pills -->
+        <div class="flex flex-wrap items-center gap-1.5 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700">
+          <button 
+            v-for="timeOpt in timeFilterOptions" 
+            :key="timeOpt.id"
+            @click="selectAnalyticsTimeframe(timeOpt.id)"
+            :class="[
+              'px-3 py-1.5 text-xs font-extrabold rounded-xl transition-all cursor-pointer',
+              selectedTimeframe === timeOpt.id 
+                ? 'bg-emerald-600 text-white shadow-sm' 
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            ]"
+          >
+            {{ timeOpt.label }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Highlights Leaderboard Banner (4 Cards) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Card 1: Top Revenue Service -->
+        <div class="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 space-y-1.5">
+          <span class="text-[10px] font-black text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">💰 Huduma Inayoingiza Pesa Nyingi</span>
+          <div class="text-base font-black text-emerald-900 dark:text-emerald-100 truncate">
+            {{ inventoryAnalytics.top_revenue_service?.name || 'Hakuna Data' }}
+          </div>
+          <div class="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-300">
+            Tsh {{ (inventoryAnalytics.top_revenue_service?.amount || 0).toLocaleString() }}
+          </div>
+        </div>
+
+        <!-- Card 2: Top Usage Service -->
+        <div class="p-4 rounded-2xl bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 space-y-1.5">
+          <span class="text-[10px] font-black text-blue-700 dark:text-blue-300 uppercase tracking-wider">⚡ Huduma Inayotumika Sana</span>
+          <div class="text-base font-black text-blue-900 dark:text-blue-100 truncate">
+            {{ inventoryAnalytics.top_usage_service?.name || 'Hakuna Data' }}
+          </div>
+          <div class="text-xs font-bold text-blue-700 dark:text-blue-300">
+            {{ inventoryAnalytics.top_usage_service?.count || 0 }} Jobs Executed
+          </div>
+        </div>
+
+        <!-- Card 3: Active Crops Count -->
+        <div class="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800 space-y-1.5">
+          <span class="text-[10px] font-black text-indigo-700 dark:text-indigo-300 uppercase tracking-wider">🌾 Mazao Yaliyosajiliwa</span>
+          <div class="text-base font-black text-indigo-900 dark:text-indigo-100">
+            {{ inventoryAnalytics.crop_analytics?.length || 0 }} Categories
+          </div>
+          <div class="text-xs font-medium text-indigo-700 dark:text-indigo-300">
+            Mpunga, Mahindi, Maharage, Mchele, n.k.
+          </div>
+        </div>
+
+        <!-- Card 4: Total Batches Analyzed -->
+        <div class="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 space-y-1.5">
+          <span class="text-[10px] font-black text-amber-700 dark:text-amber-300 uppercase tracking-wider">📜 Batches Zilizosajiliwa</span>
+          <div class="text-base font-black text-amber-900 dark:text-amber-100">
+            {{ inventoryAnalytics.summary?.total_batches_count || 0 }} Batches
+          </div>
+          <div class="text-xs font-medium text-amber-700 dark:text-amber-300">
+            Consignments Audited
+          </div>
+        </div>
+      </div>
+
+      <!-- Crop-by-Crop Detailed Audit Cards -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">
+            🌾 Uchambuzi wa Kina kwa kila Zao (Crop-by-Crop Audit)
+          </h3>
+          <span class="text-xs font-bold text-slate-400">Vipimo Halisi vya Akiba na Huduma</span>
+        </div>
+
+        <div v-if="!inventoryAnalytics.crop_analytics || inventoryAnalytics.crop_analytics.length === 0" class="p-8 text-center text-xs text-slate-400 font-medium bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800">
+          Hakuna kumbukumbu za mazao katika kipindi hiki.
+        </div>
+
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div 
+            v-for="cAudit in inventoryAnalytics.crop_analytics" 
+            :key="cAudit.crop_type"
+            class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-4 hover:border-emerald-500/40 transition-all"
+          >
+            <!-- Crop Header -->
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2.5">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">{{ getCropEmoji(cAudit.crop_type) }}</span>
+                <div>
+                  <h4 class="text-sm font-black text-slate-900 dark:text-white">{{ cAudit.crop_type }}</h4>
+                  <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Kipimo: {{ cAudit.unit }}</span>
+                </div>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-mono font-black text-xs">
+                {{ cAudit.batch_count }} Batches
+              </span>
+            </div>
+
+            <!-- Metric Grid for this Crop -->
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <!-- 1. Total Received -->
+              <div class="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+                <span class="text-[10px] font-bold text-slate-400 block uppercase">📥 Iliyopokelewa:</span>
+                <span class="font-mono font-black text-slate-900 dark:text-white text-sm">
+                  {{ (cAudit.total_received_qty || 0).toLocaleString() }} {{ cAudit.unit }}
+                </span>
+              </div>
+
+              <!-- 2. Serviced / Processed -->
+              <div class="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+                <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 block uppercase">⚡ Iliyopata Huduma:</span>
+                <span class="font-mono font-black text-emerald-600 dark:text-emerald-400 text-sm">
+                  {{ (cAudit.serviced_qty || 0).toLocaleString() }} {{ cAudit.unit }}
+                </span>
+              </div>
+
+              <!-- 3. Pending Raw Stock -->
+              <div class="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+                <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400 block uppercase">⏳ Bado Haijapata Huduma:</span>
+                <span class="font-mono font-black text-amber-600 dark:text-amber-400 text-sm">
+                  {{ (cAudit.pending_raw_qty || 0).toLocaleString() }} {{ cAudit.unit }}
+                </span>
+              </div>
+
+              <!-- 4. Dispatched / Sold -->
+              <div class="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+                <span class="text-[10px] font-bold text-blue-600 dark:text-blue-400 block uppercase">🛍️ Iliyouzwa/Kutoka:</span>
+                <span class="font-mono font-black text-blue-600 dark:text-blue-400 text-sm">
+                  {{ (cAudit.sold_dispatched_qty || 0).toLocaleString() }} {{ cAudit.unit }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Services Applied Pills -->
+            <div class="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-1.5">
+              <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">🛠️ Huduma Zilizotolewa Kwenye {{ cAudit.crop_type }}:</span>
+              <div v-if="!cAudit.services_applied || cAudit.services_applied.length === 0" class="text-[11px] text-slate-400 italic">
+                Hakuna huduma zilizofanyika bado kwenye zao hili.
+              </div>
+              <div v-else class="flex flex-wrap gap-1.5">
+                <span 
+                  v-for="sItem in cAudit.services_applied" 
+                  :key="sItem.name"
+                  class="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 font-bold text-[10.5px] border border-indigo-200 dark:border-indigo-800"
+                >
+                  {{ sItem.name }}: <strong>{{ sItem.count }} Jobs</strong>
+                </span>
+              </div>
+            </div>
+
+            <!-- Current Bin Balance Footnote -->
+            <div class="p-2 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl flex items-center justify-between text-xs border border-emerald-200 dark:border-emerald-800">
+              <span class="font-extrabold text-emerald-800 dark:text-emerald-200 text-[11px]">🏭 Salio la Stoko Ghalani:</span>
+              <span class="font-mono font-black text-emerald-700 dark:text-emerald-300">
+                {{ (cAudit.current_bin_qty || 0).toLocaleString() }} {{ cAudit.unit }}
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Service Performance Breakdown Table / Leaderboard -->
+      <div v-if="Object.keys(inventoryAnalytics.service_breakdown || {}).length > 0" class="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">
+            💰 Mchanganuo wa Mapato ya Kila Huduma (Service Revenue Ranking)
+          </h3>
+          <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">Live Services Ledger</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+          <div 
+            v-for="(amount, sName) in inventoryAnalytics.service_breakdown" 
+            :key="sName"
+            class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-between"
+          >
+            <div>
+              <span class="font-extrabold text-slate-800 dark:text-slate-100 block text-xs">{{ sName }}</span>
+              <span class="text-[10px] text-slate-400 font-bold">
+                Executed: {{ inventoryAnalytics.service_counts?.[sName] || 0 }} Jobs
+              </span>
+            </div>
+            <span class="font-mono font-black text-emerald-600 dark:text-emerald-400 text-sm">
+              Tsh {{ (parseFloat(amount) || 0).toLocaleString() }}
+            </span>
+          </div>
+        </div>
+      </div>
 
     </div>
 
@@ -887,6 +1092,64 @@ const getCropEmoji = (cropName) => {
   return '📦';
 };
 
+const selectedTimeframe = ref('all_time');
+const inventoryAnalytics = ref({
+  crop_analytics: [],
+  top_revenue_service: null,
+  top_usage_service: null,
+  service_breakdown: {},
+  service_counts: {},
+  summary: { total_batches_count: 0, active_crops_count: 0 }
+});
+
+const timeFilterOptions = [
+  { id: 'today', label: 'Leo' },
+  { id: 'this_week', label: 'Wiki Hii' },
+  { id: 'this_month', label: 'Mwezi Huu' },
+  { id: 'last_3_months', label: 'Miezi 3' },
+  { id: 'this_year', label: 'Mwaka Huu' },
+  { id: 'all_time', label: 'Siku Zote' }
+];
+
+const selectAnalyticsTimeframe = (tf) => {
+  selectedTimeframe.value = tf;
+  fetchInventoryAnalytics();
+};
+
+const getAnalyticsQueryParams = () => {
+  if (selectedTimeframe.value === 'all_time') return '';
+  const now = new Date();
+  const formatIsoDate = (d) => d.toISOString().split('T')[0];
+  let start, end = formatIsoDate(now);
+
+  if (selectedTimeframe.value === 'today') {
+    start = end;
+  } else if (selectedTimeframe.value === 'this_week') {
+    const day = now.getDay();
+    const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+    start = formatIsoDate(new Date(now.setDate(diff)));
+  } else if (selectedTimeframe.value === 'this_month') {
+    start = formatIsoDate(new Date(now.getFullYear(), now.getMonth(), 1));
+  } else if (selectedTimeframe.value === 'last_3_months') {
+    start = formatIsoDate(new Date(now.getFullYear(), now.getMonth() - 3, now.getDate()));
+  } else if (selectedTimeframe.value === 'this_year') {
+    start = formatIsoDate(new Date(now.getFullYear(), 0, 1));
+  }
+
+  return start && end ? `?start_date=${start}&end_date=${end}` : '';
+};
+
+const fetchInventoryAnalytics = async () => {
+  try {
+    const res = await fetch('/api/v1/inventory/analytics' + getAnalyticsQueryParams());
+    if (res.ok) {
+      inventoryAnalytics.value = await res.json();
+    }
+  } catch (err) {
+    console.error('Error fetching inventory analytics:', err);
+  }
+};
+
 // Fetch Real Inventory Summary & Batches from Backend API
 const fetchInventoryData = async () => {
   loading.value = true;
@@ -911,6 +1174,8 @@ const fetchInventoryData = async () => {
       const fData = await fRes.json();
       farmersList.value = Array.isArray(fData) ? fData : (fData.data || []);
     }
+
+    await fetchInventoryAnalytics();
   } catch (err) {
     console.error('Error fetching inventory summary data:', err);
     triggerToast('Failed to connect to backend server', 'error');

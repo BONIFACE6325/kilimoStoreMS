@@ -348,6 +348,153 @@ class ReportController extends Controller
         ]);
     }
 
+    public function getInventoryAnalytics(Request $request)
+    {
+        try {
+            $startDate = $request->query('start_date');
+            $endDate = $request->query('end_date') ? $request->query('end_date') . ' 23:59:59' : null;
+
+            $batchQuery = Batch::with(['bin', 'farmer', 'dryingJobs.service', 'millingJobs.service', 'gradingRecords.service']);
+            if ($startDate && $endDate) {
+                $batchQuery->whereBetween('created_at', [$startDate, $endDate]);
+            }
+            $batches = $batchQuery->get();
+
+            $cropBreakdown = [];
+            foreach ($batches as $b) {
+                $crop = $b->crop_type ?: 'General';
+                $unit = $b->intake_unit ?: 'Gunia';
+                
+                if (!isset($cropBreakdown[$crop])) {
+                    $cropBreakdown[$crop] = [
+                        'crop_type' => $crop,
+                        'unit' => $unit,
+                        'total_received_qty' => 0.0,
+                        'serviced_qty' => 0.0,
+                        'pending_raw_qty' => 0.0,
+                        'sold_dispatched_qty' => 0.0,
+                        'current_bin_qty' => 0.0,
+                        'services_applied' => [],
+                        'batch_count' => 0
+                    ];
+                }
+
+                $qty = (float) ($b->intake_quantity > 0 ? $b->intake_quantity : $b->current_weight_mt);
+                $cropBreakdown[$crop]['total_received_qty'] += $qty;
+                $cropBreakdown[$crop]['batch_count']++;
+
+                $hasService = false;
+
+                foreach ($b->dryingJobs as $dj) {
+                    $hasService = true;
+                    $sName = $dj->service ? ($dj->service->name_sw ?: $dj->service->name_en) : 'Kuanika Mazao (Drying)';
+                    $cropBreakdown[$crop]['services_applied'][$sName] = ($cropBreakdown[$crop]['services_applied'][$sName] ?? 0) + 1;
+                }
+
+                foreach ($b->millingJobs as $mj) {
+                    $hasService = true;
+                    $sName = $mj->service ? ($mj->service->name_sw ?: $mj->service->name_en) : 'Kukoboa / Kusaga (Milling)';
+                    $cropBreakdown[$crop]['services_applied'][$sName] = ($cropBreakdown[$crop]['services_applied'][$sName] ?? 0) + 1;
+                }
+
+                foreach ($b->gradingRecords as $gr) {
+                    $hasService = true;
+                    $sName = $gr->service ? ($gr->service->name_sw ?: $gr->service->name_en) : 'Sorting & Grading';
+                    $cropBreakdown[$crop]['services_applied'][$sName] = ($cropBreakdown[$crop]['services_applied'][$sName] ?? 0) + 1;
+                }
+
+                if ($hasService || in_array($b->status, ['processing', 'processed'])) {
+                    $cropBreakdown[$crop]['serviced_qty'] += $qty;
+                } else if (in_array($b->status, ['stored', 'received'])) {
+                    $cropBreakdown[$crop]['pending_raw_qty'] += $qty;
+                }
+
+                if ($b->status === 'sold') {
+                    $cropBreakdown[$crop]['sold_dispatched_qty'] += $qty;
+                } else if (in_array($b->status, ['stored', 'received', 'processing'])) {
+                    $cropBreakdown[$crop]['current_bin_qty'] += $qty;
+                }
+            }
+
+            foreach ($cropBreakdown as &$cData) {
+                $formattedServices = [];
+                foreach ($cData['services_applied'] as $sName => $count) {
+                    $formattedServices[] = [
+                        'name' => $sName,
+                        'count' => $count
+                    ];
+                }
+                $cData['services_applied'] = $formattedServices;
+            }
+            unset($cData);
+
+            $serviceMetrics = $this->calculateServiceMetrics($startDate, $endDate);
+            $serviceBreakdownMap = $serviceMetrics['breakdown'];
+
+            $topRevenueService = null;
+            $maxRev = -1;
+            foreach ($serviceBreakdownMap as $sName => $rev) {
+                if ($rev > $maxRev) {
+                    $maxRev = $rev;
+                    $topRevenueService = [
+                        'name' => $sName,
+                        'amount' => $rev
+                    ];
+                }
+            }
+
+            $serviceCountsMap = [];
+            $dQuery = DryingJob::with('service');
+            $mQuery = MillingJob::with('service');
+            $gQuery = GradingRecord::with('service');
+            if ($startDate && $endDate) {
+                $dQuery->whereBetween('created_at', [$startDate, $endDate]);
+                $mQuery->whereBetween('created_at', [$startDate, $endDate]);
+                $gQuery->whereBetween('created_at', [$startDate, $endDate]);
+            }
+
+            foreach ($dQuery->get() as $dj) {
+                $name = $dj->service ? ($dj->service->name_sw ?: $dj->service->name_en) : 'Kuanika Mazao (Drying)';
+                $serviceCountsMap[$name] = ($serviceCountsMap[$name] ?? 0) + 1;
+            }
+            foreach ($mQuery->get() as $mj) {
+                $name = $mj->service ? ($mj->service->name_sw ?: $mj->service->name_en) : 'Kukoboa / Kusaga (Milling)';
+                $serviceCountsMap[$name] = ($serviceCountsMap[$name] ?? 0) + 1;
+            }
+            foreach ($gQuery->get() as $gr) {
+                $name = $gr->service ? ($gr->service->name_sw ?: $gr->service->name_en) : 'Sorting & Grading';
+                $serviceCountsMap[$name] = ($serviceCountsMap[$name] ?? 0) + 1;
+            }
+
+            $topUsageService = null;
+            $maxCount = -1;
+            foreach ($serviceCountsMap as $sName => $count) {
+                if ($count > $maxCount) {
+                    $maxCount = $count;
+                    $topUsageService = [
+                        'name' => $sName,
+                        'count' => $count
+                    ];
+                }
+            }
+
+            return response()->json([
+                'crop_analytics' => array_values($cropBreakdown),
+                'top_revenue_service' => $topRevenueService,
+                'top_usage_service' => $topUsageService,
+                'service_breakdown' => $serviceBreakdownMap,
+                'service_counts' => $serviceCountsMap,
+                'summary' => [
+                    'total_batches_count' => count($batches),
+                    'active_crops_count' => count($cropBreakdown)
+                ]
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('getInventoryAnalytics failed: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
     public function resetAllData(Request $request)
     {
         try {

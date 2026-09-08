@@ -39,6 +39,7 @@ Route::prefix('v1')->group(function () {
 
     // Batches & Warehouse Bins
     Route::get('/inventory/summary', [BatchController::class, 'getInventorySummary']);
+    Route::get('/inventory/analytics', [ReportController::class, 'getInventoryAnalytics']);
     Route::apiResource('batches', BatchController::class);
     Route::get('/bins/map', [BatchController::class, 'binsMap']);
     Route::post('/batches/{id}/move', [BatchController::class, 'moveBatch']);
