@@ -10,7 +10,11 @@ class Tenant extends Model
 {
     use HasUuids;
 
-    protected $fillable = ['name', 'subdomain', 'status'];
+    protected $fillable = ['id', 'name', 'subdomain', 'status'];
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
 
     public function branches(): HasMany
     {
