@@ -171,16 +171,33 @@ class BatchController extends Controller
         ], 201);
     }
 
-    public function binsMap()
+    public function binsMap(Request $request)
     {
-        // Get bins list
-        $bins = Bin::orderBy('name')->get();
+        $tenantId = $this->getTenantId($request);
+        $branchIds = Branch::where('tenant_id', $tenantId)->pluck('id');
+        $bins = Bin::whereIn('branch_id', $branchIds)->orderBy('name')->get();
+
+        if ($bins->isEmpty()) {
+            $branch = Branch::where('tenant_id', $tenantId)->first() ?? Branch::create(['tenant_id' => $tenantId, 'name' => 'Main Branch', 'code' => 'BR-001', 'status' => 'active']);
+            $defaultBins = [
+                ['name' => 'Silo 01', 'capacity_mt' => 500, 'current_occupancy_mt' => 0, 'status' => 'empty', 'branch_id' => $branch->id],
+                ['name' => 'Silo 02', 'capacity_mt' => 500, 'current_occupancy_mt' => 0, 'status' => 'empty', 'branch_id' => $branch->id],
+                ['name' => 'Bin 01', 'capacity_mt' => 200, 'current_occupancy_mt' => 0, 'status' => 'empty', 'branch_id' => $branch->id],
+                ['name' => 'Bin 02', 'capacity_mt' => 200, 'current_occupancy_mt' => 0, 'status' => 'empty', 'branch_id' => $branch->id],
+            ];
+            foreach ($defaultBins as $dbin) {
+                Bin::create($dbin);
+            }
+            $bins = Bin::where('branch_id', $branch->id)->orderBy('name')->get();
+        }
+
         return response()->json($bins);
     }
 
     public function moveBatch(Request $request, $id)
     {
-        $batch = Batch::findOrFail($id);
+        $tenantId = $this->getTenantId($request);
+        $batch = Batch::where('tenant_id', $tenantId)->findOrFail($id);
         $validated = $request->validate([
             'destination_bin_id' => 'required|exists:bins,id',
             'reason' => 'nullable|string|max:255',
@@ -227,7 +244,8 @@ class BatchController extends Controller
     public function updateProcessing(Request $request, $id)
     {
         try {
-            $batch = Batch::find($id);
+            $tenantId = $this->getTenantId($request);
+            $batch = Batch::where('tenant_id', $tenantId)->find($id);
             if (!$batch) {
                 return response()->json([
                     'success' => false,
@@ -509,7 +527,8 @@ class BatchController extends Controller
 
     public function update(Request $request, $id)
     {
-        $batch = Batch::findOrFail($id);
+        $tenantId = $this->getTenantId($request);
+        $batch = Batch::where('tenant_id', $tenantId)->findOrFail($id);
 
         $validated = $request->validate([
             'crop_type' => 'nullable|string|max:100',
@@ -542,9 +561,10 @@ class BatchController extends Controller
         ]);
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        $batch = Batch::findOrFail($id);
+        $tenantId = $this->getTenantId($request);
+        $batch = Batch::where('tenant_id', $tenantId)->findOrFail($id);
         $batch->delete();
 
         return response()->json([
@@ -619,13 +639,15 @@ class BatchController extends Controller
         return ucfirst(trim($raw));
     }
 
-    public function getInventorySummary()
+    public function getInventorySummary(Request $request)
     {
-        $totalBatchesCount = Batch::count();
+        $tenantId = $this->getTenantId($request);
 
-        $intakeBatches = Batch::all();
-        $storedBatches = Batch::whereNotIn('status', ['sold', 'transformed'])->get();
-        $soldBatches = Batch::where('status', 'sold')->get();
+        $totalBatchesCount = Batch::where('tenant_id', $tenantId)->count();
+
+        $intakeBatches = Batch::where('tenant_id', $tenantId)->get();
+        $storedBatches = Batch::where('tenant_id', $tenantId)->whereNotIn('status', ['sold', 'transformed'])->get();
+        $soldBatches = Batch::where('tenant_id', $tenantId)->where('status', 'sold')->get();
 
         $storedUnitSums = [];
         foreach ($storedBatches as $b) {
@@ -702,13 +724,30 @@ class BatchController extends Controller
             ];
         }
 
-        $rawBins = Bin::orderBy('name')->get();
+        $branchIds = Branch::where('tenant_id', $tenantId)->pluck('id');
+        $rawBins = Bin::whereIn('branch_id', $branchIds)->orderBy('name')->get();
+
+        if ($rawBins->isEmpty()) {
+            $branch = Branch::where('tenant_id', $tenantId)->first() ?? Branch::create(['tenant_id' => $tenantId, 'name' => 'Main Branch', 'code' => 'BR-001', 'status' => 'active']);
+            $defaultBins = [
+                ['name' => 'Silo 01', 'capacity_mt' => 500, 'current_occupancy_mt' => 0, 'status' => 'empty', 'branch_id' => $branch->id],
+                ['name' => 'Silo 02', 'capacity_mt' => 500, 'current_occupancy_mt' => 0, 'status' => 'empty', 'branch_id' => $branch->id],
+                ['name' => 'Bin 01', 'capacity_mt' => 200, 'current_occupancy_mt' => 0, 'status' => 'empty', 'branch_id' => $branch->id],
+                ['name' => 'Bin 02', 'capacity_mt' => 200, 'current_occupancy_mt' => 0, 'status' => 'empty', 'branch_id' => $branch->id],
+            ];
+            foreach ($defaultBins as $dbin) {
+                Bin::create($dbin);
+            }
+            $rawBins = Bin::where('branch_id', $branch->id)->orderBy('name')->get();
+        }
+
         $totalCapacityMt = floatval($rawBins->sum('capacity_mt'));
         $totalOccupancyMt = 0.0;
 
         $bins = [];
         foreach ($rawBins as $bin) {
-            $activeBatches = Batch::where('current_bin_id', $bin->id)
+            $activeBatches = Batch::where('tenant_id', $tenantId)
+                ->where('current_bin_id', $bin->id)
                 ->whereNotIn('status', ['transformed', 'sold'])
                 ->get();
 
@@ -730,9 +769,9 @@ class BatchController extends Controller
         $utilizationPct = $totalCapacityMt > 0 ? number_format(($totalOccupancyMt / $totalCapacityMt) * 100, 1) : '0.0';
 
         $periodAnalytics = [
-            'this_week' => $this->buildPeriodAnalytics(now()->startOfWeek()),
-            'this_month' => $this->buildPeriodAnalytics(now()->startOfMonth()),
-            'all_time' => $this->buildPeriodAnalytics(null),
+            'this_week' => $this->buildPeriodAnalytics(now()->startOfWeek(), $tenantId),
+            'this_month' => $this->buildPeriodAnalytics(now()->startOfMonth(), $tenantId),
+            'all_time' => $this->buildPeriodAnalytics(null, $tenantId),
         ];
 
         return response()->json([
@@ -749,9 +788,12 @@ class BatchController extends Controller
         ]);
     }
 
-    private function buildPeriodAnalytics($startDate = null)
+    private function buildPeriodAnalytics($startDate = null, $tenantId = null)
     {
         $derivedQuery = Batch::whereNotNull('parent_batch_id');
+        if ($tenantId) {
+            $derivedQuery->where('tenant_id', $tenantId);
+        }
         if ($startDate) {
             $derivedQuery->where('created_at', '>=', $startDate);
         }
@@ -772,6 +814,9 @@ class BatchController extends Controller
         $transformOutputs = array_values($transformMap);
 
         $soldQuery = Batch::where('status', 'sold');
+        if ($tenantId) {
+            $soldQuery->where('tenant_id', $tenantId);
+        }
         if ($startDate) {
             $soldQuery->where('updated_at', '>=', $startDate);
         }
