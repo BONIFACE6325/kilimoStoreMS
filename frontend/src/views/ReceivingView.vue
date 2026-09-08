@@ -819,6 +819,7 @@ const expenses = ref([]);
 const batches = ref([]);
 const farmers = ref([]);
 const services = ref([]);
+const otherIncomes = ref([]);
 
 const modals = ref({
   expense: false,
@@ -906,12 +907,13 @@ const getSettlementTotalCashRetained = (s) => {
 const fetchData = async () => {
   loading.value = true;
   try {
-    const [bRes, eRes, sRes, fRes, srvRes] = await Promise.all([
+    const [bRes, eRes, sRes, fRes, srvRes, incRes] = await Promise.all([
       fetch('/api/v1/batches'),
       fetch('/api/v1/expenses'),
       fetch('/api/v1/sales/settlements').catch(() => ({ ok: false })),
       fetch('/api/v1/farmers'),
-      fetch('/api/v1/services').catch(() => ({ ok: false }))
+      fetch('/api/v1/services').catch(() => ({ ok: false })),
+      fetch('/api/v1/incomes').catch(() => ({ ok: false }))
     ]);
 
     if (bRes.ok) batches.value = await bRes.json();
@@ -919,6 +921,9 @@ const fetchData = async () => {
     if (sRes.ok && typeof sRes.json === 'function') settlements.value = await sRes.json();
     if (fRes.ok) farmers.value = await fRes.json();
     if (srvRes.ok && typeof srvRes.json === 'function') services.value = await srvRes.json();
+    if (incRes.ok && typeof incRes.json === 'function') otherIncomes.value = await incRes.json();
+
+    renderCharts();
 
     renderCharts();
   } catch (err) {
@@ -1006,7 +1011,7 @@ const todayOutflows = computed(() => {
   return todayFarmerPayouts.value + todayExpenses.value;
 });
 
-// 6. 100% DYNAMIC Service Fees & Loan Recoveries Breakdown for selectedDate
+// 6. 100% DYNAMIC Service Fees, Other Incomes & Loan Recoveries Breakdown for selectedDate
 const todayDynamicDeductions = computed(() => {
   const map = {};
 
@@ -1041,6 +1046,18 @@ const todayDynamicDeductions = computed(() => {
           map[label].amount += fee;
         }
       }
+    }
+  });
+
+  // Include Other Incomes registered for this date
+  otherIncomes.value.forEach(inc => {
+    const dateStr = getDateStr(inc.date_received || inc.created_at);
+    if (dateStr === selectedDate.value) {
+      const label = inc.source_name || 'Mapato Mengineyo';
+      if (!map[label]) {
+        map[label] = { label, amount: 0, type: 'other_income' };
+      }
+      map[label].amount += parseFloat(inc.amount || 0);
     }
   });
 
@@ -1261,16 +1278,46 @@ const renderCharts = async () => {
     let pieColors = [];
 
     if (rightChartMode.value === 'income') {
-      // 🟢 SERVICE INCOMES BREAKDOWN (Vyanzo vya Mapato ya Faida PEKEE - Excluding Loan Principal)
+      // 🟢 SERVICE & OPERATIONAL INCOMES BREAKDOWN (Vyanzo vya Mapato - Excluding Loan Principal)
       const realIncomeDeductions = todayDynamicDeductions.value.filter(item => item.type !== 'loan_principal');
       if (realIncomeDeductions.length > 0) {
         pieLabels = realIncomeDeductions.map(item => item.label);
         pieData = realIncomeDeductions.map(item => item.amount);
-        pieColors = ['#059669', '#0284c7', '#7c3aed', '#d97706', '#0d9488', '#e11d48'];
+        pieColors = ['#059669', '#0284c7', '#7c3aed', '#d97706', '#0d9488', '#e11d48', '#2563eb', '#ca8a04'];
       } else {
-        pieLabels = ['Hakuna Mapato ya Huduma Leo'];
-        pieData = [1];
-        pieColors = ['#e2e8f0'];
+        // Fallback: Compute all-time vyanzo vya mapato directly from Database
+        const dbIncomeMap = {};
+        settlements.value.forEach(s => {
+          if (s.deductions && Array.isArray(s.deductions)) {
+            s.deductions.forEach(d => {
+              if (d.deduction_type === 'loan_principal') return;
+              let label = d.deduction_type || 'Ada za Huduma';
+              if (d.deduction_type === 'storage_fee') label = 'Ada ya Hifadhi Ghalani';
+              else if (d.deduction_type === 'drying_fee') label = 'Ada ya Kukausha Mazao';
+              else if (d.deduction_type === 'milling_fee') label = 'Ada ya Kukoboa / Kusaga';
+              else if (d.deduction_type === 'grading_fee') label = 'Ada ya Sorting & Packaging';
+              else if (d.deduction_type === 'loan_interest') label = 'Riba ya Mikopo';
+              else label = label.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+
+              dbIncomeMap[label] = (dbIncomeMap[label] || 0) + parseFloat(d.amount || 0);
+            });
+          }
+        });
+        otherIncomes.value.forEach(inc => {
+          const label = inc.source_name || 'Mapato Mengineyo';
+          dbIncomeMap[label] = (dbIncomeMap[label] || 0) + parseFloat(inc.amount || 0);
+        });
+
+        const dbKeys = Object.keys(dbIncomeMap);
+        if (dbKeys.length > 0) {
+          pieLabels = dbKeys.map(k => `${k} (DB Total)`);
+          pieData = dbKeys.map(k => dbIncomeMap[k]);
+          pieColors = ['#059669', '#0284c7', '#7c3aed', '#d97706', '#0d9488', '#e11d48', '#2563eb', '#ca8a04'];
+        } else {
+          pieLabels = ['Hakuna Mapato yoyote DB'];
+          pieData = [1];
+          pieColors = ['#e2e8f0'];
+        }
       }
     } else {
       // 🔴 OPERATIONAL EXPENSES BREAKDOWN (Matumizi ya Ofisi)

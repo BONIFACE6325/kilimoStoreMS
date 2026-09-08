@@ -57,10 +57,10 @@
           <div class="w-6.5 h-6.5 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 flex items-center justify-center font-bold text-xs shadow-2xs">🏭</div>
         </div>
         <div class="text-lg font-black text-blue-700 dark:text-blue-400 font-mono">
-          {{ (finances.totalWeightStored || 0).toLocaleString() }} <span class="text-xs">MT</span>
+          {{ (finances.totalWeightStored || 0).toLocaleString() }} <span class="text-xs">Qty</span>
         </div>
         <div class="text-[9px] text-slate-500 dark:text-slate-400 font-semibold pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <span>Jumla Intake: {{ (finances.totalIntakeMt || 0).toLocaleString() }} MT</span>
+          <span>Jumla Intake: {{ (finances.totalIntakeMt || 0).toLocaleString() }}</span>
           <span class="font-mono text-[8px] bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 px-1 rounded font-extrabold uppercase">CROP STOCK</span>
         </div>
       </div>
@@ -170,7 +170,7 @@
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
           <div>
             <h2 class="text-sm font-extrabold text-slate-900 dark:text-slate-50 flex items-center gap-2">
-              <span>📈 {{ trendMode === 'finance' ? 'Financial Performance Trend (Revenues vs Expenses)' : '🌾 Grain Volume Analysis (Intake vs Dispatch in MT)' }}</span>
+              <span>📈 {{ trendMode === 'finance' ? 'Financial Performance Trend (Revenues vs Expenses)' : '🌾 Grain Volume Analysis (Intake vs Dispatch)' }}</span>
             </h2>
             <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Monthly performance comparison over the last 6 months.</p>
           </div>
@@ -187,7 +187,7 @@
               @click="trendMode = 'volume'" 
               :class="['px-2.5 py-1 text-[11px] font-extrabold rounded-lg transition-all cursor-pointer', trendMode === 'volume' ? 'bg-slate-900 text-white dark:bg-blue-600 shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900']"
             >
-              🌾 Volume (MT)
+              🌾 Volume (Qty)
             </button>
           </div>
         </div>
@@ -227,14 +227,14 @@
 
           <!-- Crop Stock Distribution Pills -->
           <div v-if="Object.keys(finances.cropDistribution).length > 0" class="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1">
-            <div class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Mzigo Uliopo Ghalani (Crop MT)</div>
+            <div class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Mzigo Uliopo Ghalani (By Unit)</div>
             <div class="flex flex-wrap gap-1.5">
               <div 
-                v-for="(mt, cName) in finances.cropDistribution" 
+                v-for="(qty, cName) in finances.cropDistribution" 
                 :key="cName" 
                 class="px-2 py-0.5 bg-blue-50 dark:bg-blue-950/60 rounded border border-blue-200 dark:border-blue-800 text-[10.5px] font-mono font-bold text-blue-900 dark:text-blue-300"
               >
-                {{ cName }}: <strong class="text-blue-700 dark:text-blue-400 font-black">{{ mt }} MT</strong>
+                {{ cName }}: <strong class="text-blue-700 dark:text-blue-400 font-black">{{ (qty || 0).toLocaleString() }}</strong>
               </div>
             </div>
           </div>
@@ -674,7 +674,7 @@ const financialTrendData = computed(() => {
       labels: months,
       datasets: [
         {
-          label: 'Mzigo Uliopokelewa (Intake MT)',
+          label: 'Mzigo Uliopokelewa (Intake)',
           data: trendsData.value.intake && trendsData.value.intake.length > 0 ? trendsData.value.intake : [0, 0, 0, 0, 0, 0],
           borderColor: '#0284c7',
           backgroundColor: 'rgba(2, 132, 199, 0.08)',
@@ -683,7 +683,7 @@ const financialTrendData = computed(() => {
           tension: 0.4
         },
         {
-          label: 'Mzigo Uliotoka/Uliouzwa (Dispatch MT)',
+          label: 'Mzigo Uliotoka/Uliouzwa (Dispatch)',
           data: trendsData.value.dispatch && trendsData.value.dispatch.length > 0 ? trendsData.value.dispatch : [0, 0, 0, 0, 0, 0],
           borderColor: '#f59e0b',
           backgroundColor: 'rgba(245, 158, 11, 0.08)',
@@ -743,7 +743,7 @@ const financialTrendOptions = computed(() => {
           color: textColor,
           font: { size: 10, weight: '600' },
           callback: (value) => {
-            if (trendMode.value === 'volume') return value + ' MT';
+            if (trendMode.value === 'volume') return value.toLocaleString();
             if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
             if (value >= 1000) return (value / 1000).toFixed(0) + 'k';
             return value;

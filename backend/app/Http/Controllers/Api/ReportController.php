@@ -21,7 +21,7 @@ use App\Models\Expense;
 use App\Models\Bin;
 use App\Models\Service;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class ReportController extends Controller
@@ -30,99 +30,107 @@ class ReportController extends Controller
     {
         try {
             $startDate = $request->query('start_date');
-        $endDate = $request->query('end_date') ? $request->query('end_date') . ' 23:59:59' : null;
+            $endDate = $request->query('end_date') ? $request->query('end_date') . ' 23:59:59' : null;
 
-        $activeWeight = (float) Batch::whereIn('status', ['stored', 'received', 'processing'])->sum('current_weight_mt');
-        $totalIntakeWeight = (float) Batch::sum('initial_weight_mt');
-        $farmersCount = Farmer::where('status', 'active')->count();
-        $outstandingLoans = (float) Loan::whereIn('status', ['active', 'overdue'])->sum('current_balance');
-        $activeLoansCount = Loan::where('status', 'active')->count();
-        $overdueLoansCount = Loan::where('status', 'overdue')->count();
+            $activeWeight = (float) Batch::whereIn('status', ['stored', 'received', 'processing'])
+                ->sum(DB::raw('COALESCE(NULLIF(intake_quantity, 0), current_weight_mt)'));
+            $totalIntakeWeight = (float) Batch::sum(DB::raw('COALESCE(NULLIF(intake_quantity, 0), initial_weight_mt)'));
+            $farmersCount = Farmer::where('status', 'active')->count();
+            $outstandingLoans = (float) Loan::whereIn('status', ['active', 'overdue'])->sum('current_balance');
+            $activeLoansCount = Loan::where('status', 'active')->count();
+            $overdueLoansCount = Loan::where('status', 'overdue')->count();
 
-        $serviceMetrics = $this->calculateServiceMetrics($startDate, $endDate);
-        $totalServiceFeeRevenue = $serviceMetrics['total_revenue'];
-        $dynamicServiceBreakdown = $serviceMetrics['breakdown'];
+            $serviceMetrics = $this->calculateServiceMetrics($startDate, $endDate);
+            $totalServiceFeeRevenue = $serviceMetrics['total_revenue'];
+            $dynamicServiceBreakdown = $serviceMetrics['breakdown'];
 
-        $totalLoansRecovered = $this->getSumByDateRange(SettlementDeduction::query()->where('deduction_type', 'loan_principal'), 'created_at', $startDate, $endDate);
-        $otherIncomeTotal = $this->getSumByDateRange(OtherIncome::query(), 'date_received', $request->query('start_date'), $request->query('end_date'));
-        $totalLoansDisbursed = $this->getSumByDateRange(Loan::query(), 'created_at', $startDate, $endDate, 'principal_amount');
-        $totalExpenses = $this->getSumByDateRange(Expense::query(), 'date_incurred', $request->query('start_date'), $request->query('end_date'));
+            $totalLoansRecovered = $this->getSumByDateRange(SettlementDeduction::query()->where('deduction_type', 'loan_principal'), 'created_at', $startDate, $endDate);
+            $otherIncomeTotal = $this->getSumByDateRange(OtherIncome::query(), 'date_received', $request->query('start_date'), $request->query('end_date'));
+            $totalLoansDisbursed = $this->getSumByDateRange(Loan::query(), 'created_at', $startDate, $endDate, 'principal_amount');
+            $totalExpenses = $this->getSumByDateRange(Expense::query(), 'date_incurred', $request->query('start_date'), $request->query('end_date'));
 
-        $grossStoreInflows = $totalServiceFeeRevenue + $totalLoansRecovered + $otherIncomeTotal;
-        $totalNetServiceProfit = ($totalServiceFeeRevenue + $otherIncomeTotal) - $totalExpenses;
+            $grossStoreInflows = $totalServiceFeeRevenue + $totalLoansRecovered + $otherIncomeTotal;
+            $totalNetServiceProfit = ($totalServiceFeeRevenue + $otherIncomeTotal) - $totalExpenses;
 
-        $settlementSalesQuery = Settlement::query();
-        if ($startDate && $endDate) {
-            $settlementSalesQuery->where(function($q) use ($startDate, $endDate) {
-                $q->whereBetween('settled_at', [$startDate, $endDate])
-                  ->orWhere(function($q2) use ($startDate, $endDate) {
-                      $q2->whereNull('settled_at')->whereBetween('created_at', [$startDate, $endDate]);
-                  });
-            });
-        }
-        $totalCropSales = (float) $settlementSalesQuery->sum('gross_amount');
-        if ($totalCropSales <= 0) {
-            $invoiceSalesQuery = Invoice::query();
+            $settlementSalesQuery = Settlement::query();
             if ($startDate && $endDate) {
-                $invoiceSalesQuery->whereBetween('created_at', [$startDate, $endDate]);
+                $settlementSalesQuery->where(function($q) use ($startDate, $endDate) {
+                    $q->whereBetween('settled_at', [$startDate, $endDate])
+                      ->orWhere(function($q2) use ($startDate, $endDate) {
+                          $q2->whereNull('settled_at')->whereBetween('created_at', [$startDate, $endDate]);
+                      });
+                });
             }
-            $totalCropSales = (float) $invoiceSalesQuery->sum('total_amount');
-        }
+            $totalCropSales = (float) $settlementSalesQuery->sum('gross_amount');
+            if ($totalCropSales <= 0) {
+                $invoiceSalesQuery = Invoice::query();
+                if ($startDate && $endDate) {
+                    $invoiceSalesQuery->whereBetween('created_at', [$startDate, $endDate]);
+                }
+                $totalCropSales = (float) $invoiceSalesQuery->sum('total_amount');
+            }
 
-        $totalCapacity = Bin::sum('capacity_mt') ?: 1;
-        $totalOccupied = Bin::sum('current_occupancy_mt');
-        $occupancyPercentage = round(($totalOccupied / $totalCapacity) * 100, 1);
+            $totalCapacity = Bin::sum('capacity_mt') ?: 1;
+            $totalOccupied = Bin::sum('current_occupancy_mt');
+            $occupancyPercentage = round(($totalOccupied / $totalCapacity) * 100, 1);
 
-        $otherIncomeMap = $this->getGroupedMap(OtherIncome::query(), 'source_name', 'date_received', $request->query('start_date'), $request->query('end_date'));
-        $expensesMap = $this->getGroupedMap(Expense::query(), 'category_name', 'date_incurred', $request->query('start_date'), $request->query('end_date'));
+            $otherIncomeMap = $this->getGroupedMap(OtherIncome::query(), 'source_name', 'date_received', $request->query('start_date'), $request->query('end_date'));
+            $expensesMap = $this->getGroupedMap(Expense::query(), 'category_name', 'date_incurred', $request->query('start_date'), $request->query('end_date'));
 
-        $trends = $this->getMonthlyTrends();
+            $trends = $this->getMonthlyTrends();
 
-        return response()->json([
-            'stats' => [
-                'total_weight_stored_mt' => $activeWeight,
-                'total_intake_mt' => $totalIntakeWeight,
-                'registered_farmers' => $farmersCount,
-                'total_crop_sales_tzs' => $totalCropSales,
-                'gross_all_inflows_tzs' => $grossStoreInflows,
-                'total_loans_disbursed_tzs' => $totalLoansDisbursed,
-                'total_loans_recovered_tzs' => $totalLoansRecovered,
-                'loan_portfolio_value' => $outstandingLoans,
-                'total_revenue_tzs' => $totalServiceFeeRevenue,
-                'total_other_income_tzs' => $otherIncomeTotal,
-                'total_net_service_profit_tzs' => $totalNetServiceProfit,
-                'total_expenses_tzs' => $totalExpenses,
-                'stock_valuation_tzs' => $this->getStockValuation(),
-                'active_loans_count' => $activeLoansCount,
-                'overdue_loans_count' => $overdueLoansCount,
-            ],
-            'warehouse' => [
-                'capacity_mt' => $totalCapacity,
-                'occupied_mt' => $totalOccupied,
-                'occupancy_pct' => $occupancyPercentage,
-            ],
-            'service_breakdown' => $dynamicServiceBreakdown,
-            'other_income_breakdown' => $otherIncomeMap,
-            'expenses_breakdown' => $expensesMap,
-            'machine_stats' => [
-                'drying_jobs' => DryingJob::count(),
-                'drying_active' => DryingJob::whereIn('status', ['queued', 'processing'])->count(),
-                'drying_completed' => DryingJob::where('status', 'completed')->count(),
-                'drying_qty' => DryingJob::sum('weight_before_mt'),
-                'milling_jobs' => MillingJob::count(),
-                'milling_active' => MillingJob::whereIn('status', ['queued', 'processing'])->count(),
-                'milling_completed' => MillingJob::where('status', 'completed')->count(),
-                'milling_qty' => MillingJob::sum('input_weight_mt'),
-                'grading_jobs' => GradingRecord::count(),
-                'grading_qty' => GradingRecord::count(),
-            ],
-            'trends' => $trends,
-            'crop_distribution' => [
-                'Mpunga / Rice' => (float) Batch::whereIn('crop_type', ['Rice', 'Mpunga', 'Paddy', 'mchele', 'Mchele'])->whereIn('status', ['stored', 'received', 'processing'])->sum('current_weight_mt'),
-                'Mahindi / Maize' => (float) Batch::whereIn('crop_type', ['Maize', 'Mahindi', 'Sembe'])->whereIn('status', ['stored', 'received', 'processing'])->sum('current_weight_mt'),
-                'Maharage / Beans' => (float) Batch::whereIn('crop_type', ['Beans', 'Maharage'])->whereIn('status', ['stored', 'received', 'processing'])->sum('current_weight_mt'),
-            ]
-        ]);
+            // Calculate registered crop distribution in original units (no forced MT conversion)
+            $cropDistribution = [];
+            $batches = Batch::whereIn('status', ['stored', 'received', 'processing'])->get();
+            foreach ($batches as $b) {
+                $cropName = $b->crop_type ?: 'General';
+                $unit = $b->intake_unit ?: 'Gunia';
+                $qty = (float) ($b->intake_quantity > 0 ? $b->intake_quantity : $b->current_weight_mt);
+                $key = "{$cropName} ({$unit})";
+                $cropDistribution[$key] = ($cropDistribution[$key] ?? 0) + $qty;
+            }
+
+            return response()->json([
+                'stats' => [
+                    'total_weight_stored_mt' => $activeWeight,
+                    'total_intake_mt' => $totalIntakeWeight,
+                    'registered_farmers' => $farmersCount,
+                    'total_crop_sales_tzs' => $totalCropSales,
+                    'gross_all_inflows_tzs' => $grossStoreInflows,
+                    'total_loans_disbursed_tzs' => $totalLoansDisbursed,
+                    'total_loans_recovered_tzs' => $totalLoansRecovered,
+                    'loan_portfolio_value' => $outstandingLoans,
+                    'total_revenue_tzs' => $totalServiceFeeRevenue,
+                    'total_other_income_tzs' => $otherIncomeTotal,
+                    'total_net_service_profit_tzs' => $totalNetServiceProfit,
+                    'total_expenses_tzs' => $totalExpenses,
+                    'stock_valuation_tzs' => $this->getStockValuation(),
+                    'active_loans_count' => $activeLoansCount,
+                    'overdue_loans_count' => $overdueLoansCount,
+                ],
+                'warehouse' => [
+                    'capacity_mt' => $totalCapacity,
+                    'occupied_mt' => $totalOccupied,
+                    'occupancy_pct' => $occupancyPercentage,
+                ],
+                'service_breakdown' => $dynamicServiceBreakdown,
+                'other_income_breakdown' => $otherIncomeMap,
+                'expenses_breakdown' => $expensesMap,
+                'machine_stats' => [
+                    'drying_jobs' => DryingJob::count(),
+                    'drying_active' => DryingJob::whereIn('status', ['queued', 'processing'])->count(),
+                    'drying_completed' => DryingJob::where('status', 'completed')->count(),
+                    'drying_qty' => DryingJob::sum('weight_before_mt'),
+                    'milling_jobs' => MillingJob::count(),
+                    'milling_active' => MillingJob::whereIn('status', ['queued', 'processing'])->count(),
+                    'milling_completed' => MillingJob::where('status', 'completed')->count(),
+                    'milling_qty' => MillingJob::sum('input_weight_mt'),
+                    'grading_jobs' => GradingRecord::count(),
+                    'grading_qty' => GradingRecord::count(),
+                ],
+                'trends' => $trends,
+                'crop_distribution' => $cropDistribution
+            ]);
         } catch (\Throwable $e) {
             Log::error('getDashboardStats failed: ' . $e->getMessage());
             return response()->json([
@@ -253,14 +261,14 @@ class ReportController extends Controller
             
             $intakeSum = Batch::whereYear('created_at', $date->year)
                 ->whereMonth('created_at', $date->month)
-                ->sum('initial_weight_mt');
-            $monthlyIntake[$monthName] = (float)$intakeSum * 1000;
+                ->sum(DB::raw('COALESCE(NULLIF(intake_quantity, 0), initial_weight_mt)'));
+            $monthlyIntake[$monthName] = (float)$intakeSum;
 
             $dispatchSum = Batch::where('status', 'sold')
                 ->whereYear('updated_at', $date->year)
                 ->whereMonth('updated_at', $date->month)
-                ->sum('current_weight_mt');
-            $monthlyDispatch[$monthName] = (float)$dispatchSum * 1000;
+                ->sum(DB::raw('COALESCE(NULLIF(intake_quantity, 0), current_weight_mt)'));
+            $monthlyDispatch[$monthName] = (float)$dispatchSum;
         }
 
         return [
