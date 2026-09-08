@@ -2773,16 +2773,12 @@ const fetchServicesCatalog = async () => {
     const res = await fetch('/api/v1/services');
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        catalogServices.value = data;
-      } else {
-        catalogServices.value = defaultRegisteredServices;
-      }
+      catalogServices.value = Array.isArray(data) ? data : [];
     } else {
-      catalogServices.value = defaultRegisteredServices;
+      catalogServices.value = [];
     }
   } catch (e) {
-    catalogServices.value = defaultRegisteredServices;
+    catalogServices.value = [];
   }
 };
 

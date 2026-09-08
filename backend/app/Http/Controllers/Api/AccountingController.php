@@ -10,18 +10,24 @@ use App\Models\Service;
 use App\Models\MillingJob;
 use App\Models\DryingJob;
 use App\Models\GradingRecord;
+use App\Traits\HasTenantScope;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AccountingController extends Controller
 {
+    use HasTenantScope;
+
     public function getFinancialSummary(Request $request)
     {
+        $tenantId = $this->getTenantId($request);
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date') ? $request->query('end_date') . ' 23:59:59' : null;
 
         // 1. Storage & Service Fee Revenues collected via Settlements
-        $serviceDeductionQuery = SettlementDeduction::query();
+        $serviceDeductionQuery = SettlementDeduction::whereHas('settlement', function($q) use ($tenantId) {
+            $q->where('tenant_id', $tenantId);
+        });
         if ($startDate && $endDate) {
             $serviceDeductionQuery->whereBetween('created_at', [$startDate, $endDate]);
         }
@@ -34,7 +40,7 @@ class AccountingController extends Controller
         $totalServiceFeeRevenue = $storageFees + $dryingFees + $millingFees + $gradingFees;
 
         // 2. Other Incomes
-        $otherIncomeQuery = OtherIncome::query();
+        $otherIncomeQuery = OtherIncome::where('tenant_id', $tenantId);
         if ($startDate && $endDate) {
             $otherIncomeQuery->whereBetween('date_received', [$request->query('start_date'), $request->query('end_date')]);
         }
@@ -44,7 +50,7 @@ class AccountingController extends Controller
         $totalRevenue = $totalServiceFeeRevenue + $totalOtherIncome;
 
         // 3. Operating Expenses (OPEX)
-        $expenseQuery = Expense::query();
+        $expenseQuery = Expense::where('tenant_id', $tenantId);
         if ($startDate && $endDate) {
             $expenseQuery->whereBetween('date_incurred', [$request->query('start_date'), $request->query('end_date')]);
         }
@@ -71,7 +77,7 @@ class AccountingController extends Controller
             });
 
         // 5. Dynamic Income Breakdown from Registered Services & Other Income Sources
-        $registeredServices = Service::all();
+        $registeredServices = Service::where('tenant_id', $tenantId)->get();
         $incomeBreakdown = [];
 
         // Map revenue per service_id

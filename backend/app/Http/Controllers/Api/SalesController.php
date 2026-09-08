@@ -14,20 +14,25 @@ use App\Models\SettlementDeduction;
 use App\Models\DryingJob;
 use App\Models\MillingJob;
 use App\Models\GradingRecord;
+use App\Traits\HasTenantScope;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class SalesController extends Controller
 {
-    public function getBuyers()
+    use HasTenantScope;
+
+    public function getBuyers(Request $request)
     {
-        $buyers = Buyer::where('status', 'active')->orderBy('name')->get();
+        $tenantId = $this->getTenantId($request);
+        $buyers = Buyer::where('tenant_id', $tenantId)->where('status', 'active')->orderBy('name')->get();
         return response()->json($buyers);
     }
 
-    public function indexInvoices()
+    public function indexInvoices(Request $request)
     {
-        $invoices = Invoice::with(['buyer', 'items.batch.farmer'])->orderBy('created_at', 'desc')->get();
+        $tenantId = $this->getTenantId($request);
+        $invoices = Invoice::where('tenant_id', $tenantId)->with(['buyer', 'items.batch.farmer'])->orderBy('created_at', 'desc')->get();
         return response()->json($invoices);
     }
 
@@ -55,9 +60,10 @@ class SalesController extends Controller
         ]);
     }
 
-    public function indexSettlements()
+    public function indexSettlements(Request $request)
     {
-        $settlements = Settlement::with(['farmer', 'invoice.buyer', 'deductions'])->orderBy('created_at', 'desc')->get();
+        $tenantId = $this->getTenantId($request);
+        $settlements = Settlement::where('tenant_id', $tenantId)->with(['farmer', 'invoice.buyer', 'deductions'])->orderBy('created_at', 'desc')->get();
         return response()->json($settlements);
     }
 

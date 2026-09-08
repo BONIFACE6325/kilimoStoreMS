@@ -694,17 +694,13 @@ const fetchServices = async () => {
     const res = await fetch('/api/v1/services');
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        services.value = data;
-      } else {
-        services.value = defaultServices;
-      }
+      services.value = Array.isArray(data) ? data : [];
     } else {
-      services.value = defaultServices;
+      services.value = [];
     }
   } catch (e) {
     console.error('Error fetching services:', e);
-    services.value = defaultServices;
+    services.value = [];
   } finally {
     loading.value = false;
   }

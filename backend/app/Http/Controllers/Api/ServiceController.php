@@ -23,6 +23,24 @@ class ServiceController extends Controller
             \Illuminate\Support\Facades\DB::statement("UPDATE services SET crop_type = 'Mahindi' WHERE (LOWER(name_sw) LIKE '%mahindi%' OR LOWER(name_en) LIKE '%maize%')");
         } catch (\Throwable $e) {}
 
+        if (Service::where('tenant_id', $tenantId)->count() === 0) {
+            $defaultServices = [
+                ['name_sw' => 'Kukoboa (Sembe/Mpunga)', 'name_en' => 'Milling (Flour/Paddy)', 'rate' => 70.00, 'unit' => 'kg', 'crop_type' => 'Mpunga/Mahindi', 'description' => 'Ada ya kukoboa nafaka kwa kilo.'],
+                ['name_sw' => 'Kusogeza kwenye kinu', 'name_en' => 'Handling & Bagging', 'rate' => 300.00, 'unit' => 'gunia', 'crop_type' => 'Zote', 'description' => 'Ada ya kubeba na kusogeza gunia kwenye kinu.'],
+                ['name_sw' => 'Kuanika mpunga (Drying)', 'name_en' => 'Paddy Drying', 'rate' => 1000.00, 'unit' => 'gunia', 'crop_type' => 'Mpunga', 'description' => 'Ada ya kuanika mpunga juani kwa gunia.'],
+                ['name_sw' => 'Kugiredi (Grading)', 'name_en' => 'Rice Grading', 'rate' => 8.00, 'unit' => 'kg', 'crop_type' => 'Mchele', 'description' => 'Ada ya kupambanua daraja la mchele.'],
+                ['name_sw' => 'Kudoloti (Color sorting)', 'name_en' => 'Color Sorting', 'rate' => 22.00, 'unit' => 'kg', 'crop_type' => 'Mchele', 'description' => 'Kutenganisha mchele mweusi/mwekundu kwa mashine ya rangi.'],
+                ['name_sw' => 'Kuanika + Kuchanganya', 'name_en' => 'Drying + Mixing', 'rate' => 1500.00, 'unit' => 'gunia', 'crop_type' => 'Mpunga', 'description' => 'Ada ya kuanika na kuchanganya mpunga.'],
+                ['name_sw' => 'Kuchanganya Mchele na Mafuta', 'name_en' => 'Polishing + Oil Mix', 'rate' => 2.50, 'unit' => 'kg', 'crop_type' => 'Mchele', 'description' => 'Polishing na kurutubisha mchele.'],
+                ['name_sw' => 'Kupanga stoko (Warehouse)', 'name_en' => 'Warehouse Stacking', 'rate' => 700.00, 'unit' => 'gunia', 'crop_type' => 'Zote', 'description' => 'Ada ya kupanga magunia ghalani.'],
+                ['name_sw' => 'Wafanyakazi (Labor)', 'name_en' => 'Labor Charges', 'rate' => 1000.00, 'unit' => 'gunia', 'crop_type' => 'Zote', 'description' => 'Gharama za vibarua vya kinu.']
+            ];
+
+            foreach ($defaultServices as $ds) {
+                Service::create(array_merge($ds, ['tenant_id' => $tenantId]));
+            }
+        }
+
         $services = Service::where('tenant_id', $tenantId)->orderBy('name_sw')->get();
         return response()->json($services);
     }

@@ -397,9 +397,9 @@ const fetchSalesData = async () => {
     const res = await fetch('/api/v1/sales/invoices');
     if (res.ok) {
       const data = await res.json();
-      invoices.value = (Array.isArray(data) && data.length > 0) ? data : defaultInvoices;
+      invoices.value = Array.isArray(data) ? data : [];
     } else {
-      invoices.value = defaultInvoices;
+      invoices.value = [];
     }
 
     const bRes = await fetch('/api/v1/sales/buyers');
@@ -407,7 +407,7 @@ const fetchSalesData = async () => {
       buyers.value = await bRes.json();
     }
   } catch (e) {
-    invoices.value = defaultInvoices;
+    invoices.value = [];
   } finally {
     loading.value = false;
   }
