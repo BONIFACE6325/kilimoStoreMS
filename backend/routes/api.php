@@ -11,9 +11,13 @@ use App\Http\Controllers\Api\IncomeController;
 use App\Http\Controllers\Api\ExpenseController;
 
 use App\Http\Controllers\Api\BuyerController;
+use App\Http\Controllers\Api\AccountingController;
 
 // Group under v1
 Route::prefix('v1')->group(function () {
+    // Financial Summary & Accounting P&L Analysis
+    Route::get('/accounting/financial-summary', [AccountingController::class, 'getFinancialSummary']);
+
     // Buyers CRUD
     Route::get('buyers/stats', [BuyerController::class, 'stats']);
     Route::get('buyers/{id}/history', [BuyerController::class, 'history']);
