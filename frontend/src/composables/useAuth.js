@@ -1,4 +1,5 @@
 import { ref, computed } from 'vue';
+import { useTenants } from './useTenants';
 
 const INACTIVITY_LIMIT_MS = 15 * 60 * 1000; // 15 Minutes Inactivity Timeout
 
@@ -26,6 +27,10 @@ const getInitialUser = () => {
     email: 'gwakilabonface@gmail.com',
     phone: '0750000000',
     role: 'System Owner',
+    tenantId: 'tenant_kigoma',
+    tenantName: 'Kigoma Grain Mills Ltd',
+    subscriptionPlan: 'enterprise',
+    isSuperAdmin: true,
     avatarUrl: ''
   };
 };
@@ -42,7 +47,12 @@ let inactivityCheckInterval = null;
 let lastThrottleTime = 0;
 
 export function useAuth() {
+  const { tenants, setActiveTenant } = useTenants();
+
   const isAuthenticated = computed(() => !!token.value);
+  const isSuperAdmin = computed(() => {
+    return user.value?.email?.toLowerCase() === 'gwakilabonface@gmail.com' || user.value?.isSuperAdmin === true;
+  });
 
   const updateActivity = () => {
     const now = Date.now();
@@ -89,26 +99,70 @@ export function useAuth() {
     const cleanEmail = (emailInput || '').trim().toLowerCase();
     const cleanPass = (passwordInput || '').trim();
 
-    const validPass = storedPassword.value;
+    // 1. Super Admin Authentication
+    if (cleanEmail === 'gwakilabonface@gmail.com') {
+      if (cleanPass !== storedPassword.value) {
+        return { success: false, message: 'Access Denied: Neno la siri la Super Admin siyo sahihi.' };
+      }
 
-    if (cleanEmail !== 'gwakilabonface@gmail.com' || cleanPass !== validPass) {
-      return { 
-        success: false, 
-        message: 'Access Denied: Incorrect email or password. Only authorized system owner can log in.' 
+      const newToken = 'garanoki_saas_token_' + Date.now();
+      const userData = {
+        name: 'Boniface Gwakila',
+        email: 'gwakilabonface@gmail.com',
+        phone: '0750000000',
+        role: 'System Owner',
+        tenantId: 'tenant_kigoma',
+        tenantName: 'Kigoma Grain Mills Ltd',
+        subscriptionPlan: 'enterprise',
+        isSuperAdmin: true,
+        avatarUrl: ''
       };
+
+      token.value = newToken;
+      user.value = userData;
+      setActiveTenant('tenant_kigoma');
+
+      persistSession(newToken, userData, rememberMe);
+      return { success: true, isSuperAdmin: true };
     }
 
-    const newToken = 'garanoki_owner_token_' + Date.now();
+    // 2. Tenant Account Authentication
+    const matchingTenant = tenants.value.find(t => t.ownerEmail.toLowerCase() === cleanEmail);
+
+    if (!matchingTenant) {
+      return { success: false, message: 'Akaunti haikupatikana. Hakikisha barua pepe au sajili akaunti mpya.' };
+    }
+
+    if (cleanPass !== (matchingTenant.password || '12345678')) {
+      return { success: false, message: 'Neno la siri siyo sahihi.' };
+    }
+
+    if (matchingTenant.status === 'suspended') {
+      return { success: false, message: 'Akaunti yako imesimamishwa na Admin. Tafadhali mawasiliana na Uongozi wa GARANOKI.' };
+    }
+
+    const newToken = 'garanoki_tenant_token_' + Date.now();
     const userData = {
-      ...user.value,
-      name: user.value?.name || 'Boniface Gwakila',
-      email: 'gwakilabonface@gmail.com',
-      role: 'System Owner'
+      name: matchingTenant.ownerName,
+      email: matchingTenant.ownerEmail,
+      phone: matchingTenant.phone,
+      role: 'Warehouse Owner',
+      tenantId: matchingTenant.id,
+      tenantName: matchingTenant.name,
+      subscriptionPlan: matchingTenant.plan,
+      isSuperAdmin: false,
+      avatarUrl: ''
     };
 
     token.value = newToken;
     user.value = userData;
+    setActiveTenant(matchingTenant.id);
 
+    persistSession(newToken, userData, rememberMe);
+    return { success: true, isSuperAdmin: false };
+  };
+
+  const persistSession = (newToken, userData, rememberMe) => {
     sessionStorage.removeItem('garanoki_logout_reason');
     sessionStorage.setItem('garanoki_token', newToken);
     sessionStorage.setItem('garanoki_user', JSON.stringify(userData));
@@ -123,8 +177,6 @@ export function useAuth() {
 
     localStorage.setItem('garanoki_last_activity', String(Date.now()));
     startInactivityTimer();
-
-    return { success: true };
   };
 
   const updateProfile = ({ name, email, phone, avatarUrl }) => {
@@ -147,20 +199,20 @@ export function useAuth() {
     const cleanConfirm = (confirmPassword || '').trim();
 
     if (cleanCurrent !== storedPassword.value) {
-      return { success: false, message: 'Current password is incorrect.' };
+      return { success: false, message: 'Neno la siri la sasa siyo sahihi.' };
     }
 
     if (cleanNew.length < 6) {
-      return { success: false, message: 'New password must be at least 6 characters long.' };
+      return { success: false, message: 'Neno jipya la siri lazima liwe na angalau herufi 6.' };
     }
 
     if (cleanNew !== cleanConfirm) {
-      return { success: false, message: 'New password and confirmation do not match.' };
+      return { success: false, message: 'Maneno mapya ya siri hayafanani.' };
     }
 
     storedPassword.value = cleanNew;
     localStorage.setItem('garanoki_user_password', cleanNew);
-    return { success: true, message: 'Password changed successfully!' };
+    return { success: true, message: 'Neno la siri limebadilishwa vyema!' };
   };
 
   const logout = (reason = 'user') => {
@@ -189,6 +241,7 @@ export function useAuth() {
     token,
     user,
     isAuthenticated,
+    isSuperAdmin,
     login,
     logout,
     updateProfile,

@@ -234,6 +234,25 @@
         <div class="space-y-1">
           <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">{{ t('navSys') }}</div>
 
+          <!-- SaaS Admin Portal (Only visible to Super Admin / System Owner) -->
+          <router-link 
+            v-if="isSuperAdmin"
+            @click="closeMobileSidebar" 
+            to="/saas-admin" 
+            class="flex items-center rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 relative group bg-gradient-to-r from-amber-500/20 via-emerald-500/20 to-teal-500/20 text-emerald-300 border border-emerald-500/30 hover:border-emerald-400"
+            :class="[
+              $route.path.startsWith('/saas-admin') ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md ring-1 ring-emerald-400/30' : '',
+              isSidebarCollapsed ? 'justify-center py-3 px-0' : 'justify-between px-3.5 py-2.5'
+            ]"
+            :title="isSidebarCollapsed ? '👑 SaaS Admin Portal' : ''"
+          >
+            <div class="flex items-center gap-3">
+              <span class="text-base">👑</span>
+              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap font-black">SaaS Admin Portal</span>
+            </div>
+            <span v-if="!isSidebarCollapsed" class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-slate-950">PRO</span>
+          </router-link>
+
           <!-- Settings -->
           <router-link 
             @click="closeMobileSidebar" 
@@ -327,7 +346,7 @@ import { useLanguage } from '../composables/useLanguage';
 
 const router = useRouter();
 const { isSidebarCollapsed, isMobileSidebarOpen, toggleSidebar, closeMobileSidebar } = useLayout();
-const { user, logout } = useAuth();
+const { user, logout, isSuperAdmin } = useAuth();
 const { t } = useLanguage();
 
 const userInitials = computed(() => {

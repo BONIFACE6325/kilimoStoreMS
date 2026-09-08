@@ -37,6 +37,51 @@
         </div>
       </div>
 
+      <!-- Active Tenant Badge & Switcher for Super Admin / Tenant -->
+      <div class="relative">
+        <div 
+          @click="isSuperAdmin && (showTenantMenu = !showTenantMenu)"
+          class="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 rounded-xl text-xs font-bold text-emerald-900 dark:text-emerald-300 transition shadow-2xs"
+          :class="isSuperAdmin ? 'cursor-pointer hover:bg-emerald-100 dark:hover:bg-emerald-900/80' : ''"
+          :title="isSuperAdmin ? 'Badili Ghala (Switch Warehouse)' : 'Ghala Yako'"
+        >
+          <span class="text-base shrink-0">🏢</span>
+          <div class="text-left hidden sm:block">
+            <div class="text-[11px] font-extrabold truncate max-w-[130px] md:max-w-[170px]">
+              {{ activeTenant?.name || 'Kigoma Grain Mills Ltd' }}
+            </div>
+            <div class="text-[9px] uppercase tracking-wider font-black text-emerald-600 dark:text-emerald-400">
+              {{ activeTenant?.plan || 'enterprise' }} PLAN
+            </div>
+          </div>
+          <svg v-if="isSuperAdmin" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+
+        <!-- Dropdown for Super Admin Tenant Switcher -->
+        <transition name="pop">
+          <div v-if="showTenantMenu && isSuperAdmin" class="absolute left-0 mt-2 w-64 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2 z-50 space-y-1">
+            <div class="px-3 py-1.5 text-[10.5px] font-black uppercase text-slate-400 tracking-wider">
+              Badilisha Ghala (Multi-Tenant)
+            </div>
+            <button
+              v-for="tItem in tenants"
+              :key="tItem.id"
+              @click="switchTenant(tItem.id)"
+              class="w-full text-left p-2.5 rounded-xl text-xs flex items-center justify-between transition cursor-pointer"
+              :class="tItem.id === activeTenant?.id ? 'bg-emerald-50 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-300 font-extrabold border border-emerald-200 dark:border-emerald-800' : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold'"
+            >
+              <div>
+                <div class="truncate font-black">{{ tItem.name }}</div>
+                <div class="text-[10px] text-slate-400 capitalize">{{ tItem.ownerName }} • {{ tItem.plan }}</div>
+              </div>
+              <span v-if="tItem.id === activeTenant?.id" class="text-emerald-600 font-black text-sm">✓</span>
+            </button>
+          </div>
+        </transition>
+      </div>
+
     </div>
 
     <!-- Right Controls Area -->
@@ -199,19 +244,28 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useLayout } from '../composables/useLayout';
 import { useAuth } from '../composables/useAuth';
+import { useTenants } from '../composables/useTenants';
 import { useLanguage } from '../composables/useLanguage';
 
 const router = useRouter();
 const { toggleSidebar } = useLayout();
-const { user, logout } = useAuth();
+const { user, isSuperAdmin, logout } = useAuth();
+const { tenants, activeTenant, setActiveTenant } = useTenants();
 const { currentLang, toggleLanguage, t } = useLanguage();
 
 const searchQuery = ref('');
 const showNotifs = ref(false);
 const showProfile = ref(false);
+const showTenantMenu = ref(false);
 const isDark = ref(false);
 const isFullscreen = ref(false);
 const showLogoutModal = ref(false);
+
+const switchTenant = (tenantId) => {
+  setActiveTenant(tenantId);
+  showTenantMenu.value = false;
+  window.location.reload();
+};
 
 const userInitials = computed(() => {
   const name = user.value?.name || 'Boniface Gwakila';

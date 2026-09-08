@@ -12,6 +12,7 @@ import AccountingView from '../views/AccountingView.vue';
 import ReportsView from '../views/ReportsView.vue';
 import SettingsView from '../views/SettingsView.vue';
 import SettlementView from '../views/SettlementView.vue';
+import SaasAdminView from '../views/SaasAdminView.vue';
 import { useAuth } from '../composables/useAuth';
 
 const routes = [
@@ -28,6 +29,7 @@ const routes = [
   { path: '/reports', name: 'Reports', component: ReportsView },
   { path: '/settings', name: 'Settings', component: SettingsView },
   { path: '/settlement', name: 'Settlement', component: SettlementView },
+  { path: '/saas-admin', name: 'SaasAdmin', component: SaasAdminView },
   { path: '/:pathMatch(.*)*', redirect: '/' }
 ];
 
