@@ -1,8 +1,8 @@
 <template>
-  <div class="space-y-6 text-slate-800 dark:text-slate-100">
+  <div class="space-y-6 text-slate-800 dark:text-slate-100 font-sans">
     
-    <!-- Top Executive Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs">
+    <!-- 🏢 TOP EXECUTIVE HEADER: ENTERPRISE REPORTING GOVERNANCE CENTER -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs">
       <div class="space-y-1">
         <div class="flex items-center gap-2 text-xs font-semibold text-slate-400">
           <router-link to="/" class="hover:text-emerald-600 flex items-center gap-1">
@@ -10,21 +10,24 @@
             <span>{{ t('dashboard', 'Dashboard') }}</span>
           </router-link>
           <span>/</span>
-          <span class="text-slate-700 dark:text-slate-200 font-bold">{{ t('reports', 'Ripoti & Hati') }}</span>
+          <span class="text-slate-700 dark:text-slate-200 font-bold">{{ t('reports', 'Ripoti & Financial Governance') }}</span>
         </div>
         <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-          <span>🧾 {{ t('reportManagement', 'Kituo cha Ripoti Rasmi & Ankara') }}</span>
+          <span>📊 {{ t('enterpriseReportsHeader', 'Kituo Kikuu cha Ripoti Rasmi za Kifedha na Uendeshaji') }}</span>
         </h1>
-        <p class="text-xs text-slate-500 dark:text-slate-400">{{ t('reportSubtitle', 'Pakua na chapa ripoti safi za PDF, Invois na Risiti rasmi') }}</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400">
+          {{ t('reportSubtitle', 'Uchambuzi rasmi wa Faida/Hasara (P&L), Hifadhi ya Maghala, Huduma, Mikopo ya Wakulima na Invois za Mauzo') }}
+        </p>
       </div>
 
+      <!-- Action Buttons Bar for Export / Print / Verification -->
       <div class="flex flex-wrap items-center gap-2 print:hidden">
         <button 
           @click="openOfficialVoucherModal"
-          class="px-4 py-2.5 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 font-extrabold text-xs rounded-xl border border-emerald-200 dark:border-emerald-800 shadow-2xs transition cursor-pointer flex items-center gap-2"
+          class="px-4 py-2.5 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 font-extrabold text-xs rounded-xl border border-emerald-200 dark:border-emerald-800 shadow-2xs transition cursor-pointer flex items-center gap-2"
         >
           <span>📄</span>
-          <span>{{ t('verifyInvoice', 'Hakiki Invois / Hati Rasmi') }}</span>
+          <span>{{ t('verifyInvoice', 'Hakiki Invois & Hati Rasmi') }}</span>
         </button>
 
         <button 
@@ -53,61 +56,28 @@
       </div>
     </div>
 
-    <!-- Period Filter Controls Bar -->
+    <!-- 🗓️ ENTERPRISE PERIOD & DATE RANGE CONTROLS BAR -->
     <div class="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4 print:hidden">
       <div class="flex items-center gap-2">
         <span class="text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-          <span class="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-600">🗓️</span>
-          <span>Kipindi cha Taarifa:</span>
+          <span class="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-600">📅</span>
+          <span>Kipindi cha Taarifa (Reporting Period):</span>
         </span>
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
         <button 
-          @click="applyPeriodFilter('all')"
-          :class="selectedPeriod === 'all' ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
+          v-for="p in periodOptions" 
+          :key="p.id"
+          @click="applyPeriodFilter(p.id)"
+          :class="selectedPeriod === p.id ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
           class="px-3.5 py-2 rounded-xl text-xs transition cursor-pointer"
         >
-          Muda Wote
-        </button>
-        <button 
-          @click="applyPeriodFilter('today')"
-          :class="selectedPeriod === 'today' ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
-          class="px-3.5 py-2 rounded-xl text-xs transition cursor-pointer"
-        >
-          Leo
-        </button>
-        <button 
-          @click="applyPeriodFilter('this_week')"
-          :class="selectedPeriod === 'this_week' ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
-          class="px-3.5 py-2 rounded-xl text-xs transition cursor-pointer"
-        >
-          Wiki Hii
-        </button>
-        <button 
-          @click="applyPeriodFilter('this_month')"
-          :class="selectedPeriod === 'this_month' ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
-          class="px-3.5 py-2 rounded-xl text-xs transition cursor-pointer"
-        >
-          Mwezi Huu
-        </button>
-        <button 
-          @click="applyPeriodFilter('this_year')"
-          :class="selectedPeriod === 'this_year' ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
-          class="px-3.5 py-2 rounded-xl text-xs transition cursor-pointer"
-        >
-          Mwaka Huu
-        </button>
-        <button 
-          @click="applyPeriodFilter('custom')"
-          :class="selectedPeriod === 'custom' ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
-          class="px-3.5 py-2 rounded-xl text-xs transition cursor-pointer"
-        >
-          ⚙️ Tarehe Zako
+          {{ p.label }}
         </button>
       </div>
 
-      <!-- Custom Date Inputs -->
+      <!-- Custom Date Pickers -->
       <div v-if="selectedPeriod === 'custom'" class="flex items-center gap-2 pt-2 md:pt-0 border-t md:border-t-0 border-slate-100 dark:border-slate-800">
         <input 
           type="date" 
@@ -129,143 +99,156 @@
       </div>
     </div>
 
-    <!-- Printable Official Executive Letterhead Header (Only visible on print/PDF) -->
+    <!-- 🖨️ PRINTABLE OFFICIAL EXECUTIVE LETTERHEAD (Only visible on print/PDF) -->
     <div class="hidden print:block space-y-4 pb-6 border-b-2 border-slate-900">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-black text-slate-900 uppercase tracking-tight">KILIMO STORE MANAGEMENT SYSTEM</h1>
-          <p class="text-xs font-bold text-slate-600 mt-0.5">S.L.P 100, Kigoma, Tanzania | Simu: +255 764 536 736 | Email: info@kilimostore.co.tz</p>
-          <p class="text-[11px] text-slate-500 font-semibold">Mfumo Rasmi wa Usimamizi wa Ghala, Mazao na Fedha</p>
+          <h1 class="text-2xl font-black text-slate-900 uppercase tracking-tight">GARANOKI STORE & FINANCE MANAGEMENT SYSTEM</h1>
+          <p class="text-xs font-bold text-slate-600 mt-0.5">S.L.P 100, Kigoma, Tanzania | Simu: +255 764 536 736 | Email: info@garanoki.co.tz</p>
+          <p class="text-[11px] text-slate-500 font-semibold">Mfumo Rasmi wa Usimamizi wa Maghala, Mazao, Huduma na Fedha</p>
         </div>
         <div class="text-right space-y-1">
           <span class="inline-block px-3 py-1 bg-slate-900 text-white font-black text-xs uppercase tracking-wider rounded">
-            OFFICIAL REPORT INVOICE VOUCHER
+            OFFICIAL FINANCIAL & OPERATIONAL REPORT
           </span>
           <p class="text-xs font-bold text-slate-800">Kumb: KSM-RPT-{{ reportTimestamp }}</p>
-          <p class="text-xs text-slate-600">Tarehe ya Kuchapwa: {{ new Date().toLocaleDateString('sw-TZ') }}</p>
+          <p class="text-xs text-slate-600">Tarehe: {{ new Date().toLocaleDateString('sw-TZ') }}</p>
         </div>
       </div>
     </div>
 
-    <!-- Navigation Tabs for All Report Categories -->
+    <!-- 🗂️ TABBED CATEGORY NAVIGATION FOR ENTERPRISE REPORT TYPES -->
     <div class="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-1 overflow-x-auto print:hidden">
       <button 
-        @click="activeTab = 'executive'"
+        @click="switchTab('executive')"
         :class="activeTab === 'executive' ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
         class="px-4 py-2.5 rounded-2xl text-xs transition cursor-pointer flex items-center gap-2 whitespace-nowrap"
       >
-        <span>📊 1. Invois & Hati Kuu ya Uendeshaji</span>
+        <span>📊 1. Muhtasari Mkuu wa Bodi (Executive Summary)</span>
       </button>
 
       <button 
-        @click="activeTab = 'inventory'"
-        :class="activeTab === 'inventory' ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
-        class="px-4 py-2.5 rounded-2xl text-xs transition cursor-pointer flex items-center gap-2 whitespace-nowrap"
-      >
-        <span>🌾 2. Hati ya Mazao & Hifadhi</span>
-      </button>
-
-      <button 
-        @click="activeTab = 'services'"
-        :class="activeTab === 'services' ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
-        class="px-4 py-2.5 rounded-2xl text-xs transition cursor-pointer flex items-center gap-2 whitespace-nowrap"
-      >
-        <span>⚙️ 3. Invois ya Utoaji Huduma</span>
-      </button>
-
-      <button 
-        @click="activeTab = 'financial'"
+        @click="switchTab('financial')"
         :class="activeTab === 'financial' ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
         class="px-4 py-2.5 rounded-2xl text-xs transition cursor-pointer flex items-center gap-2 whitespace-nowrap"
       >
-        <span>💰 4. Invois ya Kifedha & OPEX</span>
+        <span>💰 2. Taarifa ya Fedha, Faida & Hasara (P&L Statement)</span>
       </button>
 
       <button 
-        @click="activeTab = 'loans'"
+        @click="switchTab('inventory')"
+        :class="activeTab === 'inventory' ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
+        class="px-4 py-2.5 rounded-2xl text-xs transition cursor-pointer flex items-center gap-2 whitespace-nowrap"
+      >
+        <span>🌾 3. Ripoti ya Maghala, Mazao & Hifadhi</span>
+      </button>
+
+      <button 
+        @click="switchTab('services')"
+        :class="activeTab === 'services' ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
+        class="px-4 py-2.5 rounded-2xl text-xs transition cursor-pointer flex items-center gap-2 whitespace-nowrap"
+      >
+        <span>⚙️ 4. Ripoti ya Kituo cha Uchakataji na Huduma</span>
+      </button>
+
+      <button 
+        @click="switchTab('loans')"
         :class="activeTab === 'loans' ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
         class="px-4 py-2.5 rounded-2xl text-xs transition cursor-pointer flex items-center gap-2 whitespace-nowrap"
       >
-        <span>👨‍🌾 5. Hati ya Wakulima & Mikopo</span>
+        <span>👨‍🌾 5. Ripoti ya Wakulima, Mikopo & Malipo</span>
       </button>
 
       <button 
-        @click="activeTab = 'sales'"
+        @click="switchTab('sales')"
         :class="activeTab === 'sales' ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
         class="px-4 py-2.5 rounded-2xl text-xs transition cursor-pointer flex items-center gap-2 whitespace-nowrap"
       >
-        <span>🛒 6. Anao / Invois za Wanunuzi & Mauzo</span>
+        <span>🛒 6. Ripoti ya Mauzo, Wanunuzi & Invois</span>
       </button>
     </div>
 
-    <!-- TAB 1: Executive Operational Summary & Trends -->
+    <!-- 📊 TAB 1: EXECUTIVE STRATEGY & BOARD OVERVIEW REPORT -->
     <div v-if="activeTab === 'executive'" class="space-y-6">
       
-      <!-- Strategic Executive Metric Cards -->
+      <!-- Executive Key Performance Indicator Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-gradient-to-br from-white to-emerald-50/30 dark:from-slate-900 dark:to-emerald-950/20 p-5 rounded-3xl border border-emerald-200/60 dark:border-emerald-800/40 shadow-xs flex items-center gap-4">
+        <div class="bg-gradient-to-br from-white to-emerald-50/40 dark:from-slate-900 dark:to-emerald-950/20 p-5 rounded-3xl border border-emerald-200/60 dark:border-emerald-800/40 shadow-2xs flex items-center gap-4">
           <div class="p-3.5 bg-emerald-500 text-white rounded-2xl text-xl font-bold shadow-md shadow-emerald-500/20">💰</div>
           <div>
-            <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Mapato Ghafi (Gross Revenue)</p>
+            <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Mapato Ghafi (Turnover)</p>
             <h3 class="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5">TZS {{ formatCurrency(stats.total_revenue_tzs) }}</h3>
-            <p class="text-[10.5px] text-slate-400 mt-0.5">+ Mapato mengineyo TZS {{ formatCurrency(stats.total_other_income_tzs) }}</p>
+            <p class="text-[10.5px] text-slate-400 mt-0.5">+ Mengineyo: TZS {{ formatCurrency(stats.total_other_income_tzs) }}</p>
           </div>
         </div>
 
-        <div class="bg-gradient-to-br from-white to-blue-50/30 dark:from-slate-900 dark:to-blue-950/20 p-5 rounded-3xl border border-blue-200/60 dark:border-blue-800/40 shadow-xs flex items-center gap-4">
-          <div class="p-3.5 bg-blue-500 text-white rounded-2xl text-xl font-bold shadow-md shadow-blue-500/20">📦</div>
+        <div class="bg-gradient-to-br from-white to-blue-50/40 dark:from-slate-900 dark:to-blue-950/20 p-5 rounded-3xl border border-blue-200/60 dark:border-blue-800/40 shadow-2xs flex items-center gap-4">
+          <div class="p-3.5 bg-blue-500 text-white rounded-2xl text-xl font-bold shadow-md shadow-blue-500/20">🏢</div>
           <div>
-            <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Mzigo Uliopo Ghalani</p>
+            <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Ujazo wa Ghala (Occupancy)</p>
             <h3 class="text-xl font-black text-slate-900 dark:text-white mt-0.5">{{ formatCurrency(stats.total_weight_stored_mt) }} MT</h3>
-            <p class="text-[10.5px] text-slate-400 mt-0.5">Ujazo wa Ghala: {{ warehouse.occupancy_pct }}%</p>
+            <p class="text-[10.5px] text-emerald-600 font-bold mt-0.5">{{ warehouse.occupancy_pct || 0 }}% ya uwezo wa ghala</p>
           </div>
         </div>
 
-        <div class="bg-gradient-to-br from-white to-purple-50/30 dark:from-slate-900 dark:to-purple-950/20 p-5 rounded-3xl border border-purple-200/60 dark:border-purple-800/40 shadow-xs flex items-center gap-4">
+        <div class="bg-gradient-to-br from-white to-purple-50/40 dark:from-slate-900 dark:to-purple-950/20 p-5 rounded-3xl border border-purple-200/60 dark:border-purple-800/40 shadow-2xs flex items-center gap-4">
           <div class="p-3.5 bg-purple-500 text-white rounded-2xl text-xl font-bold shadow-md shadow-purple-500/20">🛒</div>
           <div>
-            <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Jumla ya Mauzo ya Mazao</p>
+            <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Mauzo ya Mazao</p>
             <h3 class="text-xl font-black text-purple-600 dark:text-purple-400 mt-0.5">TZS {{ formatCurrency(stats.total_crop_sales_tzs) }}</h3>
             <p class="text-[10.5px] text-slate-400 mt-0.5">Invoices & Settlements</p>
           </div>
         </div>
 
-        <div class="bg-gradient-to-br from-white to-amber-50/30 dark:from-slate-900 dark:to-amber-950/20 p-5 rounded-3xl border border-amber-200/60 dark:border-amber-800/40 shadow-xs flex items-center gap-4">
+        <div class="bg-gradient-to-br from-white to-amber-50/40 dark:from-slate-900 dark:to-amber-950/20 p-5 rounded-3xl border border-amber-200/60 dark:border-amber-800/40 shadow-2xs flex items-center gap-4">
           <div class="p-3.5 bg-amber-500 text-white rounded-2xl text-xl font-bold shadow-md shadow-amber-500/20">👨‍🌾</div>
           <div>
-            <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Wakulima & Mikopo</p>
-            <h3 class="text-xl font-black text-slate-900 dark:text-white mt-0.5">{{ stats.registered_farmers }} Wakulima</h3>
-            <p class="text-[10.5px] text-slate-400 mt-0.5">Deni la Mikopo: TZS {{ formatCurrency(stats.loan_portfolio_value) }}</p>
+            <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Deni la Mikopo ya Wakulima</p>
+            <h3 class="text-xl font-black text-amber-600 dark:text-amber-400 mt-0.5">TZS {{ formatCurrency(stats.loan_portfolio_value) }}</h3>
+            <p class="text-[10.5px] text-slate-400 mt-0.5">Kutoka kwa Wakulima {{ stats.registered_farmers || 0 }}</p>
           </div>
         </div>
       </div>
 
-      <!-- Trend Chart: Revenue vs Expenses & Intake vs Dispatch -->
+      <!-- Executive Management Summary Narrative Card -->
+      <div class="bg-slate-900 text-white p-6 rounded-3xl border border-slate-800 shadow-lg space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <h3 class="text-sm font-black uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+            <span>📌 Muhtasari wa Taarifa ya Uendeshaji & Mkakati (Executive Narrative)</span>
+          </h3>
+          <span class="text-xs font-mono text-slate-400">Kipindi: {{ selectedPeriod.toUpperCase() }}</span>
+        </div>
+        <p class="text-xs leading-relaxed text-slate-300 font-medium">
+          Katika kipindi hiki, kituo cha uendeshaji kimefanikiwa kukusanya mapato ya jumla ya <strong class="text-white font-mono">TZS {{ formatCurrency(stats.total_revenue_tzs) }}</strong> huku kikihifadhi mizigo yenye uzito wa <strong class="text-white font-mono">{{ formatCurrency(stats.total_weight_stored_mt) }} MT</strong> ghalani. Mzunguko wa matumizi ya uendeshaji (OPEX) unafikia <strong class="text-white font-mono">TZS {{ formatCurrency(stats.total_expenses_tzs) }}</strong>, ikitoa faida ghafi inayoelekeza ukuaji wa kituo cha ghala na uchakataji.
+        </p>
+      </div>
+
+      <!-- Executive Financial & Operations Trend Charts -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 print:hidden">
         
-        <!-- Chart 1: Financial Performance Trends -->
+        <!-- Financial Performance Trend -->
         <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-4">
           <div class="font-black text-sm text-slate-900 dark:text-white flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-            <span>📈 Mwelekeo wa Mapato na Matumizi (Financial Trend)</span>
+            <span>📈 Mwelekeo wa Mapato dhidi ya Matumizi (Financial Trend)</span>
             <span class="text-xs text-emerald-600 font-bold">Miezi 6 Iliyopita</span>
           </div>
 
           <div class="h-64 flex items-center justify-center relative">
             <Bar v-if="financialTrendChartData.labels.length > 0" :data="financialTrendChartData" :options="trendChartOptions" />
-            <div v-else class="text-center py-10 text-slate-400 font-semibold text-xs">📊 Bado hakuna data za kutosha za miezi.</div>
+            <div v-else class="text-center py-10 text-slate-400 font-semibold text-xs">📊 Bado hakuna data za miezi.</div>
           </div>
         </div>
 
-        <!-- Chart 2: Inventory Flow Trends -->
+        <!-- Inventory Stock Flow Trend -->
         <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-4">
           <div class="font-black text-sm text-slate-900 dark:text-white flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-            <span>🌾 Mwelekeo wa Mzigo Kuingia na Kutoka (Stock Intake vs Dispatch)</span>
+            <span>🌾 Mwelekeo wa Mzigo Ulioingia na Kutoka Ghalani (Intake vs Dispatch)</span>
             <span class="text-xs text-blue-600 font-bold">Miezi 6 Iliyopita</span>
           </div>
 
           <div class="h-64 flex items-center justify-center relative">
             <Bar v-if="inventoryTrendChartData.labels.length > 0" :data="inventoryTrendChartData" :options="trendChartOptions" />
-            <div v-else class="text-center py-10 text-slate-400 font-semibold text-xs">📊 Bado hakuna data za kutosha za mizigo.</div>
+            <div v-else class="text-center py-10 text-slate-400 font-semibold text-xs">📊 Bado hakuna data za mizigo.</div>
           </div>
         </div>
 
@@ -273,14 +256,137 @@
 
     </div>
 
-    <!-- TAB 2: Inventory & Crop Analytics Report -->
+    <!-- 💰 TAB 2: FINANCIAL STATEMENTS & PROFIT/LOSS (P&L) REPORT -->
+    <div v-if="activeTab === 'financial'" class="space-y-6">
+      
+      <!-- Financial Overview Summary Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-emerald-200/80 dark:border-emerald-800/40 shadow-2xs space-y-1">
+          <p class="text-[11px] font-extrabold text-emerald-600 uppercase tracking-wider">Jumla ya Mapato (Gross Revenue)</p>
+          <h3 class="text-2xl font-black text-emerald-600 dark:text-emerald-400">TZS {{ formatCurrency(stats.total_revenue_tzs + (stats.total_other_income_tzs || 0)) }}</h3>
+          <p class="text-xs text-slate-400">Crop Sales + Service Fees + Other Income</p>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-rose-200/80 dark:border-rose-800/40 shadow-2xs space-y-1">
+          <p class="text-[11px] font-extrabold text-rose-600 uppercase tracking-wider">Jumla ya Matumizi (OPEX)</p>
+          <h3 class="text-2xl font-black text-rose-600 dark:text-rose-400">TZS {{ formatCurrency(stats.total_expenses_tzs) }}</h3>
+          <p class="text-xs text-slate-400">Gharama za Uendeshaji & Maghala</p>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-blue-200/80 dark:border-blue-800/40 shadow-2xs space-y-1">
+          <p class="text-[11px] font-extrabold text-blue-600 uppercase tracking-wider">Faida Halisi ya Uendeshaji (Net Profit)</p>
+          <h3 class="text-2xl font-black text-blue-600 dark:text-blue-400">TZS {{ formatCurrency(netProfitValue) }}</h3>
+          <p class="text-xs text-emerald-600 font-bold">Margin: {{ netProfitMarginPct }}%</p>
+        </div>
+      </div>
+
+      <!-- Formal Profit and Loss (P&L) Statement Table -->
+      <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs overflow-hidden">
+        <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <h3 class="font-black text-sm text-slate-900 dark:text-white flex items-center gap-2">
+            <span>📑 Taarifa Rasmi ya Faida na Hasara (Statement of Profit & Loss)</span>
+          </h3>
+          <span class="text-xs font-mono font-bold text-slate-400">SARAFU: TZS</span>
+        </div>
+
+        <div class="p-6 space-y-6 text-xs font-medium">
+          
+          <!-- Income Section -->
+          <div class="space-y-3">
+            <h4 class="font-black text-emerald-600 uppercase tracking-wider text-xs border-b border-emerald-100 dark:border-emerald-950 pb-2">
+              1. MAPATO YA UENDESHAJI (OPERATING REVENUE)
+            </h4>
+            <div class="space-y-2 pl-4">
+              <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800">
+                <span class="font-bold text-slate-700 dark:text-slate-300">Mauzo ya Mazao (Crop Sales Revenue)</span>
+                <span class="font-mono font-bold text-slate-900 dark:text-white">TZS {{ formatCurrency(stats.total_crop_sales_tzs) }}</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800">
+                <span class="font-bold text-slate-700 dark:text-slate-300">Ada za Uchakataji na Huduma (Processing & Service Fees)</span>
+                <span class="font-mono font-bold text-slate-900 dark:text-white">TZS {{ formatCurrency(totalServiceRevenue) }}</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800">
+                <span class="font-bold text-slate-700 dark:text-slate-300">Mapato Mengineyo (Other Operating Income)</span>
+                <span class="font-mono font-bold text-slate-900 dark:text-white">TZS {{ formatCurrency(stats.total_other_income_tzs) }}</span>
+              </div>
+            </div>
+            <div class="flex justify-between py-2 px-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl font-black text-emerald-700 dark:text-emerald-300 text-xs">
+              <span>JUMLA YA MAPATO YA UENDESHAJI (TOTAL GROSS REVENUE)</span>
+              <span class="font-mono">TZS {{ formatCurrency(totalGrossRevenue) }}</span>
+            </div>
+          </div>
+
+          <!-- Expenses Section -->
+          <div class="space-y-3 pt-2">
+            <h4 class="font-black text-rose-600 uppercase tracking-wider text-xs border-b border-rose-100 dark:border-rose-950 pb-2">
+              2. MATUMIZI YA UENDESHAJI (OPERATING EXPENSES / OPEX)
+            </h4>
+            <div class="space-y-2 pl-4">
+              <div v-for="(amt, cat) in expensesBreakdown" :key="cat" class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800">
+                <span class="font-bold text-slate-700 dark:text-slate-300 capitalize">{{ cat }}</span>
+                <span class="font-mono font-bold text-slate-900 dark:text-white">TZS {{ formatCurrency(amt) }}</span>
+              </div>
+              <div v-if="!expensesBreakdown || Object.keys(expensesBreakdown).length === 0" class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800">
+                <span class="font-bold text-slate-700 dark:text-slate-300">Gharama za Maghala & Mitambo</span>
+                <span class="font-mono font-bold text-slate-900 dark:text-white">TZS {{ formatCurrency(stats.total_expenses_tzs) }}</span>
+              </div>
+            </div>
+            <div class="flex justify-between py-2 px-4 bg-rose-50 dark:bg-rose-950/40 rounded-xl font-black text-rose-700 dark:text-rose-300 text-xs">
+              <span>JUMLA YA MATUMIZI YA UENDESHAJI (TOTAL OPEX)</span>
+              <span class="font-mono">TZS {{ formatCurrency(stats.total_expenses_tzs) }}</span>
+            </div>
+          </div>
+
+          <!-- Net Profit Calculation -->
+          <div class="pt-4 border-t-2 border-slate-900 dark:border-slate-100">
+            <div class="flex justify-between py-3 px-4 bg-slate-900 text-white rounded-2xl font-black text-sm shadow-md">
+              <span>FAIDA HALISI KABLA YA KODI (NET OPERATING PROFIT / EBITDA)</span>
+              <span class="font-mono text-emerald-400">TZS {{ formatCurrency(netProfitValue) }}</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Financial Distribution Doughnut & Bar Charts -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 print:hidden">
+        
+        <!-- Doughnut: Income Distribution -->
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-4">
+          <div class="font-black text-sm text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center justify-between">
+            <span>🍩 Mgawanyo wa Mapato Kwa Huduma & Chanzo (Income Streams)</span>
+          </div>
+
+          <div class="h-64 flex items-center justify-center relative">
+            <Doughnut v-if="incomeChartData.labels.length > 0" :data="incomeChartData" :options="doughnutOptions" />
+            <div v-else class="text-center py-10 text-slate-400 font-semibold text-xs">📊 Bado hakuna data za mapato.</div>
+          </div>
+        </div>
+
+        <!-- Bar: OPEX Expenses Breakdown -->
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-4">
+          <div class="font-black text-sm text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center justify-between">
+            <span>📊 Mgawanyo wa Matumizi (Expenses Categories)</span>
+          </div>
+
+          <div class="h-64 flex items-center justify-center relative">
+            <Bar v-if="expensesChartData.labels.length > 0" :data="expensesChartData" :options="barOptions" />
+            <div v-else class="text-center py-10 text-slate-400 font-semibold text-xs">📊 Bado hakuna data za matumizi.</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- 🌾 TAB 3: GRAIN INVENTORY & STORAGE OPERATIONS REPORT -->
     <div v-if="activeTab === 'inventory'" class="space-y-6">
       
-      <!-- Warehouse Capacity Gauge Card -->
+      <!-- Warehouse Capacity Occupancy Gauge -->
       <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div class="space-y-1">
           <h2 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-            <span>🏢 Ujazo wa Ghala (Warehouse Capacity Occupancy)</span>
+            <span>🏢 Uchambuzi wa Uwezo wa Hifadhi ya Ghala (Warehouse Capacity Analysis)</span>
           </h2>
           <p class="text-xs text-slate-500 dark:text-slate-400">
             Jumla ya uwezo: <span class="font-bold text-slate-900 dark:text-white">{{ formatCurrency(warehouse.capacity_mt) }} MT</span> | 
@@ -288,40 +394,40 @@
           </p>
         </div>
 
-        <div class="w-full sm:w-72 space-y-1.5">
+        <div class="w-full sm:w-80 space-y-1.5">
           <div class="flex items-center justify-between text-xs font-black">
             <span>Ujazo Uliopo:</span>
-            <span class="text-emerald-600 dark:text-emerald-400">{{ warehouse.occupancy_pct }}%</span>
+            <span class="text-emerald-600 dark:text-emerald-400">{{ warehouse.occupancy_pct || 0 }}%</span>
           </div>
-          <div class="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+          <div class="w-full h-3.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-200 dark:border-slate-700">
             <div 
-              class="h-full bg-emerald-500 transition-all duration-500 rounded-full" 
-              :style="{ width: `${Math.min(100, warehouse.occupancy_pct)}%` }"
+              class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500 rounded-full" 
+              :style="{ width: `${Math.min(100, warehouse.occupancy_pct || 0)}%` }"
             ></div>
           </div>
         </div>
       </div>
 
-      <!-- Comprehensive Crop-by-Crop Operations Table / Invoice Voucher Format -->
+      <!-- Comprehensive Crop Operations Ledger Table -->
       <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs overflow-hidden">
         <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <h3 class="font-black text-sm text-slate-900 dark:text-white flex items-center gap-2">
-            <span>🌾 Hati ya Uchambuzi wa Mazao Yote Yaliyosajiliwa (Crop Operations Voucher)</span>
+            <span>🌾 Daftari la Hali ya Mazao Yote Yaliyohifadhiwa (Crop Inventory Ledger)</span>
           </h3>
           <span class="text-xs font-bold text-slate-400">Aina za Mazao: {{ cropAnalyticsList.length }}</span>
         </div>
 
         <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs min-w-[700px]">
+          <table class="w-full text-left text-xs min-w-[750px]">
             <thead class="bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 font-extrabold uppercase border-b border-slate-200/80 dark:border-slate-800">
               <tr>
                 <th class="py-3.5 px-4">Aina ya Zao</th>
                 <th class="py-3.5 px-4">Kipimo</th>
-                <th class="py-3.5 px-4">Jumla Iliyopokelewa</th>
-                <th class="py-3.5 px-4">Iliyopata Huduma</th>
-                <th class="py-3.5 px-4">Bado Hazijachakatwa</th>
-                <th class="py-3.5 px-4">Iliyouzwa / Kuondoka</th>
-                <th class="py-3.5 px-4">Iliyopo Ghalani sasa</th>
+                <th class="py-3.5 px-4">Yaliyopokelewa</th>
+                <th class="py-3.5 px-4">Yaliyochakatwa</th>
+                <th class="py-3.5 px-4">Bado Ghafi</th>
+                <th class="py-3.5 px-4">Yaliyouzwa / Kutoka</th>
+                <th class="py-3.5 px-4">Yaliyopo Ghalani</th>
                 <th class="py-3.5 px-4">Huduma Zilizofanyika</th>
               </tr>
             </thead>
@@ -332,28 +438,28 @@
                 </td>
               </tr>
               <tr v-for="c in paginatedCrops" :key="c.crop_type" class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors">
-                <td class="py-3.5 px-4 font-black text-slate-900 dark:text-white text-sm">
+                <td class="py-3.5 px-4 font-black text-slate-900 dark:text-white text-sm capitalize">
                   {{ c.crop_type }}
                 </td>
                 <td class="py-3.5 px-4 font-bold text-slate-500">
                   <span class="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold border border-slate-200 dark:border-slate-700">
-                    {{ c.unit }}
+                    {{ c.unit || 'KG' }}
                   </span>
                 </td>
                 <td class="py-3.5 px-4 font-extrabold text-slate-900 dark:text-white">
-                  {{ formatCurrency(c.total_received_qty) }} {{ c.unit }}
+                  {{ formatCurrency(c.total_received_qty) }}
                 </td>
                 <td class="py-3.5 px-4 font-bold text-emerald-600 dark:text-emerald-400">
-                  {{ formatCurrency(c.serviced_qty) }} {{ c.unit }}
+                  {{ formatCurrency(c.serviced_qty) }}
                 </td>
                 <td class="py-3.5 px-4 font-bold text-amber-600 dark:text-amber-400">
-                  {{ formatCurrency(c.pending_raw_qty) }} {{ c.unit }}
+                  {{ formatCurrency(c.pending_raw_qty) }}
                 </td>
                 <td class="py-3.5 px-4 font-bold text-purple-600 dark:text-purple-400">
-                  {{ formatCurrency(c.sold_dispatched_qty) }} {{ c.unit }}
+                  {{ formatCurrency(c.sold_dispatched_qty) }}
                 </td>
                 <td class="py-3.5 px-4 font-black text-blue-600 dark:text-blue-400">
-                  {{ formatCurrency(c.current_bin_qty) }} {{ c.unit }}
+                  {{ formatCurrency(c.current_bin_qty) }}
                 </td>
                 <td class="py-3.5 px-4">
                   <div class="flex flex-wrap gap-1">
@@ -370,9 +476,11 @@
               </tr>
             </tbody>
           </table>
+        </div>
+        <div class="p-4 border-t border-slate-100 dark:border-slate-800">
           <Pagination
-            v-model:currentPage="currentPage"
-            v-model:perPage="perPage"
+            v-model:currentPage="currentCropPage"
+            v-model:perPage="perCropPage"
             :totalItems="cropAnalyticsList.length"
           />
         </div>
@@ -380,45 +488,43 @@
 
     </div>
 
-    <!-- TAB 3: Service Processing Analytics Report -->
+    <!-- ⚙️ TAB 4: PROCESSING & MILLING SERVICES REPORT -->
     <div v-if="activeTab === 'services'" class="space-y-6">
       
       <!-- Top Services Highlights Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <!-- Top Usage Service -->
         <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-1">
-          <p class="text-[11px] font-extrabold text-emerald-600 uppercase tracking-wider">🌟 Huduma Inayopatikana Sana Na Wateja</p>
+          <p class="text-[11px] font-extrabold text-emerald-600 uppercase tracking-wider">🌟 Huduma Inayotumika Sana</p>
           <h3 class="text-base font-black text-slate-900 dark:text-white">
             {{ topUsageService ? topUsageService.name : 'Bado Hakuna' }}
           </h3>
           <p v-if="topUsageService" class="text-xs font-bold text-emerald-600">Mara {{ topUsageService.count }} zimetolewa</p>
         </div>
 
-        <!-- Top Revenue Service -->
         <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-1">
-          <p class="text-[11px] font-extrabold text-blue-600 uppercase tracking-wider">🏆 Huduma Inayoingiza Pesa Nyingi</p>
+          <p class="text-[11px] font-extrabold text-blue-600 uppercase tracking-wider">🏆 Huduma Inayoingiza Mapato Makubwa</p>
           <h3 class="text-base font-black text-slate-900 dark:text-white">
             {{ topRevenueService ? topRevenueService.name : 'Bado Hakuna' }}
           </h3>
           <p v-if="topRevenueService" class="text-xs font-bold text-blue-600">TZS {{ formatCurrency(topRevenueService.amount) }}</p>
         </div>
 
-        <!-- Total Service Fees Collected -->
-        <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-1">
-          <p class="text-[11px] font-extrabold text-purple-600 uppercase tracking-wider">💰 Jumla ya Ada za Huduma Zote</p>
+        <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-purple-200/80 dark:border-purple-800/40 shadow-2xs space-y-1">
+          <p class="text-[11px] font-extrabold text-purple-600 uppercase tracking-wider">💰 Jumla ya Ada za Huduma</p>
           <h3 class="text-xl font-black text-purple-600 dark:text-purple-400">
-            TZS {{ formatCurrency(stats.total_revenue_tzs) }}
+            TZS {{ formatCurrency(totalServiceRevenue) }}
           </h3>
-          <p class="text-xs text-slate-400">Zilizokusanywa kupitia mauzo</p>
+          <p class="text-xs text-slate-400">Mapato ya Utopaji Huduma Kituoni</p>
         </div>
       </div>
 
-      <!-- Services Performance Table -->
+      <!-- Detailed Services Revenue & Usage Table -->
       <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs overflow-hidden">
-        <div class="p-5 border-b border-slate-100 dark:border-slate-800">
+        <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <h3 class="font-black text-sm text-slate-900 dark:text-white flex items-center gap-2">
-            <span>⚙️ Invois ya Uchambuzi wa Huduma Zote Zilizosajiliwa (Service Charges Breakdown)</span>
+            <span>⚙️ Mchanganuo Rasmi wa Huduma na Ada Zote (Service Charges Breakdown)</span>
           </h3>
+          <span class="text-xs font-bold text-slate-400">Huduma: {{ serviceListFormatted.length }}</span>
         </div>
 
         <div class="overflow-x-auto">
@@ -432,71 +538,45 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
-              <tr v-for="(rev, name) in serviceBreakdownMap" :key="name" class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors">
+              <tr v-if="serviceListFormatted.length === 0">
+                <td colspan="4" class="py-8 text-center text-slate-400 font-bold">Hakuna data ya huduma iliyopatikana.</td>
+              </tr>
+              <tr v-for="s in paginatedServices" :key="s.name" class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors">
                 <td class="py-3.5 px-4 font-black text-slate-900 dark:text-white text-sm">
-                  {{ name }}
+                  {{ s.name }}
                 </td>
                 <td class="py-3.5 px-4 font-bold text-slate-700 dark:text-slate-300">
-                  {{ serviceCountsMap[name] || 0 }} mara
+                  {{ s.count }} mara
                 </td>
                 <td class="py-3.5 px-4 font-black text-emerald-600 dark:text-emerald-400">
-                  TZS {{ formatCurrency(rev) }}
+                  TZS {{ formatCurrency(s.revenue) }}
                 </td>
                 <td class="py-3.5 px-4 font-extrabold text-blue-600 dark:text-blue-400">
-                  {{ stats.total_revenue_tzs > 0 ? ((rev / stats.total_revenue_tzs) * 100).toFixed(1) : 0 }}%
+                  {{ totalServiceRevenue > 0 ? ((s.revenue / totalServiceRevenue) * 100).toFixed(1) : 0 }}%
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
+        <div class="p-4 border-t border-slate-100 dark:border-slate-800">
+          <Pagination
+            v-model:currentPage="currentServicePage"
+            v-model:perPage="perServicePage"
+            :totalItems="serviceListFormatted.length"
+          />
+        </div>
       </div>
 
     </div>
 
-    <!-- TAB 4: Financial Ledger & OPEX Report -->
-    <div v-if="activeTab === 'financial'" class="space-y-6">
-      
-      <!-- Financial Breakdown Doughnut & Bar Charts -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 print:hidden">
-        
-        <!-- Doughnut: Incomes -->
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-4">
-          <div class="font-black text-sm text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center justify-between">
-            <span>🍩 Mgawanyo wa Mapato (Income Breakdown)</span>
-            <span class="text-emerald-600 font-bold text-xs">TZS {{ formatCurrency(stats.total_revenue_tzs + stats.total_other_income_tzs) }}</span>
-          </div>
-
-          <div class="h-64 flex items-center justify-center relative">
-            <Doughnut v-if="incomeChartData.labels.length > 0" :data="incomeChartData" :options="doughnutOptions" />
-            <div v-else class="text-center py-10 text-slate-400 font-semibold text-xs">📊 Bado hakuna mapato.</div>
-          </div>
-        </div>
-
-        <!-- Bar: OPEX Expenses -->
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-4">
-          <div class="font-black text-sm text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center justify-between">
-            <span>📊 Mgawanyo wa Matumizi (OPEX Breakdown)</span>
-            <span class="text-rose-600 font-bold text-xs">TZS {{ formatCurrency(stats.total_expenses_tzs) }}</span>
-          </div>
-
-          <div class="h-64 flex items-center justify-center relative">
-            <Bar v-if="expensesChartData.labels.length > 0" :data="expensesChartData" :options="barOptions" />
-            <div v-else class="text-center py-10 text-slate-400 font-semibold text-xs">📊 Bado hakuna matumizi.</div>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- TAB 5: Farmers & Loan Portfolio Report -->
+    <!-- 👨‍🌾 TAB 5: FARMERS, CREDIT & LOAN SETTLEMENT REPORT -->
     <div v-if="activeTab === 'loans'" class="space-y-6">
       
       <!-- Loan Portfolio Summary Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-1">
           <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Wakulima Waliosajiliwa</p>
-          <h3 class="text-xl font-black text-slate-900 dark:text-white">{{ stats.registered_farmers }}</h3>
+          <h3 class="text-xl font-black text-slate-900 dark:text-white">{{ stats.registered_farmers || farmersList.length }}</h3>
         </div>
 
         <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-1">
@@ -515,10 +595,11 @@
         </div>
       </div>
 
-      <!-- Farmers List & Credit Table -->
+      <!-- Farmers List & Credit Ledger Table -->
       <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs overflow-hidden">
-        <div class="p-5 border-b border-slate-100 dark:border-slate-800">
+        <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <h3 class="font-black text-sm text-slate-900 dark:text-white">👨‍🌾 Daftari la Wakulima na Hali ya Mikopo (Farmers Credit Ledger)</h3>
+          <span class="text-xs font-bold text-slate-400">Wakulima: {{ farmersList.length }}</span>
         </div>
 
         <div class="overflow-x-auto">
@@ -536,30 +617,38 @@
               <tr v-if="farmersList.length === 0">
                 <td colspan="5" class="py-8 text-center text-slate-400 font-bold">Hakuna wakulima waliosajiliwa.</td>
               </tr>
-              <tr v-for="f in farmersList" :key="f.id" class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30">
-                <td class="py-3.5 px-4 font-black text-emerald-600">{{ f.farmer_code }}</td>
+              <tr v-for="f in paginatedFarmers" :key="f.id" class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30">
+                <td class="py-3.5 px-4 font-black text-emerald-600">{{ f.farmer_code || `FM-${f.id}` }}</td>
                 <td class="py-3.5 px-4 font-bold text-slate-900 dark:text-white capitalize">{{ f.name }}</td>
                 <td class="py-3.5 px-4 text-slate-600 dark:text-slate-400">{{ f.phone || '-' }}</td>
-                <td class="py-3.5 px-4 text-slate-600 dark:text-slate-400">{{ f.village || f.street || '-' }}</td>
+                <td class="py-3.5 px-4 text-slate-600 dark:text-slate-400">{{ f.village || f.district || '-' }}</td>
                 <td class="py-3.5 px-4">
                   <span 
                     :class="f.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'"
-                    class="px-2.5 py-0.5 rounded-full text-[10.5px] font-bold"
+                    class="px-2.5 py-0.5 rounded-full text-[10.5px] font-bold capitalize"
                   >
-                    {{ f.status }}
+                    {{ f.status || 'Active' }}
                   </span>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
+        <div class="p-4 border-t border-slate-100 dark:border-slate-800">
+          <Pagination
+            v-model:currentPage="currentFarmerPage"
+            v-model:perPage="perFarmerPage"
+            :totalItems="farmersList.length"
+          />
+        </div>
       </div>
 
     </div>
 
-    <!-- TAB 6: Buyers & Sales Report -->
+    <!-- 🛒 TAB 6: BUYER SALES, INVOICES & RECEIVABLES REPORT -->
     <div v-if="activeTab === 'sales'" class="space-y-6">
       
+      <!-- Buyer Sales Highlights -->
       <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs overflow-hidden">
         <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <h3 class="font-black text-sm text-slate-900 dark:text-white">🛒 Anao ya Wanunuzi na Invois za Mauzo (Buyers Invoices & Sales Report)</h3>
@@ -573,7 +662,7 @@
                 <th class="py-3.5 px-4">Jina la Mnunuzi</th>
                 <th class="py-3.5 px-4">Simu</th>
                 <th class="py-3.5 px-4">Jumla ya Invoices</th>
-                <th class="py-3.5 px-4">Jumla ya Pesa Aliyonunua (TZS)</th>
+                <th class="py-3.5 px-4">Jumla ya Mauzo (TZS)</th>
                 <th class="py-3.5 px-4">Hali</th>
               </tr>
             </thead>
@@ -581,7 +670,7 @@
               <tr v-if="buyersList.length === 0">
                 <td colspan="5" class="py-8 text-center text-slate-400 font-bold">Hakuna wanunuzi waliosajiliwa.</td>
               </tr>
-              <tr v-for="b in buyersList" :key="b.id" class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30">
+              <tr v-for="b in paginatedBuyers" :key="b.id" class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30">
                 <td class="py-3.5 px-4 font-black text-slate-900 dark:text-white text-sm capitalize">{{ b.name }}</td>
                 <td class="py-3.5 px-4 text-slate-600 dark:text-slate-400">{{ b.phone || '-' }}</td>
                 <td class="py-3.5 px-4 font-bold text-blue-600">{{ b.invoices_count || 0 }} Invoices</td>
@@ -593,11 +682,18 @@
             </tbody>
           </table>
         </div>
+        <div class="p-4 border-t border-slate-100 dark:border-slate-800">
+          <Pagination
+            v-model:currentPage="currentBuyerPage"
+            v-model:perPage="perBuyerPage"
+            :totalItems="buyersList.length"
+          />
+        </div>
       </div>
 
     </div>
 
-    <!-- Official Printable Signatures & Approval Footer (Only visible on print/PDF) -->
+    <!-- 🖨️ OFFICIAL PRINTABLE SIGNATURES & STAMP FOOTER (Only visible on print/PDF) -->
     <div class="hidden print:block pt-12 space-y-12 border-t border-slate-300">
       <div class="grid grid-cols-3 gap-6 text-xs text-slate-800">
         <div class="space-y-10">
@@ -621,7 +717,7 @@
       </div>
     </div>
 
-    <!-- MODAL: Preview Official Executive Report Invoice Voucher -->
+    <!-- 🧾 MODAL: PREVIEW OFFICIAL EXECUTIVE REPORT VOUCHER -->
     <transition name="fade">
       <div v-if="showOfficialVoucherModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4 print:hidden">
         <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-3xl overflow-hidden animate-fadeIn max-h-[90vh] flex flex-col">
@@ -639,7 +735,7 @@
             <!-- Letterhead -->
             <div class="border-b-2 border-emerald-600 pb-4 flex flex-col sm:flex-row justify-between gap-4">
               <div>
-                <h2 class="text-lg font-black text-emerald-700 dark:text-emerald-400 tracking-tight">KILIMO STORE MANAGEMENT SYSTEM</h2>
+                <h2 class="text-lg font-black text-emerald-700 dark:text-emerald-400 tracking-tight">GARANOKI STORE & FINANCE MS</h2>
                 <p class="text-xs font-semibold text-slate-500 dark:text-slate-400">S.L.P 100, Kigoma, Tanzania | +255 764 536 736</p>
                 <p class="text-[11px] text-slate-400">Hati Rasmi ya Ukaguzi na Ripoti ya Uendeshaji</p>
               </div>
@@ -676,13 +772,13 @@
                   </tr>
                   <tr>
                     <td class="p-3">Faida Halisi (Net Profit)</td>
-                    <td class="p-3 text-blue-600">TZS {{ formatCurrency(stats.total_net_service_profit_tzs) }}</td>
+                    <td class="p-3 text-blue-600">TZS {{ formatCurrency(netProfitValue) }}</td>
                     <td class="p-3"><span class="px-2 py-0.5 rounded bg-blue-100 text-blue-700 text-[10px]">Net Value</span></td>
                   </tr>
                   <tr>
                     <td class="p-3">Jumla ya Mzigo Ghalani</td>
                     <td class="p-3 text-slate-900 dark:text-white">{{ formatCurrency(stats.total_weight_stored_mt) }} MT</td>
-                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px]">Occupancy: {{ warehouse.occupancy_pct }}%</span></td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px]">Occupancy: {{ warehouse.occupancy_pct || 0 }}%</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -735,17 +831,35 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarEleme
 
 const { t } = useLanguage();
 
-const currentPage = ref(1);
-const perPage = ref(10);
-
 const activeTab = ref('executive');
 const selectedPeriod = ref('all');
 const startDate = ref('');
 const endDate = ref('');
 
+const periodOptions = computed(() => [
+  { id: 'all', label: t('allTime', 'Muda Wote') },
+  { id: 'today', label: t('today', 'Leo') },
+  { id: 'this_week', label: t('thisWeek', 'Wiki Hii') },
+  { id: 'this_month', label: t('thisMonth', 'Mwezi Huu') },
+  { id: 'this_year', label: t('thisYear', 'Mwaka Huu') },
+  { id: 'custom', label: t('customRange', '⚙️ Tarehe Zako') }
+]);
+
+// Pagination State for Each Report Table
+const currentCropPage = ref(1);
+const perCropPage = ref(10);
+
+const currentServicePage = ref(1);
+const perServicePage = ref(10);
+
+const currentFarmerPage = ref(1);
+const perFarmerPage = ref(10);
+
+const currentBuyerPage = ref(1);
+const perBuyerPage = ref(10);
+
 const showOfficialVoucherModal = ref(false);
 const reportTimestamp = ref(Math.floor(Date.now() / 1000).toString().slice(-6));
-
 const loading = ref(false);
 
 const stats = ref({});
@@ -758,22 +872,69 @@ const machineStats = ref({});
 const trends = ref({ months: [], revenue: [], expenses: [], intake: [], dispatch: [] });
 
 const cropAnalyticsList = ref([]);
-const paginatedCrops = computed(() => {
-  const start = (currentPage.value - 1) * perPage.value;
-  return cropAnalyticsList.value.slice(start, start + perPage.value);
-});
-
-watch([cropAnalyticsList, perPage], () => {
-  currentPage.value = 1;
-});
+const farmersList = ref([]);
+const buyersList = ref([]);
 const topRevenueService = ref(null);
 const topUsageService = ref(null);
 
-const farmersList = ref([]);
-const buyersList = ref([]);
+// Computed Paginated Data Lists
+const paginatedCrops = computed(() => {
+  const start = (currentCropPage.value - 1) * perCropPage.value;
+  return cropAnalyticsList.value.slice(start, start + perCropPage.value);
+});
+
+const serviceListFormatted = computed(() => {
+  return Object.keys(serviceBreakdownMap.value).map(name => ({
+    name,
+    count: serviceCountsMap.value[name] || 0,
+    revenue: serviceBreakdownMap.value[name] || 0
+  }));
+});
+
+const paginatedServices = computed(() => {
+  const start = (currentServicePage.value - 1) * perServicePage.value;
+  return serviceListFormatted.value.slice(start, start + perServicePage.value);
+});
+
+const paginatedFarmers = computed(() => {
+  const start = (currentFarmerPage.value - 1) * perFarmerPage.value;
+  return farmersList.value.slice(start, start + perFarmerPage.value);
+});
+
+const paginatedBuyers = computed(() => {
+  const start = (currentBuyerPage.value - 1) * perBuyerPage.value;
+  return buyersList.value.slice(start, start + perBuyerPage.value);
+});
+
+// Watchers for resetting pagination pages
+watch([cropAnalyticsList, perCropPage], () => { currentCropPage.value = 1; });
+watch([serviceBreakdownMap, perServicePage], () => { currentServicePage.value = 1; });
+watch([farmersList, perFarmerPage], () => { currentFarmerPage.value = 1; });
+watch([buyersList, perBuyerPage], () => { currentBuyerPage.value = 1; });
+
+const totalServiceRevenue = computed(() => {
+  return Object.values(serviceBreakdownMap.value).reduce((sum, val) => sum + (Number(val) || 0), 0);
+});
+
+const totalGrossRevenue = computed(() => {
+  return (stats.value.total_revenue_tzs || 0) + (stats.value.total_other_income_tzs || 0);
+});
+
+const netProfitValue = computed(() => {
+  return totalGrossRevenue.value - (stats.value.total_expenses_tzs || 0);
+});
+
+const netProfitMarginPct = computed(() => {
+  if (totalGrossRevenue.value <= 0) return '0.0';
+  return ((netProfitValue.value / totalGrossRevenue.value) * 100).toFixed(1);
+});
 
 const formatCurrency = (val) => {
   return Number(val || 0).toLocaleString('en-US');
+};
+
+const switchTab = (tabId) => {
+  activeTab.value = tabId;
 };
 
 const openOfficialVoucherModal = () => {
@@ -861,7 +1022,7 @@ const fetchAllReportData = async () => {
   }
 };
 
-// Charts
+// Chart Configurations
 const trendChartOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -934,7 +1095,7 @@ const printReport = () => {
 };
 
 const downloadCSVReport = () => {
-  let filename = `Ripoti_Invois_KilimoStore_${activeTab.value}_${new Date().toISOString().split('T')[0]}.csv`;
+  let filename = `Ripoti_GARANOKI_${activeTab.value}_${new Date().toISOString().split('T')[0]}.csv`;
   let dataArray = [];
   let headers = [];
 
@@ -943,10 +1104,10 @@ const downloadCSVReport = () => {
     dataArray = cropAnalyticsList.value;
   } else if (activeTab.value === 'services') {
     headers = ['service_name', 'usage_count', 'total_revenue_tzs'];
-    dataArray = Object.keys(serviceBreakdownMap.value).map(name => ({
-      service_name: name,
-      usage_count: serviceCountsMap.value[name] || 0,
-      total_revenue_tzs: serviceBreakdownMap.value[name]
+    dataArray = serviceListFormatted.value.map(s => ({
+      service_name: s.name,
+      usage_count: s.count,
+      total_revenue_tzs: s.revenue
     }));
   } else if (activeTab.value === 'loans') {
     headers = ['farmer_code', 'name', 'phone', 'village', 'status'];
@@ -957,10 +1118,10 @@ const downloadCSVReport = () => {
   } else {
     headers = ['metric', 'value'];
     dataArray = [
-      { metric: 'Jumla ya Mapato Ghafi', value: stats.value.total_revenue_tzs },
+      { metric: 'Jumla ya Mapato Ghafi (Turnover)', value: stats.value.total_revenue_tzs },
       { metric: 'Jumla ya Mzigo Ghalani (MT)', value: stats.value.total_weight_stored_mt },
       { metric: 'Jumla ya Mauzo (TZS)', value: stats.value.total_crop_sales_tzs },
-      { metric: 'Deni la Mikopo (TZS)', value: stats.value.loan_portfolio_value }
+      { metric: 'Deni la Mikopo ya Wakulima (TZS)', value: stats.value.loan_portfolio_value }
     ];
   }
 
