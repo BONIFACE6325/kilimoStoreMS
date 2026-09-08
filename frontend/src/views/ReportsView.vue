@@ -2,26 +2,26 @@
   <div class="space-y-6 text-slate-800 dark:text-slate-100">
     
     <!-- Top Executive Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-emerald-900/90 via-slate-900 to-slate-900 p-6 rounded-3xl border border-emerald-500/20 shadow-xl text-white">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs">
       <div class="space-y-1">
-        <div class="flex items-center gap-2 text-xs font-semibold text-emerald-400">
-          <router-link to="/" class="hover:underline flex items-center gap-1">
+        <div class="flex items-center gap-2 text-xs font-semibold text-slate-400">
+          <router-link to="/" class="hover:text-emerald-600 flex items-center gap-1">
             <span>🌾</span>
             <span>Dashboard</span>
           </router-link>
           <span>/</span>
-          <span class="text-slate-200 font-bold">Official Executive Reports & Invoices</span>
+          <span class="text-slate-700 dark:text-slate-200 font-bold">Official Executive Reports & Invoices</span>
         </div>
-        <h1 class="text-2xl font-black tracking-tight flex items-center gap-2 text-white">
+        <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
           <span>🧾 Kituo Kikuu cha Invois, Hati & Ripoti (Official Reports & Invoices Hub)</span>
         </h1>
-        <p class="text-xs text-slate-300">Taarifa rasmi za kifedha, ankara za mauzo, uchambuzi wa uendeshaji ghalani na hati za ukaguzi.</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400">Taarifa rasmi za kifedha, ankara za mauzo, uchambuzi wa uendeshaji ghalani na hati za ukaguzi.</p>
       </div>
 
-      <div class="flex items-center gap-2 print:hidden">
+      <div class="flex flex-wrap items-center gap-2 print:hidden">
         <button 
           @click="openOfficialVoucherModal"
-          class="px-4 py-2.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 font-extrabold text-xs rounded-2xl border border-emerald-400/30 shadow-md transition cursor-pointer flex items-center gap-2 backdrop-blur-md"
+          class="px-4 py-2.5 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 font-extrabold text-xs rounded-xl border border-emerald-200 dark:border-emerald-800 shadow-2xs transition cursor-pointer flex items-center gap-2"
         >
           <span>📄</span>
           <span>Hakiki Invois / Hati Rasmi</span>
@@ -29,7 +29,7 @@
 
         <button 
           @click="downloadCSVReport"
-          class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-extrabold text-xs rounded-2xl border border-slate-700 shadow-md transition cursor-pointer flex items-center gap-2"
+          class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 font-extrabold text-xs rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs transition cursor-pointer flex items-center gap-2"
         >
           <span>📥</span>
           <span>Pakua CSV / Excel</span>
@@ -37,7 +37,7 @@
 
         <button 
           @click="downloadBackendPDF"
-          class="px-4.5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs rounded-2xl shadow-lg border border-emerald-400/40 transition cursor-pointer flex items-center gap-2"
+          class="px-4.5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow-md border border-emerald-500/30 transition cursor-pointer flex items-center gap-2"
         >
           <span>📑</span>
           <span>Pakua Official PDF</span>
@@ -45,7 +45,7 @@
 
         <button 
           @click="printReport"
-          class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-extrabold text-xs rounded-2xl border border-slate-700 shadow-md transition cursor-pointer flex items-center gap-2"
+          class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 font-extrabold text-xs rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs transition cursor-pointer flex items-center gap-2"
         >
           <span>🖨️</span>
           <span>Chapa / Preview</span>
