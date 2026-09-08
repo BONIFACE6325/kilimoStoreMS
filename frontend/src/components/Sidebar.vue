@@ -240,18 +240,17 @@
             v-if="isSuperAdmin"
             @click="closeMobileSidebar" 
             to="/saas-admin" 
-            class="flex items-center rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 relative group bg-gradient-to-r from-amber-500/20 via-emerald-500/20 to-teal-500/20 text-emerald-300 border border-emerald-500/30 hover:border-emerald-400"
+            class="flex items-center rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 relative group"
             :class="[
-              $route.path.startsWith('/saas-admin') ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md ring-1 ring-emerald-400/30' : '',
+              $route.path.startsWith('/saas-admin') ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-900/40 ring-1 ring-emerald-400/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white',
               isSidebarCollapsed ? 'justify-center py-3 px-0' : 'justify-between px-3.5 py-2.5'
             ]"
-            :title="isSidebarCollapsed ? '👑 SaaS Admin Portal' : ''"
+            :title="isSidebarCollapsed ? 'SaaS Admin Portal' : ''"
           >
             <div class="flex items-center gap-3">
-              <span class="text-base">👑</span>
-              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap font-black">SaaS Admin Portal</span>
+              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">SaaS Admin Portal</span>
             </div>
-            <span v-if="!isSidebarCollapsed" class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-slate-950">PRO</span>
           </router-link>
 
           <!-- Settings -->
@@ -291,11 +290,10 @@
         </div>
         <button 
           @click="openLogoutModal"
-          class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-red-950/60 hover:bg-red-900/80 text-red-300 hover:text-white border border-red-800/60 transition text-xs font-bold shadow-xs cursor-pointer" 
+          class="p-2 rounded-xl bg-red-950/60 hover:bg-red-900/80 text-red-300 hover:text-white border border-red-800/60 transition shadow-xs cursor-pointer flex items-center justify-center" 
           :title="t('logout')"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-          <span v-if="!isSidebarCollapsed">{{ t('logout') }}</span>
         </button>
       </div>
 
