@@ -11,7 +11,7 @@
 
     <!-- Sidebar Container -->
     <aside 
-      class="bg-slate-950 text-slate-300 h-full flex flex-col border-r border-slate-800/80 select-none overflow-hidden transition-all duration-300 ease-in-out fixed md:sticky top-0 left-0 z-50 w-72 md:w-full"
+      class="bg-slate-950 text-slate-300 h-full flex flex-col border-r border-slate-800/80 select-none overflow-hidden transition-all duration-300 ease-in-out fixed md:sticky top-0 left-0 z-50 w-[82vw] sm:w-80 max-w-xs md:w-full"
       :class="[
         isMobileSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
       ]"

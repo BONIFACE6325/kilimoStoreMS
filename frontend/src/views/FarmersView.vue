@@ -63,7 +63,7 @@
       </div>
 
       <!-- STATUS TABS (Active / Inactive / Wote) -->
-      <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800 flex-wrap">
+      <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800 overflow-x-auto whitespace-nowrap">
         <button 
           @click="statusFilter = ''"
           :class="!statusFilter ? 'bg-slate-900 text-white shadow-xs font-black' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-200/60 dark:bg-slate-700/60'"
@@ -93,7 +93,7 @@
     <!-- Data Table -->
     <div class="bg-white dark:bg-slate-900 rounded-2xl border border-emerald-100/80 dark:border-slate-700/80 shadow-2xs overflow-hidden">
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs">
+        <table class="w-full text-left text-xs min-w-[700px]">
           <thead class="bg-emerald-50/70 dark:bg-slate-950 text-emerald-950 dark:text-emerald-400 font-bold border-b border-emerald-100 dark:border-slate-800 capitalize text-[11px] tracking-wide">
             <tr>
               <th class="py-3 px-4">Mkulima</th>

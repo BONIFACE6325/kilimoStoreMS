@@ -210,7 +210,7 @@
 
       <!-- Table Body -->
       <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse text-xs">
+        <table class="w-full text-left border-collapse text-xs min-w-[750px]">
           <thead>
             <tr class="bg-slate-50/80 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 font-extrabold border-b border-slate-100 dark:border-slate-800 uppercase tracking-wider text-[10.5px]">
               <th class="py-3.5 px-4">Namba ya Mkopo</th>

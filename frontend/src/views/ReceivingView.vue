@@ -277,7 +277,7 @@
         </div>
 
         <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs border-collapse">
+          <table class="w-full text-left text-xs border-collapse min-w-[700px]">
             <thead>
               <tr class="bg-slate-100/70 dark:bg-slate-800/70 text-slate-700 dark:text-slate-200 font-extrabold border-b border-slate-200/80 dark:border-slate-700/80 uppercase text-[10px] tracking-wider">
                 <th class="py-3 px-4">Tarehe / Muda</th>
