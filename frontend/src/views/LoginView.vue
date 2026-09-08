@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen w-full relative flex items-center justify-center overflow-hidden font-sans select-none bg-slate-950">
     
-    <!-- 🌾 CINEMATIC FARM BACKGROUND SLIDESHOW WITH DYNAMIC ROTATION & KEN BURNS ZOOM -->
+    <!-- 🌾 CINEMATIC FARM BACKGROUND SLIDESHOW WITH POWERPOINT TRANSITIONS -->
     <div class="absolute inset-0 z-0 overflow-hidden">
       
       <!-- Video Element with High-Quality Agriculture Loop (If supported) -->
@@ -17,13 +17,15 @@
         <source src="https://cdn.pixabay.com/video/2019/04/20/22907-331560939_large.mp4" type="video/mp4" />
       </video>
 
-      <!-- Multi-Image Smooth Cross-fade Slideshow -->
+      <!-- Multi-Image Slideshow with PowerPoint-Style Dynamic Animations -->
       <div 
         v-for="(img, idx) in bgImages" 
         :key="idx"
-        class="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out pointer-events-none"
+        class="absolute inset-0 bg-cover bg-center pointer-events-none"
         :class="[
-          idx === currentBgIndex ? 'opacity-100 scale-105 z-0 animate-kenburns' : 'opacity-0 scale-100 -z-10'
+          idx === currentBgIndex 
+            ? `${pptTransitions[idx % pptTransitions.length]} z-0` 
+            : 'opacity-0 -z-10'
         ]"
         :style="{ backgroundImage: `url('${img.url}')` }"
       ></div>
@@ -34,11 +36,14 @@
       <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none z-10"></div>
     </div>
 
-    <!-- Floating Ambient Atmospheric Dust & Sparkles -->
-    <div class="absolute inset-0 z-10 pointer-events-none opacity-30">
-      <div class="absolute top-1/4 left-1/5 w-2 h-2 rounded-full bg-emerald-400 animate-ping"></div>
-      <div class="absolute top-2/3 left-3/4 w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse"></div>
-      <div class="absolute top-1/3 left-2/3 w-2 h-2 rounded-full bg-teal-300 animate-ping" style="animation-delay: 1.5s;"></div>
+    <!-- 🔮 FLOATING GLOWING ATMOSPHERIC BUBBLES (PowerPoint Bubble Effect) -->
+    <div class="absolute inset-0 z-10 pointer-events-none overflow-hidden">
+      <div 
+        v-for="n in 12" 
+        :key="n" 
+        class="absolute rounded-full bg-gradient-to-t from-emerald-400/30 to-teal-300/20 blur-xs animate-bubble-float shadow-[0_0_15px_rgba(52,211,153,0.4)]"
+        :style="getBubbleStyle(n)"
+      ></div>
     </div>
 
     <!-- TOP HEADER BAR: BRAND LOGO & LANGUAGE SWITCHER -->
@@ -194,30 +199,26 @@
 
     </div>
 
-    <!-- BACKGROUND SLIDESHOW SELECTOR PILLS -->
-    <div class="absolute bottom-16 left-6 z-30 hidden md:flex items-center gap-2 bg-slate-950/80 backdrop-blur-md p-2 rounded-2xl border border-white/10 shadow-2xl">
+    <!-- ELEGANT DOT INDICATORS -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2.5 bg-slate-950/60 backdrop-blur-xl px-4 py-2 rounded-full border border-white/10 shadow-2xl">
       <button 
         v-for="(img, idx) in bgImages" 
         :key="idx"
         @click="setBgIndex(idx)"
-        class="px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5"
+        class="transition-all duration-500 cursor-pointer rounded-full"
         :class="[
           idx === currentBgIndex 
-            ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/30' 
-            : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
+            ? 'w-7 h-2.5 bg-gradient-to-r from-emerald-400 to-teal-300 shadow-md shadow-emerald-500/50' 
+            : 'w-2.5 h-2.5 bg-white/30 hover:bg-white/70 hover:scale-125'
         ]"
-      >
-        <span>{{ img.icon }}</span>
-        <span>{{ currentLang === 'sw' ? img.swTitle : img.enTitle }}</span>
-      </button>
+        :title="currentLang === 'sw' ? img.swTitle : img.enTitle"
+      ></button>
     </div>
 
     <!-- FOOTER COPYRIGHT & TRUST BADGES -->
-    <footer class="absolute bottom-4 left-0 right-0 z-30 text-center text-xs font-semibold text-slate-400/80">
+    <footer class="absolute bottom-3 left-0 right-0 z-20 text-center text-xs font-semibold text-slate-400/60 pointer-events-none">
       <div class="flex flex-wrap items-center justify-center gap-4 text-[11px]">
         <span>© 2026 GARANOKI Store & Finance MS</span>
-        <span>•</span>
-        <span>All Rights Reserved</span>
       </div>
     </footer>
 
@@ -243,33 +244,36 @@ const errorMessage = ref('');
 const sessionWarning = ref('');
 const showVideo = ref(true);
 
+const pptTransitions = [
+  'animate-ppt-bubble',
+  'animate-ppt-zoom-blur',
+  'animate-ppt-diamond',
+  'animate-ppt-sweep',
+  'animate-ppt-ripple'
+];
+
 const bgImages = ref([
   {
-    icon: '🌽',
     swTitle: 'Mahindi',
     enTitle: 'Corn Field',
     url: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1920&q=80'
   },
   {
-    icon: '🌾',
     swTitle: 'Ngano',
     enTitle: 'Wheat Field',
     url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1920&q=80'
   },
   {
-    icon: '🏢',
     swTitle: 'Maghala',
     enTitle: 'Grain Storage',
     url: 'https://images.unsplash.com/photo-1595841696677-6489ff3f8cd1?auto=format&fit=crop&w=1920&q=80'
   },
   {
-    icon: '🌱',
     swTitle: 'Shamba Kijani',
     enTitle: 'Green Crops',
     url: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=1920&q=80'
   },
   {
-    icon: '🚜',
     swTitle: 'Mavuno',
     enTitle: 'Harvesting',
     url: 'https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=1920&q=80'
@@ -278,6 +282,22 @@ const bgImages = ref([
 
 const currentBgIndex = ref(0);
 let bgInterval = null;
+
+const getBubbleStyle = (n) => {
+  const sizes = [14, 28, 20, 36, 18, 30, 44, 22, 16, 40, 26, 18];
+  const lefts = [8, 22, 42, 58, 72, 85, 14, 34, 52, 68, 80, 94];
+  const delays = [0, 1.5, 2.8, 0.6, 3.4, 2.1, 0.3, 2.5, 4.0, 1.2, 3.0, 0.1];
+  const durations = [8, 11, 9, 13, 10, 12, 9.5, 10.5, 12.5, 8.5, 11.5, 9];
+  
+  return {
+    width: `${sizes[n - 1]}px`,
+    height: `${sizes[n - 1]}px`,
+    left: `${lefts[n - 1]}%`,
+    bottom: '-50px',
+    animationDelay: `${delays[n - 1]}s`,
+    animationDuration: `${durations[n - 1]}s`
+  };
+};
 
 const setBgIndex = (idx) => {
   currentBgIndex.value = idx;
@@ -334,22 +354,99 @@ const showForgotNotice = () => {
 </script>
 
 <style scoped>
-@keyframes kenburns {
+/* 1. PowerPoint Radial Bubble Wipe */
+@keyframes pptBubble {
   0% {
-    transform: scale(1) translate(0, 0);
+    clip-path: circle(0% at 50% 50%);
+    transform: scale(1.18);
+    filter: blur(10px) brightness(1.2);
+    opacity: 0.2;
   }
-  50% {
-    transform: scale(1.08) translate(-1%, -1%);
+  60% {
+    filter: blur(2px) brightness(1.05);
   }
   100% {
-    transform: scale(1) translate(0, 0);
+    clip-path: circle(150% at 50% 50%);
+    transform: scale(1.05);
+    filter: blur(0px) brightness(1);
+    opacity: 1;
   }
 }
-
-.animate-kenburns {
-  animation: kenburns 25s ease-in-out infinite alternate;
+.animate-ppt-bubble {
+  animation: pptBubble 1.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
+/* 2. PowerPoint Zoom & Blur Morph */
+@keyframes pptZoomBlur {
+  0% {
+    opacity: 0;
+    transform: scale(1.3);
+    filter: blur(25px) contrast(1.3);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.05);
+    filter: blur(0px) contrast(1);
+  }
+}
+.animate-ppt-zoom-blur {
+  animation: pptZoomBlur 1.5s ease-out forwards;
+}
+
+/* 3. PowerPoint Diamond Split Wipe */
+@keyframes pptDiamond {
+  0% {
+    clip-path: polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%);
+    transform: scale(1.15);
+    opacity: 0.3;
+  }
+  100% {
+    clip-path: polygon(50% -60%, 160% 50%, 50% 160%, -60% 50%);
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+.animate-ppt-diamond {
+  animation: pptDiamond 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 4. PowerPoint Diagonal Sweep Wipe */
+@keyframes pptSweep {
+  0% {
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+    transform: scale(1.12);
+    filter: brightness(1.4);
+    opacity: 0.3;
+  }
+  100% {
+    clip-path: polygon(0 0, 120% 0, 100% 120%, 0 100%);
+    transform: scale(1.05);
+    filter: brightness(1);
+    opacity: 1;
+  }
+}
+.animate-ppt-sweep {
+  animation: pptSweep 1.3s ease-out forwards;
+}
+
+/* 5. PowerPoint Corner Ripple Pop */
+@keyframes pptRipple {
+  0% {
+    opacity: 0;
+    clip-path: circle(0% at 85% 15%);
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    clip-path: circle(170% at 85% 15%);
+    transform: scale(1.05);
+  }
+}
+.animate-ppt-ripple {
+  animation: pptRipple 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Ambient Slow Pan for active slide after reveal */
 @keyframes slowPan {
   0% {
     transform: scale(1.05) translateY(0);
@@ -361,9 +458,29 @@ const showForgotNotice = () => {
     transform: scale(1.05) translateY(0);
   }
 }
-
 .animate-slow-pan {
   animation: slowPan 30s ease-in-out infinite alternate;
+}
+
+/* Floating Ambient Bubbles Animation */
+@keyframes bubbleFloat {
+  0% {
+    transform: translateY(0) scale(0.8);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.7;
+  }
+  85% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(-110vh) scale(1.5);
+    opacity: 0;
+  }
+}
+.animate-bubble-float {
+  animation: bubbleFloat linear infinite;
 }
 
 @keyframes shake {
@@ -371,8 +488,8 @@ const showForgotNotice = () => {
   25% { transform: translateX(-5px); }
   75% { transform: translateX(5px); }
 }
-
 .animate-shake {
   animation: shake 0.3s ease-in-out;
 }
 </style>
+
