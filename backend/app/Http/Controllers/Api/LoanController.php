@@ -97,7 +97,7 @@ class LoanController extends Controller
                 'principal_amount' => $validated['principal_amount'],
                 'interest_rate_annual' => 0.00, // Strictly 0.00%
                 'current_balance' => $validated['principal_amount'],
-                'due_date' => $validated['due_date'] ?? null,
+                'due_date' => $validated['due_date'] ?? now()->addYear()->format('Y-m-d'),
                 'status' => 'active',
                 'disbursed_at' => now(),
             ]);
