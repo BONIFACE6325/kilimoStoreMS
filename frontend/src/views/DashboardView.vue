@@ -545,15 +545,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 import { Line, Doughnut } from 'vue-chartjs';
 import { useLanguage } from '../composables/useLanguage';
+import { useTenants } from '../composables/useTenants';
+import { subscribeToTenantUpdates } from '../services/echo';
 import Pagination from '../components/Pagination.vue';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend);
 
 const { t } = useLanguage();
+const { activeTenant } = useTenants();
+let echoChannel = null;
 
 const loading = ref(false);
 const activeFilter = ref('all_time');
@@ -955,5 +959,27 @@ const fetchFinancialData = async () => {
 
 onMounted(() => {
   fetchFinancialData();
+  if (activeTenant.value?.id) {
+    echoChannel = subscribeToTenantUpdates(activeTenant.value.id, () => {
+      fetchFinancialData();
+    });
+  }
+});
+
+watch(() => activeTenant.value?.id, (newTenantId) => {
+  if (newTenantId) {
+    if (echoChannel && typeof echoChannel.unsubscribe === 'function') {
+      echoChannel.unsubscribe();
+    }
+    echoChannel = subscribeToTenantUpdates(newTenantId, () => {
+      fetchFinancialData();
+    });
+  }
+});
+
+onUnmounted(() => {
+  if (echoChannel && typeof echoChannel.unsubscribe === 'function') {
+    echoChannel.unsubscribe();
+  }
 });
 </script>

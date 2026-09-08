@@ -112,6 +112,10 @@ class LoanController extends Controller
             return $l;
         });
 
+        try {
+            event(new \App\Events\StoreDataUpdated($tenantId, 'loan', 'created'));
+        } catch (\Throwable $e) {}
+
         return response()->json([
             'success' => true,
             'message' => 'Mkopo umesajiliwa na kutolewa kikamilifu bila riba (0% Interest)',

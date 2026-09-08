@@ -482,6 +482,10 @@ class SalesController extends Controller
                 return $settlement;
             });
 
+            try {
+                event(new \App\Events\StoreDataUpdated($tenantId, 'sale', 'created'));
+            } catch (\Throwable $e) {}
+
             return response()->json([
                 'success' => true,
                 'message' => 'Sale finalized, invoice issued, and farmer payout processed successfully',

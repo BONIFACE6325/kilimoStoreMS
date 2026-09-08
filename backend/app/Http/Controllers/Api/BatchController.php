@@ -164,6 +164,10 @@ class BatchController extends Controller
             return $batch;
         });
 
+        try {
+            event(new \App\Events\StoreDataUpdated($tenantId, 'batch', 'created'));
+        } catch (\Throwable $e) {}
+
         return response()->json([
             'success' => true,
             'message' => 'Grain batch received and recorded successfully',
