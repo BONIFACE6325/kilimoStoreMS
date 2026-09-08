@@ -36,11 +36,19 @@
         </button>
 
         <button 
+          @click="downloadBackendPDF"
+          class="px-4.5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs rounded-2xl shadow-lg border border-emerald-400/40 transition cursor-pointer flex items-center gap-2"
+        >
+          <span>📑</span>
+          <span>Pakua Official PDF</span>
+        </button>
+
+        <button 
           @click="printReport"
-          class="px-4.5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-2xl shadow-lg border border-emerald-400/40 transition cursor-pointer flex items-center gap-2"
+          class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-extrabold text-xs rounded-2xl border border-slate-700 shadow-md transition cursor-pointer flex items-center gap-2"
         >
           <span>🖨️</span>
-          <span>Chapa / PDF</span>
+          <span>Chapa / Preview</span>
         </button>
       </div>
     </div>
@@ -952,6 +960,14 @@ const downloadCSVReport = () => {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+};
+
+const downloadBackendPDF = () => {
+  let qParams = `?type=${activeTab.value}`;
+  if (startDate.value && endDate.value) {
+    qParams += `&start_date=${startDate.value}&end_date=${endDate.value}`;
+  }
+  window.open(`/api/v1/reports/export-pdf${qParams}`, '_blank');
 };
 
 onMounted(() => {

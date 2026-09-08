@@ -43,6 +43,7 @@ Route::prefix('v1')->group(function () {
     // Dashboard & Reports
     Route::get('/dashboard/stats', [ReportController::class, 'getDashboardStats']);
     Route::get('/reports/profit-loss', [ReportController::class, 'profitLossReport']);
+    Route::get('/reports/export-pdf', [ReportController::class, 'exportPdf']);
     Route::post('/system/reset-data', [ReportController::class, 'resetAllData']);
 
     // Farmers

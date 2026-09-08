@@ -552,4 +552,223 @@ class ReportController extends Controller
             ], 500);
         }
     }
+
+    public function exportPdf(Request $request)
+    {
+        try {
+            $type = $request->query('type', 'executive');
+            $startDate = $request->query('start_date');
+            $endDate = $request->query('end_date');
+
+            $statsResponse = $this->getDashboardStats($request);
+            $statsData = json_decode($statsResponse->getContent(), true);
+
+            $inventoryResponse = $this->getInventoryAnalytics($request);
+            $inventoryData = json_decode($inventoryResponse->getContent(), true);
+
+            $stats = $statsData['stats'] ?? [];
+            $warehouse = $statsData['warehouse'] ?? [];
+            $serviceBreakdown = $statsData['service_breakdown'] ?? [];
+            $expensesBreakdown = $statsData['expenses_breakdown'] ?? [];
+            $cropAnalytics = $inventoryData['crop_analytics'] ?? [];
+            $serviceCounts = $inventoryData['service_counts'] ?? [];
+
+            $refNumber = 'KSM-PDF-' . strtoupper(substr(md5(time() . rand(100, 999)), 0, 6));
+            $periodLabel = ($startDate && $endDate) ? "Kipindi: {$startDate} hadi {$endDate}" : 'Kipindi: Muda Wote (Lifetime Report)';
+
+            $html = '
+            <!DOCTYPE html>
+            <html lang="sw">
+            <head>
+                <meta charset="UTF-8">
+                <title>KilimoStore Executive Report</title>
+                <style>
+                    @page { margin: 25px 30px; }
+                    body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 11px; color: #1e293b; line-height: 1.5; margin: 0; padding: 0; }
+                    .header-table { width: 100%; border-bottom: 3px solid #059669; padding-bottom: 12px; margin-bottom: 20px; }
+                    .company-title { font-size: 18px; font-weight: 900; color: #047857; text-transform: uppercase; margin: 0; }
+                    .company-sub { font-size: 10px; font-weight: bold; color: #64748b; margin-top: 2px; }
+                    .doc-badge { background-color: #047857; color: #ffffff; padding: 4px 8px; font-weight: 900; font-size: 9px; text-transform: uppercase; border-radius: 4px; display: inline-block; }
+                    .ref-text { font-size: 10px; font-weight: bold; color: #334155; margin-top: 4px; }
+                    
+                    .section-title { font-size: 12px; font-weight: 800; color: #0f172a; margin-top: 15px; margin-bottom: 8px; border-left: 4px solid #059669; padding-left: 8px; text-transform: uppercase; }
+                    
+                    .cards-table { width: 100%; border-collapse: separate; border-spacing: 6px; margin-bottom: 15px; }
+                    .card-cell { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; text-align: left; }
+                    .card-label { font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase; }
+                    .card-val { font-size: 13px; font-weight: 900; color: #047857; margin-top: 2px; }
+                    
+                    .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 15px; }
+                    .data-table th { background-color: #f1f5f9; color: #334155; font-size: 9.5px; font-weight: 800; text-transform: uppercase; border: 1px solid #cbd5e1; padding: 7px; text-align: left; }
+                    .data-table td { border: 1px solid #e2e8f0; padding: 7px; font-size: 10px; }
+                    .data-table tr:nth-child(even) { background-color: #f8fafc; }
+
+                    .footer-table { width: 100%; margin-top: 40px; border-top: 1px solid #cbd5e1; padding-top: 15px; page-break-inside: avoid; }
+                    .sig-title { font-size: 9.5px; font-weight: bold; color: #475569; text-transform: uppercase; }
+                    .sig-line { border-bottom: 1px solid #0f172a; height: 35px; width: 85%; }
+                    .stamp-box { border: 2px dashed #94a3b8; width: 85px; height: 85px; border-radius: 50%; text-align: center; line-height: 85px; color: #94a3b8; font-size: 8.5px; font-weight: bold; margin: auto; }
+                </style>
+            </head>
+            <body>
+                <table class="header-table">
+                    <tr>
+                        <td>
+                            <div class="company-title">KILIMO STORE MANAGEMENT SYSTEM</div>
+                            <div class="company-sub">S.L.P 100, Kigoma, Tanzania | Simu: +255 764 536 736 | Email: info@kilimostore.co.tz</div>
+                            <div class="company-sub">HATI RASMI YA ANKARA NA RIPOTI ZA GHALA (OFFICIAL INVOICE VOUCHER)</div>
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="doc-badge">OFFICIAL EXECUTIVE PDF</div>
+                            <div class="ref-text">Kumb: ' . $refNumber . '</div>
+                            <div class="ref-text">' . $periodLabel . '</div>
+                            <div class="ref-text">Tarehe: ' . date('d/m/Y H:i') . '</div>
+                        </td>
+                    </tr>
+                </table>
+            ';
+
+            if ($type === 'inventory') {
+                $html .= '<div class="section-title">🌾 Uchambuzi wa Mazao na Hifadhi Ghalani (Crop Inventory Analytics)</div>';
+                $html .= '<table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Aina ya Zao</th>
+                            <th>Kipimo</th>
+                            <th>Jumla Iliyopokelewa</th>
+                            <th>Iliyopata Huduma</th>
+                            <th>Bado Hazijachakatwa</th>
+                            <th>Iliyouzwa / Kuondoka</th>
+                            <th>Iliyopo Ghalani sasa</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+                foreach ($cropAnalytics as $c) {
+                    $html .= '<tr>
+                        <td><strong>' . htmlspecialchars($c['crop_type']) . '</strong></td>
+                        <td>' . htmlspecialchars($c['unit']) . '</td>
+                        <td>' . number_format($c['total_received_qty']) . ' ' . htmlspecialchars($c['unit']) . '</td>
+                        <td style="color: #047857;">' . number_format($c['serviced_qty']) . ' ' . htmlspecialchars($c['unit']) . '</td>
+                        <td style="color: #d97706;">' . number_format($c['pending_raw_qty']) . ' ' . htmlspecialchars($c['unit']) . '</td>
+                        <td style="color: #9333ea;">' . number_format($c['sold_dispatched_qty']) . ' ' . htmlspecialchars($c['unit']) . '</td>
+                        <td style="color: #2563eb; font-weight: bold;">' . number_format($c['current_bin_qty']) . ' ' . htmlspecialchars($c['unit']) . '</td>
+                    </tr>';
+                }
+                $html .= '</tbody></table>';
+
+            } else if ($type === 'services') {
+                $html .= '<div class="section-title">⚙️ Uchambuzi wa Huduma Zote Zilizosajiliwa (Service Charges Breakdown)</div>';
+                $html .= '<table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Jina la Huduma</th>
+                            <th>Mara Zilizotolewa (Usage)</th>
+                            <th>Mapato Yaliyopatikana (TZS)</th>
+                            <th>Asilimia (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+                $totRev = $stats['total_revenue_tzs'] ?? 1;
+                foreach ($serviceBreakdown as $name => $rev) {
+                    $cnt = $serviceCounts[$name] ?? 0;
+                    $pct = $totRev > 0 ? round(($rev / $totRev) * 100, 1) : 0;
+                    $html .= '<tr>
+                        <td><strong>' . htmlspecialchars($name) . '</strong></td>
+                        <td>' . number_format($cnt) . ' mara</td>
+                        <td style="color: #047857; font-weight: bold;">TZS ' . number_format($rev) . '</td>
+                        <td>' . $pct . '%</td>
+                    </tr>';
+                }
+                $html .= '</tbody></table>';
+
+            } else if ($type === 'financial') {
+                $html .= '<div class="section-title">💰 Mchanganuo wa Mapato na Matumizi (Financial Ledger Statement)</div>';
+                $html .= '<table class="cards-table">
+                    <tr>
+                        <td class="card-cell">
+                            <div class="card-label">Jumla ya Mapato Ghafi</div>
+                            <div class="card-val">TZS ' . number_format($stats['total_revenue_tzs'] ?? 0) . '</div>
+                        </td>
+                        <td class="card-cell">
+                            <div class="card-label">Jumla ya Matumizi (OPEX)</div>
+                            <div class="card-val" style="color: #e11d48;">TZS ' . number_format($stats['total_expenses_tzs'] ?? 0) . '</div>
+                        </td>
+                        <td class="card-cell">
+                            <div class="card-label">Faida Halisi (Net Profit)</div>
+                            <div class="card-val" style="color: #2563eb;">TZS ' . number_format($stats['total_net_service_profit_tzs'] ?? 0) . '</div>
+                        </td>
+                    </tr>
+                </table>';
+
+                $html .= '<div class="section-title">📉 Matumizi ya Uendeshaji (OPEX Expenses)</div>';
+                $html .= '<table class="data-table">
+                    <thead><tr><th>Kundi la Matumizi</th><th>Kiasi (TZS)</th></tr></thead>
+                    <tbody>';
+                foreach ($expensesBreakdown as $cat => $amt) {
+                    $html .= '<tr><td>' . htmlspecialchars($cat) . '</td><td style="color: #e11d48;">TZS ' . number_format($amt) . '</td></tr>';
+                }
+                $html .= '</tbody></table>';
+
+            } else {
+                $html .= '<div class="section-title">📊 Muhtasari Mkuu wa Uendeshaji (Executive Operational Overview)</div>';
+                $html .= '<table class="cards-table">
+                    <tr>
+                        <td class="card-cell">
+                            <div class="card-label">Mapato Ghafi</div>
+                            <div class="card-val">TZS ' . number_format($stats['total_revenue_tzs'] ?? 0) . '</div>
+                        </td>
+                        <td class="card-cell">
+                            <div class="card-label">Mzigo Uliopo Ghalani</div>
+                            <div class="card-val">' . number_format($stats['total_weight_stored_mt'] ?? 0) . ' MT</div>
+                        </td>
+                        <td class="card-cell">
+                            <div class="card-label">Jumla ya Mauzo</div>
+                            <div class="card-val" style="color: #9333ea;">TZS ' . number_format($stats['total_crop_sales_tzs'] ?? 0) . '</div>
+                        </td>
+                        <td class="card-cell">
+                            <div class="card-label">Deni la Mikopo</div>
+                            <div class="card-val" style="color: #d97706;">TZS ' . number_format($stats['loan_portfolio_value'] ?? 0) . '</div>
+                        </td>
+                    </tr>
+                </table>';
+            }
+
+            $html .= '
+                <table class="footer-table">
+                    <tr>
+                        <td style="width: 38%;">
+                            <div class="sig-title">Imeandaliwa Na:</div>
+                            <div class="sig-line"></div>
+                            <div style="font-size: 9px; font-weight: bold; margin-top: 3px;">Mhasibu wa Ghala / Store Accountant</div>
+                        </td>
+                        <td style="width: 38%;">
+                            <div class="sig-title">Imeidhinishwa Na:</div>
+                            <div class="sig-line"></div>
+                            <div style="font-size: 9px; font-weight: bold; margin-top: 3px;">Meneja wa Ghala / Warehouse Lead</div>
+                        </td>
+                        <td style="width: 24%; text-align: center;">
+                            <div class="stamp-box">OFFICIAL STAMP</div>
+                        </td>
+                    </tr>
+                </table>
+            </body>
+            </html>';
+
+            $options = new \Dompdf\Options();
+            $options->set('isHtml5ParserEnabled', true);
+            $options->set('isRemoteEnabled', true);
+
+            $dompdf = new \Dompdf\Dompdf($options);
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'portrait');
+            $dompdf->render();
+
+            return response($dompdf->output(), 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="KilimoStore_Executive_Report_' . $type . '.pdf"'
+            ]);
+
+        } catch (\Throwable $e) {
+            return response()->json(['error' => $e->getMessage(), 'line' => $e->getLine()], 500);
+        }
+    }
 }
