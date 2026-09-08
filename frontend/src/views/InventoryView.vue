@@ -63,12 +63,9 @@
           </div>
         </div>
         <div>
-          <div class="text-xl font-black text-slate-900 dark:text-white tracking-tight">
-            {{ formatNum(summaryData.stored_stock_mt) }} <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">MT</span>
+          <div class="text-lg font-black text-slate-900 dark:text-white tracking-tight">
+            {{ summaryData.stored_stock_formatted || '0' }}
           </div>
-          <p class="text-[10.5px] text-slate-500 dark:text-slate-400 mt-0.5 font-semibold">
-            {{ formatNum(summaryData.stored_stock_kg) }} Kg (~{{ formatNum(summaryData.stored_stock_bags) }} Gunia)
-          </p>
         </div>
         <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10.5px]">
           <span class="text-slate-400 font-medium">Status:</span>
@@ -85,12 +82,9 @@
           </div>
         </div>
         <div>
-          <div class="text-xl font-black text-slate-900 dark:text-white tracking-tight">
-            {{ formatNum(summaryData.sold_stock_mt) }} <span class="text-xs font-bold text-blue-600 dark:text-blue-400">MT</span>
+          <div class="text-lg font-black text-slate-900 dark:text-white tracking-tight">
+            {{ summaryData.sold_stock_formatted || '0' }}
           </div>
-          <p class="text-[10.5px] text-slate-500 dark:text-slate-400 mt-0.5 font-semibold">
-            {{ formatNum(summaryData.sold_stock_kg) }} Kg (~{{ formatNum(summaryData.sold_stock_bags) }} Gunia Sold)
-          </p>
         </div>
         <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10.5px]">
           <span class="text-slate-400 font-medium">Sales Dispatched:</span>
@@ -107,12 +101,9 @@
           </div>
         </div>
         <div>
-          <div class="text-xl font-black text-slate-900 dark:text-white tracking-tight">
-            {{ formatNum(summaryData.total_intake_mt) }} <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400">MT</span>
+          <div class="text-lg font-black text-slate-900 dark:text-white tracking-tight">
+            {{ summaryData.intake_stock_formatted || '0' }}
           </div>
-          <p class="text-[10.5px] text-slate-500 dark:text-slate-400 mt-0.5 font-semibold">
-            {{ formatNum(summaryData.total_intake_kg) }} Kg (~{{ formatNum(summaryData.total_intake_bags) }} Gunia)
-          </p>
         </div>
         <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10.5px]">
           <span class="text-slate-400 font-medium">Lifetime Intake:</span>
@@ -442,18 +433,12 @@
           <div class="grid grid-cols-2 gap-2 pt-1 text-xs">
             <div class="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700/60 dark:border-slate-700/60">
               <span class="text-[10.5px] font-bold text-slate-400 block uppercase">Total Received:</span>
-              <span class="font-black text-slate-900 dark:text-white text-sm">{{ formatNum(item.received_mt) }} MT</span>
-              <span class="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">
-                {{ formatNum(item.received_kg) }} Kg (~{{ formatNum(item.received_bags) }} Gunia)
-              </span>
+              <span class="font-black text-slate-900 dark:text-white text-sm">{{ formatNum(item.received_qty) }} {{ item.unit }}</span>
             </div>
 
             <div class="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700/60 dark:border-slate-700/60">
               <span class="text-[10.5px] font-bold text-slate-400 block uppercase">In Active Store:</span>
-              <span class="font-black text-emerald-600 dark:text-emerald-400 text-sm">{{ formatNum(item.stored_mt) }} MT</span>
-              <span class="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">
-                {{ formatNum(item.stored_kg) }} Kg (~{{ formatNum(item.stored_bags) }} Gunia)
-              </span>
+              <span class="font-black text-emerald-600 dark:text-emerald-400 text-sm">{{ formatNum(item.stored_qty) }} {{ item.unit }}</span>
             </div>
           </div>
 
@@ -525,8 +510,7 @@
               </div>
             </div>
             <div class="text-right">
-              <span class="text-sm font-black text-slate-900 dark:text-white">{{ formatNum(activeAnalytics.total_transformed_mt) }} MT</span>
-              <span class="block text-[10.5px] text-amber-600 dark:text-amber-400 font-bold">~{{ formatNum(activeAnalytics.total_transformed_bags) }} Bags</span>
+              <span class="text-sm font-black text-slate-900 dark:text-white">{{ activeAnalytics.transform_outputs?.length || 0 }} Items</span>
             </div>
           </div>
 
@@ -544,9 +528,8 @@
                 <span>{{ getCropEmoji(prod.crop_type) }}</span>
                 <span class="font-bold text-slate-800 dark:text-slate-200">{{ prod.crop_type }}</span>
               </div>
-              <div class="font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                <span>{{ formatNum(prod.mt) }} MT</span>
-                <span class="text-[11px] text-slate-400 font-normal">({{ formatNum(prod.kg) }} Kg / ~{{ formatNum(prod.bags) }} Gunia)</span>
+              <div class="font-extrabold text-slate-900 dark:text-white">
+                <span>{{ formatNum(prod.qty) }} {{ prod.unit }}</span>
               </div>
             </div>
           </div>
@@ -565,8 +548,7 @@
               </div>
             </div>
             <div class="text-right">
-              <span class="text-sm font-black text-slate-900 dark:text-white">{{ formatNum(activeAnalytics.total_sold_mt) }} MT</span>
-              <span class="block text-[10.5px] text-emerald-600 dark:text-emerald-400 font-bold">~{{ formatNum(activeAnalytics.total_sold_bags) }} Bags</span>
+              <span class="text-sm font-black text-slate-900 dark:text-white">{{ activeAnalytics.crop_sales?.length || 0 }} Items</span>
             </div>
           </div>
 
@@ -584,9 +566,8 @@
                 <span>{{ getCropEmoji(sItem.crop_type) }}</span>
                 <span class="font-bold text-slate-800 dark:text-slate-200">{{ sItem.crop_type }}</span>
               </div>
-              <div class="font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                <span>{{ formatNum(sItem.mt) }} MT</span>
-                <span class="text-[11px] text-slate-400 font-normal">({{ formatNum(sItem.kg) }} Kg / ~{{ formatNum(sItem.bags) }} Gunia)</span>
+              <div class="font-extrabold text-slate-900 dark:text-white">
+                <span>{{ formatNum(sItem.qty) }} {{ sItem.unit }}</span>
               </div>
             </div>
           </div>
@@ -736,11 +717,10 @@
                 </div>
               </td>
 
-              <!-- Current Stock Weight -->
+              <!-- Current Stock Quantity -->
               <td class="py-3.5 px-4 font-black text-slate-900 dark:text-white">
                 <div>
-                  <span>{{ formatNum(batch.current_weight) }} MT</span>
-                  <span class="text-[10.5px] font-normal text-slate-400 block">({{ (parseFloat(batch.current_weight || 0) * 1000).toLocaleString() }} Kg)</span>
+                  <span>{{ formatNum(batch.intake_quantity > 0 ? batch.intake_quantity : batch.current_weight) }} {{ batch.intake_unit || 'Gunia' }}</span>
                 </div>
               </td>
 
@@ -944,7 +924,7 @@
 
           <div v-if="activeMoveBatch" class="p-3 bg-slate-50 dark:bg-slate-800/70 rounded-2xl space-y-1 text-xs text-left border border-slate-200 dark:border-slate-700/60 dark:border-slate-700">
             <div class="font-extrabold text-slate-900 dark:text-white">Batch: {{ activeMoveBatch.batch_code }} ({{ activeMoveBatch.crop_type }})</div>
-            <div class="text-slate-500 dark:text-slate-400 font-medium">Owner: {{ activeMoveBatch.farmer_name }} | Weight: {{ activeMoveBatch.current_weight }} MT</div>
+            <div class="text-slate-500 dark:text-slate-400 font-medium">Owner: {{ activeMoveBatch.farmer_name }} | Quantity: {{ activeMoveBatch.intake_quantity || activeMoveBatch.current_weight }} {{ activeMoveBatch.intake_unit || 'Gunia' }}</div>
             <div class="text-slate-500 dark:text-slate-400 font-medium">Current Bin: <strong class="text-emerald-600 dark:text-emerald-400">{{ activeMoveBatch.bin_name || 'Unassigned' }}</strong></div>
           </div>
 

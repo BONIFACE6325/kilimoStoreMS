@@ -619,65 +619,85 @@ class BatchController extends Controller
     public function getInventorySummary()
     {
         $totalBatchesCount = Batch::count();
-        $totalIntakeWeightMt = floatval(Batch::sum('initial_weight_mt'));
-        $currentStoredWeightMt = floatval(Batch::whereNotIn('status', ['sold', 'transformed'])->sum('current_weight_mt'));
-        
-        $soldFromInvoiceItems = floatval(DB::table('invoice_items')->sum('quantity_mt'));
-        $soldFromBatches = floatval(Batch::where('status', 'sold')->sum('initial_weight_mt'));
-        $totalSoldWeightMt = max($soldFromInvoiceItems, $soldFromBatches);
 
-        $totalBagsReceived = intval(round($totalIntakeWeightMt * 10)); // 1 MT = 10 Bags of 100kg
-        $totalBagsStored = intval(round($currentStoredWeightMt * 10));
-        $totalBagsSold = intval(round($totalSoldWeightMt * 10));
+        $intakeBatches = Batch::all();
+        $storedBatches = Batch::whereNotIn('status', ['sold', 'transformed'])->get();
+        $soldBatches = Batch::where('status', 'sold')->get();
 
-        $rawCrops = Batch::select(
-            'crop_type',
-            DB::raw('SUM(initial_weight_mt) as initial_mt'),
-            DB::raw("SUM(CASE WHEN status NOT IN ('transformed', 'sold') THEN current_weight_mt ELSE 0 END) as current_mt"),
-            DB::raw('COUNT(*) as batch_count')
-        )->groupBy('crop_type')->get();
+        $storedUnitSums = [];
+        foreach ($storedBatches as $b) {
+            $u = $b->intake_unit ?: 'Gunia';
+            $q = (float) ($b->intake_quantity > 0 ? $b->intake_quantity : $b->current_weight_mt);
+            $storedUnitSums[$u] = ($storedUnitSums[$u] ?? 0) + $q;
+        }
+
+        $soldUnitSums = [];
+        foreach ($soldBatches as $b) {
+            $u = $b->intake_unit ?: 'Gunia';
+            $q = (float) ($b->intake_quantity > 0 ? $b->intake_quantity : $b->current_weight_mt);
+            $soldUnitSums[$u] = ($soldUnitSums[$u] ?? 0) + $q;
+        }
+
+        $intakeUnitSums = [];
+        foreach ($intakeBatches as $b) {
+            $u = $b->intake_unit ?: 'Gunia';
+            $q = (float) ($b->intake_quantity > 0 ? $b->intake_quantity : $b->initial_weight_mt);
+            $intakeUnitSums[$u] = ($intakeUnitSums[$u] ?? 0) + $q;
+        }
+
+        $formatUnitMap = function($map) {
+            if (empty($map)) return '0';
+            $parts = [];
+            foreach ($map as $u => $q) {
+                $parts[] = number_format($q, 0) . ' ' . $u;
+            }
+            return implode(' / ', $parts);
+        };
+
+        $storedStockFormatted = $formatUnitMap($storedUnitSums);
+        $soldStockFormatted = $formatUnitMap($soldUnitSums);
+        $intakeStockFormatted = $formatUnitMap($intakeUnitSums);
 
         $groupedMap = [];
-        $totalWeightForPct = $totalIntakeWeightMt > 0 ? $totalIntakeWeightMt : 1;
+        $totalBatchesCountForPct = max($totalBatchesCount, 1);
 
-        foreach ($rawCrops as $c) {
-            $canonical = $this->getCanonicalCropName($c->crop_type);
-            if (!isset($groupedMap[$canonical])) {
-                $groupedMap[$canonical] = [
-                    'crop_type' => $canonical,
-                    'received_mt' => 0.0,
-                    'stored_mt' => 0.0,
+        foreach ($intakeBatches as $c) {
+            $cropName = $c->crop_type ?: 'General';
+            $unit = $c->intake_unit ?: 'Gunia';
+            $key = "{$cropName} ({$unit})";
+
+            if (!isset($groupedMap[$key])) {
+                $groupedMap[$key] = [
+                    'crop_type' => $cropName,
+                    'unit' => $unit,
+                    'received_qty' => 0.0,
+                    'stored_qty' => 0.0,
                     'batch_count' => 0
                 ];
             }
-            $groupedMap[$canonical]['received_mt'] += floatval($c->initial_mt);
-            $groupedMap[$canonical]['stored_mt'] += floatval($c->current_mt);
-            $groupedMap[$canonical]['batch_count'] += intval($c->batch_count);
+
+            $qtyReceived = (float) ($c->intake_quantity > 0 ? $c->intake_quantity : $c->initial_weight_mt);
+            $qtyStored = !in_array($c->status, ['sold', 'transformed']) 
+                ? (float) ($c->intake_quantity > 0 ? $c->intake_quantity : $c->current_weight_mt)
+                : 0.0;
+
+            $groupedMap[$key]['received_qty'] += $qtyReceived;
+            $groupedMap[$key]['stored_qty'] += $qtyStored;
+            $groupedMap[$key]['batch_count']++;
         }
 
         $cropBreakdown = [];
-        foreach ($groupedMap as $canonical => $data) {
-            $receivedMt = $data['received_mt'];
-            $storedMt = $data['stored_mt'];
-            $pct = number_format(($receivedMt / $totalWeightForPct) * 100, 1);
-
+        foreach ($groupedMap as $key => $data) {
+            $pct = number_format(($data['batch_count'] / $totalBatchesCountForPct) * 100, 1);
             $cropBreakdown[] = [
-                'crop_type' => $canonical,
-                'received_mt' => $receivedMt,
-                'received_kg' => $receivedMt * 1000,
-                'received_bags' => intval(round($receivedMt * 10)),
-                'stored_mt' => $storedMt,
-                'stored_kg' => $storedMt * 1000,
-                'stored_bags' => intval(round($storedMt * 10)),
+                'crop_type' => $data['crop_type'],
+                'unit' => $data['unit'],
+                'received_qty' => $data['received_qty'],
+                'stored_qty' => $data['stored_qty'],
                 'batch_count' => $data['batch_count'],
                 'percentage' => floatval($pct)
             ];
         }
-
-        // Sort by received_mt descending
-        usort($cropBreakdown, function ($a, $b) {
-            return $b['received_mt'] <=> $a['received_mt'];
-        });
 
         $rawBins = Bin::orderBy('name')->get();
         $totalCapacityMt = floatval($rawBins->sum('capacity_mt'));
@@ -687,16 +707,12 @@ class BatchController extends Controller
         foreach ($rawBins as $bin) {
             $activeBatches = Batch::where('current_bin_id', $bin->id)
                 ->whereNotIn('status', ['transformed', 'sold'])
-                ->where('current_weight_mt', '>', 0)
                 ->get();
 
             $liveOccupancyMt = floatval($activeBatches->sum('current_weight_mt'));
             $totalOccupancyMt += $liveOccupancyMt;
 
-            $cropNames = $activeBatches->pluck('crop_type')
-                ->unique()
-                ->map(fn($c) => $this->getCanonicalCropName($c))
-                ->implode(', ');
+            $cropNames = $activeBatches->pluck('crop_type')->unique()->implode(', ');
 
             $bins[] = [
                 'id' => $bin->id,
@@ -718,15 +734,9 @@ class BatchController extends Controller
 
         return response()->json([
             'total_batches' => $totalBatchesCount,
-            'total_intake_mt' => $totalIntakeWeightMt,
-            'total_intake_kg' => $totalIntakeWeightMt * 1000,
-            'total_intake_bags' => $totalBagsReceived,
-            'stored_stock_mt' => $currentStoredWeightMt,
-            'stored_stock_kg' => $currentStoredWeightMt * 1000,
-            'stored_stock_bags' => $totalBagsStored,
-            'sold_stock_mt' => $totalSoldWeightMt,
-            'sold_stock_kg' => $totalSoldWeightMt * 1000,
-            'sold_stock_bags' => $totalBagsSold,
+            'stored_stock_formatted' => $storedStockFormatted,
+            'sold_stock_formatted' => $soldStockFormatted,
+            'intake_stock_formatted' => $intakeStockFormatted,
             'warehouse_capacity_mt' => $totalCapacityMt,
             'warehouse_occupancy_mt' => $totalOccupancyMt,
             'utilization_pct' => floatval($utilizationPct),
@@ -738,7 +748,6 @@ class BatchController extends Controller
 
     private function buildPeriodAnalytics($startDate = null)
     {
-        // 1. Transformation Outputs (derived batches from milling/processing)
         $derivedQuery = Batch::whereNotNull('parent_batch_id');
         if ($startDate) {
             $derivedQuery->where('created_at', '>=', $startDate);
@@ -746,69 +755,41 @@ class BatchController extends Controller
         $derivedBatches = $derivedQuery->get();
 
         $transformMap = [];
-        $totalTransformedMt = 0.0;
         foreach ($derivedBatches as $d) {
-            $canonical = $this->getCanonicalCropName($d->crop_type);
-            $mt = floatval($d->initial_weight_mt);
-            $totalTransformedMt += $mt;
-            if (!isset($transformMap[$canonical])) {
-                $transformMap[$canonical] = 0.0;
+            $crop = $d->crop_type ?: 'General';
+            $unit = $d->intake_unit ?: 'Gunia';
+            $key = "{$crop} ({$unit})";
+            $qty = floatval($d->intake_quantity > 0 ? $d->intake_quantity : $d->initial_weight_mt);
+            if (!isset($transformMap[$key])) {
+                $transformMap[$key] = ['crop_type' => $crop, 'unit' => $unit, 'qty' => 0.0];
             }
-            $transformMap[$canonical] += $mt;
+            $transformMap[$key]['qty'] += $qty;
         }
 
-        $transformOutputs = [];
-        foreach ($transformMap as $crop => $mt) {
-            $transformOutputs[] = [
-                'crop_type' => $crop,
-                'mt' => $mt,
-                'kg' => $mt * 1000,
-                'bags' => intval(round($mt * 10))
-            ];
-        }
-        usort($transformOutputs, fn($a, $b) => $b['mt'] <=> $a['mt']);
+        $transformOutputs = array_values($transformMap);
 
-        // 2. Crop Sales Breakdown
-        $salesQuery = DB::table('invoice_items')
-            ->join('batches', 'invoice_items.batch_id', '=', 'batches.id')
-            ->select('batches.crop_type', DB::raw('SUM(invoice_items.quantity_mt) as sold_mt'));
-
+        $soldQuery = Batch::where('status', 'sold');
         if ($startDate) {
-            $salesQuery->where('invoice_items.created_at', '>=', $startDate);
+            $soldQuery->where('updated_at', '>=', $startDate);
         }
-        $salesItems = $salesQuery->groupBy('batches.crop_type')->get();
+        $soldBatches = $soldQuery->get();
 
         $salesMap = [];
-        $totalSoldMt = 0.0;
-        foreach ($salesItems as $s) {
-            $canonical = $this->getCanonicalCropName($s->crop_type);
-            $mt = floatval($s->sold_mt);
-            $totalSoldMt += $mt;
-            if (!isset($salesMap[$canonical])) {
-                $salesMap[$canonical] = 0.0;
+        foreach ($soldBatches as $s) {
+            $crop = $s->crop_type ?: 'General';
+            $unit = $s->intake_unit ?: 'Gunia';
+            $key = "{$crop} ({$unit})";
+            $qty = floatval($s->intake_quantity > 0 ? $s->intake_quantity : $s->initial_weight_mt);
+            if (!isset($salesMap[$key])) {
+                $salesMap[$key] = ['crop_type' => $crop, 'unit' => $unit, 'qty' => 0.0];
             }
-            $salesMap[$canonical] += $mt;
+            $salesMap[$key]['qty'] += $qty;
         }
 
-        $cropSales = [];
-        foreach ($salesMap as $crop => $mt) {
-            $cropSales[] = [
-                'crop_type' => $crop,
-                'mt' => $mt,
-                'kg' => $mt * 1000,
-                'bags' => intval(round($mt * 10))
-            ];
-        }
-        usort($cropSales, fn($a, $b) => $b['mt'] <=> $a['mt']);
+        $cropSales = array_values($salesMap);
 
         return [
-            'total_transformed_mt' => $totalTransformedMt,
-            'total_transformed_kg' => $totalTransformedMt * 1000,
-            'total_transformed_bags' => intval(round($totalTransformedMt * 10)),
             'transform_outputs' => $transformOutputs,
-            'total_sold_mt' => $totalSoldMt,
-            'total_sold_kg' => $totalSoldMt * 1000,
-            'total_sold_bags' => intval(round($totalSoldMt * 10)),
             'crop_sales' => $cropSales
         ];
     }
