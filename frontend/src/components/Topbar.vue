@@ -42,11 +42,12 @@
       
       <!-- Language Switcher Pill -->
       <button 
-        @click="toggleLang" 
-        class="px-2.5 sm:px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100 text-xs font-black rounded-xl border border-slate-200/80 dark:border-slate-700/80 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center gap-1.5 shadow-2xs"
+        @click="toggleLanguage" 
+        class="px-2.5 sm:px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100 text-xs font-black rounded-xl border border-slate-200/80 dark:border-slate-700/80 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center gap-1.5 shadow-2xs cursor-pointer"
+        :title="currentLang === 'sw' ? 'Switch to English' : 'Badili kwenda Kiswahili'"
       >
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-        <span>{{ lang.toUpperCase() }}</span>
+        <span class="text-sm leading-none">{{ currentLang === 'sw' ? '🇹🇿' : '🇬🇧' }}</span>
+        <span>{{ currentLang.toUpperCase() }}</span>
       </button>
 
       <!-- Notifications Bell -->
@@ -54,7 +55,7 @@
         <button 
           @click="showNotifs = !showNotifs"
           class="relative p-2.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-slate-50 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200/80 dark:bg-slate-700/80 rounded-xl transition-all duration-200 border border-slate-200/60 dark:border-slate-700/60 transform hover:scale-105 active:scale-95"
-          title="Notifications"
+          :title="t('notifications')"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
           <span class="w-4 h-4 rounded-full bg-red-500 text-white font-black text-[9.5px] flex items-center justify-center absolute -top-1 -right-1 border-2 border-white dark:border-slate-900 shadow-sm animate-pulse">3</span>
@@ -64,8 +65,8 @@
         <transition name="pop">
           <div v-if="showNotifs" class="absolute right-0 mt-3 w-72 sm:w-80 max-w-[92vw] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200/80 dark:border-slate-700/80 overflow-hidden z-50 p-4 space-y-3">
             <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-              <span class="text-xs font-black text-slate-900 dark:text-slate-50 uppercase tracking-wider">System Notifications (3)</span>
-              <button @click="showNotifs = false" class="text-slate-400 hover:text-slate-600 dark:text-slate-300 text-xs font-bold">Close</button>
+              <span class="text-xs font-black text-slate-900 dark:text-slate-50 uppercase tracking-wider">{{ t('notifications') }} (3)</span>
+              <button @click="showNotifs = false" class="text-slate-400 hover:text-slate-600 dark:text-slate-300 text-xs font-bold">{{ t('close') }}</button>
             </div>
             <div class="space-y-2 text-xs">
               <div class="p-2.5 bg-amber-50/80 dark:bg-amber-900/40 border border-amber-200/70 dark:border-amber-700/50 rounded-xl flex items-start gap-2.5">
@@ -87,14 +88,16 @@
         </transition>
       </div>
 
-      <!-- Theme Switcher -->
+      <!-- Intuitive & Consistent Theme Switcher Button -->
       <button 
         @click="toggleDark"
-        class="p-2.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-slate-50 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200/80 dark:bg-slate-700/80 rounded-xl transition-all duration-300 border border-slate-200/60 dark:border-slate-700/60 transform hover:rotate-45 active:scale-95 cursor-pointer"
-        :title="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+        class="p-2.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-slate-50 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200/80 dark:bg-slate-700/80 rounded-xl transition-all duration-300 border border-slate-200/60 dark:border-slate-700/60 transform hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-1.5"
+        :title="isDark ? t('lightMode', 'Switch to Light Mode') : t('darkMode', 'Switch to Dark Mode')"
       >
-        <svg v-if="!isDark" class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-        <svg v-else class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        <!-- Sun Icon when Light Mode is Active -->
+        <svg v-if="!isDark" class="w-5 h-5 text-amber-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.591zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.061-1.06l-1.591-1.591a.75.75 0 10-1.06 1.061l1.59 1.59zM12 18.75a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-1.5a.75.75 0 01.75-.75zM6.166 17.834a.75.75 0 00-1.061 1.06l1.591 1.591a.75.75 0 101.06-1.061l-1.59-1.591zM4.5 12a.75.75 0 01-.75.75H1.5a.75.75 0 010-1.5h2.25a.75.75 0 01.75.75zM6.166 6.166a.75.75 0 001.06-1.06L5.635 3.515a.75.75 0 00-1.06 1.061l1.591 1.59z"/></svg>
+        <!-- Moon Icon when Dark Mode is Active -->
+        <svg v-else class="w-5 h-5 text-indigo-400" fill="currentColor" viewBox="0 0 24 24"><path d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z"/></svg>
       </button>
 
       <div class="w-px h-6 bg-slate-200/80 dark:bg-slate-700/80 mx-0.5"></div>
@@ -110,7 +113,7 @@
           </div>
           <div class="hidden lg:block text-left pr-1">
             <div class="text-xs font-extrabold text-slate-900 dark:text-slate-50 leading-tight">Boniface Gwakila</div>
-            <div class="text-[10px] font-bold text-emerald-600 dark:text-emerald-500">Owner</div>
+            <div class="text-[10px] font-bold text-emerald-600 dark:text-emerald-500">{{ t('systemOwner') }}</div>
           </div>
         </button>
 
@@ -122,10 +125,10 @@
               <div class="text-[10.5px] text-slate-500 dark:text-slate-400 font-medium">gwakilabonface@gmail.com</div>
             </div>
             <router-link to="/settings" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-100 dark:bg-slate-800 transition">
-              <span>⚙️ Profile Settings</span>
+              <span>⚙️ {{ t('profileSettings') }}</span>
             </router-link>
             <button @click="openLogoutModal" class="w-full text-left flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 transition cursor-pointer">
-              <span>🚪 Logout of System</span>
+              <span>🚪 {{ t('logout') }}</span>
             </button>
           </div>
         </transition>
@@ -144,7 +147,7 @@
         </div>
 
         <div class="space-y-1">
-          <h3 class="text-base font-extrabold text-slate-900 dark:text-slate-50">Logout of System?</h3>
+          <h3 class="text-base font-extrabold text-slate-900 dark:text-slate-50">{{ t('logout') }}?</h3>
           <p class="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
             Are you sure you want to log out of <strong>GARANOKI</strong>? Your active session will be securely closed.
           </p>
@@ -155,13 +158,13 @@
             @click="showLogoutModal = false"
             class="py-2.5 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-extrabold text-xs rounded-xl border border-slate-200/80 dark:border-slate-700/80 transition cursor-pointer"
           >
-            Cancel
+            {{ t('cancel') }}
           </button>
           <button 
             @click="executeLogout"
             class="py-2.5 px-4 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-extrabold text-xs rounded-xl shadow-md shadow-red-900/30 border border-red-400/30 transition cursor-pointer"
           >
-            Yes, Logout →
+            {{ t('logout') }} →
           </button>
         </div>
 
@@ -175,13 +178,14 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useLayout } from '../composables/useLayout';
 import { useAuth } from '../composables/useAuth';
+import { useLanguage } from '../composables/useLanguage';
 
 const router = useRouter();
 const { toggleSidebar } = useLayout();
 const { logout } = useAuth();
+const { currentLang, toggleLanguage, t } = useLanguage();
 
 const searchQuery = ref('');
-const lang = ref(localStorage.getItem('lang') || 'en');
 const showNotifs = ref(false);
 const showProfile = ref(false);
 const isDark = ref(false);
@@ -196,11 +200,6 @@ const toggleDark = () => {
     document.documentElement.classList.remove('dark');
     localStorage.setItem('garanoki_theme', 'light');
   }
-};
-
-const toggleLang = () => {
-  lang.value = lang.value === 'sw' ? 'en' : 'sw';
-  localStorage.setItem('lang', lang.value);
 };
 
 const openLogoutModal = () => {

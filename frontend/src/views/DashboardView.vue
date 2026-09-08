@@ -541,8 +541,11 @@
 import { ref, onMounted, computed } from 'vue';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 import { Line, Doughnut } from 'vue-chartjs';
+import { useLanguage } from '../composables/useLanguage';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend);
+
+const { t } = useLanguage();
 
 const loading = ref(false);
 const activeFilter = ref('all_time');
@@ -550,16 +553,16 @@ const customStartDate = ref('');
 const customEndDate = ref('');
 const trendMode = ref('finance'); // 'finance' or 'volume'
 
-const filterOptions = [
-  { id: 'all_time', label: 'All Time' },
-  { id: 'today', label: 'Today' },
-  { id: 'this_week', label: 'This Week' },
-  { id: 'this_month', label: 'This Month' },
+const filterOptions = computed(() => [
+  { id: 'all_time', label: t('allTime', 'Muda Wote') },
+  { id: 'today', label: t('today', 'Leo') },
+  { id: 'this_week', label: t('thisWeek', 'Wiki Hii') },
+  { id: 'this_month', label: t('thisMonth', 'Mwezi Huu') },
   { id: 'last_3_months', label: '3 Months' },
   { id: 'last_6_months', label: '6 Months' },
-  { id: 'this_year', label: 'This Year' },
-  { id: 'custom', label: 'Custom' }
-];
+  { id: 'this_year', label: t('thisYear', 'Mwaka Huu') },
+  { id: 'custom', label: t('customRange', 'Tarehe Zako') }
+]);
 
 const finances = ref({
   totalWeightStored: 0,

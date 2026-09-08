@@ -44,7 +44,7 @@
         
         <!-- Group 1: MAIN -->
         <div class="space-y-1">
-          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">Main</div>
+          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">{{ t('navMain') }}</div>
 
           <!-- Dashboard -->
           <router-link 
@@ -55,11 +55,11 @@
               $route.path === '/' ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-900/40 ring-1 ring-emerald-400/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white',
               isSidebarCollapsed ? 'justify-center py-3 px-0' : 'justify-between px-3.5 py-2.5'
             ]"
-            :title="isSidebarCollapsed ? 'Dashboard' : ''"
+            :title="isSidebarCollapsed ? t('dashboard') : ''"
           >
             <div class="flex items-center gap-3">
               <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">Dashboard</span>
+              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">{{ t('dashboard') }}</span>
             </div>
           </router-link>
 
@@ -72,11 +72,11 @@
               $route.path.startsWith('/farmers') ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-900/40 ring-1 ring-emerald-400/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white',
               isSidebarCollapsed ? 'justify-center py-3 px-0' : 'justify-between px-3.5 py-2.5'
             ]"
-            :title="isSidebarCollapsed ? `Farmers (${farmerCount})` : ''"
+            :title="isSidebarCollapsed ? `${t('farmers')} (${farmerCount})` : ''"
           >
             <div class="flex items-center gap-3">
               <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">Farmers</span>
+              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">{{ t('farmers') }}</span>
             </div>
             <span v-if="!isSidebarCollapsed && farmerCount > 0" class="px-2 py-0.5 rounded-lg text-xs font-black bg-emerald-950 text-emerald-400 border border-emerald-800/60 font-mono">{{ farmerCount.toLocaleString() }}</span>
           </router-link>
@@ -84,7 +84,7 @@
 
         <!-- Group 2: OPERATIONS -->
         <div class="space-y-1">
-          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">Operations</div>
+          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">{{ t('navOps') }}</div>
 
           <!-- Cashbook -->
           <router-link 
@@ -95,11 +95,11 @@
               $route.path.startsWith('/receiving') ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-900/40 ring-1 ring-emerald-400/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white',
               isSidebarCollapsed ? 'justify-center py-3 px-0' : 'justify-between px-3.5 py-2.5'
             ]"
-            :title="isSidebarCollapsed ? `Cashbook (${receivingCount})` : ''"
+            :title="isSidebarCollapsed ? `${t('cashbook')} (${receivingCount})` : ''"
           >
             <div class="flex items-center gap-3">
               <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
-              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">Cashbook</span>
+              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">{{ t('cashbook') }}</span>
             </div>
             <span v-if="!isSidebarCollapsed && receivingCount > 0" class="px-2 py-0.5 rounded-lg text-xs font-black bg-amber-950 text-amber-400 border border-amber-800/60 font-mono">{{ receivingCount }}</span>
           </router-link>
@@ -113,11 +113,11 @@
               $route.path.startsWith('/inventory') ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-900/40 ring-1 ring-emerald-400/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white',
               isSidebarCollapsed ? 'justify-center py-3 px-0' : 'justify-between px-3.5 py-2.5'
             ]"
-            :title="isSidebarCollapsed ? 'Inventory' : ''"
+            :title="isSidebarCollapsed ? t('inventory') : ''"
           >
             <div class="flex items-center gap-3">
               <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">Inventory</span>
+              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">{{ t('inventory') }}</span>
             </div>
           </router-link>
 
@@ -130,11 +130,11 @@
               $route.path.startsWith('/services') ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-900/40 ring-1 ring-emerald-400/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white',
               isSidebarCollapsed ? 'justify-center py-3 px-0' : 'justify-between px-3.5 py-2.5'
             ]"
-            :title="isSidebarCollapsed ? 'Services' : ''"
+            :title="isSidebarCollapsed ? t('services') : ''"
           >
             <div class="flex items-center gap-3">
               <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">Services</span>
+              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">{{ t('services') }}</span>
             </div>
           </router-link>
 
@@ -147,11 +147,11 @@
               $route.path.startsWith('/loans') ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-900/40 ring-1 ring-emerald-400/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white',
               isSidebarCollapsed ? 'justify-center py-3 px-0' : 'justify-between px-3.5 py-2.5'
             ]"
-            :title="isSidebarCollapsed ? `Loans (${loanCount})` : ''"
+            :title="isSidebarCollapsed ? `${t('loans')} (${loanCount})` : ''"
           >
             <div class="flex items-center gap-3">
               <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">Loans</span>
+              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">{{ t('loans') }}</span>
             </div>
             <span v-if="!isSidebarCollapsed && loanCount > 0" class="px-2 py-0.5 rounded-lg text-xs font-black bg-amber-950 text-amber-400 border border-amber-800/60 font-mono">{{ loanCount }}</span>
           </router-link>
@@ -159,7 +159,7 @@
 
         <!-- Group 3: FINANCE -->
         <div class="space-y-1">
-          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">Finance</div>
+          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">{{ t('navFin') }}</div>
 
           <!-- Buyers -->
           <router-link 
@@ -170,11 +170,11 @@
               $route.path.startsWith('/buyers') ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-900/40 ring-1 ring-emerald-400/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white',
               isSidebarCollapsed ? 'justify-center py-3 px-0' : 'justify-between px-3.5 py-2.5'
             ]"
-            :title="isSidebarCollapsed ? 'Buyers' : ''"
+            :title="isSidebarCollapsed ? t('buyers') : ''"
           >
             <div class="flex items-center gap-3">
               <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">Buyers</span>
+              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">{{ t('buyers') }}</span>
             </div>
           </router-link>
 
@@ -187,11 +187,11 @@
               $route.path.startsWith('/sales') ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-900/40 ring-1 ring-emerald-400/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white',
               isSidebarCollapsed ? 'justify-center py-3 px-0' : 'justify-between px-3.5 py-2.5'
             ]"
-            :title="isSidebarCollapsed ? 'Sales' : ''"
+            :title="isSidebarCollapsed ? t('sales') : ''"
           >
             <div class="flex items-center gap-3">
               <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">Sales</span>
+              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">{{ t('sales') }}</span>
             </div>
           </router-link>
 
@@ -204,11 +204,11 @@
               $route.path.startsWith('/accounting') ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-900/40 ring-1 ring-emerald-400/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white',
               isSidebarCollapsed ? 'justify-center py-3 px-0' : 'justify-between px-3.5 py-2.5'
             ]"
-            :title="isSidebarCollapsed ? 'Income & Expenses' : ''"
+            :title="isSidebarCollapsed ? t('accounting') : ''"
           >
             <div class="flex items-center gap-3">
               <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">Income & Expenses</span>
+              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">{{ t('accounting') }}</span>
             </div>
           </router-link>
 
@@ -221,18 +221,18 @@
               $route.path.startsWith('/reports') ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-900/40 ring-1 ring-emerald-400/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white',
               isSidebarCollapsed ? 'justify-center py-3 px-0' : 'justify-between px-3.5 py-2.5'
             ]"
-            :title="isSidebarCollapsed ? 'Reports' : ''"
+            :title="isSidebarCollapsed ? t('reports') : ''"
           >
             <div class="flex items-center gap-3">
               <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">Reports</span>
+              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">{{ t('reports') }}</span>
             </div>
           </router-link>
         </div>
 
         <!-- Group 4: SYSTEM -->
         <div class="space-y-1">
-          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">System</div>
+          <div v-if="!isSidebarCollapsed" class="px-3 text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 whitespace-nowrap">{{ t('navSys') }}</div>
 
           <!-- Settings -->
           <router-link 
@@ -243,11 +243,11 @@
               $route.path.startsWith('/settings') ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-900/40 ring-1 ring-emerald-400/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white',
               isSidebarCollapsed ? 'justify-center py-3 px-0' : 'justify-between px-3.5 py-2.5'
             ]"
-            :title="isSidebarCollapsed ? 'Settings' : ''"
+            :title="isSidebarCollapsed ? t('settings') : ''"
           >
             <div class="flex items-center gap-3">
               <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg>
-              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">Settings</span>
+              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">{{ t('settings') }}</span>
             </div>
           </router-link>
         </div>
@@ -265,16 +265,16 @@
           </div>
           <div v-if="!isSidebarCollapsed">
             <div class="font-bold text-white text-xs leading-tight whitespace-nowrap">Boniface Gwakila</div>
-            <div class="text-[10px] text-emerald-400 font-semibold whitespace-nowrap">System Owner</div>
+            <div class="text-[10px] text-emerald-400 font-semibold whitespace-nowrap">{{ t('systemOwner') }}</div>
           </div>
         </div>
         <button 
           @click="openLogoutModal"
           class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-red-950/60 hover:bg-red-900/80 text-red-300 hover:text-white border border-red-800/60 transition text-xs font-bold shadow-xs cursor-pointer" 
-          title="Logout of System"
+          :title="t('logout')"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-          <span v-if="!isSidebarCollapsed">Logout</span>
+          <span v-if="!isSidebarCollapsed">{{ t('logout') }}</span>
         </button>
       </div>
 
@@ -322,10 +322,12 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useLayout } from '../composables/useLayout';
 import { useAuth } from '../composables/useAuth';
+import { useLanguage } from '../composables/useLanguage';
 
 const router = useRouter();
 const { isSidebarCollapsed, isMobileSidebarOpen, toggleSidebar, closeMobileSidebar } = useLayout();
 const { logout } = useAuth();
+const { t } = useLanguage();
 
 const showLogoutModal = ref(false);
 
