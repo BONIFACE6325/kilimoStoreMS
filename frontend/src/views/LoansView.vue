@@ -219,7 +219,7 @@
               <th class="py-3.5 px-4">Kiasi cha Mkopo</th>
               <th class="py-3.5 px-4">Riba</th>
               <th class="py-3.5 px-4">Salio Linalodaiwa</th>
-              <th class="py-3.5 px-4">Siku ya Mwisho</th>
+              <th class="py-3.5 px-4">Njia ya Marejesho</th>
               <th class="py-3.5 px-4">Hali</th>
               <th class="py-3.5 px-4 text-right">Vitendo</th>
             </tr>
@@ -278,9 +278,11 @@
                 TZS {{ formatCurrency(loan.current_balance) }}
               </td>
 
-              <!-- Due Date -->
+              <!-- Repayment Method -->
               <td class="py-3.5 px-4 font-bold text-slate-600 dark:text-slate-400">
-                {{ loan.due_date || 'N/A' }}
+                <span class="px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-800/50 text-[10.5px] font-bold">
+                  🔄 Kukatwa Kwenye Mauzo
+                </span>
               </td>
 
               <!-- Status Badge -->
@@ -401,15 +403,10 @@
               />
             </div>
 
-            <!-- Due Date Selector -->
-            <div class="space-y-1">
-              <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Tarehe ya Mwisho ya Marejesho (Due Date)</label>
-              <input 
-                type="date" 
-                v-model="loanForm.due_date" 
-                required
-                class="w-full py-2.5 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-              />
+            <!-- Repayment Notice -->
+            <div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl flex items-center gap-2 text-xs text-emerald-800 dark:text-emerald-300 font-bold">
+              <span>ℹ️</span>
+              <span>Mkopo huu hauna siku maalum ya marejesho. Utakatwa kiatomati mara tu mkulima atakapouza mzigo.</span>
             </div>
 
             <!-- Modal Action Buttons -->
@@ -543,14 +540,9 @@
               />
             </div>
 
-            <div class="space-y-1">
-              <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Tarehe Mpya ya Mwisho ya Marejesho (Due Date)</label>
-              <input 
-                type="date" 
-                v-model="editLoanForm.due_date" 
-                required
-                class="w-full py-2.5 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/40"
-              />
+            <div class="p-3 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 rounded-xl flex items-center gap-2 text-xs text-blue-800 dark:text-blue-300 font-bold">
+              <span>ℹ️</span>
+              <span>Mkopo huu hauna siku maalum ya marejesho. Utakatwa kiatomati mara tu mkulima atakapouza mzigo.</span>
             </div>
 
             <div class="grid grid-cols-2 gap-2 pt-2">
@@ -611,8 +603,7 @@ const activeRepayLoan = ref(null);
 const editLoanForm = ref({
   id: '',
   loan_code: '',
-  principal_amount: null,
-  due_date: ''
+  principal_amount: null
 });
 
 const toastMessage = ref('');
@@ -638,8 +629,7 @@ const openEditLoanModal = (loan) => {
   editLoanForm.value = {
     id: loan.id,
     loan_code: loan.loan_code,
-    principal_amount: loan.principal_amount,
-    due_date: loan.due_date || new Date().toISOString().split('T')[0]
+    principal_amount: loan.principal_amount
   };
   showEditLoanModal.value = true;
 };
@@ -656,8 +646,7 @@ const submitEditLoan = async () => {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        principal_amount: editLoanForm.value.principal_amount,
-        due_date: editLoanForm.value.due_date
+        principal_amount: editLoanForm.value.principal_amount
       })
     });
 
@@ -709,8 +698,7 @@ const deleteLoan = async (loan) => {
 const loanForm = ref({
   farmer_id: '',
   collateral_batch_id: '',
-  principal_amount: null,
-  due_date: new Date(Date.now() + 90 * 86400000).toISOString().split('T')[0] // Default 90 days
+  principal_amount: null
 });
 
 const repayForm = ref({
@@ -840,8 +828,7 @@ const openNewLoanModal = () => {
   loanForm.value = {
     farmer_id: '',
     collateral_batch_id: '',
-    principal_amount: null,
-    due_date: new Date(Date.now() + 90 * 86400000).toISOString().split('T')[0]
+    principal_amount: null
   };
   showNewLoanModal.value = true;
 };

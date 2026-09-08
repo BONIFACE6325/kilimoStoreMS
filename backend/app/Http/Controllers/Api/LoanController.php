@@ -92,7 +92,7 @@ class LoanController extends Controller
                 'principal_amount' => $validated['principal_amount'],
                 'interest_rate_annual' => 0.00, // Strictly 0.00%
                 'current_balance' => $validated['principal_amount'],
-                'due_date' => $validated['due_date'] ?? now()->format('Y-m-d'),
+                'due_date' => $validated['due_date'] ?? null,
                 'status' => 'active',
                 'disbursed_at' => now(),
             ]);
@@ -135,7 +135,7 @@ class LoanController extends Controller
         $loan->update([
             'principal_amount' => $validated['principal_amount'],
             'current_balance' => $newBalance,
-            'due_date' => $validated['due_date'] ?? $loan->due_date,
+            'due_date' => $validated['due_date'] ?? null,
         ]);
 
         return response()->json([

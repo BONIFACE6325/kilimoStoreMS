@@ -1133,9 +1133,9 @@
               />
             </div>
 
-            <div>
-              <label class="block mb-1 font-bold">Tarehe ya Kulipa (Due Date) *</label>
-              <input v-model="loanForm.due_date" type="date" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50"/>
+            <div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl flex items-center gap-2 text-xs text-emerald-800 dark:text-emerald-300 font-bold">
+              <span>ℹ️</span>
+              <span>Mkopo huu hauna siku ya kurejesha. Utakatwa kiatomati mara tu mkulima atakapouza mzigo.</span>
             </div>
           </template>
 
@@ -1176,9 +1176,9 @@
             />
           </div>
 
-          <div>
-            <label class="block mb-1 font-bold">Tarehe Mpya ya Kulipa (Due Date) *</label>
-            <input v-model="editLoanForm.due_date" type="date" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-50"/>
+          <div class="p-3 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 rounded-xl flex items-center gap-2 text-xs text-blue-800 dark:text-blue-300 font-bold">
+            <span>ℹ️</span>
+            <span>Mkopo huu hauna siku ya kurejesha. Utakatwa kiatomati mara tu mkulima atakapouza mzigo.</span>
           </div>
 
           <div class="flex justify-end gap-2 pt-2">
@@ -1782,8 +1782,7 @@ const modals = ref({
 const editLoanForm = ref({
   id: '',
   loan_code: '',
-  amount: null,
-  due_date: ''
+  amount: null
 });
 
 const confirmModal = ref({
@@ -2280,7 +2279,7 @@ watch(() => editFarmerForm.value.village, () => {
 });
 const intakeForm = ref({ crop_type: 'Mpunga', quantity: 45, unit: 'Gunia' });
 const serviceForm = ref({ batch_id: '', service_id: '' });
-const loanForm = ref({ amount: 1500000, due_date: '2026-12-31', collateral_batch_id: '' });
+const loanForm = ref({ amount: 1500000, collateral_batch_id: '' });
 const completeForm = ref({
   type: 'milling',
   has_changed: 'yes',
@@ -3300,8 +3299,7 @@ const submitNewLoan = async () => {
       body: JSON.stringify({
         farmer_id: selectedFarmer.value.id,
         collateral_batch_id: loanForm.value.collateral_batch_id,
-        principal_amount: loanForm.value.amount,
-        due_date: loanForm.value.due_date
+        principal_amount: loanForm.value.amount
       })
     });
     const data = await res.json();
@@ -3326,8 +3324,7 @@ const openEditLoanModal = (loan) => {
   editLoanForm.value = {
     id: loan.id,
     loan_code: loan.loan_code || 'LN',
-    amount: loan.principal_amount,
-    due_date: loan.due_date || new Date().toISOString().split('T')[0]
+    amount: loan.principal_amount
   };
   modals.value.editLoan = true;
 };
@@ -3343,8 +3340,7 @@ const submitEditLoan = async () => {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        principal_amount: editLoanForm.value.amount,
-        due_date: editLoanForm.value.due_date
+        principal_amount: editLoanForm.value.amount
       })
     });
     const data = await res.json();
