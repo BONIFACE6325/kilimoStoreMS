@@ -132,6 +132,10 @@ class FarmerController extends Controller
                 'status' => 'inactive',
             ]));
 
+            try {
+                event(new \App\Events\StoreDataUpdated($tenantId, 'farmer', 'created'));
+            } catch (\Throwable $e) {}
+
             return response()->json([
                 'success' => true,
                 'message' => 'Mkulima amesajiliwa kikamilifu',
@@ -364,6 +368,10 @@ class FarmerController extends Controller
 
         $farmer->update($validated);
 
+        try {
+            event(new \App\Events\StoreDataUpdated($farmer->tenant_id, 'farmer', 'updated'));
+        } catch (\Throwable $e) {}
+
         return response()->json([
             'success' => true,
             'message' => 'Farmer profile updated successfully',
@@ -374,6 +382,7 @@ class FarmerController extends Controller
     public function destroy($id)
     {
         $farmer = Farmer::findOrFail($id);
+        $tenantId = $farmer->tenant_id;
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($farmer) {
             $batchIds = $farmer->batches()->pluck('id')->toArray();
@@ -416,6 +425,10 @@ class FarmerController extends Controller
             // Finally delete the farmer
             $farmer->delete();
         });
+
+        try {
+            event(new \App\Events\StoreDataUpdated($tenantId, 'farmer', 'deleted'));
+        } catch (\Throwable $e) {}
 
         return response()->json([
             'success' => true,

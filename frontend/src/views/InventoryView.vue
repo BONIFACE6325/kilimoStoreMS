@@ -986,11 +986,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useLanguage } from '../composables/useLanguage.js';
+import { useTenants } from '../composables/useTenants.js';
+import { subscribeToTenantUpdates } from '../services/echo.js';
 import Pagination from '../components/Pagination.vue';
 
 const { t } = useLanguage();
+const { activeTenant } = useTenants();
+let echoChannel = null;
 
 const currentPage = ref(1);
 const perPage = ref(10);
@@ -1386,6 +1390,29 @@ const deleteBatch = async (id) => {
 
 onMounted(() => {
   fetchInventoryData();
+
+  if (activeTenant.value?.id) {
+    echoChannel = subscribeToTenantUpdates(activeTenant.value.id, () => {
+      fetchInventoryData();
+    });
+  }
+});
+
+watch(() => activeTenant.value?.id, (newTenantId) => {
+  if (newTenantId) {
+    if (echoChannel && typeof echoChannel.unsubscribe === 'function') {
+      echoChannel.unsubscribe();
+    }
+    echoChannel = subscribeToTenantUpdates(newTenantId, () => {
+      fetchInventoryData();
+    });
+  }
+});
+
+onUnmounted(() => {
+  if (echoChannel && typeof echoChannel.unsubscribe === 'function') {
+    echoChannel.unsubscribe();
+  }
 });
 </script>
 

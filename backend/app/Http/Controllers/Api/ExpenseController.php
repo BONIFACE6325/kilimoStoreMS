@@ -74,15 +74,22 @@ class ExpenseController extends Controller
             'date_incurred' => 'required|date',
             'description' => 'nullable|string',
         ]);
+        $tenantId = $this->getTenantId($request);
         $validated['recorded_by'] = null;
-        $validated['tenant_id'] = $this->getTenantId($request);
+        $validated['tenant_id'] = $tenantId;
 
         $expense = \App\Models\Expense::create($validated);
+
+        try {
+            event(new \App\Events\StoreDataUpdated($tenantId, 'expense', 'created'));
+        } catch (\Throwable $e) {}
+
         return response()->json(['message' => 'Gharama imesajiliwa kikamilifu', 'expense' => $expense], 201);
     }
 
     public function update(Request $request, $id)
     {
+        $tenantId = $this->getTenantId($request);
         $validated = $request->validate([
             'category_name' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
@@ -93,13 +100,23 @@ class ExpenseController extends Controller
         $expense = \App\Models\Expense::findOrFail($id);
         $expense->update($validated);
 
+        try {
+            event(new \App\Events\StoreDataUpdated($tenantId, 'expense', 'updated'));
+        } catch (\Throwable $e) {}
+
         return response()->json(['message' => 'Gharama imebadilishwa kikamilifu', 'expense' => $expense]);
     }
 
     public function destroy($id)
     {
         $expense = \App\Models\Expense::findOrFail($id);
+        $tenantId = $expense->tenant_id ?? $this->getTenantId(request());
         $expense->delete();
+
+        try {
+            event(new \App\Events\StoreDataUpdated($tenantId, 'expense', 'deleted'));
+        } catch (\Throwable $e) {}
+
         return response()->json(['message' => 'Gharama imefutwa']);
     }
 }

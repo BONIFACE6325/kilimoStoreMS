@@ -78,16 +78,21 @@ class IncomeController extends Controller
         ]);
 
         // assuming no auth for now, or you could do auth()->id() if available
-        $validated['recorded_by'] = null;
-        $validated['tenant_id'] = $this->getTenantId($request);
+        $tenantId = $this->getTenantId($request);
+        $validated['tenant_id'] = $tenantId;
 
         $income = \App\Models\OtherIncome::create($validated);
+
+        try {
+            event(new \App\Events\StoreDataUpdated($tenantId, 'income', 'created'));
+        } catch (\Throwable $e) {}
 
         return response()->json(['message' => 'Mapato yamesajiliwa kikamilifu', 'income' => $income], 201);
     }
 
     public function update(Request $request, $id)
     {
+        $tenantId = $this->getTenantId($request);
         $validated = $request->validate([
             'source_name' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
@@ -98,13 +103,23 @@ class IncomeController extends Controller
         $income = \App\Models\OtherIncome::findOrFail($id);
         $income->update($validated);
 
+        try {
+            event(new \App\Events\StoreDataUpdated($tenantId, 'income', 'updated'));
+        } catch (\Throwable $e) {}
+
         return response()->json(['message' => 'Mapato yamebadilishwa kikamilifu', 'income' => $income]);
     }
 
     public function destroy($id)
     {
         $income = \App\Models\OtherIncome::findOrFail($id);
+        $tenantId = $income->tenant_id ?? $this->getTenantId(request());
         $income->delete();
+
+        try {
+            event(new \App\Events\StoreDataUpdated($tenantId, 'income', 'deleted'));
+        } catch (\Throwable $e) {}
+
         return response()->json(['message' => 'Mapato yamefutwa']);
     }
 }

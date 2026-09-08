@@ -797,9 +797,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import Chart from 'chart.js/auto';
+import { useTenants } from '../composables/useTenants.js';
+import { subscribeToTenantUpdates } from '../services/echo.js';
 import Pagination from '../components/Pagination.vue';
+
+const { activeTenant } = useTenants();
+let echoChannel = null;
 
 // Today and Yesterday Date Strings
 const todayDateStr = new Date().toISOString().split('T')[0];
@@ -943,6 +948,29 @@ const fetchData = async () => {
 
 onMounted(() => {
   fetchData();
+
+  if (activeTenant.value?.id) {
+    echoChannel = subscribeToTenantUpdates(activeTenant.value.id, () => {
+      fetchData();
+    });
+  }
+});
+
+watch(() => activeTenant.value?.id, (newTenantId) => {
+  if (newTenantId) {
+    if (echoChannel && typeof echoChannel.unsubscribe === 'function') {
+      echoChannel.unsubscribe();
+    }
+    echoChannel = subscribeToTenantUpdates(newTenantId, () => {
+      fetchData();
+    });
+  }
+});
+
+onUnmounted(() => {
+  if (echoChannel && typeof echoChannel.unsubscribe === 'function') {
+    echoChannel.unsubscribe();
+  }
 });
 
 watch(selectedDate, () => {

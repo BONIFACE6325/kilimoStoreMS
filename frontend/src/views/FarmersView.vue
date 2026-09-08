@@ -1741,10 +1741,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useAgroMaster } from '../composables/useAgroMaster.js';
 import { useLanguage } from '../composables/useLanguage.js';
+import { useTenants } from '../composables/useTenants.js';
+import { subscribeToTenantUpdates } from '../services/echo.js';
 import Pagination from '../components/Pagination.vue';
+
+const { activeTenant } = useTenants();
+let echoChannel = null;
 
 const { cropsList, unitsList, addCrop, addUnit, getUnitKg, convertUnits } = useAgroMaster();
 const { t } = useLanguage();
@@ -3785,9 +3790,36 @@ const resetFilters = () => {
   statusFilter.value = '';
 };
 
+const handleRealtimeUpdate = async () => {
+  await fetchFarmers();
+  await fetchServicesCatalog();
+  if (selectedFarmer.value?.id) {
+    await openFarmerProfile(selectedFarmer.value.id);
+  }
+};
+
 onMounted(() => {
   fetchFarmers();
   fetchServicesCatalog();
   fetchGeoData();
+
+  if (activeTenant.value?.id) {
+    echoChannel = subscribeToTenantUpdates(activeTenant.value.id, handleRealtimeUpdate);
+  }
+});
+
+watch(() => activeTenant.value?.id, (newTenantId) => {
+  if (newTenantId) {
+    if (echoChannel && typeof echoChannel.unsubscribe === 'function') {
+      echoChannel.unsubscribe();
+    }
+    echoChannel = subscribeToTenantUpdates(newTenantId, handleRealtimeUpdate);
+  }
+});
+
+onUnmounted(() => {
+  if (echoChannel && typeof echoChannel.unsubscribe === 'function') {
+    echoChannel.unsubscribe();
+  }
 });
 </script>
