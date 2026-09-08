@@ -563,6 +563,7 @@ const trendMode = ref('finance'); // 'finance' or 'volume'
 
 const currentPage = ref(1);
 const perPage = ref(5);
+const recentTransactions = ref([]);
 
 const paginatedRecentTransactions = computed(() => {
   const start = (currentPage.value - 1) * perPage.value;
@@ -606,7 +607,6 @@ const finances = ref({
 });
 
 const trendsData = ref({ months: [], revenue: [], expenses: [], intake: [], dispatch: [] });
-const recentTransactions = ref([]);
 
 const todayFormatted = computed(() => {
   return new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });

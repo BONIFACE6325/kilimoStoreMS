@@ -2825,15 +2825,6 @@ watch([farmerSettlements, perSettlementsPage], () => {
   currentSettlementsPage.value = 1;
 });
 
-const paginatedBatchMovements = computed(() => {
-  const start = (currentMovementsPage.value - 1) * perMovementsPage.value;
-  return (selectedBatchDetails.value?.movements || []).slice(start, start + perMovementsPage.value);
-});
-
-watch([selectedBatchDetails, perMovementsPage], () => {
-  currentMovementsPage.value = 1;
-});
-
 const expandedBatchIds = ref(new Set());
 
 const isBatchExpanded = (batchId) => {
