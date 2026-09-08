@@ -60,89 +60,86 @@
     </header>
 
     <!-- MAIN LANDING FORM CONTAINER -->
-    <div class="w-full max-w-md mx-auto px-4 py-12 z-20 relative">
+    <div class="w-full max-w-xl mx-auto px-4 py-12 z-20 relative">
       
       <!-- ULTRA-MODERN GLASSMORPHISM FLOATING LOGIN CARD -->
-      <div class="bg-slate-900/75 backdrop-blur-2xl border border-white/15 rounded-3xl shadow-[0_25px_70px_-15px_rgba(0,0,0,0.8)] overflow-hidden transition-all duration-300 hover:border-emerald-500/40">
-        
-        <!-- Card Header Accent Glow -->
-        <div class="h-1.5 w-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-300"></div>
+      <div class="bg-slate-900/75 backdrop-blur-2xl border border-white/15 rounded-3xl shadow-[0_25px_70px_-15px_rgba(0,0,0,0.8)] overflow-hidden transition-all duration-300 hover:border-white/30">
 
-        <div class="p-6 sm:p-8 space-y-6">
+        <div class="p-8 sm:p-10 space-y-7">
           
           <!-- Title & Subtitle -->
-          <div class="text-center space-y-1.5">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-black uppercase tracking-wider mb-1">
+          <div class="text-center space-y-2">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-black uppercase tracking-wider mb-1">
               <span>🌾 Agribusiness Portal</span>
             </div>
-            <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            <h2 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
               {{ currentLang === 'sw' ? 'Karibu Mfumoni' : 'Welcome Back' }}
             </h2>
-            <p class="text-xs text-slate-300 font-medium">
+            <p class="text-sm text-slate-300 font-medium">
               {{ currentLang === 'sw' ? 'Ingiza taarifa zako kufungua mfumo wa ghala' : 'Sign in to access your mill & warehouse workspace' }}
             </p>
           </div>
 
           <!-- Session Expiry Warning Alert -->
-          <div v-if="sessionWarning" class="p-3.5 bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-semibold rounded-2xl flex items-start gap-2.5 shadow-inner">
+          <div v-if="sessionWarning" class="p-4 bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs sm:text-sm font-semibold rounded-2xl flex items-start gap-2.5 shadow-inner">
             <span class="text-base shrink-0">⚠️</span>
             <span class="leading-relaxed">{{ sessionWarning }}</span>
           </div>
 
           <!-- Error Alert -->
-          <div v-if="errorMessage" class="p-3.5 bg-red-500/15 border border-red-500/30 text-red-300 text-xs font-semibold rounded-2xl flex items-start gap-2.5 shadow-inner animate-shake">
+          <div v-if="errorMessage" class="p-4 bg-red-500/15 border border-red-500/30 text-red-300 text-xs sm:text-sm font-semibold rounded-2xl flex items-start gap-2.5 shadow-inner animate-shake">
             <span class="text-base shrink-0">🚫</span>
             <span class="leading-relaxed">{{ errorMessage }}</span>
           </div>
 
           <!-- LOGIN FORM -->
-          <form @submit.prevent="handleLoginSubmit" class="space-y-4" autocomplete="off">
+          <form @submit.prevent="handleLoginSubmit" class="space-y-5" autocomplete="off">
             
             <!-- Email Field -->
-            <div class="space-y-1.5">
-              <label class="text-xs font-extrabold text-slate-200 ml-1 flex items-center justify-between">
+            <div class="space-y-2">
+              <label class="text-xs sm:text-sm font-extrabold text-slate-200 ml-1 flex items-center justify-between">
                 <span>{{ currentLang === 'sw' ? 'Barua Pepe (Email)' : 'Email Address' }}</span>
               </label>
               <div class="relative group">
-                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-400 transition-colors">
-                  <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/></svg>
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-400 transition-colors">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/></svg>
                 </div>
                 <input 
                   type="email" 
                   v-model="email"
                   required
                   placeholder="gwakilabonface@gmail.com"
-                  class="w-full pl-10 pr-4 py-3 bg-slate-950/80 border border-slate-700/80 focus:border-emerald-500 rounded-2xl text-xs sm:text-sm font-semibold text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-inner"
+                  class="w-full pl-11 pr-4 py-3.5 bg-slate-950/80 border border-slate-700/80 focus:border-emerald-500 rounded-2xl text-sm sm:text-base font-semibold text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-inner"
                 />
               </div>
             </div>
 
             <!-- Password Field -->
-            <div class="space-y-1.5">
+            <div class="space-y-2">
               <div class="flex items-center justify-between ml-1">
-                <label class="text-xs font-extrabold text-slate-200">{{ currentLang === 'sw' ? 'Neno la Siri (Password)' : 'Password' }}</label>
-                <a href="#" @click.prevent="showForgotNotice" class="text-[11px] font-bold text-emerald-400 hover:text-emerald-300 transition-colors">
+                <label class="text-xs sm:text-sm font-extrabold text-slate-200">{{ currentLang === 'sw' ? 'Neno la Siri (Password)' : 'Password' }}</label>
+                <a href="#" @click.prevent="showForgotNotice" class="text-xs font-bold text-emerald-400 hover:text-emerald-300 transition-colors">
                   {{ currentLang === 'sw' ? 'Umesahau?' : 'Forgot?' }}
                 </a>
               </div>
               <div class="relative group">
-                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-400 transition-colors">
-                  <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-400 transition-colors">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                 </div>
                 <input 
                   :type="showPassword ? 'text' : 'password'" 
                   v-model="password"
                   required
                   placeholder="••••••••"
-                  class="w-full pl-10 pr-11 py-3 bg-slate-950/80 border border-slate-700/80 focus:border-emerald-500 rounded-2xl text-xs sm:text-sm font-semibold text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-inner"
+                  class="w-full pl-11 pr-12 py-3.5 bg-slate-950/80 border border-slate-700/80 focus:border-emerald-500 rounded-2xl text-sm sm:text-base font-semibold text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-inner"
                 />
                 <button 
                   type="button"
                   @click="showPassword = !showPassword"
-                  class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition-colors cursor-pointer"
+                  class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-white transition-colors cursor-pointer"
                   title="Onyesha/Ficha Neno la Siri"
                 >
-                  <span class="text-sm">{{ showPassword ? '👁️‍🗨️' : '👁️' }}</span>
+                  <span class="text-base">{{ showPassword ? '👁️‍🗨️' : '👁️' }}</span>
                 </button>
               </div>
             </div>
@@ -153,9 +150,9 @@
                 type="checkbox" 
                 id="rememberMe" 
                 v-model="rememberMe"
-                class="w-4 h-4 rounded-md border-slate-700 bg-slate-950 text-emerald-500 focus:ring-emerald-500/50 cursor-pointer"
+                class="w-4.5 h-4.5 rounded-md border-slate-700 bg-slate-950 text-emerald-500 focus:ring-emerald-500/50 cursor-pointer"
               />
-              <label for="rememberMe" class="text-xs font-bold text-slate-300 cursor-pointer select-none">
+              <label for="rememberMe" class="text-xs sm:text-sm font-bold text-slate-300 cursor-pointer select-none">
                 {{ currentLang === 'sw' ? 'Kumbuka Session Hii (Remember Me)' : 'Remember me on this browser' }}
               </label>
             </div>
@@ -165,7 +162,7 @@
               <button 
                 type="submit" 
                 :disabled="loading"
-                class="w-full py-3.5 px-5 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-sm rounded-2xl shadow-xl shadow-emerald-500/25 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+                class="w-full py-4 px-6 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-base rounded-2xl shadow-xl shadow-emerald-500/25 transition-all duration-200 transform hover:scale-[1.01] active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
               >
                 <svg v-if="loading" class="animate-spin h-5 w-5 text-slate-950" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -180,8 +177,8 @@
         </div>
 
         <!-- Security & System Governance Footer -->
-        <div class="bg-slate-950/80 px-6 py-4 border-t border-white/10 flex items-center justify-between text-[11px] font-bold text-slate-400">
-          <div class="flex items-center gap-1.5">
+        <div class="bg-slate-950/80 px-8 py-4.5 border-t border-white/10 flex items-center justify-between text-xs font-bold text-slate-400">
+          <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <span>GARANOKI ERP v2.4</span>
           </div>
