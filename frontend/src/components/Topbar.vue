@@ -37,19 +37,7 @@
         </div>
       </div>
 
-      <!-- Active Store Badge (Clean Static Indicator) -->
-      <div class="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 rounded-xl text-xs font-bold text-emerald-900 dark:text-emerald-300 shadow-2xs">
-        <img v-if="activeTenant?.logoUrl" :src="activeTenant.logoUrl" class="w-5 h-5 rounded-md object-cover shrink-0 border border-emerald-300" />
-        <span v-else class="text-base shrink-0">🏢</span>
-        <div class="text-left hidden sm:block">
-          <div class="text-[11px] font-extrabold truncate max-w-[130px] md:max-w-[170px]">
-            {{ activeTenant?.name || user?.tenantName || 'Ghala Yako' }}
-          </div>
-          <div class="text-[9px] uppercase tracking-wider font-black text-emerald-600 dark:text-emerald-400">
-            {{ activeTenant?.plan || 'enterprise' }} PLAN
-          </div>
-        </div>
-      </div>
+
 
     </div>
 
@@ -213,13 +201,11 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useLayout } from '../composables/useLayout';
 import { useAuth } from '../composables/useAuth';
-import { useTenants } from '../composables/useTenants';
 import { useLanguage } from '../composables/useLanguage';
 
 const router = useRouter();
 const { toggleSidebar } = useLayout();
 const { user, isSuperAdmin, logout } = useAuth();
-const { activeTenant } = useTenants();
 const { currentLang, toggleLanguage, t } = useLanguage();
 
 const searchQuery = ref('');
