@@ -343,138 +343,69 @@
           <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
             <div class="flex items-center gap-2">
               <span class="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-base">💰</span>
-              <h3 class="text-base font-extrabold text-slate-900 dark:text-white">Sajili Mkopo Mpya kwa Mkulima</h3>
+              <h3 class="text-base font-extrabold text-slate-900 dark:text-white">Sajili Mkopo Mpya (Asiye Mkulima)</h3>
             </div>
             <button @click="showNewLoanModal = false" class="text-slate-400 hover:text-slate-600 dark:text-slate-300 text-lg font-bold cursor-pointer">✕</button>
           </div>
 
           <form @submit.prevent="submitNewLoan" class="space-y-4 text-left">
             
-            <!-- Borrower Mode Tabs -->
-            <div class="grid grid-cols-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl text-xs font-bold gap-1">
-              <button 
-                type="button" 
-                @click="borrowerType = 'existing'"
-                class="py-2 rounded-lg transition-all cursor-pointer"
-                :class="borrowerType === 'existing' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs border border-slate-200 dark:border-slate-600' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'"
-              >
-                👤 Mkopaji Yupo Kwenye Mfumo
-              </button>
-              <button 
-                type="button" 
-                @click="borrowerType = 'new'"
-                class="py-2 rounded-lg transition-all cursor-pointer"
-                :class="borrowerType === 'new' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs border border-slate-200 dark:border-slate-600' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'"
-              >
-                ➕ Mkopaji Mpya / Asiye Mkulima
-              </button>
-            </div>
+            <div class="space-y-3 p-3.5 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/60">
+              <h4 class="text-xs font-black text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                <span>👤</span>
+                <span>Taarifa za Mkopaji (Asiye Mkulima)</span>
+              </h4>
 
-            <!-- MODE 1: EXISTING BORROWER -->
-            <template v-if="borrowerType === 'existing'">
-              <!-- Select Farmer -->
               <div class="space-y-1">
-                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Chagua Mkopaji / Mkulima Mwombaji *</label>
-                <select 
-                  v-model="loanForm.farmer_id" 
-                  @change="onFarmerChange"
+                <label class="text-[11px] font-bold text-slate-700 dark:text-slate-300">Jina Kamili la Mkopaji *</label>
+                <input 
+                  type="text"
+                  v-model="loanForm.new_borrower_name"
                   required
-                  class="w-full py-2.5 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-                >
-                  <option value="" disabled>-- Chagua Mkopaji / Mkulima --</option>
-                  <option v-for="farmer in farmersList" :key="farmer.id" :value="farmer.id">
-                    {{ farmer.name }} ({{ farmer.phone || 'Hakuna Simu' }})
-                  </option>
-                </select>
+                  placeholder="e.g. Juma Ally Kassim"
+                  class="w-full py-2 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                />
               </div>
 
-              <!-- Select Collateral Batch -->
+              <div class="grid grid-cols-2 gap-2">
+                <div class="space-y-1">
+                  <label class="text-[11px] font-bold text-slate-700 dark:text-slate-300">Namba ya Simu</label>
+                  <input 
+                    type="text"
+                    v-model="loanForm.new_borrower_phone"
+                    placeholder="e.g. 0712345678"
+                    class="w-full py-2 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                  />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[11px] font-bold text-slate-700 dark:text-slate-300">Kitambulisho (NIDA/Simu)</label>
+                  <input 
+                    type="text"
+                    v-model="loanForm.new_borrower_nida"
+                    placeholder="NIDA au namba nyingine"
+                    class="w-full py-2 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                  />
+                </div>
+              </div>
+
               <div class="space-y-1">
-                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Chagua Batch ya Mzigo Ghalani (Dhamana - Siyo Lazima)</label>
-                <select 
-                  v-model="loanForm.collateral_batch_id" 
-                  @change="onBatchChange"
-                  :disabled="!loanForm.farmer_id"
-                  class="w-full py-2.5 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40 disabled:opacity-50"
-                >
-                  <option value="">-- {{ farmerBatches.length > 0 ? 'Chagua Batch au Acha Bila Dhamana' : 'Hakuna Batch Ghalani (Bila Dhamana ya Batch)' }} --</option>
-                  <option v-for="batch in farmerBatches" :key="batch.id" :value="batch.id">
-                    Batch: {{ batch.batch_code }} - {{ batch.crop_type }} ({{ batch.intake_quantity || batch.current_weight }} {{ batch.intake_unit || 'Gunia' }})
-                  </option>
-                </select>
+                <label class="text-[11px] font-bold text-slate-700 dark:text-slate-300">Anwani / Mahali Anapotoka</label>
+                <input 
+                  type="text"
+                  v-model="loanForm.new_borrower_address"
+                  placeholder="e.g. Morogoro Mjini / Mtaa wa Kahororo"
+                  class="w-full py-2 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                />
               </div>
 
-              <!-- Live Collateral Batch Info Card -->
-              <div v-if="selectedBatchInfo" class="p-3.5 bg-indigo-50/70 dark:bg-indigo-950/40 rounded-2xl border border-indigo-200/80 dark:border-indigo-800/60 space-y-1 text-xs">
-                <div class="flex items-center justify-between">
-                  <span class="font-bold text-indigo-900 dark:text-indigo-200">Mzigo Ghalani (Dhamana):</span>
-                  <span class="font-black text-indigo-700 dark:text-indigo-300">{{ selectedBatchInfo.intake_quantity || selectedBatchInfo.current_weight }} {{ selectedBatchInfo.intake_unit || 'Gunia' }}</span>
-                </div>
-                <p class="text-[10.5px] text-slate-500 dark:text-slate-400 mt-1">
-                  ℹ️ Riba: <strong>0% (Bila Riba)</strong>. Kiasi kitakatwa kikamilifu kwenye mauzo yajayo.
-                </p>
+              <div class="p-2.5 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 rounded-xl text-[10.5px] text-blue-900 dark:text-blue-300 font-medium">
+                ℹ️ Mkopaji huyu atasajiliwa kiatomati kwenye mfumo na kupewa mkopo wake wa <strong>Direct (Bila Mzigo Ghalani)</strong>.
               </div>
-            </template>
-
-            <!-- MODE 2: NEW BORROWER FORM -->
-            <template v-else>
-              <div class="space-y-3 p-3.5 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/60">
-                <h4 class="text-xs font-black text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
-                  <span>👤</span>
-                  <span>Sajili Taarifa za Mkopaji Mpya</span>
-                </h4>
-
-                <div class="space-y-1">
-                  <label class="text-[11px] font-bold text-slate-700 dark:text-slate-300">Jina Kamili la Mkopaji *</label>
-                  <input 
-                    type="text"
-                    v-model="loanForm.new_borrower_name"
-                    required
-                    placeholder="e.g. Juma Ally Kassim"
-                    class="w-full py-2 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-                  />
-                </div>
-
-                <div class="grid grid-cols-2 gap-2">
-                  <div class="space-y-1">
-                    <label class="text-[11px] font-bold text-slate-700 dark:text-slate-300">Namba ya Simu</label>
-                    <input 
-                      type="text"
-                      v-model="loanForm.new_borrower_phone"
-                      placeholder="e.g. 0712345678"
-                      class="w-full py-2 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-                    />
-                  </div>
-                  <div class="space-y-1">
-                    <label class="text-[11px] font-bold text-slate-700 dark:text-slate-300">Kitambulisho (NIDA/Simu)</label>
-                    <input 
-                      type="text"
-                      v-model="loanForm.new_borrower_nida"
-                      placeholder="NIDA au namba nyingine"
-                      class="w-full py-2 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-                    />
-                  </div>
-                </div>
-
-                <div class="space-y-1">
-                  <label class="text-[11px] font-bold text-slate-700 dark:text-slate-300">Anwani / Mahali Anapotoka</label>
-                  <input 
-                    type="text"
-                    v-model="loanForm.new_borrower_address"
-                    placeholder="e.g. Morogoro Mjini / Mtaa wa Kahororo"
-                    class="w-full py-2 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-                  />
-                </div>
-
-                <div class="p-2.5 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 rounded-xl text-[10.5px] text-blue-900 dark:text-blue-300 font-medium">
-                  ℹ️ Mkopaji huyu atasajiliwa kiatomati kwenye mfumo na kupewa mkopo wake wa <strong>Direct (Bila Mzigo Ghalani)</strong>.
-                </div>
-              </div>
-            </template>
+            </div>
 
             <!-- Principal Loan Amount Input -->
             <div class="space-y-1">
-              <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Kiasi cha Mkopo Unachoombwa (TZS)</label>
+              <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Kiasi cha Mkopo Unachoombwa (TZS) *</label>
               <input 
                 type="number" 
                 v-model.number="loanForm.principal_amount" 
@@ -488,7 +419,7 @@
             <!-- Repayment Notice -->
             <div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl flex items-center gap-2 text-xs text-emerald-800 dark:text-emerald-300 font-bold">
               <span>ℹ️</span>
-              <span>Mkopo huu hauna siku maalum ya marejesho. Utakatwa kiatomati mara tu mkulima atakapouza mzigo.</span>
+              <span>Riba: 0% (Bila Riba). Marejesho yataingizwa mara baada ya mkopaji kurudisha kiasi hiki.</span>
             </div>
 
             <!-- Modal Action Buttons -->
@@ -502,7 +433,7 @@
               </button>
               <button 
                 type="submit" 
-                :disabled="submitting || !loanForm.principal_amount || loanForm.principal_amount <= 0"
+                :disabled="submitting || !loanForm.new_borrower_name || !loanForm.principal_amount || loanForm.principal_amount <= 0"
                 class="py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow-md border border-emerald-400/30 transition cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
               >
                 <span>{{ submitting ? 'Inasajili...' : 'Thibitisha Mkopo →' }}</span>
@@ -941,14 +872,11 @@ const fetchLoansData = async () => {
 };
 
 const openNewLoanModal = () => {
-  borrowerType.value = 'existing';
   loanForm.value = {
-    farmer_id: '',
     new_borrower_name: '',
     new_borrower_phone: '',
     new_borrower_nida: '',
     new_borrower_address: '',
-    collateral_batch_id: '',
     principal_amount: null
   };
   showNewLoanModal.value = true;
@@ -964,30 +892,25 @@ const openRepayModal = (loan) => {
 };
 
 const submitNewLoan = async () => {
+  if (!loanForm.value.new_borrower_name || !loanForm.value.new_borrower_name.trim()) {
+    triggerToast('Tafadhali ingiza jina la mkopaji mpya!', 'error');
+    return;
+  }
+
   if (!loanForm.value.principal_amount || loanForm.value.principal_amount <= 0) {
     triggerToast('Tafadhali weka kiasi halali cha mkopo!', 'error');
-    return;
-  }
-
-  if (borrowerType.value === 'existing' && !loanForm.value.farmer_id) {
-    triggerToast('Tafadhali chagua mkulima kutoka kwenye orodha!', 'error');
-    return;
-  }
-
-  if (borrowerType.value === 'new' && (!loanForm.value.new_borrower_name || !loanForm.value.new_borrower_name.trim())) {
-    triggerToast('Tafadhali ingiza jina la mkopaji mpya!', 'error');
     return;
   }
 
   submitting.value = true;
   try {
     const payload = {
-      farmer_id: borrowerType.value === 'existing' ? loanForm.value.farmer_id : null,
-      new_borrower_name: borrowerType.value === 'new' ? loanForm.value.new_borrower_name.trim() : null,
-      new_borrower_phone: borrowerType.value === 'new' ? (loanForm.value.new_borrower_phone || '').trim() : null,
-      new_borrower_nida: borrowerType.value === 'new' ? (loanForm.value.new_borrower_nida || '').trim() : null,
-      new_borrower_address: borrowerType.value === 'new' ? (loanForm.value.new_borrower_address || '').trim() : null,
-      collateral_batch_id: borrowerType.value === 'existing' ? (loanForm.value.collateral_batch_id || null) : null,
+      farmer_id: null,
+      new_borrower_name: loanForm.value.new_borrower_name.trim(),
+      new_borrower_phone: (loanForm.value.new_borrower_phone || '').trim(),
+      new_borrower_nida: (loanForm.value.new_borrower_nida || '').trim(),
+      new_borrower_address: (loanForm.value.new_borrower_address || '').trim(),
+      collateral_batch_id: null,
       principal_amount: parseFloat(loanForm.value.principal_amount)
     };
 
