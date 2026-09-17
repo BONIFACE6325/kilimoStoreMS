@@ -211,15 +211,15 @@
       </div>
 
       <!-- Executive Management Summary Narrative Card -->
-      <div class="bg-gradient-to-r from-emerald-500/10 via-teal-500/5 to-emerald-500/10 dark:from-emerald-950/40 dark:to-slate-900 p-6 rounded-3xl border border-emerald-300/80 dark:border-emerald-800/60 shadow-xs space-y-3">
-        <div class="flex items-center justify-between border-b border-emerald-200/80 dark:border-emerald-800/60 pb-3">
-          <h3 class="text-sm font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-emerald-200/80 dark:border-emerald-800/60 shadow-2xs space-y-3">
+        <div class="flex items-center justify-between border-b border-emerald-100 dark:border-slate-800 pb-3">
+          <h3 class="text-sm font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
             <span>📌 Muhtasari wa Taarifa ya Uendeshaji & Mkakati (Executive Narrative)</span>
           </h3>
-          <span class="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100/80 dark:bg-emerald-900/60 px-2.5 py-1 rounded-lg">Kipindi: {{ selectedPeriod.toUpperCase() }}</span>
+          <span class="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-200/60 dark:border-emerald-800/40">Kipindi: {{ selectedPeriod.toUpperCase() }}</span>
         </div>
-        <p class="text-xs leading-relaxed text-slate-700 dark:text-slate-300 font-semibold">
-          Katika kipindi hiki, kituo cha uendeshaji cha <strong class="text-slate-900 dark:text-white font-black">GALANOKI</strong> kimefanikiwa kukusanya mapato ya jumla ya <strong class="text-emerald-700 dark:text-emerald-400 font-black font-mono">TZS {{ formatCurrency(stats.total_revenue_tzs) }}</strong> huku kikihifadhi mizigo yenye uzito wa <strong class="text-slate-900 dark:text-white font-black font-mono">{{ formatCurrency(stats.total_weight_stored_mt) }} MT</strong> ghalani. Mzunguko wa matumizi ya uendeshaji (OPEX) unafikia <strong class="text-rose-600 dark:text-rose-400 font-black font-mono">TZS {{ formatCurrency(stats.total_expenses_tzs) }}</strong>, ikitoa faida ghafi inayoelekeza ukuaji wa kituo cha ghala na uchakataji.
+        <p class="text-xs leading-relaxed text-slate-700 dark:text-slate-300 font-medium">
+          Katika kipindi hiki, kituo cha uendeshaji cha <strong class="text-slate-900 dark:text-white font-black">GALANOKI</strong> kimefanikiwa kukusanya mapato ya jumla ya <strong class="text-emerald-600 dark:text-emerald-400 font-black font-mono">TZS {{ formatCurrency(stats.total_revenue_tzs) }}</strong> huku kikihifadhi mizigo yenye uzito wa <strong class="text-slate-900 dark:text-white font-black font-mono">{{ formatCurrency(stats.total_weight_stored_mt) }} MT</strong> ghalani. Mzunguko wa matumizi ya uendeshaji (OPEX) unafikia <strong class="text-rose-600 dark:text-rose-400 font-black font-mono">TZS {{ formatCurrency(stats.total_expenses_tzs) }}</strong>, ikitoa faida ghafi inayoelekeza ukuaji wa kituo cha ghala na uchakataji.
         </p>
       </div>
 
