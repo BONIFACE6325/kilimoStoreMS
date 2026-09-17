@@ -68,7 +68,7 @@
           <div>
             <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Jumla ya Ankara</p>
             <h3 class="text-xl font-black text-slate-900 dark:text-white mt-0.5">{{ invoicesList.length }}</h3>
-            <p class="text-[10.5px] text-slate-400 mt-0.5">{{ paidInvoicesCount }} zimelipwa, {{ unpaidInvoicesCount }} zinadaiwa</p>
+            <p class="text-[10.5px] text-emerald-600 dark:text-emerald-400 font-bold mt-0.5">✓ 100% Imelipwa (Paid)</p>
           </div>
         </div>
 
@@ -207,15 +207,6 @@
                     class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 font-extrabold text-[11px] rounded-lg border border-emerald-200 dark:border-emerald-800 transition cursor-pointer flex items-center gap-1"
                   >
                     <span>👁️ Ankara</span>
-                  </button>
-
-                  <button 
-                    v-if="inv.status !== 'paid'"
-                    @click="markInvoiceAsPaid(inv)"
-                    title="Thibitisha Malipo"
-                    class="px-2 py-1 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 text-blue-600 dark:text-blue-400 font-bold text-[11px] rounded-lg border border-blue-200 dark:border-blue-800 transition cursor-pointer"
-                  >
-                    ✅ Mark Paid
                   </button>
 
                   <button 
