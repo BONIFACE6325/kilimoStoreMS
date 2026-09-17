@@ -122,7 +122,7 @@
         <div class="text-[9px] text-orange-800 dark:text-orange-400 font-bold pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <span>{{ t('loanBalance', 'Salio la Mikopo') }}</span>
           <span v-if="finances.overdueLoansCount > 0" class="text-[8px] bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 font-extrabold px-1 rounded">
-            {{ finances.overdueLoansCount }} Overdue
+            {{ finances.overdueLoansCount }} {{ t('overdue', 'Zilizochelewa') }}
           </span>
           <span v-else class="text-[8px] bg-orange-50 dark:bg-orange-900/40 text-orange-800 dark:text-orange-400 font-extrabold px-1 rounded border border-orange-200 dark:border-orange-700/50">
             0% Interest
@@ -140,7 +140,7 @@
           Tsh {{ (finances.netProfit || 0).toLocaleString() }}
         </div>
         <div class="text-[9px] text-slate-500 dark:text-slate-400 font-semibold pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <span>(Ada + Mengine) - Expenses</span>
+          <span>(Ada + Mengine) - {{ t('operatingExpensesShort', 'Matumizi') }}</span>
           <span class="text-[8px] bg-teal-50 dark:bg-teal-900/40 text-teal-800 dark:text-teal-400 font-black px-1 rounded uppercase border border-teal-200 dark:border-teal-700/50">NET PROFIT</span>
         </div>
       </div>
@@ -362,8 +362,8 @@
                 <div class="bg-emerald-500 h-full rounded-full transition-all" :style="{ width: item.pct + '%' }"></div>
               </div>
               <div class="flex justify-between text-[9.5px] text-slate-400 font-medium">
-                <span>Rank #{{ idx + 1 }}</span>
-                <span>{{ item.pct }}% of revenue</span>
+                <span>{{ t('rank', 'Nafasi') }} #{{ idx + 1 }}</span>
+                <span>{{ item.pct }}% {{ t('ofRevenue', 'ya mapato') }}</span>
               </div>
             </div>
             <div v-if="top3Services.length === 0" class="text-xs text-slate-400 py-3 text-center">{{ t('noCoreServices', 'Hakuna huduma kuu zilizosajiliwa') }}</div>
@@ -394,8 +394,8 @@
                 <div class="bg-red-500 h-full rounded-full transition-all" :style="{ width: item.pct + '%' }"></div>
               </div>
               <div class="flex justify-between text-[9.5px] text-slate-400 font-medium">
-                <span>Cost Center #{{ idx + 1 }}</span>
-                <span>{{ item.pct }}% of expenses</span>
+                <span>{{ t('costCenter', 'Eneo la Gharama') }} #{{ idx + 1 }}</span>
+                <span>{{ item.pct }}% {{ t('ofExpenses', 'ya matumizi') }}</span>
               </div>
             </div>
             <div v-if="top3Expenses.length === 0" class="text-xs text-slate-400 py-3 text-center">{{ t('noExpensesRecorded', 'Hakuna matumizi yaliyorekodiwa') }}</div>

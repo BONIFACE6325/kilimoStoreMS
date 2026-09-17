@@ -245,11 +245,11 @@
               $route.path.startsWith('/saas-admin') ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-900/40 ring-1 ring-emerald-400/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white',
               isSidebarCollapsed ? 'justify-center py-3 px-0' : 'justify-between px-3.5 py-2.5'
             ]"
-            :title="isSidebarCollapsed ? 'SaaS Admin Portal' : ''"
+            :title="isSidebarCollapsed ? t('saasAdmin', 'Portal ya SaaS Admin') : ''"
           >
             <div class="flex items-center gap-3">
               <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">SaaS Admin Portal</span>
+              <span v-if="!isSidebarCollapsed" class="whitespace-nowrap">{{ t('saasAdmin', 'Portal ya SaaS Admin') }}</span>
             </div>
           </router-link>
 
@@ -309,9 +309,9 @@
           </div>
 
           <div class="space-y-1">
-            <h3 class="text-base font-extrabold text-slate-900 dark:text-slate-50">Logout of System?</h3>
+            <h3 class="text-base font-extrabold text-slate-900 dark:text-slate-50">{{ t('logoutModalTitle', 'Kutoka Mfumoni?') }}</h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
-              Are you sure you want to log out of <strong>GARANOKI</strong>? Your active session will be securely closed.
+              {{ t('logoutModalText', 'Je, una uhakika unataka kutoka kwenye mfumo wa GARANOKI? Mfumo utafunga akaunti yako kwa usalama.') }}
             </p>
           </div>
 
@@ -320,13 +320,13 @@
               @click="showLogoutModal = false"
               class="py-2.5 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-extrabold text-xs rounded-xl border border-slate-200/80 dark:border-slate-700/80 transition cursor-pointer"
             >
-              Cancel
+              {{ t('cancel', 'Ghairi') }}
             </button>
             <button 
               @click="executeLogout"
               class="py-2.5 px-4 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-extrabold text-xs rounded-xl shadow-md shadow-red-900/30 border border-red-400/30 transition cursor-pointer"
             >
-              Yes, Logout →
+              {{ t('yesLogout', 'Ndiyo, Toka →') }}
             </button>
           </div>
 

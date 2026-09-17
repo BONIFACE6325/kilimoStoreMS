@@ -134,15 +134,15 @@
               <div class="p-2.5 bg-amber-50/80 dark:bg-amber-900/40 border border-amber-200/70 dark:border-amber-700/50 rounded-xl flex items-start gap-2.5">
                 <span class="text-base">💳</span>
                 <div>
-                  <div class="font-bold text-amber-900 dark:text-amber-400">3 Loan Applications</div>
-                  <div class="text-[11px] text-amber-700 dark:text-amber-400 mt-0.5">Requires your quick approval.</div>
+                  <div class="font-bold text-amber-900 dark:text-amber-400">{{ t('notifLoansTitle', 'Maombi 3 ya Mikopo') }}</div>
+                  <div class="text-[11px] text-amber-700 dark:text-amber-400 mt-0.5">{{ t('notifLoansSub', 'Yanahitaji idhini yako haraka.') }}</div>
                 </div>
               </div>
               <div class="p-2.5 bg-emerald-50/80 dark:bg-emerald-900/40 border border-emerald-200/70 dark:border-emerald-700/50 rounded-xl flex items-start gap-2.5">
                 <span class="text-base">📦</span>
                 <div>
-                  <div class="font-bold text-emerald-900 dark:text-emerald-400">New Paddy Consignment</div>
-                  <div class="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5">45.2 Tons received in Bin 01.</div>
+                  <div class="font-bold text-emerald-900 dark:text-emerald-400">{{ t('notifPaddyTitle', 'Shehena Mpya ya Mpunga') }}</div>
+                  <div class="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5">{{ t('notifPaddySub', 'Tani 45.2 zimepokelewa Kitalu 01.') }}</div>
                 </div>
               </div>
             </div>

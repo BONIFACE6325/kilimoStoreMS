@@ -897,7 +897,7 @@
                 @click="showIntakeModal = false"
                 class="py-2.5 px-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold text-xs rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer"
               >
-                Cancel
+                {{ t('cancel', 'Ghairi') }}
               </button>
               <button 
                 type="submit" 
@@ -965,7 +965,7 @@
                 @click="showMoveModal = false"
                 class="py-2.5 px-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold text-xs rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer"
               >
-                Cancel
+                {{ t('cancel', 'Ghairi') }}
               </button>
               <button 
                 type="submit" 
