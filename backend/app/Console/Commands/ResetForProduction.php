@@ -39,7 +39,7 @@ class ResetForProduction extends Command
      *
      * @var string
      */
-    protected $description = 'Reset database for production: add nimasumbuko2409@gmail.com admin account and delete all test transactional data while preserving users, services, crops, and master categories.';
+    protected $description = 'Reset database for production: configure gwakilabonface@gmail.com & masumbuko2409@gmail.com System Owners with password 12345678 and purge all test data.';
 
     /**
      * Execute the console command.
@@ -52,22 +52,34 @@ class ResetForProduction extends Command
         $tenant = Tenant::first();
         $tenantId = $tenant ? $tenant->id : null;
 
-        // 2. Add / Update Admin user: nimasumbuko2409@gmail.com
-        $newAdmin = User::firstOrNew(['email' => 'nimasumbuko2409@gmail.com']);
-        $newAdmin->name = 'Nimasumbuko Admin';
-        $newAdmin->password = Hash::make('12345678');
-        $newAdmin->tenant_id = $tenantId;
-        $newAdmin->role = 'Admin';
-        $newAdmin->status = 'active';
-        $newAdmin->save();
+        // 2. Remove any unwanted/test users except the two production admins
+        User::whereNotIn('email', ['gwakilabonface@gmail.com', 'masumbuko2409@gmail.com'])->delete();
 
-        $this->info("✅ Admin user 'nimasumbuko2409@gmail.com' successfully configured with password '12345678'.");
+        // 3. Configure User 1: gwakilabonface@gmail.com
+        $user1 = User::firstOrNew(['email' => 'gwakilabonface@gmail.com']);
+        $user1->name = 'Boniface Gwakila';
+        $user1->password = Hash::make('12345678');
+        $user1->tenant_id = $tenantId;
+        $user1->role = 'System Owner';
+        $user1->status = 'active';
+        $user1->save();
 
-        // Display current active users
+        // 4. Configure User 2: masumbuko2409@gmail.com
+        $user2 = User::firstOrNew(['email' => 'masumbuko2409@gmail.com']);
+        $user2->name = 'Masumbuko';
+        $user2->password = Hash::make('12345678');
+        $user2->tenant_id = $tenantId;
+        $user2->role = 'System Owner';
+        $user2->status = 'active';
+        $user2->save();
+
+        $this->info("✅ System Owner accounts successfully configured with identical initial password '12345678':");
+
+        // Display current active production users
         $users = User::all(['name', 'email', 'role']);
         $this->table(['Name', 'Email', 'Role'], $users->toArray());
 
-        // 3. Purge operational / test data
+        // 5. Purge operational / test data
         $this->warn('🧹 Purging all test transactional data (farmers, loans, sales, intake batches, receipts)...');
 
         FarmerService::query()->delete();
@@ -87,7 +99,7 @@ class ResetForProduction extends Command
         Farmer::query()->delete();
         Buyer::query()->delete();
 
-        // 4. Reset warehouse bin occupancies to 0
+        // 6. Reset warehouse bin occupancies to 0
         Bin::query()->update(['current_occupancy_mt' => 0]);
 
         $this->info('✨ Database cleanup completed! Master configuration (Users, Services, Crops, Income & Expense categories) remains intact.');
