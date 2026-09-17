@@ -993,21 +993,25 @@ const submitNewLoan = async () => {
 
     const res = await fetch('/api/v1/loans', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
       body: JSON.stringify(payload)
     });
 
-    const data = await res.json();
-    if (res.ok && (data.success || data.id || data.loan)) {
+    const data = await res.json().catch(() => null);
+    if (res.ok && data && (data.success || data.id || data.loan)) {
       triggerToast('Mkopo umesajiliwa kikamilifu!');
       showNewLoanModal.value = false;
       await fetchLoansData();
     } else {
-      triggerToast(data.error || data.message || (data.errors ? Object.values(data.errors).flat().join(', ') : 'Imeshindwa kusajili mkopo'), 'error');
+      const errMsg = (data && (data.error || data.message)) || `Imeshindwa kusajili mkopo (Status ${res.status})`;
+      triggerToast(errMsg, 'error');
     }
   } catch (err) {
     console.error('Error submitting loan:', err);
-    triggerToast(`Kosa wakati wa kusajili mkopo: ${err.message}`, 'error');
+    triggerToast(`Kosa la Mtandao au Server: ${err.message || 'Imefeli kuwasiliana na server'}`, 'error');
   } finally {
     submitting.value = false;
   }
