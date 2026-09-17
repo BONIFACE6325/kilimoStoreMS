@@ -48,6 +48,8 @@ Route::prefix('v1')->group(function () {
 
     // Farmers
     Route::apiResource('farmers', FarmerController::class);
+    Route::post('/farmers/{id}/services', [FarmerController::class, 'storeService']);
+    Route::delete('/farmers/{id}/services/{serviceId}', [FarmerController::class, 'destroyService']);
 
     // Batches & Warehouse Bins
     Route::get('/inventory/summary', [BatchController::class, 'getInventorySummary']);

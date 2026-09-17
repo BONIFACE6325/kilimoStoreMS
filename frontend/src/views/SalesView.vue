@@ -413,6 +413,7 @@
                 <div class="flex justify-between text-slate-500"><span>• Ada ya Ukaushaji (Drying)</span><span>- TZS {{ formatCurrency(deductionsPreview.deductions.drying_fees) }}</span></div>
                 <div class="flex justify-between text-slate-500"><span>• Ada ya Ukoboaji (Milling)</span><span>- TZS {{ formatCurrency(deductionsPreview.deductions.milling_fees) }}</span></div>
                 <div class="flex justify-between text-slate-500"><span>• Ada ya Daraja (Grading)</span><span>- TZS {{ formatCurrency(deductionsPreview.deductions.grading_fees) }}</span></div>
+                <div class="flex justify-between text-slate-500" v-if="deductionsPreview.deductions.other_services_fees > 0"><span>• Huduma Nyingine za Mkulima</span><span>- TZS {{ formatCurrency(deductionsPreview.deductions.other_services_fees) }}</span></div>
                 <div class="flex justify-between text-slate-500"><span>• Marejesho ya Mikopo (Loan Principal)</span><span>- TZS {{ formatCurrency(deductionsPreview.deductions.loan_principal) }}</span></div>
               </div>
 

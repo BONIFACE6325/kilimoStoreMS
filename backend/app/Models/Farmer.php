@@ -44,4 +44,9 @@ class Farmer extends Model
     {
         return $this->hasMany(Settlement::class);
     }
+
+    public function farmerServices(): HasMany
+    {
+        return $this->hasMany(FarmerService::class);
+    }
 }

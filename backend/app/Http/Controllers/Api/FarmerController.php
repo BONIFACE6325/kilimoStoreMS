@@ -358,6 +358,34 @@ class FarmerController extends Controller
             return $batch;
         });
 
+        $farmerDirectServices = \App\Models\FarmerService::where('farmer_id', $farmer->id)->with('service')->orderBy('created_at', 'desc')->get();
+        foreach ($farmerDirectServices as $fs) {
+            $alreadyPaid = (float) \App\Models\SettlementDeduction::where('source_reference_id', $fs->id)->sum('amount');
+            $feeAmount = (float) ($fs->fee_amount ?? 0);
+            $unpaidFee = max(0.0, $feeAmount - $alreadyPaid);
+            if ($fs->status !== 'paid' && $feeAmount > 0 && $unpaidFee <= 0.001) {
+                $fs->update(['status' => 'paid']);
+            }
+
+            $services->push([
+                'id' => $fs->id,
+                'job_id' => $fs->id,
+                'service_id' => $fs->service_id,
+                'batch_code' => 'N/A (Mkulima)',
+                'batch_id' => null,
+                'type' => 'Direct',
+                'service_name' => $fs->service_name ?: ($fs->service ? $fs->service->name_sw : 'Huduma ya Mkulima'),
+                'fee_amount' => $feeAmount,
+                'already_paid' => $alreadyPaid,
+                'unpaid_fee' => $unpaidFee,
+                'rate' => $fs->rate,
+                'unit' => $fs->unit ?: 'huduma',
+                'notes' => $fs->notes,
+                'status' => $fs->status,
+                'created_at' => $fs->created_at ? $fs->created_at->format('Y-m-d H:i:s') : now()->format('Y-m-d H:i:s'),
+            ]);
+        }
+
         $services = $services->sortByDesc('created_at')->values();
 
         return response()->json([
@@ -366,6 +394,7 @@ class FarmerController extends Controller
             'loans' => $loans,
             'settlements' => $settlements,
             'services' => $services,
+            'farmer_services' => $farmerDirectServices,
         ]);
     }
 
@@ -440,6 +469,9 @@ class FarmerController extends Controller
                 }
             }
 
+            // Delete direct farmer services
+            \App\Models\FarmerService::where('farmer_id', $farmer->id)->delete();
+
             // Finally delete the farmer
             $farmer->delete();
         });
@@ -451,6 +483,71 @@ class FarmerController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Mkulima na kumbukumbu zake zote zimefutwa kikamilifu.'
+        ]);
+    }
+
+    public function storeService(Request $request, $id)
+    {
+        $farmer = Farmer::findOrFail($id);
+        $tenantId = $this->getTenantId($request);
+
+        $validated = $request->validate([
+            'service_name' => 'required|string|max:255',
+            'fee_amount' => 'required|numeric|min:0',
+            'quantity' => 'nullable|numeric|min:0.001',
+            'rate' => 'nullable|numeric|min:0',
+            'unit' => 'nullable|string|max:50',
+            'service_id' => 'nullable|exists:services,id',
+            'notes' => 'nullable|string',
+        ]);
+
+        $farmerService = \App\Models\FarmerService::create([
+            'tenant_id' => $tenantId,
+            'farmer_id' => $farmer->id,
+            'service_id' => $validated['service_id'] ?? null,
+            'service_name' => $validated['service_name'],
+            'fee_amount' => floatval($validated['fee_amount']),
+            'quantity' => floatval($validated['quantity'] ?? 1),
+            'rate' => isset($validated['rate']) ? floatval($validated['rate']) : null,
+            'unit' => $validated['unit'] ?? 'huduma',
+            'notes' => $validated['notes'] ?? null,
+            'status' => 'pending',
+        ]);
+
+        try {
+            event(new \App\Events\StoreDataUpdated($tenantId, 'farmer_service', 'created'));
+        } catch (\Throwable $e) {}
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Huduma/Gharama ya Mkulima imesajiliwa kikamilifu',
+            'farmer_service' => $farmerService
+        ], 201);
+    }
+
+    public function destroyService(Request $request, $id, $serviceId)
+    {
+        $tenantId = $this->getTenantId($request);
+        $farmerService = \App\Models\FarmerService::where('tenant_id', $tenantId)
+            ->where('farmer_id', $id)
+            ->findOrFail($serviceId);
+
+        if ($farmerService->status === 'paid') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Huwezi kufuta huduma ambayo tayari imeshalipiwa.'
+            ], 422);
+        }
+
+        $farmerService->delete();
+
+        try {
+            event(new \App\Events\StoreDataUpdated($tenantId, 'farmer_service', 'deleted'));
+        } catch (\Throwable $e) {}
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Huduma/Gharama imeondolewa'
         ]);
     }
 }

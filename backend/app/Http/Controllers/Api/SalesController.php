@@ -177,13 +177,20 @@ class SalesController extends Controller
             return $this->getJobUnpaidFee($j);
         });
 
+        // 4b. Fetch Unpaid Direct Farmer Services / Expenses
+        $farmerServices = \App\Models\FarmerService::where('farmer_id', $batch->farmer_id)->where('status', '!=', 'paid')->get();
+        $otherServicesFees = $farmerServices->sum(function($fs) {
+            $alreadyPaid = (float) \App\Models\SettlementDeduction::where('source_reference_id', $fs->id)->sum('amount');
+            return max(0.0, floatval($fs->fee_amount) - $alreadyPaid);
+        });
+
         // 5. Fetch Active Loans
         $loans = Loan::where('farmer_id', $batch->farmer_id)
             ->whereIn('status', ['active', 'overdue'])
             ->get();
         $loanPrincipal = $loans->sum('current_balance');
 
-        $totalDeductions = $storageFees + $dryingFees + $millingFees + $gradingFees + $loanPrincipal;
+        $totalDeductions = $storageFees + $dryingFees + $millingFees + $gradingFees + $otherServicesFees + $loanPrincipal;
         $netPayout = max(0, $grossSales - $totalDeductions);
 
         return response()->json([
@@ -196,6 +203,7 @@ class SalesController extends Controller
                 'drying_fees' => $dryingFees,
                 'milling_fees' => $millingFees,
                 'grading_fees' => $gradingFees,
+                'other_services_fees' => $otherServicesFees,
                 'loan_principal' => $loanPrincipal,
                 'loan_interest' => 0.00,
             ],
@@ -325,6 +333,23 @@ class SalesController extends Controller
                 ];
             }
 
+            // 4b. Farmer Direct Services Waterfall
+            $farmerServices = \App\Models\FarmerService::where('farmer_id', $batch->farmer_id)->where('status', '!=', 'paid')->get();
+            $farmerServicePayments = [];
+            foreach ($farmerServices as $fs) {
+                if ($availableFunds <= 0) break;
+                $alreadyPaid = (float) \App\Models\SettlementDeduction::where('source_reference_id', $fs->id)->sum('amount');
+                $unpaid = max(0.0, floatval($fs->fee_amount) - $alreadyPaid);
+                if ($unpaid <= 0) continue;
+                $pay = min($availableFunds, $unpaid);
+                $availableFunds -= $pay;
+                $farmerServicePayments[] = [
+                    'service' => $fs,
+                    'amount' => $pay,
+                    'is_full' => ($pay >= $unpaid - 0.001)
+                ];
+            }
+
             // 5. Loans Waterfall
             $loanPayments = [];
             foreach ($loans as $loan) {
@@ -345,7 +370,7 @@ class SalesController extends Controller
 
             $result = DB::transaction(function () use (
                 $tenantId, $batch, $buyer, $invoiceNumber, $pricePerUnit, $soldQty, $availQty, $grossSales,
-                $paidStorage, $dryingPayments, $millingPayments, $gradingPayments, $loanPayments,
+                $paidStorage, $dryingPayments, $millingPayments, $gradingPayments, $farmerServicePayments, $loanPayments,
                 $actualDeductions, $netPayout
             ) {
                 // 1. Create Invoice
@@ -425,6 +450,18 @@ class SalesController extends Controller
                     ]);
                     if ($gp['is_full']) {
                         $gp['job']->update(['status' => 'paid']);
+                    }
+                }
+
+                foreach ($farmerServicePayments as $fsp) {
+                    SettlementDeduction::create([
+                        'settlement_id' => $settlement->id,
+                        'deduction_type' => 'farmer_service',
+                        'source_reference_id' => $fsp['service']->id,
+                        'amount' => $fsp['amount'],
+                    ]);
+                    if ($fsp['is_full']) {
+                        $fsp['service']->update(['status' => 'paid']);
                     }
                 }
 

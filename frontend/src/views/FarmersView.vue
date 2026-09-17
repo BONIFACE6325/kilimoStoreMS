@@ -400,6 +400,13 @@
               >
                 <span>🏷️ Mauzo & Settlement</span>
               </button>
+              <button 
+                @click="profileTab = 'services'" 
+                :class="profileTab === 'services' ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md' : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-900 dark:text-emerald-400 hover:bg-emerald-100 dark:bg-emerald-500/20'" 
+                class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center gap-2"
+              >
+                <span>🛠️ Huduma & Gharama</span>
+              </button>
             </div>
 
             <!-- TAB 1: BATCHES & SERVICE PROCESSING TREE -->
@@ -1031,11 +1038,132 @@
                   :perPageOptions="[5, 10, 20]"
                 />
               </div>
+            </div>
 
+            <!-- TAB 4: FARMER SERVICES & OTHER EXPENSES -->
+            <div v-if="profileTab === 'services'" class="space-y-4">
+              <!-- Header & Action Button -->
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-extrabold text-slate-900 dark:text-slate-50">Huduma & Gharama za Mkulima</h3>
+                  <p class="text-[11px] text-slate-500">Orodha ya huduma zote (za Mkulima binafsi & za Uchakataji wa Mzigo ghalani)</p>
+                </div>
+                <button @click="openAddFarmerServiceModal" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                  <span>+ Sajili Huduma / Gharama Nyingine</span>
+                </button>
+              </div>
+
+              <!-- Services Table -->
+              <div class="border border-emerald-100 rounded-2xl overflow-hidden shadow-2xs">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-emerald-50/80 dark:bg-emerald-900/40 text-emerald-950 dark:text-emerald-400 font-extrabold border-b border-emerald-100 uppercase text-[10px]">
+                    <tr>
+                      <th class="py-2.5 px-3">Tarehe</th>
+                      <th class="py-2.5 px-3">Aina</th>
+                      <th class="py-2.5 px-3">Maelezo ya Huduma</th>
+                      <th class="py-2.5 px-3">Shehena / Mzigo</th>
+                      <th class="py-2.5 px-3">Gharama</th>
+                      <th class="py-2.5 px-3">Ilipwa / Baki</th>
+                      <th class="py-2.5 px-3">Hali</th>
+                      <th class="py-2.5 px-3 text-right">Kitendo</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 font-medium">
+                    <tr v-if="farmerServices.length === 0" class="text-center text-slate-400">
+                      <td colspan="8" class="py-6">Hakuna huduma au gharama zilizosajiliwa kwa mkulima huyu.</td>
+                    </tr>
+                    <tr v-for="s in farmerServices" :key="s.id" class="hover:bg-slate-50 dark:bg-slate-950 transition">
+                      <td class="py-2 px-3 text-slate-600 dark:text-slate-300 font-mono font-semibold">{{ formatDate(s.created_at) }}</td>
+                      <td class="py-2 px-3 whitespace-nowrap">
+                        <span v-if="s.type === 'Direct' || !s.batch_id" class="px-2 py-0.5 rounded-md text-[9.5px] font-black bg-blue-100 text-blue-800 border border-blue-200 uppercase">👤 Mkulima (Direct)</span>
+                        <span v-else-if="s.type === 'Drying'" class="px-2 py-0.5 rounded-md text-[9.5px] font-black bg-amber-100 text-amber-800 border border-amber-200 uppercase">☀️ Kukausha</span>
+                        <span v-else-if="s.type === 'Milling'" class="px-2 py-0.5 rounded-md text-[9.5px] font-black bg-teal-100 text-teal-800 border border-teal-200 uppercase">⚙️ Kukoboa</span>
+                        <span v-else class="px-2 py-0.5 rounded-md text-[9.5px] font-black bg-purple-100 text-purple-800 border border-purple-200 uppercase">📊 Kupanga</span>
+                      </td>
+                      <td class="py-2 px-3 font-bold text-slate-900 dark:text-slate-50">
+                        {{ s.service_name }}
+                        <div v-if="s.notes" class="text-[10px] text-slate-400 font-normal italic">{{ s.notes }}</div>
+                      </td>
+                      <td class="py-2 px-3 font-mono text-emerald-800 dark:text-emerald-400 font-bold">{{ s.batch_code || 'N/A (Mkulima)' }}</td>
+                      <td class="py-2 px-3 font-bold text-slate-900 dark:text-slate-50">Tsh {{ Number(s.fee_amount || 0).toLocaleString() }}</td>
+                      <td class="py-2 px-3 text-[11px]">
+                        <span class="text-emerald-700 dark:text-emerald-400 font-bold">Imelipwa: {{ Number(s.already_paid || 0).toLocaleString() }}</span>
+                        <div v-if="s.unpaid_fee > 0" class="text-rose-600 dark:text-rose-400 font-bold text-[10px]">Baki: Tsh {{ Number(s.unpaid_fee).toLocaleString() }}</div>
+                      </td>
+                      <td class="py-2 px-3 whitespace-nowrap">
+                        <span v-if="s.status === 'paid'" class="px-2 py-0.5 rounded-md text-[9.5px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300 uppercase">💳 IMELIPWA</span>
+                        <span v-else class="px-2 py-0.5 rounded-md text-[9.5px] font-black bg-amber-100 text-amber-900 border border-amber-300 uppercase">⏳ INASUBIRI</span>
+                      </td>
+                      <td class="py-2 px-3 text-right">
+                        <button v-if="(s.type === 'Direct' || !s.batch_id) && s.status !== 'paid'" @click="deleteFarmerDirectService(s.id)" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-[10.5px] font-bold rounded-lg cursor-pointer transition" title="Futa Huduma">
+                          🗑️ Futa
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
 
           </div>
 
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: SAJILI HUDUMA / GHARAMA NYINGINE ZA MKULIMA -->
+    <div v-if="modals.addFarmerService" class="fixed inset-0 z-[90] bg-slate-900/75 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-emerald-200 dark:border-emerald-500/20">
+        <div class="px-6 py-4 border-b border-emerald-800 flex items-center justify-between bg-gradient-to-r from-emerald-900 to-teal-900 text-white">
+          <h3 class="text-base font-extrabold flex items-center gap-2">
+            <span>👤</span>
+            <span>Sajili Huduma / Gharama ya Mkulima</span>
+          </h3>
+          <button @click="modals.addFarmerService = false" class="text-emerald-200 hover:text-white p-1 cursor-pointer">✕</button>
+        </div>
+        <div class="p-6 space-y-3.5 text-xs font-semibold text-slate-700 dark:text-slate-200">
+          <div>
+            <label class="block mb-1 font-bold">Chagua Huduma kutoka Catalog (Hiari)</label>
+            <select v-model="newFarmerServiceForm.service_id" @change="onSelectCatalogServiceForFarmer" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50">
+              <option value="">-- Chagua kutoka huduma zilizosajiliwa --</option>
+              <option v-for="cs in catalogServices" :key="cs.id" :value="cs.id">
+                {{ cs.name_sw || cs.name_en }} (Tsh {{ Number(cs.rate).toLocaleString() }} / {{ cs.unit }})
+              </option>
+            </select>
+          </div>
+          <div>
+            <label class="block mb-1 font-bold">Jina / Maelezo ya Huduma / Gharama *</label>
+            <input v-model="newFarmerServiceForm.service_name" type="text" placeholder="e.g. Usafiri wa Mkulima, Pembejeo za Kilimo, Posho" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50"/>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block mb-1 font-bold">Kipimo / Unit</label>
+              <input v-model="newFarmerServiceForm.unit" type="text" placeholder="e.g. huduma, safari, gunia" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50"/>
+            </div>
+            <div>
+              <label class="block mb-1 font-bold">Idadi (Quantity)</label>
+              <input v-model.number="newFarmerServiceForm.quantity" @input="calculateFarmerServiceFeeAmount" type="number" step="0.01" min="0.01" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50"/>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block mb-1 font-bold">Gharama kwa Kipimo (Rate - Tsh)</label>
+              <input v-model.number="newFarmerServiceForm.rate" @input="calculateFarmerServiceFeeAmount" type="number" step="1" min="0" placeholder="0" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50"/>
+            </div>
+            <div>
+              <label class="block mb-1 font-bold">Jumla ya Gharama (Tsh) *</label>
+              <input v-model.number="newFarmerServiceForm.fee_amount" type="number" step="1" min="0" placeholder="0" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-bold text-emerald-800 dark:text-emerald-400 text-slate-900 dark:text-slate-50"/>
+            </div>
+          </div>
+          <div>
+            <label class="block mb-1 font-bold">Maelezo ya Ziada (Notes)</label>
+            <textarea v-model="newFarmerServiceForm.notes" rows="2" placeholder="Maelezo mengine ya hiari..." class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50"></textarea>
+          </div>
+          <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+            <button @click="modals.addFarmerService = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl cursor-pointer">Ghairi</button>
+            <button @click="submitAddFarmerService" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-xs cursor-pointer">Thibitisha (Sajili Huduma)</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1796,6 +1924,7 @@ const modals = ref({
   profile: false,
   intake: false,
   applyService: false,
+  addFarmerService: false,
   newLoan: false,
   editLoan: false,
   newSale: false,
@@ -1803,6 +1932,16 @@ const modals = ref({
   farmerReceipt: false,
   quickCrop: false,
   quickUnit: false
+});
+
+const newFarmerServiceForm = ref({
+  service_id: '',
+  service_name: '',
+  unit: 'huduma',
+  quantity: 1,
+  rate: 0,
+  fee_amount: 0,
+  notes: ''
 });
 
 const editLoanForm = ref({
@@ -2839,11 +2978,108 @@ const toggleBatchAccordion = (batchId) => {
 
 const closeAllSubModals = () => {
   modals.value.applyService = false;
+  modals.value.addFarmerService = false;
   modals.value.completeService = false;
   modals.value.intake = false;
   modals.value.newLoan = false;
   modals.value.newSale = false;
   modals.value.farmerReceipt = false;
+};
+
+const openAddFarmerServiceModal = () => {
+  newFarmerServiceForm.value = {
+    service_id: '',
+    service_name: '',
+    unit: 'huduma',
+    quantity: 1,
+    rate: 0,
+    fee_amount: 0,
+    notes: ''
+  };
+  modals.value.addFarmerService = true;
+};
+
+const onSelectCatalogServiceForFarmer = () => {
+  const s = catalogServices.value.find(c => c.id === newFarmerServiceForm.value.service_id);
+  if (s) {
+    newFarmerServiceForm.value.service_name = s.name_sw || s.name_en;
+    newFarmerServiceForm.value.unit = s.unit || 'huduma';
+    newFarmerServiceForm.value.rate = parseFloat(s.rate || 0);
+    newFarmerServiceForm.value.fee_amount = (newFarmerServiceForm.value.rate || 0) * (newFarmerServiceForm.value.quantity || 1);
+  }
+};
+
+const calculateFarmerServiceFeeAmount = () => {
+  const qty = parseFloat(newFarmerServiceForm.value.quantity || 1);
+  const rate = parseFloat(newFarmerServiceForm.value.rate || 0);
+  if (rate > 0) {
+    newFarmerServiceForm.value.fee_amount = rate * qty;
+  }
+};
+
+const submitAddFarmerService = async () => {
+  if (!newFarmerServiceForm.value.service_name) {
+    triggerToast('Tafadhali jaza jina la huduma au gharama.', 'error');
+    return;
+  }
+
+  const fee = parseFloat(newFarmerServiceForm.value.fee_amount || 0);
+  if (fee <= 0) {
+    triggerToast('Tafadhali ingiza kiasi cha gharama (sio sifuri).', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/v1/farmers/${selectedFarmer.value.id}/services`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(newFarmerServiceForm.value)
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (res.ok && data.success !== false) {
+      triggerToast('Huduma/Gharama ya Mkulima imesajiliwa kikamilifu! ✓');
+      modals.value.addFarmerService = false;
+      await openFarmerProfile(selectedFarmer.value.id);
+      await fetchFarmers();
+    } else {
+      triggerToast(data.message || 'Imefeli kusajili huduma.', 'error');
+    }
+  } catch (e) {
+    triggerToast('Kosa la mtandao wakati wa kusajili huduma.', 'error');
+  }
+};
+
+const deleteFarmerDirectService = async (serviceId) => {
+  triggerConfirmModal({
+    title: '🗑️ Uthibitisho wa Kufuta Huduma',
+    message: 'Je, una uhakika unataka kufuta huduma/gharama hii ya mkulima?',
+    warningNote: 'Kitendo hiki kitaondoa gharama hii kwenye mahesabu ya mkulima.',
+    confirmText: 'Ndiyo, Futa',
+    cancelText: 'Ghairi',
+    isDanger: true,
+    onConfirm: async () => {
+      try {
+        const res = await fetch(`/api/v1/farmers/${selectedFarmer.value.id}/services/${serviceId}`, {
+          method: 'DELETE'
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.success !== false) {
+          triggerToast('Huduma/Gharama imeondolewa! ✓');
+          await openFarmerProfile(selectedFarmer.value.id);
+          await fetchFarmers();
+        } else {
+          triggerToast(data.message || 'Imefeli kufuta huduma.', 'error');
+        }
+      } catch (e) {
+        triggerToast('Imefeli kufuta huduma.', 'error');
+      }
+    }
+  });
 };
 
 const getBatchServices = (b) => {
