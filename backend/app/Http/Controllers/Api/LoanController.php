@@ -18,7 +18,7 @@ class LoanController extends Controller
     public function index(Request $request)
     {
         $tenantId = $this->getTenantId($request);
-        $query = Loan::where('tenant_id', $tenantId)->with(['farmer', 'collateralBatch']);
+        $query = Loan::where('tenant_id', $tenantId)->with(['farmer', 'collateralBatch', 'transactions']);
 
         if ($request->has('status')) {
             $query->where('status', $request->input('status'));
@@ -35,6 +35,7 @@ class LoanController extends Controller
                 'id' => $loan->id,
                 'loan_code' => $loan->loan_code,
                 'farmer_name' => $loan->farmer ? $loan->farmer->name : 'N/A',
+                'farmer_phone' => $loan->farmer ? $loan->farmer->phone : 'N/A',
                 'collateral_batch' => $loan->collateralBatch ? $loan->collateralBatch->batch_code : 'N/A',
                 'principal_amount' => $loan->principal_amount,
                 'current_balance' => $loan->current_balance,
@@ -43,6 +44,15 @@ class LoanController extends Controller
                 'due_date' => $loan->due_date,
                 'status' => $loan->status,
                 'created_at' => $loan->created_at->format('Y-m-d H:i'),
+                'transactions' => $loan->transactions->map(function ($t) {
+                    return [
+                        'id' => $t->id,
+                        'transaction_type' => $t->transaction_type,
+                        'amount' => $t->amount,
+                        'reference_number' => $t->reference_number,
+                        'created_at' => $t->created_at->format('Y-m-d H:i'),
+                    ];
+                }),
             ];
         });
 

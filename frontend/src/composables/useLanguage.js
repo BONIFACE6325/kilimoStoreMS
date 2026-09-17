@@ -14,7 +14,7 @@ const translations = {
     dashboard: 'Dashboard',
     farmers: 'Wakulima',
     cashbook: 'Daftari la Pesa',
-    inventory: 'Stoko & Vihenge',
+    inventory: 'Inventory',
     services: 'Huduma za Kinu',
     loans: 'Mikopo',
     buyers: 'Wanunuzi',
@@ -135,7 +135,7 @@ const translations = {
     serviceSubtitle: 'Ada za kukoboa, kuanika, kugiredi, kuchanganya na vipimo vya kinu',
     registerService: 'Sajili Huduma Mpya',
     
-    inventoryManagement: 'Stoko & Vihenge vya Kinu',
+    inventoryManagement: 'Inventory',
     inventorySubtitle: 'Viwango vya nafaka, mpunga, sembe, mchele na pumba ghalani',
     
     loanManagement: 'Usimamizi wa Mikopo ya Wakulima',
@@ -174,7 +174,7 @@ const translations = {
     dashboard: 'Dashboard',
     farmers: 'Farmers',
     cashbook: 'Cashbook',
-    inventory: 'Inventory & Silos',
+    inventory: 'Inventory',
     services: 'Milling Services',
     loans: 'Loans',
     buyers: 'Buyers',
@@ -295,7 +295,7 @@ const translations = {
     serviceSubtitle: 'Hulling, drying, grading, mixing and weighing rates',
     registerService: 'Register New Service',
     
-    inventoryManagement: 'Store Inventory & Silos',
+    inventoryManagement: 'Inventory',
     inventorySubtitle: 'Stock levels for paddy, sembe, polished rice, and bran',
     
     loanManagement: 'Loans & Advances',

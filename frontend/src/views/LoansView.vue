@@ -217,21 +217,20 @@
               <th class="py-3.5 px-4">Mkulima</th>
               <th class="py-3.5 px-4">Batch ya Dhamana</th>
               <th class="py-3.5 px-4">Kiasi cha Mkopo</th>
-              <th class="py-3.5 px-4">Riba</th>
+              <th class="py-3.5 px-4">Kiasi Kilichorejeshwa</th>
               <th class="py-3.5 px-4">Salio Linalodaiwa</th>
-              <th class="py-3.5 px-4">Njia ya Marejesho</th>
               <th class="py-3.5 px-4">Hali</th>
               <th class="py-3.5 px-4 text-right">Vitendo</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
             <tr v-if="loading" class="text-center py-8">
-              <td colspan="9" class="py-10 text-slate-400 font-bold text-xs">
+              <td colspan="8" class="py-10 text-slate-400 font-bold text-xs">
                 ⏳ Inapakia mikopo kutoka kwenye database...
               </td>
             </tr>
             <tr v-else-if="filteredLoans.length === 0" class="text-center py-8">
-              <td colspan="9" class="py-10 text-slate-400 font-bold text-xs">
+              <td colspan="8" class="py-10 text-slate-400 font-bold text-xs">
                 🔍 Hakuna kumbukumbu ya mkopo uliopatikana kulingana na vigezo vyako.
               </td>
             </tr>
@@ -252,7 +251,8 @@
 
               <!-- Borrower Farmer Name -->
               <td class="py-3.5 px-4 font-extrabold text-slate-900 dark:text-white">
-                {{ loan.farmer_name }}
+                <div>{{ loan.farmer_name }}</div>
+                <span class="text-[10px] text-slate-400 font-normal block">{{ loan.farmer_phone }}</span>
               </td>
 
               <!-- Collateral Batch Code -->
@@ -268,37 +268,31 @@
                 TZS {{ formatCurrency(loan.principal_amount) }}
               </td>
 
-              <!-- Interest Rate (Strictly 0.00%) -->
-              <td class="py-3.5 px-4 font-extrabold text-emerald-600 dark:text-emerald-400">
-                0.00% (No Interest)
+              <!-- Repaid Amount -->
+              <td class="py-3.5 px-4 font-black text-emerald-600 dark:text-emerald-400">
+                <span>TZS {{ formatCurrency(getLoanRepaidAmount(loan)) }}</span>
+                <span v-if="isLoanSettled(loan)" class="text-[9.5px] font-black text-emerald-600 dark:text-emerald-400 block">✓ 100% Imelipwa</span>
               </td>
 
               <!-- Current Balance -->
-              <td class="py-3.5 px-4 font-black" :class="parseFloat(loan.current_balance) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'">
+              <td class="py-3.5 px-4 font-black" :class="parseFloat(loan.current_balance) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400'">
                 TZS {{ formatCurrency(loan.current_balance) }}
-              </td>
-
-              <!-- Repayment Method -->
-              <td class="py-3.5 px-4 font-bold text-slate-600 dark:text-slate-400">
-                <span class="px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-800/50 text-[10.5px] font-bold">
-                  🔄 Kukatwa Kwenye Mauzo
-                </span>
               </td>
 
               <!-- Status Badge -->
               <td class="py-3.5 px-4">
                 <span 
-                  :class="loan.status === 'settled' ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' : 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'"
+                  :class="isLoanSettled(loan) ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' : 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'"
                   class="px-2.5 py-1 rounded-lg text-[10.5px] font-black border inline-flex items-center gap-1"
                 >
-                  <span v-if="loan.status === 'settled'">✅ Iliyokamilika</span>
-                  <span v-else>⏳ Active</span>
+                  <span v-if="isLoanSettled(loan)">✅ Imelipwa (Settled)</span>
+                  <span v-else>⏳ Inayoendelea</span>
                 </span>
               </td>
 
               <!-- Action Buttons -->
               <td class="py-3.5 px-4 text-right">
-                <div v-if="loan.status !== 'settled' && parseFloat(loan.current_balance) > 0" class="flex items-center justify-end gap-1.5">
+                <div v-if="!isLoanSettled(loan)" class="flex items-center justify-end gap-1.5">
                   <button 
                     @click="openRepayModal(loan)"
                     class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-[11px] rounded-lg shadow-xs border border-emerald-400/30 transition cursor-pointer"
@@ -320,9 +314,11 @@
                     🗑️
                   </button>
                 </div>
-                <span v-else class="text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                  ✓ Paid Off
-                </span>
+                <div v-else class="flex items-center justify-end gap-1.5">
+                  <span class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-lg border border-emerald-200/50">
+                    ✓ Full Repaid
+                  </span>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -633,7 +629,7 @@ const formatCurrency = (val) => {
 };
 
 const openEditLoanModal = (loan) => {
-  if (loan.status === 'settled' || parseFloat(loan.current_balance) <= 0) {
+  if (isLoanSettled(loan)) {
     triggerToast('Huwezi kufanya marekebisho kwa mkopo ambao umeshalipwa na kukamilika!', 'error');
     return;
   }
@@ -678,7 +674,7 @@ const submitEditLoan = async () => {
 };
 
 const deleteLoan = async (loan) => {
-  if (loan.status === 'settled' || parseFloat(loan.current_balance) <= 0) {
+  if (isLoanSettled(loan)) {
     triggerToast('Huwezi kufuta mkopo ambao umeshalipwa na kukamilika!', 'error');
     return;
   }
@@ -717,6 +713,18 @@ const repayForm = ref({
   reference_number: ''
 });
 
+const isLoanSettled = (l) => {
+  if (!l) return false;
+  return l.status === 'settled' || l.status === 'paid' || parseFloat(l.current_balance || 0) <= 0;
+};
+
+const getLoanRepaidAmount = (l) => {
+  if (!l) return 0;
+  const principal = parseFloat(l.principal_amount || 0);
+  const balance = parseFloat(l.current_balance || 0);
+  return Math.max(0, principal - balance);
+};
+
 // Computed Metrics
 const totalPrincipalAmount = computed(() => {
   return loansList.value.reduce((acc, l) => acc + parseFloat(l.principal_amount || 0), 0);
@@ -731,11 +739,11 @@ const totalRepaidAmount = computed(() => {
 });
 
 const activeLoansCount = computed(() => {
-  return loansList.value.filter(l => l.status !== 'settled' && parseFloat(l.current_balance) > 0).length;
+  return loansList.value.filter(l => !isLoanSettled(l)).length;
 });
 
 const settledLoansCount = computed(() => {
-  return loansList.value.filter(l => l.status === 'settled' || parseFloat(l.current_balance) <= 0).length;
+  return loansList.value.filter(l => isLoanSettled(l)).length;
 });
 
 const recoveryRate = computed(() => {
@@ -757,10 +765,10 @@ const filteredLoans = computed(() => {
 
     // Status Filter
     if (statusFilter.value) {
-      if (statusFilter.value === 'active' && (loan.status === 'settled' || parseFloat(loan.current_balance) <= 0)) {
+      if (statusFilter.value === 'active' && isLoanSettled(loan)) {
         return false;
       }
-      if (statusFilter.value === 'settled' && loan.status !== 'settled' && parseFloat(loan.current_balance) > 0) {
+      if (statusFilter.value === 'settled' && !isLoanSettled(loan)) {
         return false;
       }
     }
