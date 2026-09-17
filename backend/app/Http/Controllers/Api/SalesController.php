@@ -460,11 +460,19 @@ class SalesController extends Controller
                 // 5. Decrement Bin Occupancy
                 if ($batch->current_bin_id && $batch->bin) {
                     $bin = $batch->bin;
-                    $soldWeightMt = $soldQty / 1000;
+                    $unitStr = strtolower($batch->intake_unit ?? '');
+                    if ($unitStr === 'kg') {
+                        $soldWeightMt = $soldQty / 1000;
+                    } elseif ($unitStr === 'gunia') {
+                        $soldWeightMt = ($soldQty * 90) / 1000;
+                    } else {
+                        $soldWeightMt = $soldQty;
+                    }
+
                     if ($bin->current_occupancy_mt > 0) {
                         $bin->decrement('current_occupancy_mt', min($bin->current_occupancy_mt, $soldWeightMt));
                     }
-                    if ($bin->current_occupancy_mt <= 0) {
+                    if ($bin->current_occupancy_mt <= 0.001) {
                         $bin->update(['status' => 'empty', 'current_occupancy_mt' => 0.00, 'crop_type' => null]);
                     }
                 }
