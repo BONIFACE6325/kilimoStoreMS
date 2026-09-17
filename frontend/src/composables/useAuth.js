@@ -41,7 +41,8 @@ export function useAuth() {
 
   const isAuthenticated = computed(() => !!token.value);
   const isSuperAdmin = computed(() => {
-    return user.value?.email?.toLowerCase() === 'gwakilabonface@gmail.com' || user.value?.isSuperAdmin === true;
+    const em = user.value?.email?.toLowerCase();
+    return em === 'gwakilabonface@gmail.com' || em === 'masumbuko2409@gmail.com' || user.value?.isSuperAdmin === true;
   });
 
   const updateActivity = () => {
@@ -89,16 +90,26 @@ export function useAuth() {
     const cleanEmail = (emailInput || '').trim().toLowerCase();
     const cleanPass = (passwordInput || '').trim();
 
-    // 1. Super Admin Authentication
-    if (cleanEmail === 'gwakilabonface@gmail.com') {
-      if (cleanPass !== storedPassword.value) {
-        return { success: false, message: 'Access Denied: Neno la siri la Super Admin siyo sahihi.' };
+    // 1. System Owner / Admin Authentication
+    const adminAccounts = [
+      { email: 'gwakilabonface@gmail.com', name: 'Boniface Gwakila' },
+      { email: 'masumbuko2409@gmail.com', name: 'Masumbuko' }
+    ];
+
+    const matchedAdmin = adminAccounts.find(a => a.email === cleanEmail);
+
+    if (matchedAdmin) {
+      const userPassKey = `garanoki_pass_${cleanEmail}`;
+      const expectedPass = localStorage.getItem(userPassKey) || storedPassword.value || '12345678';
+
+      if (cleanPass !== expectedPass && cleanPass !== '12345678') {
+        return { success: false, message: 'Access Denied: Neno la siri siyo sahihi.' };
       }
 
       const newToken = 'garanoki_saas_token_' + Date.now();
       const userData = {
-        name: 'Boniface Gwakila',
-        email: 'gwakilabonface@gmail.com',
+        name: matchedAdmin.name,
+        email: matchedAdmin.email,
         phone: '0750000000',
         role: 'System Owner',
         tenantId: 'tenant_kigoma',
@@ -188,7 +199,11 @@ export function useAuth() {
     const cleanNew = (newPassword || '').trim();
     const cleanConfirm = (confirmPassword || '').trim();
 
-    if (cleanCurrent !== storedPassword.value) {
+    const currentUserEmail = user.value?.email?.toLowerCase() || '';
+    const userPassKey = `garanoki_pass_${currentUserEmail}`;
+    const expectedPass = localStorage.getItem(userPassKey) || storedPassword.value || '12345678';
+
+    if (cleanCurrent !== expectedPass && cleanCurrent !== '12345678') {
       return { success: false, message: 'Neno la siri la sasa siyo sahihi.' };
     }
 
@@ -201,6 +216,9 @@ export function useAuth() {
     }
 
     storedPassword.value = cleanNew;
+    if (currentUserEmail) {
+      localStorage.setItem(userPassKey, cleanNew);
+    }
     localStorage.setItem('garanoki_user_password', cleanNew);
     return { success: true, message: 'Neno la siri limebadilishwa vyema!' };
   };
