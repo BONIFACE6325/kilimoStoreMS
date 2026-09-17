@@ -111,9 +111,9 @@ class LoanController extends Controller
                         'tenant_id' => $tenantId,
                         'farmer_code' => $farmerCode,
                         'name' => trim($validated['new_borrower_name']),
-                        'phone' => $validated['new_borrower_phone'] ?? null,
-                        'national_id' => $validated['new_borrower_nida'] ?? null,
-                        'region' => $validated['new_borrower_address'] ?? null,
+                        'phone' => $validated['new_borrower_phone'] ?? '',
+                        'national_id' => $validated['new_borrower_nida'] ?? '',
+                        'region' => $validated['new_borrower_address'] ?? '',
                         'status' => 'inactive',
                     ]);
                     $farmerId = $newFarmer->id;
