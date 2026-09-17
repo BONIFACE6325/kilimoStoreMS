@@ -18,7 +18,7 @@
         <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-black flex items-center justify-center text-sm shadow-md">
           ⭐
         </div>
-        <span class="font-extrabold text-slate-900 dark:text-slate-50 text-base tracking-tight">GARANOKI</span>
+        <span class="font-extrabold text-slate-900 dark:text-slate-50 text-base tracking-tight">GALANOKI</span>
       </div>
 
       <!-- Compact Search Bar -->
@@ -172,7 +172,7 @@
         <div class="space-y-1">
           <h3 class="text-base font-extrabold text-slate-900 dark:text-slate-50">{{ t('logout') }}?</h3>
           <p class="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
-            Are you sure you want to log out of <strong>GARANOKI</strong>? Your active session will be securely closed.
+            Are you sure you want to log out of <strong>GALANOKI</strong>? Your active session will be securely closed.
           </p>
         </div>
 

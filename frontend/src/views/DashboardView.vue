@@ -524,7 +524,7 @@
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
           <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 border border-white dark:border-slate-800"></span>
         </div>
-        <span class="font-black bg-gradient-to-r from-emerald-700 to-teal-500 dark:from-emerald-400 dark:to-teal-300 bg-clip-text text-transparent tracking-tight text-sm">GARANOKI ERP</span>
+        <span class="font-black bg-gradient-to-r from-emerald-700 to-teal-500 dark:from-emerald-400 dark:to-teal-300 bg-clip-text text-transparent tracking-tight text-sm">GALANOKI ERP</span>
         <span class="text-slate-300 dark:text-slate-600 hidden sm:block">|</span>
         <span class="font-bold text-slate-600 dark:text-slate-400 text-xs hidden sm:block">Financial Governance & Analytics</span>
       </div>

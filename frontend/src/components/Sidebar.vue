@@ -25,8 +25,8 @@
             <span v-else>🏢</span>
           </div>
           <div v-if="!isSidebarCollapsed" class="min-w-0">
-            <div class="font-extrabold text-white text-sm tracking-tight leading-none truncate max-w-[150px]" :title="activeTenant?.name || 'GARANOKI'">
-              {{ activeTenant?.name || 'GARANOKI' }}
+            <div class="font-extrabold text-white text-sm tracking-tight leading-none truncate max-w-[150px]" :title="activeTenant?.name || 'GALANOKI'">
+              {{ activeTenant?.name || 'GALANOKI' }}
             </div>
             <div class="text-[10px] text-emerald-400 font-extrabold uppercase tracking-wider mt-1 truncate max-w-[150px]">
               {{ activeTenant?.slogan || 'Store & Finance MS' }}
@@ -311,7 +311,7 @@
           <div class="space-y-1">
             <h3 class="text-base font-extrabold text-slate-900 dark:text-slate-50">{{ t('logoutModalTitle', 'Kutoka Mfumoni?') }}</h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
-              {{ t('logoutModalText', 'Je, una uhakika unataka kutoka kwenye mfumo wa GARANOKI? Mfumo utafunga akaunti yako kwa usalama.') }}
+              {{ t('logoutModalText', 'Je, una uhakika unataka kutoka kwenye mfumo wa GALANOKI? Mfumo utafunga akaunti yako kwa usalama.') }}
             </p>
           </div>
 

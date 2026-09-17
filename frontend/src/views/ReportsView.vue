@@ -103,12 +103,12 @@
     <div class="hidden print:block space-y-4 pb-6 border-b-2 border-slate-900">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-black text-slate-900 uppercase tracking-tight">GARANOKI STORE & FINANCE MANAGEMENT SYSTEM</h1>
-          <p class="text-xs font-bold text-slate-600 mt-0.5">S.L.P 100, Kigoma, Tanzania | Simu: +255 764 536 736 | Email: info@garanoki.co.tz</p>
+          <h1 class="text-2xl font-black text-slate-900 uppercase tracking-tight">GALANOKI STORE & FINANCE MANAGEMENT SYSTEM</h1>
+          <p class="text-xs font-bold text-slate-600 mt-0.5">S.L.P 100, Kigoma, Tanzania | Simu: +255 764 536 736 | Email: info@galanoki.co.tz</p>
           <p class="text-[11px] text-slate-500 font-semibold">Mfumo Rasmi wa Usimamizi wa Maghala, Mazao, Huduma na Fedha</p>
         </div>
         <div class="text-right space-y-1">
-          <span class="inline-block px-3 py-1 bg-slate-900 text-white font-black text-xs uppercase tracking-wider rounded">
+          <span class="inline-block px-3 py-1 bg-emerald-800 text-white font-black text-xs uppercase tracking-wider rounded">
             OFFICIAL FINANCIAL & OPERATIONAL REPORT
           </span>
           <p class="text-xs font-bold text-slate-800">Kumb: KSM-RPT-{{ reportTimestamp }}</p>
@@ -211,15 +211,15 @@
       </div>
 
       <!-- Executive Management Summary Narrative Card -->
-      <div class="bg-slate-900 text-white p-6 rounded-3xl border border-slate-800 shadow-lg space-y-3">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-          <h3 class="text-sm font-black uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+      <div class="bg-gradient-to-r from-emerald-500/10 via-teal-500/5 to-emerald-500/10 dark:from-emerald-950/40 dark:to-slate-900 p-6 rounded-3xl border border-emerald-300/80 dark:border-emerald-800/60 shadow-xs space-y-3">
+        <div class="flex items-center justify-between border-b border-emerald-200/80 dark:border-emerald-800/60 pb-3">
+          <h3 class="text-sm font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
             <span>📌 Muhtasari wa Taarifa ya Uendeshaji & Mkakati (Executive Narrative)</span>
           </h3>
-          <span class="text-xs font-mono text-slate-400">Kipindi: {{ selectedPeriod.toUpperCase() }}</span>
+          <span class="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100/80 dark:bg-emerald-900/60 px-2.5 py-1 rounded-lg">Kipindi: {{ selectedPeriod.toUpperCase() }}</span>
         </div>
-        <p class="text-xs leading-relaxed text-slate-300 font-medium">
-          Katika kipindi hiki, kituo cha uendeshaji kimefanikiwa kukusanya mapato ya jumla ya <strong class="text-white font-mono">TZS {{ formatCurrency(stats.total_revenue_tzs) }}</strong> huku kikihifadhi mizigo yenye uzito wa <strong class="text-white font-mono">{{ formatCurrency(stats.total_weight_stored_mt) }} MT</strong> ghalani. Mzunguko wa matumizi ya uendeshaji (OPEX) unafikia <strong class="text-white font-mono">TZS {{ formatCurrency(stats.total_expenses_tzs) }}</strong>, ikitoa faida ghafi inayoelekeza ukuaji wa kituo cha ghala na uchakataji.
+        <p class="text-xs leading-relaxed text-slate-700 dark:text-slate-300 font-semibold">
+          Katika kipindi hiki, kituo cha uendeshaji cha <strong class="text-slate-900 dark:text-white font-black">GALANOKI</strong> kimefanikiwa kukusanya mapato ya jumla ya <strong class="text-emerald-700 dark:text-emerald-400 font-black font-mono">TZS {{ formatCurrency(stats.total_revenue_tzs) }}</strong> huku kikihifadhi mizigo yenye uzito wa <strong class="text-slate-900 dark:text-white font-black font-mono">{{ formatCurrency(stats.total_weight_stored_mt) }} MT</strong> ghalani. Mzunguko wa matumizi ya uendeshaji (OPEX) unafikia <strong class="text-rose-600 dark:text-rose-400 font-black font-mono">TZS {{ formatCurrency(stats.total_expenses_tzs) }}</strong>, ikitoa faida ghafi inayoelekeza ukuaji wa kituo cha ghala na uchakataji.
         </p>
       </div>
 
@@ -338,10 +338,10 @@
           </div>
 
           <!-- Net Profit Calculation -->
-          <div class="pt-4 border-t-2 border-slate-900 dark:border-slate-100">
-            <div class="flex justify-between py-3 px-4 bg-slate-900 text-white rounded-2xl font-black text-sm shadow-md">
+          <div class="pt-4 border-t-2 border-emerald-500/30 dark:border-emerald-500/50">
+            <div class="flex justify-between py-3.5 px-4 bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-600 text-white rounded-2xl font-black text-sm shadow-md">
               <span>FAIDA HALISI KABLA YA KODI (NET OPERATING PROFIT / EBITDA)</span>
-              <span class="font-mono text-emerald-400">TZS {{ formatCurrency(netProfitValue) }}</span>
+              <span class="font-mono text-emerald-200">TZS {{ formatCurrency(netProfitValue) }}</span>
             </div>
           </div>
 
@@ -735,8 +735,8 @@
             <!-- Letterhead -->
             <div class="border-b-2 border-emerald-600 pb-4 flex flex-col sm:flex-row justify-between gap-4">
               <div>
-                <h2 class="text-lg font-black text-emerald-700 dark:text-emerald-400 tracking-tight">GARANOKI STORE & FINANCE MS</h2>
-                <p class="text-xs font-semibold text-slate-500 dark:text-slate-400">S.L.P 100, Kigoma, Tanzania | +255 764 536 736</p>
+                <h2 class="text-lg font-black text-emerald-700 dark:text-emerald-400 tracking-tight">GALANOKI STORE & FINANCE MS</h2>
+                <p class="text-xs font-semibold text-slate-500 dark:text-slate-400">S.L.P 100, Kigoma, Tanzania | +255 764 536 736 | info@galanoki.co.tz</p>
                 <p class="text-[11px] text-slate-400">Hati Rasmi ya Ukaguzi na Ripoti ya Uendeshaji</p>
               </div>
               <div class="text-right space-y-1">
@@ -1095,7 +1095,7 @@ const printReport = () => {
 };
 
 const downloadCSVReport = () => {
-  let filename = `Ripoti_GARANOKI_${activeTab.value}_${new Date().toISOString().split('T')[0]}.csv`;
+  let filename = `Ripoti_GALANOKI_${activeTab.value}_${new Date().toISOString().split('T')[0]}.csv`;
   let dataArray = [];
   let headers = [];
 

@@ -498,7 +498,7 @@
               <div>
                 <h2 class="text-2xl font-black text-emerald-600 tracking-tight">KilimoStore MS</h2>
                 <p class="text-[11px] text-slate-500 mt-1">
-                  Garanoki Main Store & Warehouse, Industrial Area
+                  Galanoki Main Store & Warehouse, Industrial Area
                 </p>
               </div>
 
@@ -607,7 +607,7 @@
               <div>
                 <h2 class="text-2xl font-black text-emerald-600 tracking-tight">KilimoStore MS</h2>
                 <p class="text-[11px] text-slate-500 mt-1">
-                  Garanoki Main Store & Warehouse, Industrial Area
+                  Galanoki Main Store & Warehouse, Industrial Area
                 </p>
               </div>
 

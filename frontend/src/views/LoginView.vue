@@ -54,7 +54,7 @@
           ⭐
         </div>
         <div>
-          <span class="font-extrabold text-white text-lg tracking-tight leading-none">GARANOKI</span>
+          <span class="font-extrabold text-white text-lg tracking-tight leading-none">GALANOKI</span>
           <span class="block text-[10px] text-emerald-400 font-extrabold uppercase tracking-widest">Store & Finance MS</span>
         </div>
       </div>
@@ -325,7 +325,7 @@
         <div class="bg-slate-950/80 px-8 py-4.5 border-t border-white/10 flex items-center justify-between text-xs font-bold text-slate-400">
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>GARANOKI ERP v2.4</span>
+            <span>GALANOKI ERP v2.4</span>
           </div>
           <span class="text-emerald-400/80 font-mono">🔒 SSL 256-bit Encrypted</span>
         </div>
@@ -353,7 +353,7 @@
     <!-- FOOTER COPYRIGHT & TRUST BADGES -->
     <footer class="absolute bottom-3 left-0 right-0 z-20 text-center text-xs font-semibold text-slate-400/60 pointer-events-none">
       <div class="flex flex-wrap items-center justify-center gap-4 text-[11px]">
-        <span>© 2026 GARANOKI Store & Finance MS</span>
+        <span>© 2026 GALANOKI Store & Finance MS</span>
       </div>
     </footer>
 
@@ -369,7 +369,7 @@
               <h3 class="text-sm sm:text-base font-black text-white">
                 {{ currentLang === 'sw' ? 'Tangazo la Wakulima & Mavuno Shambani' : 'Farmer & Harvest Commercial' }}
               </h3>
-              <p class="text-[11px] text-emerald-400 font-medium">GARANOKI Store & Finance MS</p>
+              <p class="text-[11px] text-emerald-400 font-medium">GALANOKI Store & Finance MS</p>
             </div>
           </div>
 
