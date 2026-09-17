@@ -711,6 +711,197 @@
       </div>
     </transition>
 
+    <!-- MODAL: Manage Expense Categories -->
+    <transition name="fade">
+      <div v-if="showManageCategoriesModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-lg overflow-hidden animate-fadeIn">
+          
+          <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50">
+            <h3 class="font-black text-base text-slate-900 dark:text-white flex items-center gap-2">
+              <span>⚙️</span>
+              <span>Usimamizi wa Makundi ya Matumizi</span>
+            </h3>
+            <button @click="showManageCategoriesModal = false" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg cursor-pointer">✕</button>
+          </div>
+
+          <div class="p-6 space-y-4">
+            <!-- Add New Category Header Form -->
+            <div class="flex items-center gap-2 pb-4 border-b border-slate-100 dark:border-slate-800">
+              <input 
+                type="text" 
+                v-model="modalNewCategoryName" 
+                placeholder="Jina la kategoria mpya..." 
+                class="flex-1 py-2 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none"
+              />
+              <button 
+                @click="addCategoryFromModal" 
+                :disabled="!modalNewCategoryName.trim() || submittingCategory" 
+                class="py-2 px-4 bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs rounded-xl shadow-xs cursor-pointer disabled:opacity-50"
+              >
+                {{ submittingCategory ? 'Inasave...' : '➕ Ongeza' }}
+              </button>
+            </div>
+
+            <!-- Categories List -->
+            <div class="max-h-64 overflow-y-auto space-y-2 pr-1">
+              <div 
+                v-for="cat in expenseCategoriesOptions" 
+                :key="cat.id" 
+                class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-xs"
+              >
+                <!-- Inline Edit Mode -->
+                <template v-if="editingCategoryId === cat.id">
+                  <input 
+                    type="text" 
+                    v-model="editingCategoryName" 
+                    class="flex-1 py-1 px-2.5 bg-white dark:bg-slate-900 border border-rose-400 rounded-lg text-xs font-bold text-slate-900 dark:text-white mr-2"
+                  />
+                  <div class="flex items-center gap-1">
+                    <button 
+                      @click="saveCategoryEdit(cat)" 
+                      class="px-2.5 py-1 bg-emerald-600 text-white font-extrabold text-[11px] rounded-lg shadow-xs cursor-pointer"
+                    >
+                      Hifadhi
+                    </button>
+                    <button 
+                      @click="editingCategoryId = null" 
+                      class="px-2.5 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-[11px] rounded-lg cursor-pointer"
+                    >
+                      Ghairi
+                    </button>
+                  </div>
+                </template>
+
+                <!-- Normal View Mode -->
+                <template v-else>
+                  <span class="font-extrabold text-slate-800 dark:text-slate-200">
+                    💸 {{ cat.name }}
+                  </span>
+                  <div class="flex items-center gap-1.5">
+                    <button 
+                      @click="startEditCategory(cat)" 
+                      title="Badili jina"
+                      class="px-2 py-1 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 text-blue-600 dark:text-blue-400 font-bold text-[11px] rounded-lg border border-blue-200 dark:border-blue-800 cursor-pointer"
+                    >
+                      ✏️ Badili
+                    </button>
+                    <button 
+                      v-if="cat.id !== 999999"
+                      @click="deleteCategory(cat)" 
+                      title="Futa kategoria"
+                      class="px-2 py-1 bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 text-rose-600 dark:text-rose-400 font-bold text-[11px] rounded-lg border border-rose-200 dark:border-rose-800 cursor-pointer"
+                    >
+                      🗑️ Futa
+                    </button>
+                  </div>
+                </template>
+              </div>
+            </div>
+
+            <p class="text-[11px] text-slate-400 font-medium italic pt-2 border-t border-slate-100 dark:border-slate-800">
+              ℹ️ Kumbuka: Ukifuta kategoria, gharama zilizokwisha kusajiliwa awali zitaendelea kuwepo bila kufutwa. Ukibadili jina, gharama za zamani zitasasishwa jina jipya.
+            </p>
+
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- MODAL: Manage Income Sources -->
+    <transition name="fade">
+      <div v-if="showManageSourcesModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-lg overflow-hidden animate-fadeIn">
+          
+          <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50">
+            <h3 class="font-black text-base text-slate-900 dark:text-white flex items-center gap-2">
+              <span>⚙️</span>
+              <span>Usimamizi wa Vyanzo vya Mapato</span>
+            </h3>
+            <button @click="showManageSourcesModal = false" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg cursor-pointer">✕</button>
+          </div>
+
+          <div class="p-6 space-y-4">
+            <!-- Add New Source Header Form -->
+            <div class="flex items-center gap-2 pb-4 border-b border-slate-100 dark:border-slate-800">
+              <input 
+                type="text" 
+                v-model="modalNewSourceName" 
+                placeholder="Jina la chanzo kipya..." 
+                class="flex-1 py-2 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none"
+              />
+              <button 
+                @click="addSourceFromModal" 
+                :disabled="!modalNewSourceName.trim() || submittingSourceModal" 
+                class="py-2 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow-xs cursor-pointer disabled:opacity-50"
+              >
+                {{ submittingSourceModal ? 'Inasave...' : '➕ Ongeza' }}
+              </button>
+            </div>
+
+            <!-- Sources List -->
+            <div class="max-h-64 overflow-y-auto space-y-2 pr-1">
+              <div 
+                v-for="src in incomeSourcesOptions" 
+                :key="src.id" 
+                class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-xs"
+              >
+                <!-- Inline Edit Mode -->
+                <template v-if="editingSourceId === src.id">
+                  <input 
+                    type="text" 
+                    v-model="editingSourceName" 
+                    class="flex-1 py-1 px-2.5 bg-white dark:bg-slate-900 border border-emerald-400 rounded-lg text-xs font-bold text-slate-900 dark:text-white mr-2"
+                  />
+                  <div class="flex items-center gap-1">
+                    <button 
+                      @click="saveSourceEdit(src)" 
+                      class="px-2.5 py-1 bg-emerald-600 text-white font-extrabold text-[11px] rounded-lg shadow-xs cursor-pointer"
+                    >
+                      Hifadhi
+                    </button>
+                    <button 
+                      @click="editingSourceId = null" 
+                      class="px-2.5 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-[11px] rounded-lg cursor-pointer"
+                    >
+                      Ghairi
+                    </button>
+                  </div>
+                </template>
+
+                <!-- Normal View Mode -->
+                <template v-else>
+                  <span class="font-extrabold text-slate-800 dark:text-slate-200">
+                    💰 {{ src.name }}
+                  </span>
+                  <div class="flex items-center gap-1.5">
+                    <button 
+                      @click="startEditSource(src)" 
+                      title="Badili jina"
+                      class="px-2 py-1 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 text-blue-600 dark:text-blue-400 font-bold text-[11px] rounded-lg border border-blue-200 dark:border-blue-800 cursor-pointer"
+                    >
+                      ✏️ Badili
+                    </button>
+                    <button 
+                      @click="deleteSource(src)" 
+                      title="Futa chanzo"
+                      class="px-2 py-1 bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 text-rose-600 dark:text-rose-400 font-bold text-[11px] rounded-lg border border-rose-200 dark:border-rose-800 cursor-pointer"
+                    >
+                      🗑️ Futa
+                    </button>
+                  </div>
+                </template>
+              </div>
+            </div>
+
+            <p class="text-[11px] text-slate-400 font-medium italic pt-2 border-t border-slate-100 dark:border-slate-800">
+              ℹ️ Kumbuka: Ukifuta chanzo cha mapato, mapato yaliyokwisha kusajiliwa awali yataendelea kuwepo bila kufutwa. Ukibadili jina, mapato ya zamani yatasasishwa jina jipya.
+            </p>
+
+          </div>
+        </div>
+      </div>
+    </transition>
+
     <!-- Toast Notification -->
     <transition name="fade">
       <div 
@@ -1246,12 +1437,180 @@ const deleteExpenseRecord = async (exp) => {
   }
 };
 
-const openIncomeSourcesModal = () => {
-  alert('Ili kuongeza au kubadili vyanzo vya mapato, unaweza kuviongeza moja kwa moja unapochagua chanzo au kupitia Mipangilio.');
-};
+const showManageCategoriesModal = ref(false);
+const modalNewCategoryName = ref('');
+const submittingCategory = ref(false);
+const editingCategoryId = ref(null);
+const editingCategoryName = ref('');
+
+const showManageSourcesModal = ref(false);
+const modalNewSourceName = ref('');
+const submittingSourceModal = ref(false);
+const editingSourceId = ref(null);
+const editingSourceName = ref('');
 
 const openExpenseCategoriesModal = () => {
-  alert('Ili kuongeza au kubadili makundi ya matumizi, unaweza kuyapanga au kuyaongeza kupitia Mipangilio.');
+  editingCategoryId.value = null;
+  modalNewCategoryName.value = '';
+  showManageCategoriesModal.value = true;
+};
+
+const openIncomeSourcesModal = () => {
+  editingSourceId.value = null;
+  modalNewSourceName.value = '';
+  showManageSourcesModal.value = true;
+};
+
+const addCategoryFromModal = async () => {
+  if (!modalNewCategoryName.value.trim()) return;
+  submittingCategory.value = true;
+  try {
+    const res = await fetch('/api/v1/expenses/categories', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: modalNewCategoryName.value.trim() })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      triggerToast('Kategoria imesajiliwa kikamilifu!');
+      modalNewCategoryName.value = '';
+      await fetchAccountingData();
+    } else {
+      triggerToast(data.message || 'Imeshindwa kusajili kategoria', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    triggerToast('Kosa wakati wa kusajili kategoria', 'error');
+  } finally {
+    submittingCategory.value = false;
+  }
+};
+
+const startEditCategory = (cat) => {
+  editingCategoryId.value = cat.id;
+  editingCategoryName.value = cat.name;
+};
+
+const saveCategoryEdit = async (cat) => {
+  if (!editingCategoryName.value.trim() || editingCategoryName.value.trim() === cat.name) {
+    editingCategoryId.value = null;
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/v1/expenses/categories/${cat.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: editingCategoryName.value.trim() })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      triggerToast('Jina la kategoria limebadilishwa kikamilifu!');
+      editingCategoryId.value = null;
+      await fetchAccountingData();
+    } else {
+      triggerToast(data.message || 'Imeshindwa kubadili jina la kategoria', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    triggerToast('Kosa wakati wa kubadili kategoria', 'error');
+  }
+};
+
+const deleteCategory = async (cat) => {
+  if (!confirm(`Je, una uhakika unataka kufuta kategoria ya "${cat.name}"?\n\nKumbuka: Matumizi yote yaliyosajiliwa zamani kwa kategoria hii yataendelea kuwepo bila kufutwa.`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/v1/expenses/categories/${cat.id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (res.ok) {
+      triggerToast('Kategoria imefutwa kikamilifu!');
+      await fetchAccountingData();
+    } else {
+      triggerToast(data.message || 'Imeshindwa kufuta kategoria', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    triggerToast('Kosa wakati wa kufuta kategoria', 'error');
+  }
+};
+
+const addSourceFromModal = async () => {
+  if (!modalNewSourceName.value.trim()) return;
+  submittingSourceModal.value = true;
+  try {
+    const res = await fetch('/api/v1/incomes/sources', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: modalNewSourceName.value.trim() })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      triggerToast('Chanzo cha mapato kimesajiliwa kikamilifu!');
+      modalNewSourceName.value = '';
+      await fetchAccountingData();
+    } else {
+      triggerToast(data.message || 'Imeshindwa kusajili chanzo cha mapato', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    triggerToast('Kosa wakati wa kusajili chanzo cha mapato', 'error');
+  } finally {
+    submittingSourceModal.value = false;
+  }
+};
+
+const startEditSource = (src) => {
+  editingSourceId.value = src.id;
+  editingSourceName.value = src.name;
+};
+
+const saveSourceEdit = async (src) => {
+  if (!editingSourceName.value.trim() || editingSourceName.value.trim() === src.name) {
+    editingSourceId.value = null;
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/v1/incomes/sources/${src.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: editingSourceName.value.trim() })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      triggerToast('Jina la chanzo cha mapato limebadilishwa kikamilifu!');
+      editingSourceId.value = null;
+      await fetchAccountingData();
+    } else {
+      triggerToast(data.message || 'Imeshindwa kubadili jina la chanzo', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    triggerToast('Kosa wakati wa kubadili chanzo', 'error');
+  }
+};
+
+const deleteSource = async (src) => {
+  if (!confirm(`Je, una uhakika unataka kufuta chanzo cha mapato cha "${src.name}"?\n\nKumbuka: Mapato yote yaliyosajiliwa zamani kwa chanzo hiki yataendelea kuwepo bila kufutwa.`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/v1/incomes/sources/${src.id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (res.ok) {
+      triggerToast('Chanzo cha mapato kimefutwa kikamilifu!');
+      await fetchAccountingData();
+    } else {
+      triggerToast(data.message || 'Imeshindwa kufuta chanzo cha mapato', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    triggerToast('Kosa wakati wa kufuta chanzo cha mapato', 'error');
+  }
 };
 
 onMounted(() => {
