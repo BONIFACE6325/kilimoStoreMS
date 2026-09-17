@@ -10,7 +10,7 @@
           </span>
           <div>
             <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              {{ t('inventoryManagement', 'Inventory') }}
+              {{ t('inventoryManagement', 'Usimamizi wa Stoko') }}
             </h1>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
               {{ t('inventorySubtitle', 'Viwango vya nafaka, mpunga, sembe, mchele na pumba ghalani') }}

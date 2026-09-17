@@ -14,7 +14,7 @@ const translations = {
     dashboard: 'Dashboard',
     farmers: 'Wakulima',
     cashbook: 'Daftari la Pesa',
-    inventory: 'Inventory',
+    inventory: 'Stoko',
     services: 'Huduma za Kinu',
     loans: 'Mikopo',
     buyers: 'Wanunuzi',
@@ -149,7 +149,7 @@ const translations = {
     serviceSubtitle: 'Ada za kukoboa, kuanika, kugiredi, kuchanganya na vipimo vya kinu',
     registerService: 'Sajili Huduma Mpya',
     
-    inventoryManagement: 'Inventory',
+    inventoryManagement: 'Usimamizi wa Stoko',
     inventorySubtitle: 'Viwango vya nafaka, mpunga, sembe, mchele na pumba ghalani',
     
     loanManagement: 'Usimamizi wa Mikopo ya Wakulima',
