@@ -255,11 +255,14 @@
                 <span class="text-[10px] text-slate-400 font-normal block">{{ loan.farmer_phone }}</span>
               </td>
 
-              <!-- Collateral Batch Code -->
               <td class="py-3.5 px-4">
-                <span class="px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-extrabold text-[11px] border border-slate-200 dark:border-slate-700 inline-flex items-center gap-1">
+                <span v-if="loan.collateral_batch && loan.collateral_batch !== 'N/A'" class="px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-extrabold text-[11px] border border-slate-200 dark:border-slate-700 inline-flex items-center gap-1">
                   <span>📦</span>
-                  <span>{{ loan.collateral_batch || 'N/A' }}</span>
+                  <span>Batch: {{ loan.collateral_batch }}</span>
+                </span>
+                <span v-else class="px-2.5 py-1 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-bold text-[11px] border border-blue-200 dark:border-blue-800/50 inline-flex items-center gap-1">
+                  <span>👤</span>
+                  <span>Bila Mzigo (Direct)</span>
                 </span>
               </td>
 

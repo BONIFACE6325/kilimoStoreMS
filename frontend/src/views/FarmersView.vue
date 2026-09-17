@@ -1202,65 +1202,54 @@
         </div>
         <div class="p-6 space-y-3.5 text-xs font-semibold text-slate-700 dark:text-slate-200">
           
-          <div v-if="activeNonTransformedBatches.length === 0" class="p-4 bg-amber-50 dark:bg-amber-500/10 border border-amber-300 text-amber-950 dark:text-amber-400 rounded-2xl space-y-1">
-            <div class="font-extrabold text-xs flex items-center gap-1.5 text-amber-900 dark:text-amber-400">
-              <span>⚠️ Hawezi Kukopeshwa!</span>
-            </div>
-            <p class="text-[11px] leading-relaxed font-medium text-amber-800 dark:text-amber-400">
-              Mkulima huyu hana mzigo wowote ghalani (au mazao yake yote yameuzwa). Mfumo hauruhusu kutoa mkopo bila kuwa na akiba ya mzigo ghalani kama dhamana.
-            </p>
+          <!-- Collateral Batch Dropdown if farmer has batches -->
+          <div v-if="activeNonTransformedBatches.length > 0">
+            <label class="block mb-1 font-bold">Chagua Mazao ya Dhamana (Hiari)</label>
+            <select v-model="loanForm.collateral_batch_id" class="w-full p-2.5 bg-emerald-50/50 dark:bg-emerald-900/40 border border-emerald-300 dark:border-emerald-500/30 rounded-xl font-extrabold text-emerald-950 dark:text-emerald-400">
+              <option value="">-- Hakuna Batch / Mkopo wa Direct (Bila Mzigo Ghalani) --</option>
+              <option v-for="b in activeNonTransformedBatches" :key="b.id" :value="b.id">
+                Batch: {{ b.batch_code }} — {{ b.crop_type }} ({{ b.intake_quantity || parseFloat(b.current_weight_mt||b.current_weight||0) }} {{ b.intake_unit || 'Units' }})
+              </option>
+            </select>
+          </div>
+          <div v-else class="p-3 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 rounded-xl text-xs text-blue-900 dark:text-blue-300 font-medium">
+            ℹ️ Mkulima huyu hana mzigo ghalani. Mkopo utatolewa kama <strong>Mkopo wa Direct (Bila Mzigo Ghalani)</strong>.
           </div>
 
-          <template v-else>
-            <div>
-              <label class="block mb-1 font-bold">Chagua Mazao ya Dhamana (Collateral Batch) *</label>
-              <select v-model="loanForm.collateral_batch_id" class="w-full p-2.5 bg-emerald-50/50 dark:bg-emerald-900/40 border border-emerald-300 dark:border-emerald-500/30 rounded-xl font-extrabold text-emerald-950 dark:text-emerald-400">
-                <option value="">Chagua batch ya dhamana ghalani...</option>
-                <option v-for="b in activeNonTransformedBatches" :key="b.id" :value="b.id">
-                  {{ b.batch_code }} — {{ b.crop_type }} ({{ b.intake_quantity || parseFloat(b.current_weight_mt||b.current_weight||0) }} {{ b.intake_unit || 'Units' }})
-                </option>
-              </select>
-            </div>
-
-            <!-- Collateral Batch Summary Card -->
-            <div v-if="selectedCollateralBatch" class="p-3.5 bg-emerald-50/80 dark:bg-emerald-900/40 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl space-y-1.5">
-              <div class="flex justify-between items-center text-xs">
-                <span class="text-slate-600 dark:text-slate-300 font-bold">Akiba ya Mzigo Ghalani (Dhamana):</span>
-                <span class="font-mono font-black text-emerald-900 dark:text-emerald-400">
-                  {{ selectedCollateralBatch.intake_quantity || (parseFloat(selectedCollateralBatch.current_weight_mt||0)).toLocaleString() }} {{ selectedCollateralBatch.intake_unit || 'Units' }}
-                </span>
-              </div>
-              <span class="text-[10px] text-emerald-800 dark:text-emerald-400 font-medium block pt-0.5">
-                ℹ️ Riba: <strong>0% (Bila Riba)</strong>. Kiasi kitakatwa kikamilifu kwenye mauzo yajayo.
+          <!-- Collateral Batch Summary Card -->
+          <div v-if="selectedCollateralBatch" class="p-3.5 bg-emerald-50/80 dark:bg-emerald-900/40 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl space-y-1.5">
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-600 dark:text-slate-300 font-bold">Akiba ya Mzigo Ghalani (Dhamana):</span>
+              <span class="font-mono font-black text-emerald-900 dark:text-emerald-400">
+                {{ selectedCollateralBatch.intake_quantity || (parseFloat(selectedCollateralBatch.current_weight_mt||0)).toLocaleString() }} {{ selectedCollateralBatch.intake_unit || 'Units' }}
               </span>
             </div>
+          </div>
 
-            <div>
-              <label class="block mb-1 font-bold">Kiasi cha Mkopo Unachoomba (Tsh) *</label>
-              <input 
-                v-model.number="loanForm.amount" 
-                type="number" 
-                min="1"
-                placeholder="Ingiza kiasi cha mkopo..." 
-                class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl font-black text-slate-900 dark:text-slate-50 text-sm focus:ring-emerald-500"
-              />
-            </div>
+          <div>
+            <label class="block mb-1 font-bold">Kiasi cha Mkopo (Tsh) *</label>
+            <input 
+              v-model.number="loanForm.amount" 
+              type="number" 
+              min="1"
+              placeholder="Ingiza kiasi chochote cha mkopo..." 
+              class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl font-black text-slate-900 dark:text-slate-50 text-sm focus:ring-emerald-500"
+            />
+          </div>
 
-            <div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl flex items-center gap-2 text-xs text-emerald-800 dark:text-emerald-300 font-bold">
-              <span>ℹ️</span>
-              <span>Mkopo huu hauna siku ya kurejesha. Utakatwa kiatomati mara tu mkulima atakapouza mzigo.</span>
-            </div>
-          </template>
+          <div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl flex items-center gap-2 text-xs text-emerald-800 dark:text-emerald-300 font-bold">
+            <span>ℹ️</span>
+            <span>Riba: 0% (Bila Riba). Utakatwa kiatomati mara tu mkulima atakapouza mzigo ghalani.</span>
+          </div>
 
-          <div class="flex justify-end gap-2 pt-2">
+          <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
             <button @click="modals.newLoan = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl cursor-pointer">Ghairi</button>
             <button 
-              v-if="activeNonTransformedBatches.length > 0"
               @click="submitNewLoan" 
-              :disabled="!loanForm.collateral_batch_id || !loanForm.amount || loanForm.amount <= 0"
+              :disabled="!loanForm.amount || loanForm.amount <= 0"
               class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow-xs cursor-pointer transition"
             >
-              Tuma Ombi
+              Thibitisha Mkopo
             </button>
           </div>
         </div>
@@ -3512,8 +3501,8 @@ const maxLoanLimit = computed(() => {
 });
 
 const submitNewLoan = async () => {
-  if (!loanForm.value.amount || loanForm.value.amount <= 0 || !loanForm.value.collateral_batch_id) {
-    triggerToast('Tafadhali jaza sehemu zote za mkopo na dhamana.', 'error');
+  if (!loanForm.value.amount || loanForm.value.amount <= 0) {
+    triggerToast('Tafadhali ingiza kiasi halali cha mkopo.', 'error');
     return;
   }
 
@@ -3523,7 +3512,7 @@ const submitNewLoan = async () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         farmer_id: selectedFarmer.value.id,
-        collateral_batch_id: loanForm.value.collateral_batch_id,
+        collateral_batch_id: loanForm.value.collateral_batch_id || null,
         principal_amount: loanForm.value.amount
       })
     });
@@ -3532,7 +3521,7 @@ const submitNewLoan = async () => {
       modals.value.newLoan = false;
       await openFarmerProfile(selectedFarmer.value.id);
       await fetchFarmers();
-      triggerToast('Ombi la Mkopo (0% Riba) na Dhamana Limewasilishwa kikamilifu! 💰');
+      triggerToast('Ombi la Mkopo (0% Riba) Limewasilishwa kikamilifu! 💰');
     } else {
       triggerToast(data.error || 'Imefeli kuwasilisha ombi la mkopo.', 'error');
     }
