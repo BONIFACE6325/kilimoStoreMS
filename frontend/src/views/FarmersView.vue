@@ -1114,7 +1114,7 @@
 
     <!-- MODAL: SAJILI HUDUMA / GHARAMA NYINGINE ZA MKULIMA -->
     <div v-if="modals.addFarmerService" class="fixed inset-0 z-[90] bg-slate-900/75 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-emerald-200 dark:border-emerald-500/20">
+      <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-emerald-200 dark:border-emerald-500/20">
         <div class="px-6 py-4 border-b border-emerald-800 flex items-center justify-between bg-gradient-to-r from-emerald-900 to-teal-900 text-white">
           <h3 class="text-base font-extrabold flex items-center gap-2">
             <span>👤</span>
@@ -1122,47 +1122,22 @@
           </h3>
           <button @click="modals.addFarmerService = false" class="text-emerald-200 hover:text-white p-1 cursor-pointer">✕</button>
         </div>
-        <div class="p-6 space-y-3.5 text-xs font-semibold text-slate-700 dark:text-slate-200">
+        <div class="p-6 space-y-4 text-xs font-semibold text-slate-700 dark:text-slate-200">
           <div>
-            <label class="block mb-1 font-bold">Chagua Huduma kutoka Catalog (Hiari)</label>
-            <select v-model="newFarmerServiceForm.service_id" @change="onSelectCatalogServiceForFarmer" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50">
-              <option value="">-- Chagua kutoka huduma zilizosajiliwa --</option>
-              <option v-for="cs in catalogServices" :key="cs.id" :value="cs.id">
-                {{ cs.name_sw || cs.name_en }} (Tsh {{ Number(cs.rate).toLocaleString() }} / {{ cs.unit }})
-              </option>
-            </select>
+            <label class="block mb-1 font-bold">Jina la Huduma / Gharama *</label>
+            <input v-model="newFarmerServiceForm.service_name" type="text" placeholder="e.g. Usafiri wa Mkulima, Pembejeo, Posho" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-medium text-slate-900 dark:text-slate-50"/>
           </div>
           <div>
-            <label class="block mb-1 font-bold">Jina / Maelezo ya Huduma / Gharama *</label>
-            <input v-model="newFarmerServiceForm.service_name" type="text" placeholder="e.g. Usafiri wa Mkulima, Pembejeo za Kilimo, Posho" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50"/>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block mb-1 font-bold">Kipimo / Unit</label>
-              <input v-model="newFarmerServiceForm.unit" type="text" placeholder="e.g. huduma, safari, gunia" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50"/>
-            </div>
-            <div>
-              <label class="block mb-1 font-bold">Idadi (Quantity)</label>
-              <input v-model.number="newFarmerServiceForm.quantity" @input="calculateFarmerServiceFeeAmount" type="number" step="0.01" min="0.01" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50"/>
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block mb-1 font-bold">Gharama kwa Kipimo (Rate - Tsh)</label>
-              <input v-model.number="newFarmerServiceForm.rate" @input="calculateFarmerServiceFeeAmount" type="number" step="1" min="0" placeholder="0" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50"/>
-            </div>
-            <div>
-              <label class="block mb-1 font-bold">Jumla ya Gharama (Tsh) *</label>
-              <input v-model.number="newFarmerServiceForm.fee_amount" type="number" step="1" min="0" placeholder="0" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-bold text-emerald-800 dark:text-emerald-400 text-slate-900 dark:text-slate-50"/>
-            </div>
+            <label class="block mb-1 font-bold">Kiasi cha Gharama (Tsh) *</label>
+            <input v-model.number="newFarmerServiceForm.fee_amount" type="number" step="1" min="0" placeholder="0" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-black text-emerald-800 dark:text-emerald-400 text-sm text-slate-900 dark:text-slate-50"/>
           </div>
           <div>
-            <label class="block mb-1 font-bold">Maelezo ya Ziada (Notes)</label>
-            <textarea v-model="newFarmerServiceForm.notes" rows="2" placeholder="Maelezo mengine ya hiari..." class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50"></textarea>
+            <label class="block mb-1 font-bold">Maelezo (Hiari)</label>
+            <textarea v-model="newFarmerServiceForm.notes" rows="2" placeholder="Maelezo mengine ya ziada..." class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50"></textarea>
           </div>
           <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
             <button @click="modals.addFarmerService = false" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl cursor-pointer">Ghairi</button>
-            <button @click="submitAddFarmerService" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-xs cursor-pointer">Thibitisha (Sajili Huduma)</button>
+            <button @click="submitAddFarmerService" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-xs cursor-pointer">Thibitisha (Sajili Gharama)</button>
           </div>
         </div>
       </div>
@@ -2988,33 +2963,11 @@ const closeAllSubModals = () => {
 
 const openAddFarmerServiceModal = () => {
   newFarmerServiceForm.value = {
-    service_id: '',
     service_name: '',
-    unit: 'huduma',
-    quantity: 1,
-    rate: 0,
     fee_amount: 0,
     notes: ''
   };
   modals.value.addFarmerService = true;
-};
-
-const onSelectCatalogServiceForFarmer = () => {
-  const s = catalogServices.value.find(c => c.id === newFarmerServiceForm.value.service_id);
-  if (s) {
-    newFarmerServiceForm.value.service_name = s.name_sw || s.name_en;
-    newFarmerServiceForm.value.unit = s.unit || 'huduma';
-    newFarmerServiceForm.value.rate = parseFloat(s.rate || 0);
-    newFarmerServiceForm.value.fee_amount = (newFarmerServiceForm.value.rate || 0) * (newFarmerServiceForm.value.quantity || 1);
-  }
-};
-
-const calculateFarmerServiceFeeAmount = () => {
-  const qty = parseFloat(newFarmerServiceForm.value.quantity || 1);
-  const rate = parseFloat(newFarmerServiceForm.value.rate || 0);
-  if (rate > 0) {
-    newFarmerServiceForm.value.fee_amount = rate * qty;
-  }
 };
 
 const submitAddFarmerService = async () => {
@@ -3036,21 +2989,25 @@ const submitAddFarmerService = async () => {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify(newFarmerServiceForm.value)
+      body: JSON.stringify({
+        service_name: newFarmerServiceForm.value.service_name,
+        fee_amount: fee,
+        notes: newFarmerServiceForm.value.notes
+      })
     });
 
     const data = await res.json().catch(() => ({}));
 
     if (res.ok && data.success !== false) {
-      triggerToast('Huduma/Gharama ya Mkulima imesajiliwa kikamilifu! ✓');
+      triggerToast('Gharama ya Mkulima imesajiliwa kikamilifu! ✓');
       modals.value.addFarmerService = false;
       await openFarmerProfile(selectedFarmer.value.id);
       await fetchFarmers();
     } else {
-      triggerToast(data.message || 'Imefeli kusajili huduma.', 'error');
+      triggerToast(data.message || 'Imefeli kusajili gharama.', 'error');
     }
   } catch (e) {
-    triggerToast('Kosa la mtandao wakati wa kusajili huduma.', 'error');
+    triggerToast('Kosa la mtandao wakati wa kusajili gharama.', 'error');
   }
 };
 
