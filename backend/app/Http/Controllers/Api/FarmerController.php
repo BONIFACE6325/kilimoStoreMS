@@ -104,7 +104,7 @@ class FarmerController extends Controller
         try {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
-                'phone' => 'required|string|max:50',
+                'phone' => 'nullable|string|max:50',
                 'national_id' => 'nullable|string|max:100',
                 'region' => 'nullable|string|max:100',
                 'district' => 'nullable|string|max:100',
@@ -374,7 +374,7 @@ class FarmerController extends Controller
         $farmer = Farmer::findOrFail($id);
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
-            'phone' => 'sometimes|required|string|max:50',
+            'phone' => 'nullable|string|max:50',
             'national_id' => 'nullable|string|max:100',
             'region' => 'nullable|string|max:100',
             'district' => 'nullable|string|max:100',

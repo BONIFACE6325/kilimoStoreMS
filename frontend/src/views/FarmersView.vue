@@ -254,7 +254,7 @@
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                   <div>
-                    <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Simu *</label>
+                    <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Simu</label>
                     <input v-model="editFarmerForm.phone" type="text" class="w-full p-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-medium text-slate-900 dark:text-slate-50"/>
                   </div>
                   <div>
@@ -1321,7 +1321,7 @@
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block mb-1 font-bold">Namba ya Simu *</label>
+              <label class="block mb-1 font-bold">Namba ya Simu</label>
               <input v-model="newFarmerForm.phone" type="text" placeholder="0754123456" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50"/>
             </div>
             <div>
@@ -1331,7 +1331,7 @@
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block mb-1 font-bold">Mkoa *</label>
+              <label class="block mb-1 font-bold">Mkoa</label>
               <select v-model="newFarmerForm.region" class="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-50">
                  <option value="" disabled>Chagua Mkoa...</option>
                  <option v-for="r in tanzaniaRegions" :key="r" :value="r">{{ r }}</option>
@@ -3528,8 +3528,8 @@ const openAddFarmerModal = () => {
 };
 
 const submitAddFarmer = async () => {
-  if (!newFarmerForm.value.name || !newFarmerForm.value.phone) {
-    triggerToast('Jaza jina na namba ya simu.', 'error');
+  if (!newFarmerForm.value.name) {
+    triggerToast('Tafadhali jaza jina la mkulima.', 'error');
     return;
   }
 
