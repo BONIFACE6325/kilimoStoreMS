@@ -61,31 +61,26 @@ class LoanController extends Controller
 
     public function store(Request $request)
     {
+        $tenantId = $this->getTenantId($request);
+
         $validated = $request->validate([
-            'farmer_id' => 'required|exists:farmers,id',
+            'farmer_id' => 'nullable|exists:farmers,id',
+            'new_borrower_name' => 'nullable|string|max:255',
+            'new_borrower_phone' => 'nullable|string|max:50',
+            'new_borrower_nida' => 'nullable|string|max:100',
+            'new_borrower_address' => 'nullable|string|max:255',
             'collateral_batch_id' => 'nullable|exists:batches,id',
             'principal_amount' => 'required|numeric|min:1',
             'due_date' => 'nullable|date',
         ]);
 
-        $farmer = Farmer::findOrFail($validated['farmer_id']);
-        $collateralBatchId = $validated['collateral_batch_id'] ?? null;
-
-        if ($collateralBatchId) {
-            $batch = Batch::findOrFail($collateralBatchId);
-
-            if ($batch->farmer_id !== $validated['farmer_id']) {
-                return response()->json(['error' => 'Batch iliyochaguliwa haimhusu mkulima huyu!'], 422);
-            }
-
-            if ($batch->status === 'sold') {
-                return response()->json([
-                    'error' => 'Huwezi kumpa mkopo mkulima kwa batch iliyouzwa!'
-                ], 422);
-            }
+        if (empty($validated['farmer_id']) && empty($validated['new_borrower_name'])) {
+            return response()->json([
+                'error' => 'Tafadhali chagua mkulima au ingiza jina la mkopaji mpya!'
+            ], 422);
         }
 
-        $tenantId = $this->getTenantId($request);
+        $collateralBatchId = $validated['collateral_batch_id'] ?? null;
 
         // Auto-generate code
         $lastLoan = Loan::orderBy('created_at', 'desc')->first();
@@ -98,11 +93,47 @@ class LoanController extends Controller
         }
         $loanCode = 'LN-' . $nextNumber;
 
-        $loan = DB::transaction(function () use ($tenantId, $validated, $loanCode) {
+        $loan = DB::transaction(function () use ($tenantId, $validated, $collateralBatchId, $loanCode) {
+            $farmerId = $validated['farmer_id'] ?? null;
+
+            if (!$farmerId) {
+                $nextFrmNum = 1;
+                do {
+                    $farmerCode = 'FRM-' . str_pad($nextFrmNum, 3, '0', STR_PAD_LEFT);
+                    $exists = Farmer::where('tenant_id', $tenantId)->where('farmer_code', $farmerCode)->exists();
+                    if ($exists) {
+                        $nextFrmNum++;
+                    }
+                } while ($exists);
+
+                $newFarmer = Farmer::create([
+                    'tenant_id' => $tenantId,
+                    'farmer_code' => $farmerCode,
+                    'name' => trim($validated['new_borrower_name']),
+                    'phone' => $validated['new_borrower_phone'] ?? null,
+                    'national_id' => $validated['new_borrower_nida'] ?? null,
+                    'region' => $validated['new_borrower_address'] ?? null,
+                    'status' => 'inactive',
+                ]);
+                $farmerId = $newFarmer->id;
+            } else {
+                $farmer = Farmer::findOrFail($farmerId);
+            }
+
+            if ($collateralBatchId) {
+                $batch = Batch::findOrFail($collateralBatchId);
+                if ($batch->farmer_id !== $farmerId) {
+                    throw new \InvalidArgumentException('Batch iliyochaguliwa haimhusu mkulima huyu!');
+                }
+                if ($batch->status === 'sold') {
+                    throw new \InvalidArgumentException('Huwezi kumpa mkopo mkulima kwa batch iliyouzwa!');
+                }
+            }
+
             $l = Loan::create([
                 'tenant_id' => $tenantId,
-                'farmer_id' => $validated['farmer_id'],
-                'collateral_batch_id' => $validated['collateral_batch_id'],
+                'farmer_id' => $farmerId,
+                'collateral_batch_id' => $collateralBatchId,
                 'loan_code' => $loanCode,
                 'principal_amount' => $validated['principal_amount'],
                 'interest_rate_annual' => 0.00, // Strictly 0.00%
