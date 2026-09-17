@@ -16,16 +16,14 @@
 
       <div class="flex items-center gap-2 self-start sm:self-auto">
         <button 
-          v-if="activeTab === 'incomes'"
           @click="openNewIncomeModal"
           class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow-md border border-emerald-400/30 transition cursor-pointer flex items-center gap-2"
         >
           <span>➕</span>
-          <span>Sajili Mapato Mpya</span>
+          <span>Sajili Pato Mpya</span>
         </button>
 
         <button 
-          v-if="activeTab === 'expenses'"
           @click="openNewExpenseModal"
           class="px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs rounded-xl shadow-md border border-rose-400/30 transition cursor-pointer flex items-center gap-2"
         >
@@ -35,37 +33,8 @@
       </div>
     </div>
 
-    <!-- Navigation Tabs -->
-    <div class="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-1 overflow-x-auto whitespace-nowrap">
-      <button 
-        @click="activeTab = 'analysis'"
-        :class="activeTab === 'analysis' ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
-        class="px-4 py-2 rounded-xl text-xs transition cursor-pointer flex items-center gap-2"
-      >
-        <span>📈 Ripoti & Grafu za Faida na Hasara (P&L Charts)</span>
-      </button>
-
-      <button 
-        @click="activeTab = 'incomes'"
-        :class="activeTab === 'incomes' ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
-        class="px-4 py-2 rounded-xl text-xs transition cursor-pointer flex items-center gap-2"
-      >
-        <span>💰 Daftari la Mapato Mengineyo (Incomes)</span>
-        <span class="px-1.5 py-0.2 rounded-md bg-emerald-700 text-[10px] text-white">{{ incomesList.length }}</span>
-      </button>
-
-      <button 
-        @click="activeTab = 'expenses'"
-        :class="activeTab === 'expenses' ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 font-bold'"
-        class="px-4 py-2 rounded-xl text-xs transition cursor-pointer flex items-center gap-2"
-      >
-        <span>📉 Daftari la Matumizi (Expenses OPEX)</span>
-        <span class="px-1.5 py-0.2 rounded-md bg-emerald-700 text-[10px] text-white">{{ expensesList.length }}</span>
-      </button>
-    </div>
-
-    <!-- TAB 1: Executive Financial Analysis & Interactive P&L Charts -->
-    <div v-if="activeTab === 'analysis'" class="space-y-6">
+    <!-- Main Unified Content Dashboard -->
+    <div class="space-y-6">
       
       <!-- Period Filter Controls -->
       <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -312,115 +281,8 @@
 
     </div>
 
-    <!-- TAB 2: Other Incomes Ledger Table & Management -->
-    <div v-if="activeTab === 'incomes'" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs overflow-hidden">
-      <!-- Toolbar -->
-      <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-900/50">
-        <div class="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-2">
-          <span>💰 Daftari la Mapato Mengineyo (Other Incomes Ledger)</span>
-          <span class="px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-800 text-[11px] text-slate-600 dark:text-slate-400 font-bold">
-            {{ filteredIncomes.length }}
-          </span>
-        </div>
-
-        <div class="flex items-center gap-2 w-full sm:w-auto">
-          <button 
-            @click="openIncomeSourcesModal"
-            class="px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-extrabold text-xs rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer"
-          >
-            ⚙️ Vyanzo vya Mapato
-          </button>
-
-          <div class="relative w-full sm:w-60">
-            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">🔍</span>
-            <input 
-              v-model="searchIncomeQuery" 
-              type="text" 
-              placeholder="Tafuta mapato..." 
-              class="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-            />
-          </div>
-        </div>
-      </div>
-
-      <!-- Incomes Table -->
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse text-xs min-w-[700px]">
-          <thead>
-            <tr class="bg-slate-50/80 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 font-extrabold border-b border-slate-100 dark:border-slate-800 uppercase tracking-wider text-[10.5px]">
-              <th class="py-3.5 px-4">Tarehe iliyopokewa</th>
-              <th class="py-3.5 px-4">Chanzo cha Mapato</th>
-              <th class="py-3.5 px-4">Maelezo</th>
-              <th class="py-3.5 px-4">Kiasi (TZS)</th>
-              <th class="py-3.5 px-4 text-right">Vitendo</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
-            <tr v-if="loading" class="text-center py-8">
-              <td colspan="5" class="py-10 text-slate-400 font-bold text-xs">
-                ⏳ Inapakia mapato kutoka kwenye database...
-              </td>
-            </tr>
-            <tr v-else-if="filteredIncomes.length === 0" class="text-center py-8">
-              <td colspan="5" class="py-10 text-slate-400 font-bold text-xs">
-                🔍 Hakuna kumbukumbu ya mapato iliyopatikana.
-              </td>
-            </tr>
-            <tr 
-              v-else
-              v-for="inc in paginatedIncomes" 
-              :key="inc.id"
-              class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors"
-            >
-              <td class="py-3.5 px-4 font-bold text-slate-700 dark:text-slate-300">
-                {{ inc.date_received }}
-              </td>
-
-              <td class="py-3.5 px-4 font-extrabold text-slate-900 dark:text-white">
-                <span class="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[11px]">
-                  💰 {{ inc.source_name }}
-                </span>
-              </td>
-
-              <td class="py-3.5 px-4 text-slate-600 dark:text-slate-400 font-medium">
-                {{ inc.description || '-' }}
-              </td>
-
-              <td class="py-3.5 px-4 font-black text-emerald-600 dark:text-emerald-400">
-                TZS {{ formatCurrency(inc.amount) }}
-              </td>
-
-              <td class="py-3.5 px-4 text-right">
-                <div class="flex items-center justify-end gap-1.5">
-                  <button 
-                    @click="openEditIncomeModal(inc)"
-                    title="Badili"
-                    class="px-2 py-1 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 text-blue-600 dark:text-blue-400 font-bold text-[11px] rounded-lg border border-blue-200 dark:border-blue-800 cursor-pointer"
-                  >
-                    ✏️
-                  </button>
-                  <button 
-                    @click="deleteIncomeRecord(inc)"
-                    title="Futa"
-                    class="px-2 py-1 bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 text-rose-600 dark:text-rose-400 font-bold text-[11px] rounded-lg border border-rose-200 dark:border-rose-800 cursor-pointer"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <Pagination
-          v-model:currentPage="currentIncomePage"
-          v-model:perPage="perIncomePage"
-          :totalItems="filteredIncomes.length"
-        />
-      </div>
-    </div>
-
-    <!-- TAB 3: Operating Expenses Ledger Table & Management -->
-    <div v-if="activeTab === 'expenses'" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs overflow-hidden">
+    <!-- Expenses Ledger Table & Management -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs overflow-hidden">
       <!-- Toolbar -->
       <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-900/50">
         <div class="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-2">
@@ -526,6 +388,113 @@
       </div>
     </div>
 
+    <!-- Other Incomes Ledger Table & Management -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs overflow-hidden">
+      <!-- Toolbar -->
+      <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-900/50">
+        <div class="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+          <span>💰 Daftari la Mapato Mengineyo (Other Incomes Ledger)</span>
+          <span class="px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-800 text-[11px] text-slate-600 dark:text-slate-400 font-bold">
+            {{ filteredIncomes.length }}
+          </span>
+        </div>
+
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <button 
+            @click="openIncomeSourcesModal"
+            class="px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-extrabold text-xs rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer"
+          >
+            ⚙️ Vyanzo vya Mapato
+          </button>
+
+          <div class="relative w-full sm:w-60">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">🔍</span>
+            <input 
+              v-model="searchIncomeQuery" 
+              type="text" 
+              placeholder="Tafuta mapato..." 
+              class="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Incomes Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs min-w-[700px]">
+          <thead>
+            <tr class="bg-slate-50/80 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 font-extrabold border-b border-slate-100 dark:border-slate-800 uppercase tracking-wider text-[10.5px]">
+              <th class="py-3.5 px-4">Tarehe iliyopokewa</th>
+              <th class="py-3.5 px-4">Chanzo cha Mapato</th>
+              <th class="py-3.5 px-4">Maelezo</th>
+              <th class="py-3.5 px-4">Kiasi (TZS)</th>
+              <th class="py-3.5 px-4 text-right">Vitendo</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
+            <tr v-if="loading" class="text-center py-8">
+              <td colspan="5" class="py-10 text-slate-400 font-bold text-xs">
+                ⏳ Inapakia mapato kutoka kwenye database...
+              </td>
+            </tr>
+            <tr v-else-if="filteredIncomes.length === 0" class="text-center py-8">
+              <td colspan="5" class="py-10 text-slate-400 font-bold text-xs">
+                🔍 Hakuna kumbukumbu ya mapato iliyopatikana.
+              </td>
+            </tr>
+            <tr 
+              v-else
+              v-for="inc in paginatedIncomes" 
+              :key="inc.id"
+              class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors"
+            >
+              <td class="py-3.5 px-4 font-bold text-slate-700 dark:text-slate-300">
+                {{ inc.date_received }}
+              </td>
+
+              <td class="py-3.5 px-4 font-extrabold text-slate-900 dark:text-white">
+                <span class="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[11px]">
+                  💰 {{ inc.source_name }}
+                </span>
+              </td>
+
+              <td class="py-3.5 px-4 text-slate-600 dark:text-slate-400 font-medium">
+                {{ inc.description || '-' }}
+              </td>
+
+              <td class="py-3.5 px-4 font-black text-emerald-600 dark:text-emerald-400">
+                TZS {{ formatCurrency(inc.amount) }}
+              </td>
+
+              <td class="py-3.5 px-4 text-right">
+                <div class="flex items-center justify-end gap-1.5">
+                  <button 
+                    @click="openEditIncomeModal(inc)"
+                    title="Badili"
+                    class="px-2 py-1 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 text-blue-600 dark:text-blue-400 font-bold text-[11px] rounded-lg border border-blue-200 dark:border-blue-800 cursor-pointer"
+                  >
+                    ✏️
+                  </button>
+                  <button 
+                    @click="deleteIncomeRecord(inc)"
+                    title="Futa"
+                    class="px-2 py-1 bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 text-rose-600 dark:text-rose-400 font-bold text-[11px] rounded-lg border border-rose-200 dark:border-rose-800 cursor-pointer"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <Pagination
+          v-model:currentPage="currentIncomePage"
+          v-model:perPage="perIncomePage"
+          :totalItems="filteredIncomes.length"
+        />
+      </div>
+    </div>
+
     <!-- MODAL: Add / Edit Income Entry -->
     <transition name="fade">
       <div v-if="showIncomeModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
@@ -542,7 +511,31 @@
           <form @submit.prevent="submitIncomeForm" class="p-6 space-y-4 text-left">
             
             <div class="space-y-1">
-              <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Chanzo cha Mapato *</label>
+              <div class="flex items-center justify-between">
+                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Chanzo cha Mapato *</label>
+                <button type="button" @click="showNewSourceInput = !showNewSourceInput" class="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 cursor-pointer">
+                  {{ showNewSourceInput ? '✕ Ghairi' : '➕ Chanzo Kipya' }}
+                </button>
+              </div>
+
+              <!-- Inline New Source Input -->
+              <div v-if="showNewSourceInput" class="flex items-center gap-1.5 pt-1 pb-1">
+                <input 
+                  type="text" 
+                  v-model="newSourceName" 
+                  placeholder="Andika jina la chanzo kipya..." 
+                  class="flex-1 py-1.5 px-3 bg-slate-50 dark:bg-slate-800 border border-emerald-300 dark:border-emerald-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none"
+                />
+                <button 
+                  type="button" 
+                  @click="saveNewSourceInline" 
+                  :disabled="!newSourceName.trim() || savingSource" 
+                  class="py-1.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow-xs cursor-pointer disabled:opacity-50"
+                >
+                  {{ savingSource ? 'Inasave...' : 'Hifadhi' }}
+                </button>
+              </div>
+
               <select 
                 v-model="incomeForm.source_name" 
                 required
@@ -626,7 +619,31 @@
           <form @submit.prevent="submitExpenseForm" class="p-6 space-y-4 text-left">
             
             <div class="space-y-1">
-              <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Kundi la Matumizi *</label>
+              <div class="flex items-center justify-between">
+                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Kundi la Matumizi *</label>
+                <button type="button" @click="showNewCategoryInput = !showNewCategoryInput" class="text-[11px] font-bold text-rose-600 hover:text-rose-700 dark:text-rose-400 cursor-pointer">
+                  {{ showNewCategoryInput ? '✕ Ghairi' : '➕ Kategoria Mpya' }}
+                </button>
+              </div>
+
+              <!-- Inline New Category Input -->
+              <div v-if="showNewCategoryInput" class="flex items-center gap-1.5 pt-1 pb-1">
+                <input 
+                  type="text" 
+                  v-model="newCategoryName" 
+                  placeholder="Andika jina la kategoria mpya..." 
+                  class="flex-1 py-1.5 px-3 bg-slate-50 dark:bg-slate-800 border border-rose-300 dark:border-rose-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none"
+                />
+                <button 
+                  type="button" 
+                  @click="saveNewCategoryInline" 
+                  :disabled="!newCategoryName.trim() || savingCategory" 
+                  class="py-1.5 px-3 bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs rounded-xl shadow-xs cursor-pointer disabled:opacity-50"
+                >
+                  {{ savingCategory ? 'Inasave...' : 'Hifadhi' }}
+                </button>
+              </div>
+
               <select 
                 v-model="expenseForm.category_name" 
                 required
@@ -662,11 +679,11 @@
             </div>
 
             <div class="space-y-1">
-              <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Maelezo (Description)</label>
+              <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Maelezo ya Matumizi (Description)</label>
               <textarea 
                 v-model="expenseForm.description" 
-                rows="2"
-                placeholder="Maelezo ya matumizi haya..."
+                rows="3"
+                placeholder="Maelezo ya kina ya matumizi haya (mfano: Mafuta ya gari T 123 ABC, matengenezo, n.k.)..."
                 class="w-full py-2.5 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none"
               ></textarea>
             </div>
@@ -963,6 +980,74 @@ watch([filteredExpenses, perExpensePage], () => {
   currentExpensePage.value = 1;
 });
 
+const showNewCategoryInput = ref(false);
+const newCategoryName = ref('');
+const savingCategory = ref(false);
+
+const showNewSourceInput = ref(false);
+const newSourceName = ref('');
+const savingSource = ref(false);
+
+const saveNewCategoryInline = async () => {
+  if (!newCategoryName.value.trim()) return;
+  savingCategory.value = true;
+  try {
+    const res = await fetch('/api/v1/expenses/categories', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: newCategoryName.value.trim() })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      triggerToast('Kategoria mpya imesajiliwa kikamilifu!');
+      const catObj = data.category || { id: Date.now(), name: newCategoryName.value.trim() };
+      if (!expenseCategoriesOptions.value.some(c => c.name.toLowerCase() === catObj.name.toLowerCase())) {
+        expenseCategoriesOptions.value.push(catObj);
+      }
+      expenseForm.value.category_name = catObj.name;
+      newCategoryName.value = '';
+      showNewCategoryInput.value = false;
+    } else {
+      triggerToast(data.message || data.error || 'Imeshindwa kusajili kategoria mpya', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    triggerToast('Kosa wakati wa kusajili kategoria mpya', 'error');
+  } finally {
+    savingCategory.value = false;
+  }
+};
+
+const saveNewSourceInline = async () => {
+  if (!newSourceName.value.trim()) return;
+  savingSource.value = true;
+  try {
+    const res = await fetch('/api/v1/incomes/sources', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: newSourceName.value.trim() })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      triggerToast('Chanzo kipya cha mapato kimesajiliwa kikamilifu!');
+      const srcObj = data.source || { id: Date.now(), name: newSourceName.value.trim() };
+      if (!incomeSourcesOptions.value.some(s => s.name.toLowerCase() === srcObj.name.toLowerCase())) {
+        incomeSourcesOptions.value.push(srcObj);
+      }
+      incomeForm.value.source_name = srcObj.name;
+      newSourceName.value = '';
+      showNewSourceInput.value = false;
+    } else {
+      triggerToast(data.message || data.error || 'Imeshindwa kusajili chanzo kipya', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    triggerToast('Kosa wakati wa kusajili chanzo kipya', 'error');
+  } finally {
+    savingSource.value = false;
+  }
+};
+
 const fetchAccountingData = async () => {
   loading.value = true;
   try {
@@ -990,7 +1075,14 @@ const fetchAccountingData = async () => {
     if (incRes.ok) incomesList.value = await incRes.json();
     if (expRes.ok) expensesList.value = await expRes.json();
     if (incSourcesRes.ok) incomeSourcesOptions.value = await incSourcesRes.json();
-    if (expCatsRes.ok) expenseCategoriesOptions.value = await expCatsRes.json();
+    if (expCatsRes.ok) {
+      const cats = await expCatsRes.json();
+      const defaultCat = 'Other Expenses (Gharama Nyinginezo)';
+      if (!cats.some(c => c.name.toLowerCase().includes('other expenses') || c.name.toLowerCase().includes('gharama nyinginezo'))) {
+        cats.push({ id: 999999, name: defaultCat });
+      }
+      expenseCategoriesOptions.value = cats;
+    }
 
   } catch (err) {
     console.error(err);
