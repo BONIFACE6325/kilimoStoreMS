@@ -2519,28 +2519,20 @@ const calculateServiceTotalFee = (cs, batch) => {
   const rate = getServiceRate(cs);
   const qty = getServiceQuantity(cs, batch);
 
-  // 1. If unpaid_fee is explicitly returned from backend
-  if (cs.unpaid_fee !== undefined && cs.unpaid_fee !== null) {
-    const backendUnpaid = parseFloat(cs.unpaid_fee);
-    if (rate > 0 && qty > 1 && Math.abs(backendUnpaid - rate) < 0.01) {
-      return Math.round(rate * qty);
-    }
-    return Math.max(0, backendUnpaid);
+  // 1. If rate and quantity exist, rate * qty is the authoritative total fee for this service job
+  if (rate > 0 && qty > 0) {
+    return Math.round(rate * qty);
   }
 
   // 2. If stored fee_amount exists, that is the authoritative fee for this service job
-  const storedTotalFee = parseFloat(cs.fee_amount || cs.fee || cs.cost || 0);
+  const storedTotalFee = parseFloat(cs.fee_amount || cs.fee || cs.cost || cs.total_fee || 0);
   if (storedTotalFee > 0) {
-    if (rate > 0 && qty > 1 && Math.abs(storedTotalFee - rate) < 0.01) {
-      return Math.round(rate * qty);
-    }
-    const alreadyPaid = parseFloat(cs.already_paid || 0);
-    return Math.max(0, Math.round(storedTotalFee - alreadyPaid));
+    return Math.round(storedTotalFee);
   }
 
-  // 3. Fallback: calculate rate * qty
-  if (rate > 0 && qty > 0) {
-    return Math.round(rate * qty);
+  // 3. Fallback: if unpaid_fee is explicitly returned from backend
+  if (cs.unpaid_fee !== undefined && cs.unpaid_fee !== null) {
+    return Math.max(0, parseFloat(cs.unpaid_fee));
   }
 
   return 0;
