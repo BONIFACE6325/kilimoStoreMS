@@ -32,7 +32,6 @@ class SalesController extends Controller
     public function indexInvoices(Request $request)
     {
         $tenantId = $this->getTenantId($request);
-        Invoice::where('tenant_id', $tenantId)->where('status', 'unpaid')->update(['status' => 'paid']);
         $invoices = Invoice::where('tenant_id', $tenantId)->with(['buyer', 'items.batch.farmer'])->orderBy('created_at', 'desc')->get();
         return response()->json($invoices);
     }

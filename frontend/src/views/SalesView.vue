@@ -68,7 +68,9 @@
           <div>
             <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Jumla ya Ankara</p>
             <h3 class="text-xl font-black text-slate-900 dark:text-white mt-0.5">{{ invoicesList.length }}</h3>
-            <p class="text-[10.5px] text-emerald-600 dark:text-emerald-400 font-bold mt-0.5">✓ 100% Imelipwa (Paid)</p>
+            <p class="text-[10.5px] text-emerald-600 dark:text-emerald-400 font-bold mt-0.5">
+              ✓ {{ paidInvoicesCount }} Zilizolipwa ({{ unpaidInvoicesCount }} Zinazodaiwa)
+            </p>
           </div>
         </div>
 
@@ -156,7 +158,7 @@
             </tr>
             <tr 
               v-else
-              v-for="inv in filteredInvoices" 
+              v-for="inv in paginatedInvoices" 
               :key="inv.id"
               class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors"
             >
@@ -210,6 +212,15 @@
                   </button>
 
                   <button 
+                    v-if="inv.status === 'unpaid'"
+                    @click="markInvoiceAsPaid(inv)"
+                    title="Weka Alama ya Kulipwa"
+                    class="px-2.5 py-1 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 text-blue-600 dark:text-blue-400 font-extrabold text-[11px] rounded-lg border border-blue-200 dark:border-blue-800 transition cursor-pointer flex items-center gap-1"
+                  >
+                    <span>💳 Lipa</span>
+                  </button>
+
+                  <button 
                     @click="deleteInvoiceRecord(inv)"
                     title="Futa Ankara"
                     class="px-2 py-1 bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 text-rose-600 dark:text-rose-400 font-bold text-[11px] rounded-lg border border-rose-200 dark:border-rose-800 transition cursor-pointer"
@@ -232,18 +243,28 @@
     <!-- TAB 2: Farmer Settlements Ledger Table -->
     <div v-if="activeTab === 'settlements'" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs overflow-hidden">
       <!-- Toolbar -->
-      <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-900/50">
+      <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-900/50">
         <div class="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-2">
           <span>💵 Kumbukumbu za Malipo ya Wakulima (Farmer Settlements Ledger)</span>
           <span class="px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-800 text-[11px] text-slate-600 dark:text-slate-400 font-bold">
-            {{ settlementsList.length }}
+            {{ filteredSettlements.length }}
           </span>
+        </div>
+
+        <div class="relative w-full sm:w-60">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">🔍</span>
+          <input 
+            v-model="settlementSearchQuery" 
+            type="text" 
+            placeholder="Tafuta mkulima, ankara, ref..." 
+            class="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+          />
         </div>
       </div>
 
       <!-- Settlements Table -->
       <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse text-xs">
+        <table class="w-full text-left border-collapse text-xs min-w-[700px]">
           <thead>
             <tr class="bg-slate-50/80 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 font-extrabold border-b border-slate-100 dark:border-slate-800 uppercase tracking-wider text-[10.5px]">
               <th class="py-3.5 px-4">Ref #</th>
@@ -254,12 +275,13 @@
               <th class="py-3.5 px-4">Net Payout</th>
               <th class="py-3.5 px-4">Njia ya Malipo</th>
               <th class="py-3.5 px-4">Hali</th>
+              <th class="py-3.5 px-4 text-right">Vitendo</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
-            <tr v-if="settlementsList.length === 0" class="text-center py-8">
-              <td colspan="8" class="py-10 text-slate-400 font-bold text-xs">
-                ℹ️ Hakuna kumbukumbu za malipo ya wakulima bado.
+            <tr v-if="filteredSettlements.length === 0" class="text-center py-8">
+              <td colspan="9" class="py-10 text-slate-400 font-bold text-xs">
+                ℹ️ Hakuna kumbukumbu za malipo ya wakulima zilizopatikana.
               </td>
             </tr>
             <tr 
@@ -269,7 +291,7 @@
               class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors"
             >
               <td class="py-3.5 px-4 font-mono font-bold text-slate-700 dark:text-slate-300 text-[11px]">
-                {{ settle.payment_reference || 'SETT-' + settle.id.substring(0, 6) }}
+                {{ settle.payment_reference || ('SETT-' + (settle.id ? String(settle.id).substring(0, 6) : '')) }}
               </td>
 
               <td class="py-3.5 px-4 font-extrabold text-slate-900 dark:text-white">
@@ -301,13 +323,23 @@
                   ✅ {{ settle.payment_status }}
                 </span>
               </td>
+
+              <td class="py-3.5 px-4 text-right">
+                <button 
+                  @click="viewSettlementDoc(settle)"
+                  title="Onyesha Risiti ya Settlement"
+                  class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 font-extrabold text-[11px] rounded-lg border border-emerald-200 dark:border-emerald-800 transition cursor-pointer flex items-center gap-1"
+                >
+                  <span>👁️ Risiti</span>
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
         <Pagination
           v-model:currentPage="currentSettlementsPage"
           v-model:perPage="perSettlementsPage"
-          :totalItems="settlementsList.length"
+          :totalItems="filteredSettlements.length"
         />
       </div>
     </div>
@@ -556,6 +588,117 @@
       </div>
     </transition>
 
+    <!-- MODAL 3: Settlement Receipt Document Modal -->
+    <transition name="fade">
+      <div v-if="showSettlementModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-2xl overflow-hidden animate-fadeIn">
+          
+          <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900">
+            <h3 class="font-black text-sm text-slate-900 dark:text-white flex items-center gap-2">
+              <span>💵 Stakabadhi ya Malipo ya Mkulima (Farmer Settlement Receipt)</span>
+            </h3>
+            <button @click="showSettlementModal = false" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg cursor-pointer">✕</button>
+          </div>
+
+          <!-- Printable Area -->
+          <div id="settlementPrintArea" class="p-8 bg-white text-slate-900 font-sans text-xs space-y-6 max-h-[70vh] overflow-y-auto">
+            <!-- Receipt Header -->
+            <div class="flex justify-between border-b-2 border-emerald-600 pb-4">
+              <div>
+                <h2 class="text-2xl font-black text-emerald-600 tracking-tight">KilimoStore MS</h2>
+                <p class="text-[11px] text-slate-500 mt-1">
+                  Garanoki Main Store & Warehouse, Industrial Area
+                </p>
+              </div>
+
+              <div class="text-right">
+                <h3 class="text-xl font-black text-slate-900 uppercase">FARMER PAYOUT RECEIPT</h3>
+                <p class="text-xs text-slate-600 mt-1">
+                  <strong>Ref #:</strong> {{ selectedSettlementDoc?.payment_reference || ('SETT-' + selectedSettlementDoc?.id) }}<br/>
+                  <strong>Tarehe:</strong> {{ selectedSettlementDoc?.created_at ? new Date(selectedSettlementDoc.created_at).toISOString().split('T')[0] : 'N/A' }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Farmer & Buyer Info -->
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-slate-500 font-extrabold uppercase text-[10px]">Mkulima (Farmer):</p>
+                <h4 class="text-sm font-black text-emerald-700 mt-0.5">👤 {{ selectedSettlementDoc?.farmer ? selectedSettlementDoc.farmer.name : 'N/A' }}</h4>
+                <p class="text-slate-600 text-xs">Simu: {{ selectedSettlementDoc?.farmer?.phone || 'N/A' }} | Code: {{ selectedSettlementDoc?.farmer?.farmer_code || 'N/A' }}</p>
+              </div>
+
+              <div>
+                <p class="text-slate-500 font-extrabold uppercase text-[10px]">Mauzo / Ankara na Mnunuzi:</p>
+                <h4 class="text-sm font-black text-slate-900 mt-0.5">🧾 Ankara #: {{ selectedSettlementDoc?.invoice ? selectedSettlementDoc.invoice.invoice_number : 'N/A' }}</h4>
+                <p class="text-slate-600 text-xs">Mnunuzi: {{ selectedSettlementDoc?.invoice?.buyer ? selectedSettlementDoc.invoice.buyer.name : 'Mnunuzi wa Jumla' }}</p>
+              </div>
+            </div>
+
+            <!-- Deductions Breakdown Table -->
+            <table class="w-full text-left border-collapse border-b border-slate-900 text-xs">
+              <thead>
+                <tr class="border-b-2 border-slate-900 font-black uppercase text-[10.5px]">
+                  <th class="py-2">Kipengele (Item)</th>
+                  <th class="py-2 text-right">Kiasi (TZS)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200">
+                <tr>
+                  <td class="py-2 font-bold text-slate-900">1. Mapato Ghafi ya Mauzo (Gross Sales)</td>
+                  <td class="py-2 text-right font-black text-emerald-600">TZS {{ formatCurrency(selectedSettlementDoc?.gross_amount) }}</td>
+                </tr>
+                <tr v-for="ded in (selectedSettlementDoc?.deductions || [])" :key="ded.id">
+                  <td class="py-2 pl-4 text-slate-600">
+                    • {{ ded.deduction_type_label || ded.deduction_type }} (Makato)
+                  </td>
+                  <td class="py-2 text-right font-bold text-rose-600">- TZS {{ formatCurrency(ded.amount) }}</td>
+                </tr>
+                <tr v-if="!selectedSettlementDoc?.deductions || selectedSettlementDoc.deductions.length === 0">
+                  <td class="py-2 pl-4 text-slate-600">• Jumla ya Makato yote ya Huduma na Mikopo</td>
+                  <td class="py-2 text-right font-bold text-rose-600">- TZS {{ formatCurrency(selectedSettlementDoc?.total_deductions) }}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Summary -->
+            <div class="w-2/3 ml-auto space-y-1.5 text-xs">
+              <div class="flex justify-between font-bold text-slate-600">
+                <span>Jumla ya Makato (Total Deductions):</span>
+                <span class="text-rose-600">- TZS {{ formatCurrency(selectedSettlementDoc?.total_deductions) }}</span>
+              </div>
+              <div class="flex justify-between font-black text-base text-slate-900 border-t border-slate-900 pt-2">
+                <span>Net Payout kwa Mkulima:</span>
+                <span class="text-emerald-600">TZS {{ formatCurrency(selectedSettlementDoc?.net_payout) }}</span>
+              </div>
+            </div>
+
+            <!-- Footer Note -->
+            <div class="text-[10.5px] text-slate-400 border-t border-dashed border-slate-300 pt-4">
+              * Risiti hii imetolewa kikamilifu na mfumo wa KilimoStore MS baada ya kukata gharama zote halali za hifadhi, huduma na salio la mikopo.
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex justify-end gap-2">
+            <button 
+              @click="showSettlementModal = false"
+              class="py-2 px-4 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold text-xs rounded-xl cursor-pointer"
+            >
+              Funga
+            </button>
+            <button 
+              @click="printSettlement"
+              class="py-2 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow-md border border-emerald-400/30 cursor-pointer flex items-center gap-1.5"
+            >
+              <span>🖨️ Chapa Risiti (Print)</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </transition>
+
     <!-- Toast Notification -->
     <transition name="fade">
       <div 
@@ -596,6 +739,10 @@ const invoiceStatusFilter = ref('');
 const showNewSaleModal = ref(false);
 const showInvoiceModal = ref(false);
 const selectedInvoiceDoc = ref(null);
+
+const showSettlementModal = ref(false);
+const selectedSettlementDoc = ref(null);
+const settlementSearchQuery = ref('');
 
 const deductionsPreview = ref(null);
 
@@ -683,12 +830,24 @@ watch([filteredInvoices, perInvoicesPage], () => {
   currentInvoicesPage.value = 1;
 });
 
-const paginatedSettlements = computed(() => {
-  const start = (currentSettlementsPage.value - 1) * perSettlementsPage.value;
-  return settlementsList.value.slice(start, start + perSettlementsPage.value);
+const filteredSettlements = computed(() => {
+  if (!settlementSearchQuery.value.trim()) return settlementsList.value;
+  const q = settlementSearchQuery.value.toLowerCase().trim();
+  return settlementsList.value.filter(s => {
+    const farmerName = s.farmer ? s.farmer.name.toLowerCase() : '';
+    const farmerCode = s.farmer ? (s.farmer.farmer_code || '').toLowerCase() : '';
+    const invNum = s.invoice ? s.invoice.invoice_number.toLowerCase() : '';
+    const refNum = s.payment_reference ? s.payment_reference.toLowerCase() : '';
+    return farmerName.includes(q) || farmerCode.includes(q) || invNum.includes(q) || refNum.includes(q);
+  });
 });
 
-watch([settlementsList, perSettlementsPage], () => {
+const paginatedSettlements = computed(() => {
+  const start = (currentSettlementsPage.value - 1) * perSettlementsPage.value;
+  return filteredSettlements.value.slice(start, start + perSettlementsPage.value);
+});
+
+watch([filteredSettlements, perSettlementsPage], () => {
   currentSettlementsPage.value = 1;
 });
 
@@ -809,6 +968,11 @@ const viewInvoiceDoc = (inv) => {
   showInvoiceModal.value = true;
 };
 
+const viewSettlementDoc = (settle) => {
+  selectedSettlementDoc.value = settle;
+  showSettlementModal.value = true;
+};
+
 const markInvoiceAsPaid = async (inv) => {
   try {
     const res = await fetch(`/api/v1/sales/invoices/${inv.id}/pay`, {
@@ -850,12 +1014,53 @@ const deleteInvoiceRecord = async (inv) => {
 };
 
 const printInvoice = () => {
-  const printContents = document.getElementById('invoicePrintArea').innerHTML;
-  const originalContents = document.body.innerHTML;
-  document.body.innerHTML = printContents;
-  window.print();
-  document.body.innerHTML = originalContents;
-  window.location.reload();
+  const printElement = document.getElementById('invoicePrintArea');
+  if (!printElement) return;
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Invoice - ${selectedInvoiceDoc.value?.invoice_number || ''}</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <style>
+          body { font-family: Inter, sans-serif; padding: 24px; color: #0f172a; }
+        </style>
+      </head>
+      <body>
+        ${printElement.innerHTML}
+        <script>
+          window.onload = function() { window.print(); }
+        <\/script>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+};
+
+const printSettlement = () => {
+  const printElement = document.getElementById('settlementPrintArea');
+  if (!printElement) return;
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Settlement Receipt - ${selectedSettlementDoc.value?.payment_reference || ''}</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <style>
+          body { font-family: Inter, sans-serif; padding: 24px; color: #0f172a; }
+        </style>
+      </head>
+      <body>
+        ${printElement.innerHTML}
+        <script>
+          window.onload = function() { window.print(); }
+        <\/script>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
 };
 
 onMounted(() => {
